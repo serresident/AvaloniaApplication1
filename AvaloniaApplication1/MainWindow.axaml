@@ -1,0 +1,188 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        xmlns:v="clr-namespace:AvaloniaApplication1.Views"
+        xmlns:c="clr-namespace:AvaloniaApplication1.Converters"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaApplication1.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="Avalonia HMI Dashboard"
+        Background="#1E1E1E">
+
+    <Window.Resources>
+        <c:BoolToBrushConverter x:Key="BoolToColor" TrueBrush="#E51400" FalseBrush="#0050EF" />
+        <c:BoolToBrushConverter x:Key="DashboardTabColor" TrueBrush="#2D2D30" FalseBrush="#007ACC" />
+        <c:BoolToBrushConverter x:Key="MimicTabColor" TrueBrush="#007ACC" FalseBrush="#2D2D30" />
+    </Window.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+        <Border Grid.Row="0" Background="#333337" Padding="10">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
+                    <TextBlock Text="HMI Dashboard" Foreground="White" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <Button Command="{Binding ShowDashboardCommand}"
+                            Content="📊 Дашборд"
+                            Background="{Binding IsMimicActive, Converter={StaticResource DashboardTabColor}}"
+                            Foreground="White" CornerRadius="4" Padding="15,6" BorderThickness="0" />
+                    <Button Command="{Binding ShowMimicCommand}"
+                            Content="📐 Мнемосхема"
+                            Background="{Binding IsMimicActive, Converter={StaticResource MimicTabColor}}"
+                            Foreground="White" CornerRadius="4" Padding="15,6" BorderThickness="0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                    <Button Command="{Binding OpenConnectionManagerCommand}"
+                            Content="📡 Connections"
+                            Background="#6A1B9A"
+                            Foreground="White" CornerRadius="4" Padding="10,5"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+                    <Button Command="{Binding SaveConfigCommand}"
+                            Content="Save Config"
+                            Background="#008A00"
+                            Foreground="White" CornerRadius="4" Padding="10,5"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+                    <Button Command="{Binding ToggleDesignModeCommand}" 
+                            Background="{Binding ProjectContext.IsDesignMode, Converter={StaticResource BoolToColor}}" 
+                            Foreground="White" CornerRadius="4" Padding="10,5">
+                        <Button.Content>
+                            <Binding Path="ProjectContext.IsDesignMode">
+                                <Binding.Converter>
+                                    <c:BoolToStringConverter TrueString="Lock Runtime" FalseString="Edit Design" />
+                                </Binding.Converter>
+                            </Binding>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <Grid Grid.Row="1">
+            <!-- Main Dashboard -->
+            <ContentControl Content="{Binding Dashboard}">
+                <ContentControl.DataTemplates>
+                    <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+                        <v:DashboardView />
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+
+            <!-- Child Windows Overlay -->
+            <ItemsControl ItemsSource="{Binding ActiveChildWindows}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.Styles>
+                    <Style Selector="ItemsControl > ContentPresenter" x:DataType="vm:ChildWindowViewModel">
+                        <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}" />
+                        <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}" />
+                        <Setter Property="ZIndex" Value="{Binding ZIndex, Mode=TwoWay}" />
+                    </Style>
+                </ItemsControl.Styles>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:ChildWindowViewModel}">
+                        <!-- Child Window Frame -->
+                        <Border Background="#2B2B2B" 
+                                BorderBrush="#4E4E50" 
+                                BorderThickness="2" 
+                                CornerRadius="8" 
+                                Width="{Binding Width, Mode=TwoWay}" 
+                                Height="{Binding Height, Mode=TwoWay}"
+                                BoxShadow="0 8 24 0 #AA000000"
+                                ClipToBounds="True">
+                            <Grid RowDefinitions="Auto,*">
+                                <!-- Title Bar (Draggable) -->
+                                <Grid Grid.Row="0" 
+                                      ColumnDefinitions="*,Auto,Auto" 
+                                      Background="#3A3A3C" 
+                                      Height="36"
+                                      PointerPressed="OnTitleBarPointerPressed"
+                                      PointerMoved="OnTitleBarPointerMoved"
+                                      PointerReleased="OnTitleBarPointerReleased">
+                                    
+                                    <TextBlock Grid.Column="0" 
+                                               Text="{Binding Title}" 
+                                               Foreground="White" 
+                                               FontSize="14" 
+                                               FontWeight="Bold" 
+                                               VerticalAlignment="Center" 
+                                               Margin="12,0" 
+                                               TextTrimming="CharacterEllipsis"/>
+
+                                    <!-- Minimize Button -->
+                                    <Button Grid.Column="1" 
+                                            Command="{Binding ToggleMinimizeCommand}"
+                                            Content="🗕" 
+                                            Background="Transparent" 
+                                            Foreground="#B0B0B0" 
+                                            Width="36" Height="36" 
+                                            CornerRadius="0"
+                                            VerticalContentAlignment="Center" 
+                                            HorizontalContentAlignment="Center"
+                                            BorderThickness="0">
+                                        <Button.Styles>
+                                            <Style Selector="Button:pointerover">
+                                                <Setter Property="Background" Value="#505052"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </Style>
+                                        </Button.Styles>
+                                    </Button>
+                                    
+                                    <!-- Close Button -->
+                                    <Button Grid.Column="2" 
+                                            Command="{Binding CloseCommand}"
+                                            Content="✕" 
+                                            Background="Transparent" 
+                                            Foreground="#B0B0B0" 
+                                            Width="36" Height="36" 
+                                            CornerRadius="0"
+                                            VerticalContentAlignment="Center" 
+                                            HorizontalContentAlignment="Center"
+                                            BorderThickness="0">
+                                        <Button.Styles>
+                                            <Style Selector="Button:pointerover">
+                                                <Setter Property="Background" Value="#E81123"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </Style>
+                                        </Button.Styles>
+                                    </Button>
+                                </Grid>
+
+                                <!-- Panel Content Area -->
+                                <Grid Grid.Row="1" Background="#1E1E1E" IsVisible="{Binding !IsMinimized}">
+                                    <ContentControl Content="{Binding Dashboard}">
+                                        <ContentControl.DataTemplates>
+                                            <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+                                                <v:DashboardView />
+                                            </DataTemplate>
+                                        </ContentControl.DataTemplates>
+                                    </ContentControl>
+
+                                    <!-- Bottom-right Resize Handle -->
+                                    <Border HorizontalAlignment="Right" 
+                                            VerticalAlignment="Bottom" 
+                                            Width="16" Height="16" 
+                                            Background="Transparent"
+                                            Cursor="BottomRightCorner"
+                                            PointerPressed="OnResizeHandlePointerPressed"
+                                            PointerMoved="OnResizeHandlePointerMoved"
+                                            PointerReleased="OnResizeHandlePointerReleased">
+                                        <Path Data="M 12 4 L 12 12 L 4 12 Z M 12 8 L 12 12 L 8 12 Z" 
+                                              Fill="#66FFFFFF" 
+                                              HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"
+                                              Width="8" Height="8"/>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,435 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+             xmlns:v="clr-namespace:AvaloniaApplication1.Views"
+             xmlns:c="clr-namespace:AvaloniaApplication1.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaloniaApplication1.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+
+     <UserControl.Resources>
+         <c:BoolToBrushConverter x:Key="BoolToColor" TrueBrush="#FF0000" FalseBrush="#440000" />
+         <c:HexToBrushConverter x:Key="HexToBrush" />
+     </UserControl.Resources>
+
+     <Grid>
+         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+             <ItemsControl ItemsSource="{Binding Widgets}" x:Name="WidgetsItemsControl">
+                 <ItemsControl.ItemsPanel>
+                     <ItemsPanelTemplate>
+                         <v:DashboardPanel CellWidth="{Binding CellWidth}" CellHeight="{Binding CellHeight}" Margin="10" IsDesignMode="{Binding ProjectContext.IsDesignMode}" Background="Transparent" />
+                     </ItemsPanelTemplate>
+                 </ItemsControl.ItemsPanel>
+                 
+                 <ItemsControl.DataTemplates>
+                 <!-- ValueDisplay -->
+                 <DataTemplate DataType="{x:Type vm:ValueDisplayViewModel}">
+                     <Grid>
+                         <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
+                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                 <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                 <TextBlock Text="{Binding DisplayValue}" Foreground="#00FF00" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" />
+                             </StackPanel>
+                         </Border>
+                         <!-- Design Overlay -->
+                         <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" CornerRadius="8" Margin="5" ZIndex="100">
+                             <Grid>
+                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                     <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                 </StackPanel>
+                                 <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                             </Grid>
+                         </Border>
+                     </Grid>
+                 </DataTemplate>
+                 
+                 <!-- PilotLight -->
+                 <DataTemplate DataType="{x:Type vm:PilotLightViewModel}">
+                     <Grid>
+                         <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
+                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                 <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                 <Ellipse Width="40" Height="40" Stroke="Black" StrokeThickness="2" Fill="{Binding IsOn, Converter={StaticResource BoolToColor}}" />
+                             </StackPanel>
+                         </Border>
+                         <!-- Design Overlay -->
+                         <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" CornerRadius="8" Margin="5" ZIndex="100">
+                             <Grid>
+                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                     <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                 </StackPanel>
+                                 <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                             </Grid>
+                         </Border>
+                     </Grid>
+                 </DataTemplate>
+
+                 <!-- CommandButton -->
+                 <DataTemplate DataType="{x:Type vm:CommandButtonViewModel}">
+                     <Grid>
+                         <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
+                             <Button Command="{Binding ExecuteCommandCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="8" Background="#4A4A4D">
+                                 <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" TextWrapping="Wrap" TextAlignment="Center" />
+                             </Button>
+                         </Border>
+                         <!-- Design Overlay -->
+                         <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" CornerRadius="8" Margin="5" ZIndex="100">
+                             <Grid>
+                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                     <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                 </StackPanel>
+                                 <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                             </Grid>
+                         </Border>
+                     </Grid>
+                 </DataTemplate>
+
+                 <!-- ContainerButton -->
+                 <DataTemplate DataType="{x:Type vm:ContainerButtonViewModel}">
+                     <Grid>
+                         <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
+                             <Button Command="{Binding OpenContainerCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="8" Background="#005A9E">
+                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                     <TextBlock Text="📁" FontSize="24" HorizontalAlignment="Center" Foreground="White" />
+                                     <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White" TextWrapping="Wrap" TextAlignment="Center" Margin="0,5,0,0"/>
+                                 </StackPanel>
+                             </Button>
+                         </Border>
+                         <!-- Design Overlay -->
+                         <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" CornerRadius="8" Margin="5" ZIndex="100">
+                             <Grid>
+                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                     <Button Command="{Binding OpenContainerCommand}" Content="➡️" FontSize="20" Background="Transparent" Foreground="White" ToolTip.Tip="Open Container" />
+                                     <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                 </StackPanel>
+                                 <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                             </Grid>
+                         </Border>
+                     </Grid>
+                 </DataTemplate>
+
+                 <!-- Slider -->
+                 <DataTemplate DataType="{x:Type vm:SliderViewModel}">
+                     <Grid>
+                         <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
+                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10">
+                                 <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                 <TextBlock Text="{Binding SliderValue, StringFormat=\{0:F0\}}" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                 <Slider Minimum="0" Maximum="100" Value="{Binding SliderValue, Mode=TwoWay}" />
+                             </StackPanel>
+                         </Border>
+                         <!-- Design Overlay -->
+                         <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" CornerRadius="8" Margin="5" ZIndex="100">
+                             <Grid>
+                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                     <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                 </StackPanel>
+                                 <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                             </Grid>
+                         </Border>
+                     </Grid>
+                 </DataTemplate>
+
+                 <!-- SetValue -->
+                 <DataTemplate DataType="{x:Type vm:SetValueViewModel}">
+                     <Grid>
+                         <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
+                             <Button Command="{Binding InputSetpointCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="8" Background="#232325" Padding="5">
+                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                     <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="13" HorizontalAlignment="Center" Margin="0,0,0,6" />
+                                     <Border Background="#1E1E1E" BorderBrush="#007ACC" BorderThickness="1" CornerRadius="4" Padding="12,6">
+                                         <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
+                                             <TextBlock Text="{Binding DisplayValue}" Foreground="#FFD700" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" />
+                                             <TextBlock Text="✏️" Foreground="#888" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" />
+                                         </StackPanel>
+                                     </Border>
+                                 </StackPanel>
+                             </Button>
+                         </Border>
+                         <!-- Design Overlay -->
+                         <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" CornerRadius="8" Margin="5" ZIndex="100">
+                             <Grid>
+                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                     <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                 </StackPanel>
+                                 <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                             </Grid>
+                         </Border>
+                     </Grid>
+                 </DataTemplate>
+
+                 <!-- RealTimeTrend -->
+                 <DataTemplate DataType="{x:Type vm:RealTimeTrendViewModel}">
+                     <Grid>
+                         <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5" Padding="12">
+                             <Grid RowDefinitions="Auto,*">
+                                 <!-- Header with Live Value -->
+                                 <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                                     <TextBlock Grid.Column="0" Text="{Binding Title}" Foreground="Gray" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                     <TextBlock Grid.Column="1" Text="{Binding LatestValueDisplay}" Foreground="#00FFCC" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" />
+                                 </Grid>
+                                 <!-- Trend Line Control -->
+                                 <v:TrendLineControl Grid.Row="1" 
+                                                     Values="{Binding Values}" 
+                                                     MinY="{Binding MinY}" 
+                                                     MaxY="{Binding MaxY}" />
+                             </Grid>
+                         </Border>
+                         <!-- Design Overlay -->
+                         <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" CornerRadius="8" Margin="5" ZIndex="100">
+                             <Grid>
+                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                     <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                 </StackPanel>
+                                 <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                             </Grid>
+                         </Border>
+                     </Grid>
+                 </DataTemplate>
+
+                  <!-- Pipe (Трубопровод) -->
+                  <DataTemplate DataType="{x:Type vm:PipeWidgetViewModel}">
+                      <Grid>
+                          <v:PipeControl Points="{Binding PipePoints, Mode=TwoWay}"
+                                         ShowFlanges="{Binding ShowFlanges}"
+                                         Thickness="{Binding Thickness}"
+                                         StartFitting="{Binding StartFitting}"
+                                         EndFitting="{Binding EndFitting}"
+                                         IsDesignMode="{Binding ProjectContext.IsDesignMode}"
+                                         ActiveColor="{Binding ActiveColor}"
+                                         InactiveColor="{Binding InactiveColor}"
+                                         IsFilled="{Binding IsActive}"
+                                         CellSize="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).CellWidth}" />
+                          
+                          <!-- Design Overlay (Compact Toolbar in top-right) -->
+                          <StackPanel Orientation="Horizontal" 
+                                      IsVisible="{Binding ProjectContext.IsDesignMode}" 
+                                      HorizontalAlignment="Right" 
+                                      VerticalAlignment="Top" 
+                                      Margin="2" 
+                                      ZIndex="100"
+                                      Spacing="5">
+                              <Button Content="⚙" FontSize="12" Width="24" Height="24" Padding="0"
+                                      Background="#AA2D2D30" Foreground="White"
+                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                      CommandParameter="{Binding}" />
+                              <Button Content="❌" FontSize="12" Width="24" Height="24" Padding="0"
+                                      Background="#AAFF0000" Foreground="White"
+                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                      CommandParameter="{Binding}" />
+                          </StackPanel>
+                      </Grid>
+                  </DataTemplate>
+
+                  <!-- Valve (Клапан / Задвижка) -->
+                  <DataTemplate DataType="{x:Type vm:ValveWidgetViewModel}">
+                      <Grid>
+                          <Button Command="{Binding OpenControlPopupCommand}"
+                                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                  Background="Transparent" BorderThickness="0" Padding="0">
+                              <Border Background="#2B2B2B" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Margin="2">
+                                  <Grid RowDefinitions="*,Auto">
+                                      <!-- Valve Graphic -->
+                                      <Grid Grid.Row="0" Margin="8,10,8,4">
+                                          <!-- CutOff valve: classic bowtie -->
+                                          <Viewbox IsVisible="{Binding ValveType, Converter={x:Static c:StringEqualsConverter.CutOff}}">
+                                              <Path Data="M 0 0 L 40 40 L 40 0 L 0 40 Z"
+                                                    Fill="{Binding CurrentColor, Converter={StaticResource HexToBrush}}"
+                                                    Stroke="#333" StrokeThickness="1.5" />
+                                          </Viewbox>
+                                          <!-- Regulating valve: custom 3D control -->
+                                          <v:RegulatingValveControl 
+                                              IsVisible="{Binding ValveType, Converter={x:Static c:StringEqualsConverter.Regulating}}"
+                                              Setpoint="{Binding Setpoint}"
+                                              Feedback="{Binding Feedback}"
+                                              HasFeedbackSource="{Binding HasFeedbackSource}" />
+                                      </Grid>
+                                      <!-- Title and Value -->
+                                      <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,5">
+                                          <TextBlock Text="{Binding Title}" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" />
+                                          <TextBlock Text="{Binding DisplayValue}" FontSize="12" FontWeight="Bold" Foreground="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" HorizontalAlignment="Center" />
+                                      </StackPanel>
+                                  </Grid>
+                              </Border>
+                          </Button>
+
+                          <!-- Design Overlay -->
+                          <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" ZIndex="100">
+                              <Grid>
+                                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                      <Button Content="⚙" FontSize="16" Background="Transparent" Foreground="White"
+                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                              CommandParameter="{Binding}" />
+                                      <Button Content="❌" FontSize="16" Background="Transparent" Foreground="Red"
+                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                              CommandParameter="{Binding}" />
+                                  </StackPanel>
+                                  <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,2,2" IsHitTestVisible="False" />
+                              </Grid>
+                          </Border>
+                      </Grid>
+                  </DataTemplate>
+
+                  <!-- Tank (Бак / Резервуар) -->
+                  <DataTemplate DataType="{x:Type vm:TankWidgetViewModel}">
+                      <Grid>
+                          <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1.5" CornerRadius="8" Margin="4">
+                              <Grid RowDefinitions="Auto,*,Auto">
+                                  <TextBlock Grid.Row="0" Text="{Binding Title}" Foreground="Gray" FontSize="12" HorizontalAlignment="Center" Margin="0,4" />
+                                  
+                                  <Grid Grid.Row="1" Margin="10,0,10,4">
+                                      <Border Background="#151515" BorderBrush="#555" BorderThickness="1.5" CornerRadius="4">
+                                          <Grid VerticalAlignment="Stretch">
+                                              <ProgressBar Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" Value="{Binding CurrentLevel}" 
+                                                           Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                           Background="Transparent" Foreground="#007ACC" BorderThickness="0" CornerRadius="0" />
+                                          </Grid>
+                                      </Border>
+                                  </Grid>
+                                  
+                                  <TextBlock Grid.Row="2" Text="{Binding DisplayValue}" Foreground="#E5C158" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,4" />
+                              </Grid>
+                          </Border>
+
+                          <!-- Design Overlay -->
+                          <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" ZIndex="100">
+                              <Grid>
+                                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                      <Button Content="⚙" FontSize="16" Background="Transparent" Foreground="White"
+                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                              CommandParameter="{Binding}" />
+                                      <Button Content="❌" FontSize="16" Background="Transparent" Foreground="Red"
+                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                              CommandParameter="{Binding}" />
+                                  </StackPanel>
+                                  <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,2,2" IsHitTestVisible="False" />
+                              </Grid>
+                          </Border>
+                      </Grid>
+                  </DataTemplate>
+
+                  <!-- Pump (Насос) -->
+                  <DataTemplate DataType="{x:Type vm:PumpWidgetViewModel}">
+                      <Grid>
+                          <Button Command="{Binding OpenControlPopupCommand}"
+                                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                  Background="Transparent" BorderThickness="0" Padding="0">
+                              <Border Background="#2B2B2B" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Margin="2">
+                                  <Grid RowDefinitions="*,Auto">
+                                      <Viewbox Grid.Row="0" Margin="10,10,10,4">
+                                          <Grid Width="50" Height="50">
+                                              <Ellipse Fill="#151515" Stroke="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" StrokeThickness="2.5" />
+                                              <Path Data="M 25 5 L 25 45 M 5 25 L 45 25 M 10 10 L 40 40 M 10 40 L 40 10" 
+                                                    Stroke="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" StrokeThickness="1.5" />
+                                              <Ellipse Fill="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" Width="10" Height="10" />
+                                          </Grid>
+                                      </Viewbox>
+                                      
+                                      <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                          <TextBlock Text="{Binding Title}" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" />
+                                          <TextBlock Text="{Binding DisplayValue}" FontSize="12" FontWeight="Bold" Foreground="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" HorizontalAlignment="Center" />
+                                      </StackPanel>
+                                  </Grid>
+                              </Border>
+                          </Button>
+
+                          <!-- Design Overlay -->
+                          <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" ZIndex="100">
+                              <Grid>
+                                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                      <Button Content="⚙" FontSize="16" Background="Transparent" Foreground="White"
+                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                              CommandParameter="{Binding}" />
+                                      <Button Content="❌" FontSize="16" Background="Transparent" Foreground="Red"
+                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                              CommandParameter="{Binding}" />
+                                  </StackPanel>
+                                  <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,2,2" IsHitTestVisible="False" />
+                              </Grid>
+                          </Border>
+                      </Grid>
+                  </DataTemplate>
+
+                 <!-- Fallback WidgetViewModelBase -->
+                 <DataTemplate DataType="{x:Type vm:WidgetViewModelBase}">
+                     <Grid>
+                         <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
+                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                 <TextBlock Text="{Binding Title}" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" />
+                                 <TextBlock Text="{Binding Type}" Foreground="Gray" FontSize="12" HorizontalAlignment="Center" />
+                             </StackPanel>
+                         </Border>
+                         <!-- Design Overlay -->
+                         <Border IsVisible="{Binding ProjectContext.IsDesignMode}" Background="#AA000000" CornerRadius="8" Margin="5" ZIndex="100">
+                             <Grid>
+                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                                     <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                 </StackPanel>
+                                 <TextBlock Text="◢" Foreground="#55FFFFFF" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                             </Grid>
+                         </Border>
+                     </Grid>
+                 </DataTemplate>
+             </ItemsControl.DataTemplates>
+         </ItemsControl>
+     </ScrollViewer>
+
+     <!-- Global Add Widget Button (Visible only in Design Mode) -->
+     <Button IsVisible="{Binding ProjectContext.IsDesignMode}" 
+             Content="+" 
+             FontSize="24" FontWeight="Bold"
+             Foreground="White" Background="#007ACC"
+             Width="56" Height="56" CornerRadius="28"
+             HorizontalAlignment="Right" VerticalAlignment="Bottom"
+             Margin="20" ZIndex="1000"
+             Command="{Binding AddWidgetCommand}">
+         <Button.Styles>
+             <Style Selector="Button:pointerover">
+                 <Setter Property="Background" Value="#005A9E"/>
+             </Style>
+         </Button.Styles>
+     </Button>
+     </Grid>
+ </UserControl>

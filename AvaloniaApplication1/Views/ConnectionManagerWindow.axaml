@@ -1,0 +1,77 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        xmlns:cfg="clr-namespace:AvaloniaApplication1.Models.Config"
+        mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="500"
+        x:Class="AvaloniaApplication1.Views.ConnectionManagerWindow"
+        x:DataType="vm:ConnectionManagerViewModel"
+        Title="Connection Manager"
+        Width="620" Height="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E"
+        CanResize="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="Connections" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,12" />
+
+        <!-- Connection List -->
+        <Border Grid.Row="1" Background="#2D2D30" CornerRadius="6" Padding="4">
+            <ListBox ItemsSource="{Binding Connections}" 
+                     SelectedItem="{Binding SelectedConnection}"
+                     Background="Transparent">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="cfg:ConnectionConfig">
+                        <Grid ColumnDefinitions="Auto,*,Auto" Margin="8,6">
+                            <Border Grid.Column="0" Background="#007ACC" CornerRadius="4" Padding="8,4" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Type}" Foreground="White" FontSize="11" FontWeight="SemiBold" />
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Id}" Foreground="White" FontSize="14" FontWeight="Bold" />
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBlock Text="{Binding Host}" Foreground="#888888" FontSize="12" />
+                                    <TextBlock Text=":" Foreground="#888888" FontSize="12" />
+                                    <TextBlock Text="{Binding Port}" Foreground="#888888" FontSize="12" />
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Foreground="#666666" FontSize="11" VerticalAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0}ms | {1}">
+                                        <Binding Path="PollIntervalMs" />
+                                        <Binding Path="ByteOrder" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <!-- Action Buttons -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
+            <!-- Close button on the left -->
+            <Button Grid.Column="0"
+                    Content="Close"
+                    HorizontalAlignment="Left"
+                    Background="#3E3E42" Foreground="White" CornerRadius="6" Padding="20,10" FontSize="14"
+                    Click="OnCloseClick" />
+            <!-- CRUD buttons on the right -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Content="➕ Add" 
+                        Command="{Binding AddConnectionCommand}"
+                        Background="#008A00" Foreground="White" CornerRadius="6" Padding="14,10" FontSize="13" />
+                <Button Content="✏️ Edit" 
+                        Command="{Binding EditConnectionCommand}"
+                        Background="#007ACC" Foreground="White" CornerRadius="6" Padding="14,10" FontSize="13" />
+                <Button Content="🗑️ Delete" 
+                        Command="{Binding DeleteConnectionCommand}"
+                        Background="#C62828" Foreground="White" CornerRadius="6" Padding="14,10" FontSize="13" />
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Window>

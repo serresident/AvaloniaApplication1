@@ -1,0 +1,56 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        x:Class="AvaloniaApplication1.Views.NumpadWindow"
+        x:DataType="vm:NumpadViewModel"
+        Title="Numeric Keypad"
+        Width="300" Height="450"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        SystemDecorations="None"
+        Background="#2D2D30">
+
+    <Window.Styles>
+        <Style Selector="Button">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#3E3E42"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,*" Margin="10">
+        <!-- Display Area -->
+        <Border Grid.Row="0" Background="#1E1E1E" BorderBrush="#555" BorderThickness="1" CornerRadius="4" Margin="0,0,0,10" Height="60">
+            <TextBlock Text="{Binding InputValue}" FontSize="32" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,0"/>
+        </Border>
+
+        <!-- Keypad Grid -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" RowDefinitions="*,*,*,*,*">
+            <Button Grid.Row="0" Grid.Column="0" Content="7" Command="{Binding AppendCharCommand}" CommandParameter="7"/>
+            <Button Grid.Row="0" Grid.Column="1" Content="8" Command="{Binding AppendCharCommand}" CommandParameter="8"/>
+            <Button Grid.Row="0" Grid.Column="2" Content="9" Command="{Binding AppendCharCommand}" CommandParameter="9"/>
+
+            <Button Grid.Row="1" Grid.Column="0" Content="4" Command="{Binding AppendCharCommand}" CommandParameter="4"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="5" Command="{Binding AppendCharCommand}" CommandParameter="5"/>
+            <Button Grid.Row="1" Grid.Column="2" Content="6" Command="{Binding AppendCharCommand}" CommandParameter="6"/>
+
+            <Button Grid.Row="2" Grid.Column="0" Content="1" Command="{Binding AppendCharCommand}" CommandParameter="1"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="2" Command="{Binding AppendCharCommand}" CommandParameter="2"/>
+            <Button Grid.Row="2" Grid.Column="2" Content="3" Command="{Binding AppendCharCommand}" CommandParameter="3"/>
+
+            <Button Grid.Row="3" Grid.Column="0" Content="." Command="{Binding AppendCharCommand}" CommandParameter="."/>
+            <Button Grid.Row="3" Grid.Column="1" Content="0" Command="{Binding AppendCharCommand}" CommandParameter="0"/>
+            <Button Grid.Row="3" Grid.Column="2" Content="⌫" Command="{Binding BackspaceCommand}" Background="#8B0000"/>
+
+            <Button Grid.Row="4" Grid.Column="0" Content="C" Command="{Binding ClearCommand}" Background="#8B0000"/>
+            <Button Grid.Row="4" Grid.Column="1" Content="Cancel" Command="{Binding CancelCommand}" FontSize="16" Background="#555"/>
+            <Button Grid.Row="4" Grid.Column="2" Content="OK" Command="{Binding ConfirmCommand}" Background="#006400"/>
+        </Grid>
+    </Grid>
+</Window>

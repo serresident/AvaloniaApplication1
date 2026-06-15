@@ -1,0 +1,244 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="700"
+        x:Class="AvaloniaApplication1.Views.WidgetEditorWindow"
+        x:DataType="vm:WidgetEditorViewModel"
+        Title="Widget Editor"
+        Width="440" Height="700"
+        MinWidth="400" MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E"
+        CanResize="True">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Scrollable content area -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="20,20,20,10">
+            <StackPanel Spacing="12">
+
+                <!-- Header -->
+                <TextBlock Text="Widget Properties" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,8" />
+
+                <!-- Widget Type -->
+                <TextBlock Text="Widget Type" Foreground="#AAAAAA" FontSize="12" />
+                <ComboBox ItemsSource="{Binding AvailableWidgetTypes}" 
+                          SelectedItem="{Binding SelectedWidgetType}"
+                          HorizontalAlignment="Stretch" />
+
+                <!-- Title -->
+                <TextBlock Text="Title" Foreground="#AAAAAA" FontSize="12" />
+                <TextBox Text="{Binding Title}" PlaceholderText="Widget title..." />
+
+                <!-- Position Section -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Position &amp; Size" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,8,Auto">
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <TextBlock Text="Row" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding Row}" Minimum="0" Maximum="50" FormatString="0" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="2">
+                                <TextBlock Text="Column" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding Col}" Minimum="0" Maximum="50" FormatString="0" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="0">
+                                <TextBlock Text="Width (cells)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding SizeX}" Minimum="1" Maximum="10" FormatString="0" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="2">
+                                <TextBlock Text="Height (cells)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding SizeY}" Minimum="1" Maximum="10" FormatString="0" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Data Source Section -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Data Source" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <TextBlock Text="Connection" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableConnections}" 
+                                  SelectedItem="{Binding SelectedConnectionId}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Select connection..." />
+
+                        <TextBlock Text="Address (register/topic)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding Address}" PlaceholderText="e.g. 40001 or sensor/temp" />
+
+                        <TextBlock Text="Data Type" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableDataTypes}" 
+                                  SelectedItem="{Binding SelectedDataType}"
+                                  HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ValueDisplay Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowValueDisplaySettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Value Display Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Display Format" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding Format}" PlaceholderText="{}{0:F2} °C" />
+                    </StackPanel>
+                </Border>
+
+                <!-- PilotLight Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowPilotLightSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Pilot Light Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="True Color (hex)" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding TrueColor}" PlaceholderText="#00FF00" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="False Color (hex)" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding FalseColor}" PlaceholderText="#440000" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- CommandButton Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowCommandButtonSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Command Button Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Button Mode" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableButtonModes}" 
+                                  SelectedItem="{Binding SelectedButtonMode}"
+                                  HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Slider Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowSliderSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Slider Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Min Value" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding MinValue}" FormatString="F1" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Max Value" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding MaxValue}" FormatString="F1" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                <!-- Pipe Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowPipeSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Pipe Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <TextBlock Text="Pipe Points (e.g. 0,0;5,0;5,3)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding PipePoints}" PlaceholderText="0,0;5,0;5,3" />
+
+                        <TextBlock Text="Thickness" Foreground="#AAAAAA" FontSize="11" />
+                        <NumericUpDown Value="{Binding Thickness}" Minimum="4" Maximum="32" FormatString="0" />
+
+                        <TextBlock Text="Start Fitting" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableFittings}" 
+                                  SelectedItem="{Binding SelectedStartFitting}"
+                                  HorizontalAlignment="Stretch" />
+
+                        <TextBlock Text="End Fitting" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableFittings}" 
+                                  SelectedItem="{Binding SelectedEndFitting}"
+                                  HorizontalAlignment="Stretch" />
+                        
+                        <CheckBox Content="Show Flanges" IsChecked="{Binding ShowFlanges}" Foreground="White" />
+                    </StackPanel>
+                </Border>                <!-- Valve Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowValveSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Valve Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <TextBlock Text="Valve Type" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableValveTypes}" 
+                                  SelectedItem="{Binding SelectedValveType}"
+                                  HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Regulating Valve Feedback Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowRegulatingSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Feedback Source (optional)" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <TextBlock Text="Feedback Connection" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableConnections}" 
+                                  SelectedItem="{Binding FeedbackConnectionId}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Same as main or select..." />
+
+                        <TextBlock Text="Feedback Address" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding FeedbackAddress}" PlaceholderText="e.g. 40002 or sensor/position" />
+
+                        <TextBlock Text="Control Window Size" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" Margin="0,4,0,0" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Width (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ControlWindowWidth}" Minimum="200" Maximum="800" FormatString="0" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Height (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ControlWindowHeight}" Minimum="200" Maximum="600" FormatString="0" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Industrial Color Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowIndustrialSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Mimic Color Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Active Color (hex)" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding ActiveColor}" PlaceholderText="#00FF00" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Inactive Color (hex)" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding InactiveColor}" PlaceholderText="#FF0000" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Fixed bottom button bar -->
+        <Border Grid.Row="1" Background="#252526" BorderBrush="#3E3E42" BorderThickness="0,1,0,0" Padding="20,14">
+            <Grid ColumnDefinitions="*,12,*">
+                <Button Grid.Column="0" 
+                        Content="❌  Cancel" 
+                        Command="{Binding CancelCommand}"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                        Background="#3E3E42" Foreground="White" CornerRadius="6" 
+                        Padding="12,10" FontSize="14" />
+                <Button Grid.Column="2" 
+                        Content="✅  OK" 
+                        Command="{Binding SaveCommand}"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                        Background="#007ACC" Foreground="White" CornerRadius="6" 
+                        Padding="12,10" FontSize="14" FontWeight="SemiBold" />
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>

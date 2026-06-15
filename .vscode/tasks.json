@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/AvaloniaApplication1/AvaloniaApplication1.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummaryac"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "run",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}/AvaloniaApplication1/AvaloniaApplication1.csproj"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": "build",
+            "dependsOn": "build"
+        }
+    ]
+}
