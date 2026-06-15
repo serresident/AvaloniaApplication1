@@ -35,6 +35,12 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _hasFeedbackSource;
 
+        [ObservableProperty]
+        private bool _isVertical;
+
+        [ObservableProperty]
+        private string _actuatorType = "Solenoid";
+
         public string ValveType => string.IsNullOrEmpty(OriginalConfig.ValveType) ? "CutOff" : OriginalConfig.ValveType;
         public string ActiveColor => string.IsNullOrEmpty(OriginalConfig.ActiveColor) ? "#00FF00" : OriginalConfig.ActiveColor;
         public string InactiveColor => string.IsNullOrEmpty(OriginalConfig.InactiveColor) ? "#FF0000" : OriginalConfig.InactiveColor;
@@ -49,6 +55,8 @@ namespace AvaloniaApplication1.ViewModels
             : base(config, dataService, projectContext)
         {
             HasFeedbackSource = !string.IsNullOrEmpty(config.FeedbackSource?.Address);
+            IsVertical = config.IsVertical;
+            ActuatorType = string.IsNullOrEmpty(config.ActuatorType) ? "Solenoid" : config.ActuatorType;
             DataService.TagValueChanged += OnTagValueChanged;
             UpdateState();
         }

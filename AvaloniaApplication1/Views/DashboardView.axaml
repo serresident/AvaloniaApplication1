@@ -268,18 +268,16 @@
                                   <Grid RowDefinitions="*,Auto">
                                       <!-- Valve Graphic -->
                                       <Grid Grid.Row="0" Margin="8,10,8,4">
-                                          <!-- CutOff valve: classic bowtie -->
-                                          <Viewbox IsVisible="{Binding ValveType, Converter={x:Static c:StringEqualsConverter.CutOff}}">
-                                              <Path Data="M 0 0 L 40 40 L 40 0 L 0 40 Z"
-                                                    Fill="{Binding CurrentColor, Converter={StaticResource HexToBrush}}"
-                                                    Stroke="#333" StrokeThickness="1.5" />
-                                          </Viewbox>
-                                          <!-- Regulating valve: custom 3D control -->
-                                          <v:RegulatingValveControl 
-                                              IsVisible="{Binding ValveType, Converter={x:Static c:StringEqualsConverter.Regulating}}"
+                                          <v:ValveControl 
+                                              ValveType="{Binding ValveType}"
+                                              IsOpen="{Binding IsOpen}"
                                               Setpoint="{Binding Setpoint}"
                                               Feedback="{Binding Feedback}"
-                                              HasFeedbackSource="{Binding HasFeedbackSource}" />
+                                              HasFeedbackSource="{Binding HasFeedbackSource}"
+                                              IsVertical="{Binding IsVertical}"
+                                              ActuatorType="{Binding ActuatorType}"
+                                              ActiveColor="{Binding ActiveColor}"
+                                              InactiveColor="{Binding InactiveColor}" />
                                       </Grid>
                                       <!-- Title and Value -->
                                       <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,5">

@@ -56,7 +56,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "SetValue",
@@ -89,7 +91,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "RealTimeTrend",
@@ -122,7 +126,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "ContainerButton",
@@ -170,7 +176,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -203,7 +211,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -236,7 +246,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -269,7 +281,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -302,7 +316,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -335,7 +351,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "RealTimeTrend",
@@ -368,7 +386,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           }
         ],
         "Format": "{0}",
@@ -387,7 +407,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "ContainerButton",
@@ -435,7 +457,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -468,7 +492,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -501,7 +527,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -534,7 +562,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -567,7 +597,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -600,7 +632,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "RealTimeTrend",
@@ -633,7 +667,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           }
         ],
         "Format": "{0}",
@@ -652,7 +688,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "ContainerButton",
@@ -700,7 +738,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -733,7 +773,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -766,7 +808,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -799,7 +843,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -832,7 +878,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -865,7 +913,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "RealTimeTrend",
@@ -898,7 +948,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           }
         ],
         "Format": "{0}",
@@ -917,7 +969,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "ContainerButton",
@@ -965,7 +1019,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -998,7 +1054,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -1031,7 +1089,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -1064,7 +1124,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -1097,7 +1159,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -1130,7 +1194,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "RealTimeTrend",
@@ -1163,7 +1229,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           }
         ],
         "Format": "{0}",
@@ -1182,7 +1250,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "ContainerButton",
@@ -1230,7 +1300,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -1263,7 +1335,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -1296,7 +1370,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -1329,7 +1405,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -1362,7 +1440,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -1395,7 +1475,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "RealTimeTrend",
@@ -1428,7 +1510,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           }
         ],
         "Format": "{0}",
@@ -1447,7 +1531,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "ContainerButton",
@@ -1495,7 +1581,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -1528,7 +1616,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -1561,7 +1651,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "ValueDisplay",
@@ -1594,7 +1686,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -1627,7 +1721,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "PilotLight",
@@ -1660,7 +1756,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           },
           {
             "Type": "RealTimeTrend",
@@ -1693,7 +1791,9 @@
             "EndFitting": "None",
             "FeedbackSource": null,
             "ControlWindowWidth": 0,
-            "ControlWindowHeight": 0
+            "ControlWindowHeight": 0,
+            "IsVertical": false,
+            "ActuatorType": "Solenoid"
           }
         ],
         "Format": "{0}",
@@ -1712,7 +1812,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       }
     ]
   },
@@ -1731,7 +1833,7 @@
           "Row": 16,
           "Col": 50,
           "SizeX": 12,
-          "SizeY": 21
+          "SizeY": 20
         },
         "Children": [],
         "Format": "{0:F1} %",
@@ -1750,7 +1852,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "Pipe",
@@ -1761,10 +1865,10 @@
           "DataType": "Bool"
         },
         "Position": {
-          "Row": 25,
+          "Row": 24,
           "Col": 4,
-          "SizeX": 15,
-          "SizeY": 1
+          "SizeX": 16,
+          "SizeY": 2
         },
         "Children": [],
         "Format": "{0}",
@@ -1773,7 +1877,7 @@
         "MaxValue": 100,
         "TrueColor": "#00FF00",
         "FalseColor": "#440000",
-        "PipePoints": "0,0;15,0",
+        "PipePoints": "0,1;15,1",
         "ActiveColor": "#00AAFF",
         "InactiveColor": "#005588",
         "ValveType": "CutOff",
@@ -1783,7 +1887,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "Pump",
@@ -1816,7 +1922,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "Pipe",
@@ -1827,10 +1935,10 @@
           "DataType": "Bool"
         },
         "Position": {
-          "Row": 25,
+          "Row": 24,
           "Col": 26,
-          "SizeX": 23,
-          "SizeY": 1
+          "SizeX": 24,
+          "SizeY": 2
         },
         "Children": [],
         "Format": "{0}",
@@ -1839,7 +1947,7 @@
         "MaxValue": 100,
         "TrueColor": "#00FF00",
         "FalseColor": "#440000",
-        "PipePoints": "0,0;23,0",
+        "PipePoints": "0,1;23,1",
         "ActiveColor": "#00AAFF",
         "InactiveColor": "#005588",
         "ValveType": "CutOff",
@@ -1849,7 +1957,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "Valve",
@@ -1882,7 +1992,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "Pipe",
@@ -1893,10 +2005,10 @@
           "DataType": "Float32"
         },
         "Position": {
-          "Row": 11,
+          "Row": 10,
           "Col": 4,
-          "SizeX": 27,
-          "SizeY": 8
+          "SizeX": 28,
+          "SizeY": 10
         },
         "Children": [],
         "Format": "{0}",
@@ -1905,7 +2017,7 @@
         "MaxValue": 100,
         "TrueColor": "#00FF00",
         "FalseColor": "#440000",
-        "PipePoints": "0,0;20,0;20,8;27,8",
+        "PipePoints": "0,1;20,1;20,9;27,9",
         "ActiveColor": "#FF5500",
         "InactiveColor": "#882200",
         "ValveType": "CutOff",
@@ -1915,7 +2027,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "Valve",
@@ -1948,7 +2062,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Diaphragm"
       },
       {
         "Type": "Pipe",
@@ -1959,10 +2075,10 @@
           "DataType": "Float32"
         },
         "Position": {
-          "Row": 19,
+          "Row": 18,
           "Col": 38,
-          "SizeX": 11,
-          "SizeY": 1
+          "SizeX": 12,
+          "SizeY": 2
         },
         "Children": [],
         "Format": "{0}",
@@ -1971,7 +2087,7 @@
         "MaxValue": 100,
         "TrueColor": "#00FF00",
         "FalseColor": "#440000",
-        "PipePoints": "0,0;11,0",
+        "PipePoints": "0,1;11,1",
         "ActiveColor": "#FF5500",
         "InactiveColor": "#882200",
         "ValveType": "CutOff",
@@ -1981,7 +2097,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "Pipe",
@@ -1992,10 +2110,10 @@
           "DataType": "Bool"
         },
         "Position": {
-          "Row": 12,
+          "Row": 26,
           "Col": 62,
-          "SizeX": 57,
-          "SizeY": 23
+          "SizeX": 24,
+          "SizeY": 10
         },
         "Children": [],
         "Format": "{0}",
@@ -2004,17 +2122,19 @@
         "MaxValue": 100,
         "TrueColor": "#00FF00",
         "FalseColor": "#440000",
-        "PipePoints": "0,15;12,15;12,23;18,23;46,23;46,16;57,16;57,0",
+        "PipePoints": "0,1;12,1;12,9;23,9",
         "ActiveColor": "#00FF99",
         "InactiveColor": "#007755",
         "ValveType": "CutOff",
         "ShowFlanges": true,
-        "Thickness": 20,
+        "Thickness": 12,
         "StartFitting": "None",
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "Valve",
@@ -2047,7 +2167,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "ValueDisplay",
@@ -2080,7 +2202,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       },
       {
         "Type": "ValueDisplay",
@@ -2113,7 +2237,9 @@
         "EndFitting": "None",
         "FeedbackSource": null,
         "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0
+        "ControlWindowHeight": 0,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid"
       }
     ]
   }

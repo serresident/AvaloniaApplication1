@@ -9,3 +9,19 @@
   - [x] Пересчитать (умножить на 2) координаты виджетов и точек труб в `ConfigurationService.cs`
   - [x] Установить дефолтный `CellSize` для мнемосхемы равным `10` в `MainViewModel.cs`
 - [x] Проверить сборку проекта и протестировать UX-поведение окон и труб
+
+# Tasks: Valve Control Rework & Mimic Alignment (Сессия 5)
+
+- [x] Создать единый кастомный контрол `ValveControl.cs` с поддержкой:
+  - [x] Отрисовки запорных (CutOff) и регулирующих (Regulating) клапанов
+  - [x] Динамического масштабирования под размер ячеек
+  - [x] Вращения на 90 градусов для вертикальной ориентации (`IsVertical`)
+  - [x] Нескольких типов приводов (`Solenoid` с буквами S/P, `Diaphragm`, `Manual`, `None`)
+  - [x] Использования динамических цветов `ActiveColor` и `InactiveColor` из настроек
+- [x] Удалить устаревший файл `RegulatingValveControl.cs`
+- [x] Расширить свойства модели `WidgetConfig` (`IsVertical`, `ActuatorType`) в `HmiConfiguration.cs`
+- [x] Добавить свойства во вьюмодели `ValveWidgetViewModel.cs` и `WidgetEditorViewModel.cs`
+- [x] Встроить новые поля (выбор привода и галочку вертикальности) в форму `WidgetEditorWindow.axaml`
+- [x] Заменить визуальное отображение в `DashboardView.axaml` на новый `ValveControl`
+- [x] Обновить дефолтную конфигурацию в `ConfigurationService.cs` и очистить старые кэши `config.json`
+- [x] Убедиться, что проект успешно собирается и работает

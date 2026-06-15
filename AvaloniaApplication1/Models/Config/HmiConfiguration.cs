@@ -104,6 +104,10 @@ namespace AvaloniaApplication1.Models.Config
         // Control window dimensions (for valve/pump MDI popup)
         public double ControlWindowWidth { get; set; } = 0;
         public double ControlWindowHeight { get; set; } = 0;
+
+        // Valve properties
+        public bool IsVertical { get; set; } = false;
+        public string ActuatorType { get; set; } = "Solenoid";
     }
 
     public class DataSourceConfig

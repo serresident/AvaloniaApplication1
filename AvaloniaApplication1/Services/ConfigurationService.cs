@@ -266,7 +266,8 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 22, Col = 36, SizeX = 6, SizeY = 6 },
                             ValveType = "CutOff",
                             ActiveColor = "#00FF00",
-                            InactiveColor = "#FF0000"
+                            InactiveColor = "#FF0000",
+                            ActuatorType = "Solenoid"
                         },
                         new WidgetConfig
                         {
@@ -287,7 +288,8 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 16, Col = 32, SizeX = 6, SizeY = 6 },
                             ValveType = "Regulating",
                             ActiveColor = "#00FF00",
-                            InactiveColor = "#FF0000"
+                            InactiveColor = "#FF0000",
+                            ActuatorType = "Diaphragm"
                         },
                         new WidgetConfig
                         {
@@ -319,7 +321,8 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 24, Col = 68, SizeX = 6, SizeY = 6 },
                             ValveType = "CutOff",
                             ActiveColor = "#00FF00",
-                            InactiveColor = "#FF0000"
+                            InactiveColor = "#FF0000",
+                            ActuatorType = "Solenoid"
                         },
                         new WidgetConfig
                         {

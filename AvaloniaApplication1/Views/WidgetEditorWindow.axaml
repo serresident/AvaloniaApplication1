@@ -169,6 +169,13 @@
                         <ComboBox ItemsSource="{Binding AvailableValveTypes}" 
                                   SelectedItem="{Binding SelectedValveType}"
                                   HorizontalAlignment="Stretch" />
+
+                        <TextBlock Text="Actuator Type" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableActuatorTypes}" 
+                                  SelectedItem="{Binding SelectedActuatorType}"
+                                  HorizontalAlignment="Stretch" />
+
+                        <CheckBox Content="Vertical Orientation" IsChecked="{Binding IsVertical}" Foreground="White" Margin="0,4,0,0" />
                     </StackPanel>
                 </Border>
 

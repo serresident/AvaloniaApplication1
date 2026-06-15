@@ -114,6 +114,14 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _showRegulatingSettings;
 
+        [ObservableProperty]
+        private bool _isVertical;
+
+        public string[] AvailableActuatorTypes => new[] { "Solenoid", "Diaphragm", "Manual", "None" };
+
+        [ObservableProperty]
+        private string _selectedActuatorType = "Solenoid";
+
         // --- Visibility helpers ---
         [ObservableProperty]
         private bool _showValueDisplaySettings;
@@ -175,6 +183,8 @@ namespace AvaloniaApplication1.ViewModels
                 FeedbackAddress = existingConfig.FeedbackSource?.Address ?? string.Empty;
                 ControlWindowWidth = existingConfig.ControlWindowWidth > 0 ? existingConfig.ControlWindowWidth : 320;
                 ControlWindowHeight = existingConfig.ControlWindowHeight > 0 ? existingConfig.ControlWindowHeight : 280;
+                IsVertical = existingConfig.IsVertical;
+                SelectedActuatorType = string.IsNullOrEmpty(existingConfig.ActuatorType) ? "Solenoid" : existingConfig.ActuatorType;
             }
 
             UpdateVisibility();
@@ -252,7 +262,9 @@ namespace AvaloniaApplication1.ViewModels
                     ? new DataSourceConfig { ConnId = FeedbackConnectionId ?? string.Empty, Address = FeedbackAddress, DataType = SelectedDataType }
                     : null,
                 ControlWindowWidth = ControlWindowWidth,
-                ControlWindowHeight = ControlWindowHeight
+                ControlWindowHeight = ControlWindowHeight,
+                IsVertical = IsVertical,
+                ActuatorType = SelectedActuatorType
             };
         }
     }
