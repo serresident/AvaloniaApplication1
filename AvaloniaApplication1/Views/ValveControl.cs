@@ -8,7 +8,7 @@ namespace AvaloniaApplication1.Views
     /// <summary>
     /// Custom SCADA-style valve control.
     /// Renders a bowtie valve body, optional flanges, and multiple actuator types (Solenoid, Diaphragm, Manual, None).
-    /// Supports vertical and horizontal orientation.
+    /// Supports vertical and horizontal orientation, rotation, mismatch alarms, and bottom progress bars.
     /// </summary>
     public class ValveControl : Control
     {
@@ -47,7 +47,22 @@ namespace AvaloniaApplication1.Views
         public static readonly StyledProperty<bool> ShowFeedbackBarProperty =
             AvaloniaProperty.Register<ValveControl, bool>(nameof(ShowFeedbackBar), false);
 
-        // --- Properties wrapper ---
+        public static readonly StyledProperty<int> RotationProperty =
+            AvaloniaProperty.Register<ValveControl, int>(nameof(Rotation), 0);
+
+        public static readonly StyledProperty<bool> IsAlarmFlashingProperty =
+            AvaloniaProperty.Register<ValveControl, bool>(nameof(IsAlarmFlashing), false);
+
+        public static readonly StyledProperty<bool> IsAlarmFlashStateProperty =
+            AvaloniaProperty.Register<ValveControl, bool>(nameof(IsAlarmFlashState), false);
+
+        public static readonly StyledProperty<bool> ShowStaticAlarmIconProperty =
+            AvaloniaProperty.Register<ValveControl, bool>(nameof(ShowStaticAlarmIcon), false);
+
+        public static readonly StyledProperty<double> ThicknessProperty =
+            AvaloniaProperty.Register<ValveControl, double>(nameof(Thickness), 12.0);
+
+        // --- Properties wrappers ---
 
         public string ValveType
         {
@@ -115,6 +130,36 @@ namespace AvaloniaApplication1.Views
             set => SetValue(ShowFeedbackBarProperty, value);
         }
 
+        public int Rotation
+        {
+            get => GetValue(RotationProperty);
+            set => SetValue(RotationProperty, value);
+        }
+
+        public bool IsAlarmFlashing
+        {
+            get => GetValue(IsAlarmFlashingProperty);
+            set => SetValue(IsAlarmFlashingProperty, value);
+        }
+
+        public bool IsAlarmFlashState
+        {
+            get => GetValue(IsAlarmFlashStateProperty);
+            set => SetValue(IsAlarmFlashStateProperty, value);
+        }
+
+        public bool ShowStaticAlarmIcon
+        {
+            get => GetValue(ShowStaticAlarmIconProperty);
+            set => SetValue(ShowStaticAlarmIconProperty, value);
+        }
+
+        public double Thickness
+        {
+            get => GetValue(ThicknessProperty);
+            set => SetValue(ThicknessProperty, value);
+        }
+
         static ValveControl()
         {
             AffectsRender<ValveControl>(
@@ -128,7 +173,12 @@ namespace AvaloniaApplication1.Views
                 ActiveColorProperty,
                 InactiveColorProperty,
                 ShowFlangesProperty,
-                ShowFeedbackBarProperty);
+                ShowFeedbackBarProperty,
+                RotationProperty,
+                IsAlarmFlashingProperty,
+                IsAlarmFlashStateProperty,
+                ShowStaticAlarmIconProperty,
+                ThicknessProperty);
         }
 
         public ValveControl()
@@ -147,15 +197,21 @@ namespace AvaloniaApplication1.Views
             // Center of the control
             var center = new Point(w / 2, h / 2);
 
-            // Push rotation transform if vertical
-            double angle = IsVertical ? Math.PI / 2 : 0;
+            // Compute angle from Rotation (0, 90, 180, 270)
+            int finalRotation = Rotation;
+            if (finalRotation == 0 && IsVertical)
+            {
+                finalRotation = 90;
+            }
+            double angle = finalRotation * Math.PI / 180.0;
+
             var rotationMatrix = Matrix.CreateTranslation(-center.X, -center.Y) 
                                  * Matrix.CreateRotation(angle) 
                                  * Matrix.CreateTranslation(center.X, center.Y);
             var rotationTransform = context.PushTransform(rotationMatrix);
 
             // Inside rotated coordinate space, we draw as if it's horizontal.
-            // We scale relative to the minimum dimension to ensure it fits beautifully in any layout.
+            // We scale relative to the minimum dimension to ensure it fits beautifully.
             double minSize = Math.Min(w, h);
             double flowSize = minSize * 0.75;  // width of valve bowtie
             double crossSize = minSize * 0.45; // height of valve bowtie
@@ -163,41 +219,104 @@ namespace AvaloniaApplication1.Views
             double cx = w / 2;
             double cy = h / 2;
 
-            // Calculate colors
+            // Parse configured colors
             Color activeCol = ParseHexColor(ActiveColor);
             Color inactiveCol = ParseHexColor(InactiveColor);
+            
+            // Standard HMI dark/light grey for butterflies
+            Color greyCol = Color.FromRgb(112, 112, 112); 
+
             Color bodyColor;
+            Color actuatorColor;
 
-            if (ValveType == "Regulating")
+            // Determine body and actuator colors based on type and feedback/setpoint
+            if (string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase))
             {
-                double ratio = Math.Clamp(Feedback, 0, 100) / 100.0;
-                bodyColor = InterpolateColor(inactiveCol, activeCol, ratio);
+                // Butterflies (body) depend on Feedback: Grey -> Active Color
+                double fbRatio = Math.Clamp(Feedback, 0, 100) / 100.0;
+                bodyColor = InterpolateColor(greyCol, activeCol, fbRatio);
+
+                // Actuator (mushroom top) depends on Setpoint: Inactive -> Active Color
+                double spRatio = Math.Clamp(Setpoint, 0, 100) / 100.0;
+                actuatorColor = InterpolateColor(inactiveCol, activeCol, spRatio);
             }
-            else
+            else // CutOff / onoff
             {
-                bodyColor = IsOpen ? activeCol : inactiveCol;
+                // Butterflies depend on feedback (IsOpen): Open = Active, Closed = Grey
+                bodyColor = IsOpen ? activeCol : greyCol;
+
+                // Actuator rectangle depends on Setpoint (command): Open (Setpoint > 0) = Active, Closed = Inactive
+                actuatorColor = (Setpoint > 0) ? activeCol : inactiveCol;
             }
 
-            // Draw Actuator (stem + head)
-            DrawActuator(context, cx, cy, flowSize, crossSize, bodyColor);
+            // If alarm is flashing and we are in the "on" state, override actuator with red
+            if (IsAlarmFlashing && IsAlarmFlashState)
+            {
+                actuatorColor = Color.FromRgb(255, 30, 30);
+            }
 
-            // Draw Valve Body (bowtie)
+            // 1. Draw horizontal pipe connection stubs
+            double pipeThickness = Thickness;
+            double leftEnd = cx - flowSize / 2 - (ShowFlanges ? (flowSize * 0.06) : 0);
+            double rightStart = cx + flowSize / 2 + (ShowFlanges ? (flowSize * 0.06) : 0);
+            
+            var pipeBrush = new SolidColorBrush(Color.FromRgb(100, 100, 104));
+            var pipePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
+            
+            context.DrawRectangle(pipeBrush, pipePen, new Rect(0, cy - pipeThickness / 2, Math.Max(0, leftEnd), pipeThickness));
+            context.DrawRectangle(pipeBrush, pipePen, new Rect(rightStart, cy - pipeThickness / 2, Math.Max(0, w - rightStart), pipeThickness));
+
+            // 2. Draw Actuator (stem + head)
+            DrawActuator(context, cx, cy, flowSize, crossSize, actuatorColor);
+
+            // 3. Draw Valve Body (bowtie)
             DrawValveBody(context, cx, cy, flowSize, crossSize, bodyColor);
 
-            // Draw Flanges
+            // 4. Draw Flanges
             if (ShowFlanges)
             {
                 DrawFlanges(context, cx, cy, flowSize, crossSize);
             }
 
+            // 5. Draw Red Triangle in center if cutoff valve is CLOSED
+            if (!string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase) && !IsOpen)
+            {
+                double triSize = Math.Max(6.0, flowSize * 0.2);
+                var triGeom = new StreamGeometry();
+                using (var ctx = triGeom.Open())
+                {
+                    ctx.BeginFigure(new Point(cx - triSize / 2, cy - triSize / 3), true);
+                    ctx.LineTo(new Point(cx + triSize / 2, cy - triSize / 3));
+                    ctx.LineTo(new Point(cx, cy + triSize * 2 / 3));
+                    ctx.EndFigure(true);
+                }
+                var triBrush = Brushes.Red;
+                var triPen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
+                context.DrawGeometry(triBrush, triPen, triGeom);
+            }
+
             // Pop rotation
             rotationTransform.Dispose();
 
-            // Draw Feedback Bar outside of the rotation (at the bottom) if enabled
-            if (ValveType == "Regulating" && HasFeedbackSource && ShowFeedbackBar)
+            // 6. Draw Feedback Bar outside of the rotation (at the bottom) if enabled
+            if (string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase) && HasFeedbackSource && ShowFeedbackBar)
             {
                 double feedback = Math.Clamp(Feedback, 0, 100);
-                DrawFeedbackBar(context, w, h - 16, 14, feedback, activeCol, inactiveCol);
+                DrawFeedbackBar(context, w, h - 16, 14, feedback, activeCol, greyCol);
+            }
+
+            // 7. Draw Flashing Alarm Border around final bounds (not rotated)
+            if (IsAlarmFlashing && IsAlarmFlashState)
+            {
+                var borderPen = new Pen(Brushes.Red, 2.5);
+                context.DrawRectangle(null, borderPen, new Rect(1, 1, w - 2, h - 2), 4, 4);
+            }
+
+            // 8. Draw Static Alarm Icon (🔴) in top-right corner if disabled alarm notifications is check and mismatch is present
+            if (ShowStaticAlarmIcon)
+            {
+                var alarmPen = new Pen(Brushes.Black, 0.8);
+                context.DrawEllipse(Brushes.Red, alarmPen, new Point(w - 8, 8), 5, 5);
             }
         }
 
@@ -240,7 +359,7 @@ namespace AvaloniaApplication1.Views
             context.DrawEllipse(Brushes.LightGray, borderPen, new Point(cx, cy), jointRadius, jointRadius);
         }
 
-        private void DrawActuator(DrawingContext context, double cx, double cy, double flowSize, double crossSize, Color bodyColor)
+        private void DrawActuator(DrawingContext context, double cx, double cy, double flowSize, double crossSize, Color actuatorColor)
         {
             if (string.Equals(ActuatorType, "None", StringComparison.OrdinalIgnoreCase))
                 return;
@@ -265,13 +384,12 @@ namespace AvaloniaApplication1.Views
                 double rectH = headSize;
                 var rect = new Rect(cx - rectW / 2, stemTop - rectH, rectW, rectH);
                 
-                // Color: nice yellow matching SCADA screen
-                var boxBrush = new SolidColorBrush(Color.FromRgb(240, 210, 80)); 
+                var boxBrush = new SolidColorBrush(actuatorColor); 
                 var boxPen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
                 context.DrawRectangle(boxBrush, boxPen, rect, 1, 1);
 
                 // Draw letter inside (P for Regulating, S for CutOff)
-                string letter = ValveType == "Regulating" ? "P" : "S";
+                string letter = string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase) ? "P" : "S";
                 var text = new FormattedText(
                     letter,
                     System.Globalization.CultureInfo.InvariantCulture,
@@ -302,7 +420,7 @@ namespace AvaloniaApplication1.Views
                     ctx.EndFigure(true);
                 }
 
-                var domeBrush = new SolidColorBrush(Color.FromRgb(140, 140, 144));
+                var domeBrush = new SolidColorBrush(actuatorColor);
                 var domePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
                 context.DrawGeometry(domeBrush, domePen, domeGeom);
             }
@@ -312,7 +430,7 @@ namespace AvaloniaApplication1.Views
                 double wheelW = headSize * 1.1;
                 double plateThickness = Math.Max(2.0, flowSize * 0.05);
 
-                var wheelPen = new Pen(new SolidColorBrush(Color.FromRgb(80, 80, 80)), plateThickness);
+                var wheelPen = new Pen(new SolidColorBrush(actuatorColor), plateThickness);
                 context.DrawLine(wheelPen, new Point(cx - wheelW / 2, stemTop), new Point(cx + wheelW / 2, stemTop));
                 context.DrawLine(wheelPen, new Point(cx - wheelW / 2, stemTop - 2), new Point(cx - wheelW / 2, stemTop + 2));
                 context.DrawLine(wheelPen, new Point(cx + wheelW / 2, stemTop - 2), new Point(cx + wheelW / 2, stemTop + 2));

@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using Avalonia.Threading;
 using AvaloniaApplication1.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,6 +24,35 @@ namespace AvaloniaApplication1.ViewModels
 
         [ObservableProperty]
         private bool _isMimicActive;
+
+        [ObservableProperty]
+        private string? _toastMessage;
+
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        private DispatcherTimer? _toastTimer;
+
+        public void ShowToast(string message)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                ToastMessage = message;
+                IsToastVisible = true;
+
+                _toastTimer?.Stop();
+                _toastTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(4)
+                };
+                _toastTimer.Tick += (s, e) =>
+                {
+                    IsToastVisible = false;
+                    _toastTimer.Stop();
+                };
+                _toastTimer.Start();
+            });
+        }
 
         private DashboardViewModel? _mainDashboard;
         private DashboardViewModel? _mimicDashboard;
@@ -93,7 +124,14 @@ namespace AvaloniaApplication1.ViewModels
                 _currentConfig,
                 _dialogService);
 
-            var childWindow = new ChildWindowViewModel(title, dashboardVm);
+            return OpenChildWindow(title, (object)dashboardVm);
+        }
+
+        public ChildWindowViewModel? OpenChildWindow(string title, object content)
+        {
+            if (_currentConfig == null) return null;
+
+            var childWindow = new ChildWindowViewModel(title, content);
             
             var originalClose = childWindow.CloseAction;
             childWindow.CloseAction = () =>

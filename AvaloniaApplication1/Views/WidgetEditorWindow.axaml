@@ -176,6 +176,11 @@
                                   HorizontalAlignment="Stretch" />
 
                         <CheckBox Content="Vertical Orientation" IsChecked="{Binding IsVertical}" Foreground="White" Margin="0,4,0,0" />
+
+                        <TextBlock Text="Rotation Angle" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <ComboBox ItemsSource="{Binding AvailableRotations}" 
+                                  SelectedItem="{Binding SelectedRotation}"
+                                  HorizontalAlignment="Stretch" />
                     </StackPanel>
                 </Border>
 
@@ -183,7 +188,7 @@
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowRegulatingSettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Feedback Source (optional)" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Feedback &amp; Mode Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         
                         <TextBlock Text="Feedback Connection" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
@@ -193,6 +198,18 @@
 
                         <TextBlock Text="Feedback Address" Foreground="#AAAAAA" FontSize="11" />
                         <TextBox Text="{Binding FeedbackAddress}" PlaceholderText="e.g. 40002 or sensor/position" />
+
+                        <TextBlock Text="Mismatch Tolerance (%)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <NumericUpDown Value="{Binding Tolerance}" Minimum="0" Maximum="100" FormatString="0.0" />
+
+                        <TextBlock Text="Mode Tag Connection" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <ComboBox ItemsSource="{Binding AvailableConnections}" 
+                                  SelectedItem="{Binding ModeConnectionId}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Same as main or select..." />
+
+                        <TextBlock Text="Mode Tag Address" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding ModeAddress}" PlaceholderText="e.g. 40003 or valve/mode" />
 
                         <TextBlock Text="Control Window Size" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" Margin="0,4,0,0" />
                         <Grid ColumnDefinitions="*,10,*">

@@ -22,7 +22,7 @@ namespace AvaloniaApplication1.ViewModels
         private double _height = 380;
 
         [ObservableProperty]
-        private DashboardViewModel _dashboard;
+        private object _content;
 
         [ObservableProperty]
         private int _zIndex = 1;
@@ -34,10 +34,10 @@ namespace AvaloniaApplication1.ViewModels
 
         public Action? CloseAction { get; set; }
 
-        public ChildWindowViewModel(string title, DashboardViewModel dashboard)
+        public ChildWindowViewModel(string title, object content)
         {
             Title = title;
-            Dashboard = dashboard;
+            Content = content;
         }
 
         [RelayCommand]

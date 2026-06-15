@@ -6,7 +6,7 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class WidgetViewModelBase : ViewModelBase
     {
-        protected readonly IMockDataService DataService;
+        public readonly IMockDataService DataService;
 
         [ObservableProperty]
         private string _type = string.Empty;

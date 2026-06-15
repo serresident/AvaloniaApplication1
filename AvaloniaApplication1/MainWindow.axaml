@@ -154,10 +154,13 @@
 
                                 <!-- Panel Content Area -->
                                 <Grid Grid.Row="1" Background="#1E1E1E" IsVisible="{Binding !IsMinimized}">
-                                    <ContentControl Content="{Binding Dashboard}">
+                                    <ContentControl Content="{Binding Content}">
                                         <ContentControl.DataTemplates>
                                             <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
                                                 <v:DashboardView />
+                                            </DataTemplate>
+                                            <DataTemplate DataType="{x:Type vm:ValveControlPopupViewModel}">
+                                                <v:ValveControlPopupView />
                                             </DataTemplate>
                                         </ContentControl.DataTemplates>
                                     </ContentControl>
@@ -183,6 +186,25 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
+            <!-- Global Toast Notification overlay -->
+            <Border HorizontalAlignment="Center" 
+                    VerticalAlignment="Bottom" 
+                    Margin="0,0,0,50" 
+                    Background="#C62828" 
+                    BorderBrush="#E53935" 
+                    BorderThickness="1.5" 
+                    CornerRadius="6" 
+                    Padding="16,10" 
+                    IsVisible="{Binding IsToastVisible}"
+                    BoxShadow="0 4 12 0 #88000000"
+                    ZIndex="9999"
+                    IsHitTestVisible="False">
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <TextBlock Text="⚠️" FontSize="16" Foreground="White" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ToastMessage}" Foreground="White" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </Window>

@@ -41,15 +41,40 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string _actuatorType = "Solenoid";
 
+        // --- New HMI Properties ---
+
+        [ObservableProperty]
+        private int _rotation;
+
+        [ObservableProperty]
+        private double _tolerance = 10.0;
+
+        [ObservableProperty]
+        private bool _alarmDisabled;
+
+        [ObservableProperty]
+        private bool _isAlarmActive;
+
+        [ObservableProperty]
+        private bool _isAlarmFlashing;
+
+        [ObservableProperty]
+        private bool _isAlarmFlashState;
+
+        [ObservableProperty]
+        private bool _showStaticAlarmIcon;
+
+        [ObservableProperty]
+        private bool _isManualMode = true;
+
         public string ValveType => string.IsNullOrEmpty(OriginalConfig.ValveType) ? "CutOff" : OriginalConfig.ValveType;
         public string ActiveColor => string.IsNullOrEmpty(OriginalConfig.ActiveColor) ? "#00FF00" : OriginalConfig.ActiveColor;
         public string InactiveColor => string.IsNullOrEmpty(OriginalConfig.InactiveColor) ? "#FF0000" : OriginalConfig.InactiveColor;
 
-        /// <summary>
-        /// Control window dimensions from config.
-        /// </summary>
-        public double ControlWindowWidth => OriginalConfig.ControlWindowWidth > 0 ? OriginalConfig.ControlWindowWidth : 320;
-        public double ControlWindowHeight => OriginalConfig.ControlWindowHeight > 0 ? OriginalConfig.ControlWindowHeight : 280;
+        public bool IsRegulating => string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase);
+
+        private readonly DispatcherTimer _alarmTimer;
+        private bool _wasAlarmActive;
 
         public ValveWidgetViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
@@ -57,6 +82,33 @@ namespace AvaloniaApplication1.ViewModels
             HasFeedbackSource = !string.IsNullOrEmpty(config.FeedbackSource?.Address);
             IsVertical = config.IsVertical;
             ActuatorType = string.IsNullOrEmpty(config.ActuatorType) ? "Solenoid" : config.ActuatorType;
+
+            // Load new config values
+            Rotation = config.Rotation;
+            Tolerance = config.Tolerance == 0 ? 10.0 : config.Tolerance;
+            AlarmDisabled = config.AlarmDisabled;
+
+            // Initialize Mode
+            UpdateModeState();
+
+            // Set up 500ms alarm flashing timer
+            _alarmTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(500)
+            };
+            _alarmTimer.Tick += (s, e) =>
+            {
+                if (IsAlarmFlashing)
+                {
+                    IsAlarmFlashState = !IsAlarmFlashState;
+                }
+                else
+                {
+                    IsAlarmFlashState = false;
+                }
+            };
+            _alarmTimer.Start();
+
             DataService.TagValueChanged += OnTagValueChanged;
             UpdateState();
         }
@@ -75,6 +127,14 @@ namespace AvaloniaApplication1.ViewModels
             {
                 Dispatcher.UIThread.Post(UpdateFeedback);
             }
+
+            // Handle mode source separately
+            var modeSrc = OriginalConfig.ModeSource;
+            if (modeSrc != null && !string.IsNullOrEmpty(modeSrc.Address) &&
+                e.ConnId == modeSrc.ConnId && e.Address == modeSrc.Address)
+            {
+                Dispatcher.UIThread.Post(UpdateModeState);
+            }
         }
 
         private void UpdateState()
@@ -88,13 +148,13 @@ namespace AvaloniaApplication1.ViewModels
             var val = DataService.GetCurrentValue(Source.ConnId, Source.Address);
             if (val != null)
             {
-                if (ValveType == "CutOff")
+                if (!IsRegulating)
                 {
                     if (val is bool b) IsOpen = b;
                     else if (val is int i) IsOpen = i > 0;
                     else if (double.TryParse(val.ToString(), out double num)) IsOpen = num > 0;
                     
-                    DisplayValue = IsOpen ? "OPEN" : "CLOSED";
+                    DisplayValue = IsOpen ? "ОТКРЫТ" : "ЗАКРЫТ";
                     CurrentColor = IsOpen ? ActiveColor : InactiveColor;
                     Setpoint = IsOpen ? 100 : 0;
                 }
@@ -125,6 +185,8 @@ namespace AvaloniaApplication1.ViewModels
             {
                 UpdateFeedback();
             }
+
+            EvaluateAlarm();
         }
 
         private void UpdateFeedback()
@@ -133,9 +195,112 @@ namespace AvaloniaApplication1.ViewModels
             if (fbSource == null || string.IsNullOrEmpty(fbSource.Address)) return;
 
             var fbVal = DataService.GetCurrentValue(fbSource.ConnId, fbSource.Address);
-            if (fbVal != null && double.TryParse(fbVal.ToString(), out double dFb))
+            if (fbVal != null)
             {
-                Feedback = Math.Clamp(dFb, 0, 100);
+                if (IsRegulating)
+                {
+                    if (double.TryParse(fbVal.ToString(), out double dFb))
+                    {
+                        Feedback = Math.Clamp(dFb, 0, 100);
+                    }
+                }
+                else // CutOff
+                {
+                    if (fbVal is bool b) IsOpen = b;
+                    else if (fbVal is int i) IsOpen = i > 0;
+                    else if (double.TryParse(fbVal.ToString(), out double num)) IsOpen = num > 0;
+                }
+            }
+
+            EvaluateAlarm();
+        }
+
+        private void UpdateModeState()
+        {
+            var modeSrc = OriginalConfig.ModeSource;
+            if (modeSrc == null || string.IsNullOrEmpty(modeSrc.Address))
+            {
+                IsManualMode = true;
+                return;
+            }
+
+            var mVal = DataService.GetCurrentValue(modeSrc.ConnId, modeSrc.Address);
+            if (mVal != null)
+            {
+                // auto = true, manual = false
+                if (mVal is bool b) IsManualMode = !b;
+                else if (mVal is int i) IsManualMode = (i == 0);
+                else if (double.TryParse(mVal.ToString(), out double num)) IsManualMode = (num == 0);
+            }
+            else
+            {
+                IsManualMode = true;
+            }
+        }
+
+        partial void OnIsManualModeChanged(bool value)
+        {
+            var modeSrc = OriginalConfig.ModeSource;
+            if (modeSrc != null && !string.IsNullOrEmpty(modeSrc.Address))
+            {
+                object writeVal = !value; // Auto = true, Manual = false
+                if (modeSrc.DataType == "Float32" || modeSrc.DataType == "Float")
+                    writeVal = !value ? 1.0f : 0.0f;
+                else if (modeSrc.DataType == "Int16" || modeSrc.DataType == "Int32")
+                    writeVal = !value ? 1 : 0;
+
+                DataService.WriteCommand(modeSrc.ConnId, modeSrc.Address, writeVal);
+            }
+        }
+
+        partial void OnAlarmDisabledChanged(bool value)
+        {
+            // Persist locally in config if desired, but keep in memory for now
+            OriginalConfig.AlarmDisabled = value;
+            EvaluateAlarm();
+        }
+
+        private void EvaluateAlarm()
+        {
+            if (!HasFeedbackSource)
+            {
+                IsAlarmActive = false;
+                IsAlarmFlashing = false;
+                ShowStaticAlarmIcon = false;
+                return;
+            }
+
+            if (IsRegulating)
+            {
+                IsAlarmActive = Math.Abs(Setpoint - Feedback) > Tolerance;
+            }
+            else
+            {
+                IsAlarmActive = (Setpoint > 0) != IsOpen;
+            }
+
+            IsAlarmFlashing = IsAlarmActive && !AlarmDisabled;
+            ShowStaticAlarmIcon = IsAlarmActive && AlarmDisabled;
+
+            // Trigger Toast Notification on transition from inactive to active
+            if (IsAlarmActive && !_wasAlarmActive)
+            {
+                _wasAlarmActive = true;
+                if (!AlarmDisabled)
+                {
+                    var mainVm = App.Services?.GetService<MainViewModel>();
+                    if (mainVm != null)
+                    {
+                        string ctrlStr = IsRegulating ? $"{Setpoint:F0}%" : (Setpoint > 0 ? "ОТКРЫТ" : "ЗАКРЫТ");
+                        string fbStr = IsRegulating ? $"{Feedback:F0}%" : (IsOpen ? "ОТКРЫТ" : "ЗАКРЫТ");
+                        
+                        mainVm.ShowToast($"Ошибка рассогласования [{Title}]: управление = {ctrlStr}, обратная связь = {fbStr}");
+                    }
+                }
+            }
+            else if (!IsAlarmActive)
+            {
+                _wasAlarmActive = false;
             }
         }
 
@@ -153,93 +318,47 @@ namespace AvaloniaApplication1.ViewModels
             var existing = mainVm.ActiveChildWindows.FirstOrDefault(w => w.Title == titleToFind);
             if (existing != null)
             {
-                existing.CloseAction?.Invoke();
+                existing.CloseCommand.Execute(null);
                 _controlWindow = null;
                 return;
             }
 
-            var widgets = new List<WidgetConfig>();
-
-            if (ValveType == "CutOff")
-            {
-                // Status Display
-                widgets.Add(new WidgetConfig
-                {
-                    Type = "ValueDisplay",
-                    Title = "Valve Status",
-                    Source = new DataSourceConfig { ConnId = Source.ConnId, Address = Source.Address, DataType = Source.DataType },
-                    Position = new WidgetPosition { Row = 0, Col = 0, SizeX = 2, SizeY = 1 },
-                    Format = "State: {0}"
-                });
-
-                // Toggle Open/Close Button
-                widgets.Add(new WidgetConfig
-                {
-                    Type = "CommandButton",
-                    Title = "OPEN / CLOSE",
-                    Source = new DataSourceConfig { ConnId = Source.ConnId, Address = Source.Address, DataType = Source.DataType },
-                    Position = new WidgetPosition { Row = 1, Col = 0, SizeX = 2, SizeY = 1 },
-                    ButtonMode = "Toggle"
-                });
-            }
-            else // Regulating
-            {
-                // Status Display
-                widgets.Add(new WidgetConfig
-                {
-                    Type = "ValueDisplay",
-                    Title = "Opening Setpoint",
-                    Source = new DataSourceConfig { ConnId = Source.ConnId, Address = Source.Address, DataType = Source.DataType },
-                    Position = new WidgetPosition { Row = 0, Col = 0, SizeX = 2, SizeY = 1 },
-                    Format = "{0:F1} %"
-                });
-
-                // Setpoint Input button
-                widgets.Add(new WidgetConfig
-                {
-                    Type = "SetValue",
-                    Title = "Set Position",
-                    Source = new DataSourceConfig { ConnId = Source.ConnId, Address = Source.Address, DataType = Source.DataType },
-                    Position = new WidgetPosition { Row = 1, Col = 0, SizeX = 1, SizeY = 1 },
-                    Format = "{0:F1} %",
-                    MinValue = 0,
-                    MaxValue = 100
-                });
-
-                // Slider Input
-                widgets.Add(new WidgetConfig
-                {
-                    Type = "Slider",
-                    Title = "Slide Adjust",
-                    Source = new DataSourceConfig { ConnId = Source.ConnId, Address = Source.Address, DataType = Source.DataType },
-                    Position = new WidgetPosition { Row = 1, Col = 1, SizeX = 1, SizeY = 1 },
-                    MinValue = 0,
-                    MaxValue = 100
-                });
-            }
-
-            var dashboardConfig = new DashboardConfig
-            {
-                Widgets = widgets
-            };
-
-            _controlWindow = mainVm.OpenChildWindow($"{Title} [Control]", dashboardConfig);
+            // Create window frame
+            _controlWindow = mainVm.OpenChildWindow(titleToFind, new object());
             if (_controlWindow != null)
             {
-                _controlWindow.Width = ControlWindowWidth;
-                _controlWindow.Height = ControlWindowHeight;
-                
+                // Instantiate Popup VM and link to window Content
+                var popupVm = new ValveControlPopupViewModel(this, () => _controlWindow?.CloseCommand.Execute(null));
+                _controlWindow.Content = popupVm;
+
+                // Adjust width dynamically
+                int baseWidth = IsRegulating ? 450 : 340;
+                _controlWindow.Width = popupVm.IsKeypadVisible ? (baseWidth + 190) : baseWidth;
+                _controlWindow.Height = 350;
+
                 var originalClose = _controlWindow.CloseAction;
                 _controlWindow.CloseAction = () =>
                 {
                     originalClose?.Invoke();
+                    popupVm.Dispose();
                     _controlWindow = null;
+                };
+
+                // Track keypad visibility to expand or contract window dynamically
+                popupVm.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(ValveControlPopupViewModel.IsKeypadVisible) && _controlWindow != null)
+                    {
+                        int currentBase = IsRegulating ? 450 : 340;
+                        _controlWindow.Width = popupVm.IsKeypadVisible ? (currentBase + 190) : currentBase;
+                    }
                 };
             }
         }
 
         public override void Dispose()
         {
+            _alarmTimer.Stop();
             DataService.TagValueChanged -= OnTagValueChanged;
             base.Dispose();
         }

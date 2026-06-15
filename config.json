@@ -58,7 +58,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "SetValue",
@@ -93,7 +97,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "RealTimeTrend",
@@ -128,7 +136,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "ContainerButton",
@@ -178,7 +190,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -213,7 +229,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -248,7 +268,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -283,7 +307,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -318,7 +346,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -353,7 +385,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "RealTimeTrend",
@@ -388,7 +424,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           }
         ],
         "Format": "{0}",
@@ -409,7 +449,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "ContainerButton",
@@ -459,7 +503,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -494,7 +542,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -529,7 +581,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -564,7 +620,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -599,7 +659,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -634,7 +698,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "RealTimeTrend",
@@ -669,7 +737,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           }
         ],
         "Format": "{0}",
@@ -690,7 +762,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "ContainerButton",
@@ -740,7 +816,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -775,7 +855,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -810,7 +894,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -845,7 +933,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -880,7 +972,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -915,7 +1011,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "RealTimeTrend",
@@ -950,7 +1050,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           }
         ],
         "Format": "{0}",
@@ -971,7 +1075,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "ContainerButton",
@@ -1021,7 +1129,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -1056,7 +1168,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -1091,7 +1207,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -1126,7 +1246,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -1161,7 +1285,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -1196,7 +1324,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "RealTimeTrend",
@@ -1231,7 +1363,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           }
         ],
         "Format": "{0}",
@@ -1252,7 +1388,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "ContainerButton",
@@ -1302,7 +1442,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -1337,7 +1481,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -1372,7 +1520,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -1407,7 +1559,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -1442,7 +1598,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -1477,7 +1637,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "RealTimeTrend",
@@ -1512,7 +1676,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           }
         ],
         "Format": "{0}",
@@ -1533,7 +1701,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "ContainerButton",
@@ -1583,7 +1755,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -1618,7 +1794,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -1653,7 +1833,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "ValueDisplay",
@@ -1688,7 +1872,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -1723,7 +1911,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "PilotLight",
@@ -1758,7 +1950,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           },
           {
             "Type": "RealTimeTrend",
@@ -1793,7 +1989,11 @@
             "ControlWindowWidth": 0,
             "ControlWindowHeight": 0,
             "IsVertical": false,
-            "ActuatorType": "Solenoid"
+            "ActuatorType": "Solenoid",
+            "Rotation": 0,
+            "AlarmDisabled": false,
+            "Tolerance": 10,
+            "ModeSource": null
           }
         ],
         "Format": "{0}",
@@ -1814,7 +2014,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       }
     ]
   },
@@ -1854,7 +2058,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "Pipe",
@@ -1889,7 +2097,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "Pump",
@@ -1924,7 +2136,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "Pipe",
@@ -1959,7 +2175,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "Valve",
@@ -1990,11 +2210,19 @@
         "Thickness": 12,
         "StartFitting": "None",
         "EndFitting": "None",
-        "FeedbackSource": null,
+        "FeedbackSource": {
+          "ConnId": "mqtt1",
+          "Address": "gMqt/Mixer/Valve_YV_W1_FB",
+          "DataType": "Bool"
+        },
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "Pipe",
@@ -2029,7 +2257,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "Valve",
@@ -2060,11 +2292,23 @@
         "Thickness": 12,
         "StartFitting": "None",
         "EndFitting": "None",
-        "FeedbackSource": null,
+        "FeedbackSource": {
+          "ConnId": "mqtt1",
+          "Address": "gMqt/Mixer/Valve_YV_S1_FB",
+          "DataType": "Float32"
+        },
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Diaphragm"
+        "ActuatorType": "Diaphragm",
+        "Rotation": 270,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": {
+          "ConnId": "mqtt1",
+          "Address": "gMqt/Mixer/Valve_YV_S1_Mode",
+          "DataType": "Bool"
+        }
       },
       {
         "Type": "Pipe",
@@ -2099,7 +2343,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "Pipe",
@@ -2134,7 +2382,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "Valve",
@@ -2165,11 +2417,19 @@
         "Thickness": 12,
         "StartFitting": "None",
         "EndFitting": "None",
-        "FeedbackSource": null,
+        "FeedbackSource": {
+          "ConnId": "mqtt1",
+          "Address": "gMqt/Mixer/Valve_YV_M1_FB",
+          "DataType": "Bool"
+        },
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "ValueDisplay",
@@ -2204,7 +2464,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       },
       {
         "Type": "ValueDisplay",
@@ -2239,7 +2503,11 @@
         "ControlWindowWidth": 0,
         "ControlWindowHeight": 0,
         "IsVertical": false,
-        "ActuatorType": "Solenoid"
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null
       }
     ]
   }

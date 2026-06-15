@@ -267,7 +267,8 @@ namespace AvaloniaApplication1.Services
                             ValveType = "CutOff",
                             ActiveColor = "#00FF00",
                             InactiveColor = "#FF0000",
-                            ActuatorType = "Solenoid"
+                            ActuatorType = "Solenoid",
+                            FeedbackSource = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_W1_FB", DataType = "Bool" }
                         },
                         new WidgetConfig
                         {
@@ -289,7 +290,11 @@ namespace AvaloniaApplication1.Services
                             ValveType = "Regulating",
                             ActiveColor = "#00FF00",
                             InactiveColor = "#FF0000",
-                            ActuatorType = "Diaphragm"
+                            ActuatorType = "Diaphragm",
+                            FeedbackSource = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_S1_FB", DataType = "Float32" },
+                            ModeSource = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_S1_Mode", DataType = "Bool" },
+                            Tolerance = 10.0,
+                            Rotation = 270 // Vertically rotated!
                         },
                         new WidgetConfig
                         {
@@ -322,7 +327,8 @@ namespace AvaloniaApplication1.Services
                             ValveType = "CutOff",
                             ActiveColor = "#00FF00",
                             InactiveColor = "#FF0000",
-                            ActuatorType = "Solenoid"
+                            ActuatorType = "Solenoid",
+                            FeedbackSource = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_M1_FB", DataType = "Bool" }
                         },
                         new WidgetConfig
                         {

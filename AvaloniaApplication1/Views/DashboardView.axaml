@@ -277,7 +277,12 @@
                                               IsVertical="{Binding IsVertical}"
                                               ActuatorType="{Binding ActuatorType}"
                                               ActiveColor="{Binding ActiveColor}"
-                                              InactiveColor="{Binding InactiveColor}" />
+                                              InactiveColor="{Binding InactiveColor}"
+                                              Rotation="{Binding Rotation}"
+                                              IsAlarmFlashing="{Binding IsAlarmFlashing}"
+                                              IsAlarmFlashState="{Binding IsAlarmFlashState}"
+                                              ShowStaticAlarmIcon="{Binding ShowStaticAlarmIcon}"
+                                              ShowFeedbackBar="True" />
                                       </Grid>
                                       <!-- Title and Value -->
                                       <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,5">

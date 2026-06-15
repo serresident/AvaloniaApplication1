@@ -1,0 +1,289 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+             xmlns:c="clr-namespace:AvaloniaApplication1.Converters"
+             mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="380"
+             x:Class="AvaloniaApplication1.Views.ValveControlPopupView"
+             x:DataType="vm:ValveControlPopupViewModel"
+             Background="#1E1E1E">
+
+    <UserControl.Resources>
+        <c:HexToBrushConverter x:Key="HexToBrush" />
+    </UserControl.Resources>
+
+    <Grid ColumnDefinitions="*,Auto" Margin="15">
+        <!-- Column 0: Left Side - Control Panel -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+            <StackPanel Spacing="12">
+                <!-- Header -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding ValveViewModel.Title}" Foreground="White" FontSize="18" FontWeight="Bold" />
+                        <TextBlock Text="Панель управления клапаном" Foreground="#AAAAAA" FontSize="12" />
+                    </StackPanel>
+                    <!-- Type Badge -->
+                    <Border Grid.Column="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                        <Border.Background>
+                            <Binding Path="IsRegulating">
+                                <Binding.Converter>
+                                    <c:BoolToBrushConverter TrueBrush="#0050EF" FalseBrush="#D80073" />
+                                </Binding.Converter>
+                            </Binding>
+                        </Border.Background>
+                        <TextBlock Foreground="White" FontSize="11" FontWeight="Bold">
+                            <TextBlock.Text>
+                                <Binding Path="IsRegulating">
+                                    <Binding.Converter>
+                                        <c:BoolToStringConverter TrueString="Регулируемый" FalseString="Отсечной" />
+                                    </Binding.Converter>
+                                </Binding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Border>
+                </Grid>
+
+                <Separator Background="#3E3E42" Height="1" Margin="0,2" />
+
+                <!-- Mode Switch Row (Visible only if mode tag exists) -->
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto" IsVisible="{Binding HasModeTag}">
+                    <TextBlock Grid.Column="0" Text="Режим управления:" Foreground="#DCDCDC" FontSize="13" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <Grid Grid.Column="1" ColumnDefinitions="*,*">
+                        <!-- Manual Button -->
+                        <Button Grid.Column="0" 
+                                Content="РУЧН" 
+                                Command="{Binding ToggleManualCommand}" 
+                                IsEnabled="{Binding !IsManualMode}"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                Padding="10,6" Margin="0,0,4,0" FontSize="13" FontWeight="Bold"
+                                Background="#3E3E42" Foreground="#B0B0B0" CornerRadius="4">
+                            <Button.Styles>
+                                <Style Selector="Button:disabled">
+                                    <Setter Property="Background" Value="#005A9E" />
+                                    <Setter Property="Foreground" Value="White" />
+                                    <Setter Property="Opacity" Value="1.0" />
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                        <!-- Auto Button -->
+                        <Button Grid.Column="1" 
+                                Content="АВТО" 
+                                Command="{Binding ToggleAutoCommand}" 
+                                IsEnabled="{Binding IsManualMode}"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                Padding="10,6" Margin="4,0,0,0" FontSize="13" FontWeight="Bold"
+                                Background="#3E3E42" Foreground="#B0B0B0" CornerRadius="4">
+                            <Button.Styles>
+                                <Style Selector="Button:disabled">
+                                    <Setter Property="Background" Value="#008A00" />
+                                    <Setter Property="Foreground" Value="White" />
+                                    <Setter Property="Opacity" Value="1.0" />
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </Grid>
+                </Grid>
+
+                <!-- Regulating Inputs (Setpoint slider + numeric input field) -->
+                <StackPanel Spacing="8" IsVisible="{Binding IsRegulating}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="Уставка положения клапана:" Foreground="#DCDCDC" FontSize="13" VerticalAlignment="Center"/>
+                        
+                        <!-- Clickable Setpoint Input Field -->
+                        <Button Grid.Column="1" 
+                                Command="{Binding ToggleKeypadCommand}" 
+                                IsEnabled="{Binding IsManualMode}"
+                                Background="#1A1A1C" 
+                                BorderBrush="#007ACC" 
+                                BorderThickness="1.5" 
+                                CornerRadius="4" 
+                                Padding="14,6"
+                                Cursor="Hand">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock Text="{Binding TempSetpoint, StringFormat=\{0:F0\}}" Foreground="#FFD700" FontSize="18" FontWeight="Bold" />
+                                <TextBlock Text="%" Foreground="#888" FontSize="14" VerticalAlignment="Center" />
+                                <TextBlock Text="✏️" Foreground="#666" FontSize="11" VerticalAlignment="Center" Margin="5,0,0,0" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!-- Slider -->
+                    <Slider x:Name="SetpointSlider" 
+                            Minimum="0" Maximum="100" 
+                            Value="{Binding TempSetpoint, Mode=TwoWay}" 
+                            IsEnabled="{Binding IsManualMode}"
+                            TickFrequency="1" IsSnapToTickEnabled="True"
+                            ToolTip.Tip="{Binding SliderTooltipText}"
+                            Height="32" />
+                </StackPanel>
+
+                <!-- Cutoff Action Buttons (Open/Close, visible only for cutoff) -->
+                <Grid ColumnDefinitions="*,*" IsVisible="{Binding !IsRegulating}">
+                    <Button Grid.Column="0" 
+                            Content="ОТКРЫТЬ" 
+                            Command="{Binding WriteCutoffOpenCommand}"
+                            Background="#008A00" Foreground="White" 
+                            Height="40" Margin="0,0,5,0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            FontWeight="Bold" FontSize="14" CornerRadius="4"/>
+                    <Button Grid.Column="1" 
+                            Content="ЗАКРЫТЬ" 
+                            Command="{Binding WriteCutoffCloseCommand}"
+                            Background="#E51400" Foreground="White" 
+                            Height="40" Margin="5,0,0,0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            FontWeight="Bold" FontSize="14" CornerRadius="4"/>
+                </Grid>
+
+                <!-- Write Button (for Regulating only) -->
+                <Button Content="Записать значение" 
+                        Command="{Binding WriteSetpointCommand}"
+                        IsVisible="{Binding IsRegulating}"
+                        IsEnabled="{Binding IsManualMode}"
+                        Background="#007ACC" Foreground="White" 
+                        Height="36" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                        FontWeight="Bold" FontSize="13" CornerRadius="4" />
+
+                <!-- Real-time Indicators Section -->
+                <Border Background="#252526" CornerRadius="6" Padding="10" BorderBrush="#323233" BorderThickness="1">
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                        <!-- Command status -->
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,6">
+                            <TextBlock Text="Выход управления:" Foreground="#888" FontSize="11" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="{Binding ValveViewModel.Setpoint, StringFormat=\{0:F1\}%}" FontSize="15" FontWeight="Bold" Foreground="White" IsVisible="{Binding IsRegulating}" />
+                                <TextBlock FontSize="15" FontWeight="Bold" IsVisible="{Binding !IsRegulating}">
+                                    <TextBlock.Foreground>
+                                        <Binding Path="ValveViewModel.Setpoint">
+                                            <Binding.Converter>
+                                                <c:BoolToBrushConverter TrueBrush="#00FF00" FalseBrush="#FF0000" />
+                                            </Binding.Converter>
+                                        </Binding>
+                                    </TextBlock.Foreground>
+                                    <TextBlock.Text>
+                                        <Binding Path="ValveViewModel.Setpoint">
+                                            <Binding.Converter>
+                                                <c:BoolToStringConverter TrueString="ОТКРЫТЬ (True)" FalseString="ЗАКРЫТЬ (False)" />
+                                            </Binding.Converter>
+                                        </Binding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Feedback status -->
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,6">
+                            <TextBlock Text="Обратная связь:" Foreground="#888" FontSize="11" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="{Binding ValveViewModel.Feedback, StringFormat=\{0:F1\}%}" FontSize="15" FontWeight="Bold" Foreground="{Binding ValveViewModel.CurrentColor, Converter={StaticResource HexToBrush}}" IsVisible="{Binding IsRegulating}" />
+                                <TextBlock FontSize="15" FontWeight="Bold" IsVisible="{Binding !IsRegulating}">
+                                    <TextBlock.Foreground>
+                                        <Binding Path="ValveViewModel.IsOpen">
+                                            <Binding.Converter>
+                                                <c:BoolToBrushConverter TrueBrush="#00FF00" FalseBrush="#FF0000" />
+                                            </Binding.Converter>
+                                        </Binding>
+                                    </TextBlock.Foreground>
+                                    <TextBlock.Text>
+                                        <Binding Path="ValveViewModel.IsOpen">
+                                            <Binding.Converter>
+                                                <c:BoolToStringConverter TrueString="ОТКРЫТ (Open)" FalseString="ЗАКРЫТ (Closed)" />
+                                            </Binding.Converter>
+                                        </Binding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Alarm Status -->
+                        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,4,0,0">
+                            <TextBlock Text="Рассогласование:" Foreground="#888" FontSize="11" />
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="{Binding AlarmStateText}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center">
+                                    <TextBlock.Foreground>
+                                        <Binding Path="ValveViewModel.IsAlarmActive">
+                                            <Binding.Converter>
+                                                <c:BoolToBrushConverter TrueBrush="#FF3B30" FalseBrush="#4CD964" />
+                                            </Binding.Converter>
+                                        </Binding>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+
+                                <!-- Alarm Action button (Disable / Reset) -->
+                                <Button Content="Отключить" 
+                                        Command="{Binding DisableAlarmCommand}"
+                                        IsVisible="{Binding !ValveViewModel.AlarmDisabled}"
+                                        Background="#4A4D52" Foreground="White" Padding="8,2" FontSize="11" Height="22" CornerRadius="3" VerticalAlignment="Center" />
+                                <Button Content="Сбросить / Включить" 
+                                        Command="{Binding ResetAlarmCommand}"
+                                        IsVisible="{Binding ValveViewModel.AlarmDisabled}"
+                                        Background="#007ACC" Foreground="White" Padding="8,2" FontSize="11" Height="22" CornerRadius="3" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Alarm Disabling Checkbox -->
+                <CheckBox Content="Отключить сигнализацию ошибки рассогласования" 
+                          IsChecked="{Binding ValveViewModel.AlarmDisabled, Mode=TwoWay}" 
+                          Foreground="White" FontSize="12" Margin="0,2,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Column 1: Right Side - Virtual Numeric Keypad Panel -->
+        <Border Grid.Column="1" 
+                IsVisible="{Binding IsKeypadVisible}"
+                Background="#2D2D30" 
+                BorderBrush="#4E4E50" 
+                BorderThickness="1.5" 
+                CornerRadius="6" 
+                Padding="10" 
+                Width="190"
+                Margin="10,0,0,0">
+            <Grid RowDefinitions="Auto,*">
+                <!-- Numpad Display -->
+                <Border Grid.Row="0" Background="#18181A" BorderBrush="#555" BorderThickness="1" CornerRadius="4" Margin="0,0,0,8" Height="40">
+                    <TextBlock Text="{Binding SetpointInputText}" FontSize="22" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="8,0"/>
+                </Border>
+
+                <!-- Numpad Grid -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,*,*" RowDefinitions="*,*,*,*,*" Margin="-2">
+                    <Grid.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="FontSize" Value="18"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Margin" Value="2"/>
+                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Background" Value="#3E3E42"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                    </Grid.Styles>
+
+                    <Button Grid.Row="0" Grid.Column="0" Content="7" Command="{Binding NumpadAppendCommand}" CommandParameter="7"/>
+                    <Button Grid.Row="0" Grid.Column="1" Content="8" Command="{Binding NumpadAppendCommand}" CommandParameter="8"/>
+                    <Button Grid.Row="0" Grid.Column="2" Content="9" Command="{Binding NumpadAppendCommand}" CommandParameter="9"/>
+
+                    <Button Grid.Row="1" Grid.Column="0" Content="4" Command="{Binding NumpadAppendCommand}" CommandParameter="4"/>
+                    <Button Grid.Row="1" Grid.Column="1" Content="5" Command="{Binding NumpadAppendCommand}" CommandParameter="5"/>
+                    <Button Grid.Row="1" Grid.Column="2" Content="6" Command="{Binding NumpadAppendCommand}" CommandParameter="6"/>
+
+                    <Button Grid.Row="2" Grid.Column="0" Content="1" Command="{Binding NumpadAppendCommand}" CommandParameter="1"/>
+                    <Button Grid.Row="2" Grid.Column="1" Content="2" Command="{Binding NumpadAppendCommand}" CommandParameter="2"/>
+                    <Button Grid.Row="2" Grid.Column="2" Content="3" Command="{Binding NumpadAppendCommand}" CommandParameter="3"/>
+
+                    <Button Grid.Row="3" Grid.Column="0" Content="0" Command="{Binding NumpadAppendCommand}" CommandParameter="0"/>
+                    <Button Grid.Row="3" Grid.Column="1" Content="00" Command="{Binding NumpadAppendCommand}" CommandParameter="00"/>
+                    <Button Grid.Row="3" Grid.Column="2" Content="⌫" Command="{Binding NumpadBackspaceCommand}" Background="#8B0000"/>
+
+                    <Button Grid.Row="4" Grid.Column="0" Content="C" Command="{Binding NumpadClearCommand}" Background="#8B0000"/>
+                    <Button Grid.Row="4" Grid.Column="1" Content="Esc" Command="{Binding NumpadCancelCommand}" FontSize="12" Background="#555"/>
+                    <Button Grid.Row="4" Grid.Column="2" Content="Ent" Command="{Binding NumpadConfirmCommand}" Background="#006400"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

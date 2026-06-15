@@ -108,6 +108,10 @@ namespace AvaloniaApplication1.Models.Config
         // Valve properties
         public bool IsVertical { get; set; } = false;
         public string ActuatorType { get; set; } = "Solenoid";
+        public int Rotation { get; set; } = 0;
+        public bool AlarmDisabled { get; set; } = false;
+        public double Tolerance { get; set; } = 10.0;
+        public DataSourceConfig? ModeSource { get; set; }
     }
 
     public class DataSourceConfig

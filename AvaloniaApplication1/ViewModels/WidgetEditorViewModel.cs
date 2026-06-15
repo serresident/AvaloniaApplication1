@@ -117,6 +117,20 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _isVertical;
 
+        public int[] AvailableRotations => new[] { 0, 90, 180, 270 };
+
+        [ObservableProperty]
+        private int _selectedRotation = 0;
+
+        [ObservableProperty]
+        private double _tolerance = 10.0;
+
+        [ObservableProperty]
+        private string? _modeConnectionId;
+
+        [ObservableProperty]
+        private string _modeAddress = string.Empty;
+
         public string[] AvailableActuatorTypes => new[] { "Solenoid", "Diaphragm", "Manual", "None" };
 
         [ObservableProperty]
@@ -185,6 +199,10 @@ namespace AvaloniaApplication1.ViewModels
                 ControlWindowHeight = existingConfig.ControlWindowHeight > 0 ? existingConfig.ControlWindowHeight : 280;
                 IsVertical = existingConfig.IsVertical;
                 SelectedActuatorType = string.IsNullOrEmpty(existingConfig.ActuatorType) ? "Solenoid" : existingConfig.ActuatorType;
+                SelectedRotation = existingConfig.Rotation;
+                Tolerance = existingConfig.Tolerance == 0 ? 10.0 : existingConfig.Tolerance;
+                ModeConnectionId = existingConfig.ModeSource?.ConnId;
+                ModeAddress = existingConfig.ModeSource?.Address ?? string.Empty;
             }
 
             UpdateVisibility();
@@ -264,7 +282,12 @@ namespace AvaloniaApplication1.ViewModels
                 ControlWindowWidth = ControlWindowWidth,
                 ControlWindowHeight = ControlWindowHeight,
                 IsVertical = IsVertical,
-                ActuatorType = SelectedActuatorType
+                ActuatorType = SelectedActuatorType,
+                Rotation = SelectedRotation,
+                Tolerance = Tolerance == 0 ? 10.0 : Tolerance,
+                ModeSource = !string.IsNullOrEmpty(ModeAddress)
+                    ? new DataSourceConfig { ConnId = ModeConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" }
+                    : null
             };
         }
     }

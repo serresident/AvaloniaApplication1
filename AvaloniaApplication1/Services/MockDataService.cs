@@ -24,6 +24,15 @@ namespace AvaloniaApplication1.Services
             _currentValues["mqtt1_Pigment/ZAS/ZAS_Actual_Power"] = 150.0f; // ZAS Actual Power
             _currentValues["mqtt1_Pigment/ZAS/ZAS_Setpoint_Power"] = 200.0f; // ZAS Setpoint Power
 
+            // Seed HMI Valve tags
+            _currentValues["mqtt1_gMqt/Mixer/Valve_YV_W1"] = true; // Cutoff open command
+            _currentValues["mqtt1_gMqt/Mixer/Valve_YV_W1_FB"] = false; // Cutoff feedback closed (mismatched)
+            _currentValues["mqtt1_gMqt/Mixer/Valve_YV_S1"] = 75.0f; // Regulating setpoint command
+            _currentValues["mqtt1_gMqt/Mixer/Valve_YV_S1_FB"] = 30.0f; // Regulating feedback (mismatched)
+            _currentValues["mqtt1_gMqt/Mixer/Valve_YV_S1_Mode"] = false; // Regulating mode: Manual (false)
+            _currentValues["mqtt1_gMqt/Mixer/Valve_YV_M1"] = false;
+            _currentValues["mqtt1_gMqt/Mixer/Valve_YV_M1_FB"] = false;
+
             for (int i = 1; i <= 6; i++)
             {
                 _currentValues[$"mqtt1_Pigment/GPA{i}/PPU_Gen_active_power"] = 1100.0f + i * 50.0f;
@@ -113,6 +122,41 @@ namespace AvaloniaApplication1.Services
                         UpdateValue("mqtt1", $"Pigment/GPA{i}/HAS_IN_Word55_0", !alarm);
                     }
                 }
+
+                // Simulate YV_S1 Regulating Valve
+                bool isAuto = GetCurrentValue("mqtt1", "gMqt/Mixer/Valve_YV_S1_Mode") is bool modeVal && modeVal;
+                float sSetpoint = GetCurrentValue("mqtt1", "gMqt/Mixer/Valve_YV_S1") is float spF ? spF : 75.0f;
+                if (isAuto)
+                {
+                    // In Auto mode, simulate PLC program modulating the setpoint
+                    sSetpoint += (float)(_random.NextDouble() - 0.5) * 6.0f;
+                    sSetpoint = Math.Clamp(sSetpoint, 30.0f, 90.0f);
+                    UpdateValue("mqtt1", "gMqt/Mixer/Valve_YV_S1", sSetpoint);
+                }
+
+                float sFeedback = GetCurrentValue("mqtt1", "gMqt/Mixer/Valve_YV_S1_FB") is float fbF ? fbF : 30.0f;
+                // Feedback slowly approaches setpoint (simulating actuator travel speed)
+                if (Math.Abs(sSetpoint - sFeedback) > 0.1f)
+                {
+                    sFeedback += (sSetpoint - sFeedback) * 0.18f;
+                    UpdateValue("mqtt1", "gMqt/Mixer/Valve_YV_S1_FB", sFeedback);
+                }
+
+                // Simulate YV_W1 Cutoff Valve (aligns after a brief delay)
+                bool wCmd = GetCurrentValue("mqtt1", "gMqt/Mixer/Valve_YV_W1") is bool wCmdB && wCmdB;
+                bool wFb = GetCurrentValue("mqtt1", "gMqt/Mixer/Valve_YV_W1_FB") is bool wFbB && wFbB;
+                if (wCmd != wFb)
+                {
+                    // 30% chance to align on each tick (approx 3 seconds travel time)
+                    if (_random.Next(0, 10) < 3)
+                    {
+                        UpdateValue("mqtt1", "gMqt/Mixer/Valve_YV_W1_FB", wCmd);
+                    }
+                }
+
+                // Simulate YV_M1 Cutoff Valve (instant alignment)
+                bool mCmd = GetCurrentValue("mqtt1", "gMqt/Mixer/Valve_YV_M1") is bool mCmdB && mCmdB;
+                UpdateValue("mqtt1", "gMqt/Mixer/Valve_YV_M1_FB", mCmd);
             }
         }
 
