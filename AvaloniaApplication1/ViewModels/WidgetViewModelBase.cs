@@ -29,6 +29,9 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private DataSourceConfig? _source;
 
+        [ObservableProperty]
+        private bool _isSelected;
+
         public IProjectContextService ProjectContext { get; }
 
         /// <summary>

@@ -22,6 +22,9 @@ namespace AvaloniaApplication1.ViewModels
         public double CellWidth { get; }
         public double CellHeight { get; }
 
+        [ObservableProperty]
+        private double _zoomScale = 1.0;
+
         public DashboardViewModel(
             DashboardConfig dashboardConfig, 
             IMockDataService mockDataService, 
@@ -225,6 +228,12 @@ namespace AvaloniaApplication1.ViewModels
                     ResolvePipeConnections();
                 }
             }
+        }
+
+        [RelayCommand]
+        private void ResetZoom()
+        {
+            ZoomScale = 1.0;
         }
 
         private void OnWidgetPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

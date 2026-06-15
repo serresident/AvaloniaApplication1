@@ -1,4 +1,9 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+# -*- coding: utf-8 -*-
+import os
+
+file_path = r"c:\Users\ess2\source\repos\AvaloniaApplication1\AvaloniaApplication1\Views\DashboardView.axaml"
+
+content = """<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -621,4 +626,8 @@
              </Button.Styles>
          </Button>
      </Grid>
- </UserControl>
+ </UserControl>"""
+
+with open(file_path, "w", encoding="utf-8-sig") as f:
+    f.write(content)
+print("File written successfully!")

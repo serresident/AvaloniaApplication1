@@ -146,7 +146,9 @@ namespace AvaloniaApplication1.Views
             {
                 if (_selectedVm != value)
                 {
+                    if (_selectedVm != null) _selectedVm.IsSelected = false;
                     _selectedVm = value;
+                    if (_selectedVm != null) _selectedVm.IsSelected = true;
                     InvalidateVisual();
                     _selectionOverlay?.InvalidateVisual();
                 }

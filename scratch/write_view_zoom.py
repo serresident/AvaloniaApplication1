@@ -1,4 +1,9 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+# -*- coding: utf-8 -*-
+import os
+
+file_path = r"c:\Users\ess2\source\repos\AvaloniaApplication1\AvaloniaApplication1\Views\DashboardView.axaml"
+
+content = """<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -17,9 +22,6 @@
      <Grid>
          <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
              <LayoutTransformControl Name="ZoomControl">
-                 <LayoutTransformControl.LayoutTransform>
-                     <ScaleTransform ScaleX="{Binding ZoomScale}" ScaleY="{Binding ZoomScale}" />
-                 </LayoutTransformControl.LayoutTransform>
                  <ItemsControl ItemsSource="{Binding Widgets}" x:Name="WidgetsItemsControl">
                      <ItemsControl.ItemsPanel>
                          <ItemsPanelTemplate>
@@ -354,7 +356,7 @@
                                        </ContextMenu>
                                    </Border.ContextMenu>
                                    <Grid ClipToBounds="False">
-                                       <!-- Floating Toolbar -->
+                                       <!-- Floating Toolbar (above the pipe top-right corner) -->
                                        <Border VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,-32,0,0" Height="26" Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="4,2" BoxShadow="0 2 8 0 #80000000">
                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                <Button Content="📋" ToolTip.Tip="Копировать" FontSize="11" Width="20" Height="20" Padding="0" Background="Transparent" Foreground="White"
@@ -590,21 +592,6 @@
              </LayoutTransformControl>
          </ScrollViewer>
 
-         <!-- Floating Zoom Control Toolbar (Visible only in Design Mode) -->
-         <Border IsVisible="{Binding ProjectContext.IsDesignMode}"
-                 HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                 Margin="20" Padding="10,6"
-                 Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1"
-                 CornerRadius="8" BoxShadow="0 4 12 0 #90000000" ZIndex="1000">
-             <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                 <TextBlock Text="Масштаб:" Foreground="Gray" VerticalAlignment="Center" FontSize="12" />
-                 <Slider Minimum="0.5" Maximum="3.0" Value="{Binding ZoomScale, Mode=TwoWay}" Width="120" VerticalAlignment="Center" />
-                 <TextBlock Text="{Binding ZoomScale, StringFormat=\{0:P0\}}" Foreground="White" Width="45" TextAlignment="Right" VerticalAlignment="Center" FontSize="12" />
-                 <Border Width="1" Background="#3E3E42" Height="16" Margin="5,0" />
-                 <Button Content="100%" Command="{Binding ResetZoomCommand}" FontSize="11" Padding="6,3" Background="#4A4A4D" Foreground="White" CornerRadius="4" VerticalAlignment="Center" />
-             </StackPanel>
-         </Border>
-
          <!-- Global Add Widget Button (Visible only in Design Mode) -->
          <Button IsVisible="{Binding ProjectContext.IsDesignMode}" 
                  Content="+" 
@@ -621,4 +608,8 @@
              </Button.Styles>
          </Button>
      </Grid>
- </UserControl>
+ </UserControl>"""
+
+with open(file_path, "w", encoding="utf-8-sig") as f:
+    f.write(content)
+print("File written successfully!")
