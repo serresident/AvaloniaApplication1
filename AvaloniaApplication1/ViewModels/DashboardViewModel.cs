@@ -114,6 +114,32 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         [RelayCommand]
+        private void DuplicateWidget(WidgetViewModelBase? widget)
+        {
+            if (widget == null) return;
+
+            var sourceConfig = widget.OriginalConfig;
+            var json = System.Text.Json.JsonSerializer.Serialize(sourceConfig);
+            var clonedConfig = System.Text.Json.JsonSerializer.Deserialize<WidgetConfig>(json);
+
+            if (clonedConfig != null)
+            {
+                clonedConfig.Position.Row += 2;
+                clonedConfig.Position.Col += 2;
+
+                _dashboardConfig.Widgets.Add(clonedConfig);
+
+                var vm = CreateWidgetViewModel(clonedConfig);
+                if (vm != null)
+                {
+                    vm.PropertyChanged += OnWidgetPropertyChanged;
+                    Widgets.Add(vm);
+                    ResolvePipeConnections();
+                }
+            }
+        }
+
+        [RelayCommand]
         private async Task EditWidgetAsync(WidgetViewModelBase? widget)
         {
             if (widget == null || _dialogService == null) return;

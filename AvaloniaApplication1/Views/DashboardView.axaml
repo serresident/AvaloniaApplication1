@@ -40,6 +40,9 @@
                                      <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
                                              CommandParameter="{Binding}" />
+                                     <Button Content="📋" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
+                                             CommandParameter="{Binding}" />
                                      <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                              CommandParameter="{Binding}" />
@@ -66,6 +69,9 @@
                                      <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
                                              CommandParameter="{Binding}" />
+                                     <Button Content="📋" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
+                                             CommandParameter="{Binding}" />
                                      <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                              CommandParameter="{Binding}" />
@@ -90,6 +96,9 @@
                                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
                                      <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="📋" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
                                              CommandParameter="{Binding}" />
                                      <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
@@ -120,6 +129,9 @@
                                      <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
                                              CommandParameter="{Binding}" />
+                                     <Button Content="📋" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
+                                             CommandParameter="{Binding}" />
                                      <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                              CommandParameter="{Binding}" />
@@ -146,6 +158,9 @@
                                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
                                      <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="📋" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
                                              CommandParameter="{Binding}" />
                                      <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
@@ -180,6 +195,9 @@
                                      <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
                                              CommandParameter="{Binding}" />
+                                     <Button Content="📋" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
+                                             CommandParameter="{Binding}" />
                                      <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                              CommandParameter="{Binding}" />
@@ -213,6 +231,9 @@
                                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
                                      <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="📋" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
                                              CommandParameter="{Binding}" />
                                      <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
@@ -250,6 +271,10 @@
                                       Background="#AA2D2D30" Foreground="White"
                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
                                       CommandParameter="{Binding}" />
+                              <Button Content="📋" FontSize="12" Width="24" Height="24" Padding="0"
+                                      Background="#AA2D2D30" Foreground="White"
+                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
+                                      CommandParameter="{Binding}" />
                               <Button Content="❌" FontSize="12" Width="24" Height="24" Padding="0"
                                       Background="#AAFF0000" Foreground="White"
                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
@@ -260,14 +285,15 @@
 
                   <!-- Valve (Клапан / Задвижка) -->
                   <DataTemplate DataType="{x:Type vm:ValveWidgetViewModel}">
-                      <Grid>
+                      <Grid ClipToBounds="False">
                           <Button Command="{Binding OpenControlPopupCommand}"
                                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                  Background="Transparent" BorderThickness="0" Padding="0">
-                              <Border Background="#2B2B2B" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Margin="2">
-                                  <Grid RowDefinitions="*,Auto">
+                                  Background="Transparent" BorderThickness="0" Padding="0"
+                                  ClipToBounds="False">
+                              <Border Background="Transparent" BorderThickness="0" Margin="0" ClipToBounds="False">
+                                  <Grid RowDefinitions="*,Auto" ClipToBounds="False">
                                       <!-- Valve Graphic -->
-                                      <Grid Grid.Row="0" Margin="8,10,8,4">
+                                      <Grid Grid.Row="0" Margin="0" ClipToBounds="False">
                                           <v:ValveControl 
                                               ValveType="{Binding ValveType}"
                                               IsOpen="{Binding IsOpen}"
@@ -299,6 +325,9 @@
                                   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
                                       <Button Content="⚙" FontSize="16" Background="Transparent" Foreground="White"
                                               Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                              CommandParameter="{Binding}" />
+                                      <Button Content="📋" FontSize="16" Background="Transparent" Foreground="White"
+                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
                                               CommandParameter="{Binding}" />
                                       <Button Content="❌" FontSize="16" Background="Transparent" Foreground="Red"
                                               Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
@@ -337,6 +366,9 @@
                                   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
                                       <Button Content="⚙" FontSize="16" Background="Transparent" Foreground="White"
                                               Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                              CommandParameter="{Binding}" />
+                                      <Button Content="📋" FontSize="16" Background="Transparent" Foreground="White"
+                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
                                               CommandParameter="{Binding}" />
                                       <Button Content="❌" FontSize="16" Background="Transparent" Foreground="Red"
                                               Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
@@ -380,6 +412,9 @@
                                       <Button Content="⚙" FontSize="16" Background="Transparent" Foreground="White"
                                               Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
                                               CommandParameter="{Binding}" />
+                                      <Button Content="📋" FontSize="16" Background="Transparent" Foreground="White"
+                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
+                                              CommandParameter="{Binding}" />
                                       <Button Content="❌" FontSize="16" Background="Transparent" Foreground="Red"
                                               Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                               CommandParameter="{Binding}" />
@@ -405,6 +440,9 @@
                                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
                                      <Button Content="⚙" FontSize="20" Background="Transparent" Foreground="White"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}"
+                                             CommandParameter="{Binding}" />
+                                     <Button Content="📋" FontSize="20" Background="Transparent" Foreground="White"
+                                             Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
                                              CommandParameter="{Binding}" />
                                      <Button Content="❌" FontSize="20" Background="Transparent" Foreground="Red"
                                              Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"

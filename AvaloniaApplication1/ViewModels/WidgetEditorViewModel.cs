@@ -20,10 +20,10 @@ namespace AvaloniaApplication1.ViewModels
 
         // --- Position ---
         [ObservableProperty]
-        private int _row;
+        private double _row;
 
         [ObservableProperty]
-        private int _col;
+        private double _col;
 
         [ObservableProperty]
         private int _sizeX = 1;
@@ -158,6 +158,8 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _showIndustrialSettings;
 
+        private bool _isEditing;
+
         // --- Result ---
         public bool IsConfirmed { get; private set; }
         public Action? CloseAction { get; set; }
@@ -168,6 +170,7 @@ namespace AvaloniaApplication1.ViewModels
 
             if (existingConfig != null)
             {
+                _isEditing = true;
                 SelectedWidgetType = existingConfig.Type;
                 Title = existingConfig.Title;
                 Row = existingConfig.Position.Row;
@@ -204,8 +207,50 @@ namespace AvaloniaApplication1.ViewModels
                 ModeConnectionId = existingConfig.ModeSource?.ConnId;
                 ModeAddress = existingConfig.ModeSource?.Address ?? string.Empty;
             }
+            else
+            {
+                _isEditing = false;
+                SetDefaultSizes(SelectedWidgetType);
+            }
 
             UpdateVisibility();
+        }
+
+        private void SetDefaultSizes(string type)
+        {
+            switch (type)
+            {
+                case "Valve":
+                case "Pump":
+                    SizeX = 6;
+                    SizeY = 6;
+                    break;
+                case "Tank":
+                    SizeX = 12;
+                    SizeY = 20;
+                    break;
+                case "Pipe":
+                    SizeX = 16;
+                    SizeY = 2;
+                    break;
+                case "ValueDisplay":
+                case "SetValue":
+                    SizeX = 8;
+                    SizeY = 4;
+                    break;
+                case "RealTimeTrend":
+                    SizeX = 16;
+                    SizeY = 10;
+                    break;
+                case "Slider":
+                    SizeX = 12;
+                    SizeY = 3;
+                    break;
+                default:
+                    SizeX = 4;
+                    SizeY = 4;
+                    break;
+            }
         }
 
         partial void OnSelectedWidgetTypeChanged(string value)
@@ -214,6 +259,10 @@ namespace AvaloniaApplication1.ViewModels
             if (value == "Pipe" && string.IsNullOrEmpty(PipePoints))
             {
                 PipePoints = "0,0;10,0";
+            }
+            if (!_isEditing)
+            {
+                SetDefaultSizes(value);
             }
         }
 

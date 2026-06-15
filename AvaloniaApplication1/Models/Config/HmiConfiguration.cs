@@ -123,8 +123,8 @@ namespace AvaloniaApplication1.Models.Config
 
     public class WidgetPosition
     {
-        public int Row { get; set; } = 0;
-        public int Col { get; set; } = 0;
+        public double Row { get; set; } = 0;
+        public double Col { get; set; } = 0;
         public int SizeX { get; set; } = 1;
         public int SizeY { get; set; } = 1;
     }

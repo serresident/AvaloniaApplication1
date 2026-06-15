@@ -76,6 +76,9 @@ namespace AvaloniaApplication1.ViewModels
         private readonly DispatcherTimer _alarmTimer;
         private bool _wasAlarmActive;
 
+        private double? _lastPopupX;
+        private double? _lastPopupY;
+
         public ValveWidgetViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
@@ -209,6 +212,7 @@ namespace AvaloniaApplication1.ViewModels
                     if (fbVal is bool b) IsOpen = b;
                     else if (fbVal is int i) IsOpen = i > 0;
                     else if (double.TryParse(fbVal.ToString(), out double num)) IsOpen = num > 0;
+                    Feedback = IsOpen ? 100 : 0;
                 }
             }
 
@@ -314,7 +318,7 @@ namespace AvaloniaApplication1.ViewModels
             var mainVm = App.Services?.GetService<MainViewModel>();
             if (mainVm == null) return;
 
-            var titleToFind = $"{Title} [Control]";
+            var titleToFind = $"Управление клапаном {Title}";
             var existing = mainVm.ActiveChildWindows.FirstOrDefault(w => w.Title == titleToFind);
             if (existing != null)
             {
@@ -327,6 +331,24 @@ namespace AvaloniaApplication1.ViewModels
             _controlWindow = mainVm.OpenChildWindow(titleToFind, new object());
             if (_controlWindow != null)
             {
+                // Position window
+                if (_lastPopupX.HasValue && _lastPopupY.HasValue)
+                {
+                    _controlWindow.X = _lastPopupX.Value;
+                    _controlWindow.Y = _lastPopupY.Value;
+                }
+                else
+                {
+                    double cellWidth = mainVm.Dashboard?.CellWidth ?? 150;
+                    double cellHeight = mainVm.Dashboard?.CellHeight ?? 150;
+                    double valveX = Col * cellWidth;
+                    double valveY = Row * cellHeight;
+                    double valveHeight = SizeY * cellHeight;
+
+                    _controlWindow.X = Math.Max(10, valveX - 80);
+                    _controlWindow.Y = Math.Max(10, valveY + valveHeight + 10);
+                }
+
                 // Instantiate Popup VM and link to window Content
                 var popupVm = new ValveControlPopupViewModel(this, () => _controlWindow?.CloseCommand.Execute(null));
                 _controlWindow.Content = popupVm;
@@ -334,11 +356,17 @@ namespace AvaloniaApplication1.ViewModels
                 // Adjust width dynamically
                 int baseWidth = IsRegulating ? 450 : 340;
                 _controlWindow.Width = popupVm.IsKeypadVisible ? (baseWidth + 190) : baseWidth;
-                _controlWindow.Height = 350;
+                _controlWindow.Height = IsRegulating ? 400 : 350;
 
                 var originalClose = _controlWindow.CloseAction;
                 _controlWindow.CloseAction = () =>
                 {
+                    if (_controlWindow != null)
+                    {
+                        _lastPopupX = _controlWindow.X;
+                        _lastPopupY = _controlWindow.Y;
+                    }
+
                     originalClose?.Invoke();
                     popupVm.Dispose();
                     _controlWindow = null;

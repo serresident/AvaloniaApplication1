@@ -62,6 +62,46 @@ namespace AvaloniaApplication1.Views
         }
     }
 
+    /// <summary>
+    /// A lightweight control drawn on top of the widgets to show selection highlight.
+    /// Added as last child of DashboardPanel when in design mode.
+    /// </summary>
+    public class SelectionOverlay : Control
+    {
+        private readonly DashboardPanel _panel;
+
+        public SelectionOverlay(DashboardPanel panel)
+        {
+            _panel = panel;
+            IsHitTestVisible = false;
+        }
+
+        public override void Render(DrawingContext context)
+        {
+            base.Render(context);
+
+            if (_panel.IsDesignMode && _panel.SelectedVm != null)
+            {
+                double x = _panel.SelectedVm.Col * _panel.CellWidth;
+                double y = _panel.SelectedVm.Row * _panel.CellHeight;
+                double w = _panel.SelectedVm.SizeX * _panel.CellWidth;
+                double h = _panel.SelectedVm.SizeY * _panel.CellHeight;
+
+                var fillBrush = new SolidColorBrush(Color.FromArgb(30, 0, 122, 255));
+                var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 2.0);
+                
+                context.DrawRectangle(fillBrush, borderPen, new Rect(x, y, w, h), 4, 4);
+
+                var handleBrush = Brushes.White;
+                var handlePen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 1.5);
+                context.DrawEllipse(handleBrush, handlePen, new Point(x, y), 4, 4);
+                context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y), 4, 4);
+                context.DrawEllipse(handleBrush, handlePen, new Point(x, y + h), 4, 4);
+                context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y + h), 4, 4);
+            }
+        }
+    }
+
     public class DashboardPanel : Panel
     {
         public static readonly StyledProperty<double> CellWidthProperty =
@@ -95,8 +135,22 @@ namespace AvaloniaApplication1.Views
         private Control? _dragChild;
         private WidgetViewModelBase? _dragVm;
         private Point _dragStartPoint;
-        private int _dragOriginalRow;
-        private int _dragOriginalCol;
+        private double _dragOriginalRow;
+        private double _dragOriginalCol;
+        private WidgetViewModelBase? _selectedVm;
+        public WidgetViewModelBase? SelectedVm
+        {
+            get => _selectedVm;
+            set
+            {
+                if (_selectedVm != value)
+                {
+                    _selectedVm = value;
+                    InvalidateVisual();
+                    _selectionOverlay?.InvalidateVisual();
+                }
+            }
+        }
         private bool _isDragging;
         private bool _isResizing;
         private int _dragOriginalSizeX;
@@ -108,6 +162,8 @@ namespace AvaloniaApplication1.Views
 
         // Grid overlay control
         private GridOverlay? _gridOverlay;
+        private SelectionOverlay? _selectionOverlay;
+        private bool _isManagingOverlays;
 
         static DashboardPanel()
         {
@@ -121,6 +177,7 @@ namespace AvaloniaApplication1.Views
 
         public DashboardPanel()
         {
+            Focusable = true;
             foreach (var child in Children)
             {
                 child.DataContextChanged += Child_DataContextChanged;
@@ -129,6 +186,7 @@ namespace AvaloniaApplication1.Views
 
             Children.CollectionChanged += (s, e) =>
             {
+                if (_isManagingOverlays) return;
                 if (e.OldItems != null)
                 {
                     foreach (Control child in e.OldItems)
@@ -145,6 +203,7 @@ namespace AvaloniaApplication1.Views
                         SubscribeVm(child.DataContext as WidgetViewModelBase);
                     }
                 }
+                EnsureSelectionOverlayOnTop();
                 InvalidateMeasure();
                 InvalidateArrange();
             };
@@ -186,30 +245,76 @@ namespace AvaloniaApplication1.Views
             {
                 InvalidateMeasure();
                 InvalidateArrange();
+                InvalidateVisual();
+                _selectionOverlay?.InvalidateVisual();
             }
         }
 
         private void UpdateGridOverlay()
         {
-            if (IsDesignMode)
+            if (_isManagingOverlays) return;
+            _isManagingOverlays = true;
+            try
             {
-                if (_gridOverlay == null)
+                if (IsDesignMode)
                 {
-                    _gridOverlay = new GridOverlay
+                    if (_gridOverlay == null)
                     {
-                        CellWidth = CellWidth,
-                        CellHeight = CellHeight,
-                        IsHitTestVisible = false // Don't intercept clicks
-                    };
-                    Children.Insert(0, _gridOverlay);
+                        _gridOverlay = new GridOverlay
+                        {
+                            CellWidth = CellWidth,
+                            CellHeight = CellHeight,
+                            IsHitTestVisible = false // Don't intercept clicks
+                        };
+                        Children.Insert(0, _gridOverlay);
+                    }
+                    if (_selectionOverlay == null)
+                    {
+                        _selectionOverlay = new SelectionOverlay(this)
+                        {
+                            IsHitTestVisible = false
+                        };
+                        Children.Add(_selectionOverlay);
+                    }
+                }
+                else
+                {
+                    if (_gridOverlay != null)
+                    {
+                        Children.Remove(_gridOverlay);
+                        _gridOverlay = null;
+                    }
+                    if (_selectionOverlay != null)
+                    {
+                        Children.Remove(_selectionOverlay);
+                        _selectionOverlay = null;
+                    }
                 }
             }
-            else
+            finally
             {
-                if (_gridOverlay != null)
+                _isManagingOverlays = false;
+            }
+        }
+
+        private void EnsureSelectionOverlayOnTop()
+        {
+            if (IsDesignMode && _selectionOverlay != null)
+            {
+                int index = Children.IndexOf(_selectionOverlay);
+                if (index >= 0 && index < Children.Count - 1)
                 {
-                    Children.Remove(_gridOverlay);
-                    _gridOverlay = null;
+                    if (_isManagingOverlays) return;
+                    _isManagingOverlays = true;
+                    try
+                    {
+                        Children.Remove(_selectionOverlay);
+                        Children.Add(_selectionOverlay);
+                    }
+                    finally
+                    {
+                        _isManagingOverlays = false;
+                    }
                 }
             }
         }
@@ -220,7 +325,10 @@ namespace AvaloniaApplication1.Views
 
             if (e.Handled || !IsDesignMode) return;
 
+            Focus();
+
             var point = e.GetPosition(this);
+            bool clickedWidget = false;
 
             // 1. Check if we clicked on a vertex of any Pipe widget
             foreach (var child in Children)
@@ -300,7 +408,7 @@ namespace AvaloniaApplication1.Views
             // Find which child was clicked
             foreach (var child in Children)
             {
-                if (child == _gridOverlay) continue; // Skip overlay
+                if (child == _gridOverlay || child == _selectionOverlay) continue; // Skip overlays
 
                 if (child.DataContext is WidgetViewModelBase vm)
                 {
@@ -310,9 +418,14 @@ namespace AvaloniaApplication1.Views
 
                     if (childBounds.Contains(point))
                     {
-                        // Check if click was in the bottom-right corner for resize (24x24 pixels)
-                        var resizeRect = new Rect(childBounds.Right - 24, childBounds.Bottom - 24, 24, 24);
-                        if (resizeRect.Contains(point))
+                        bool wasSelected = SelectedVm == vm;
+                        SelectedVm = vm;
+                        clickedWidget = true;
+
+                        // Check if click was in the bottom-right corner for resize (36x36 pixels)
+                        // ONLY allow resize if the widget was ALREADY selected!
+                        var resizeRect = new Rect(childBounds.Right - 36, childBounds.Bottom - 36, 36, 36);
+                        if (wasSelected && resizeRect.Contains(point))
                         {
                             _dragChild = child;
                             _dragVm = vm;
@@ -332,10 +445,18 @@ namespace AvaloniaApplication1.Views
                             _isDragging = false; // Not dragging until threshold is met
                             _isResizing = false;
                         }
+                        
+                        // Capture pointer for robust drag/resize tracking
+                        e.Pointer.Capture(this);
                         e.Handled = true;
                         return;
                     }
                 }
+            }
+
+            if (!clickedWidget)
+            {
+                SelectedVm = null;
             }
         }
 
@@ -447,18 +568,22 @@ namespace AvaloniaApplication1.Views
                     bool overResize = false;
                     foreach (var child in Children)
                     {
-                        if (child == _gridOverlay) continue;
+                        if (child == _gridOverlay || child == _selectionOverlay) continue;
                         if (child.DataContext is WidgetViewModelBase vm)
                         {
-                            var childBounds = new Rect(
-                                vm.Col * CellWidth, vm.Row * CellHeight,
-                                vm.SizeX * CellWidth, vm.SizeY * CellHeight);
-
-                            var resizeRect = new Rect(childBounds.Right - 24, childBounds.Bottom - 24, 24, 24);
-                            if (resizeRect.Contains(point))
+                            // ONLY show resize cursor if this widget is the currently selected one!
+                            if (SelectedVm == vm)
                             {
-                                overResize = true;
-                                break;
+                                var childBounds = new Rect(
+                                    vm.Col * CellWidth, vm.Row * CellHeight,
+                                    vm.SizeX * CellWidth, vm.SizeY * CellHeight);
+
+                                var resizeRect = new Rect(childBounds.Right - 36, childBounds.Bottom - 36, 36, 36);
+                                if (resizeRect.Contains(point))
+                                {
+                                    overResize = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -486,8 +611,8 @@ namespace AvaloniaApplication1.Views
                 if (_gridOverlay != null)
                 {
                     _gridOverlay.ShowHighlight = true;
-                    _gridOverlay.HighlightCol = _dragVm.Col;
-                    _gridOverlay.HighlightRow = _dragVm.Row;
+                    _gridOverlay.HighlightCol = (int)Math.Round(_dragVm.Col);
+                    _gridOverlay.HighlightRow = (int)Math.Round(_dragVm.Row);
                     _gridOverlay.HighlightSizeX = newSizeX;
                     _gridOverlay.HighlightSizeY = newSizeY;
                     _gridOverlay.InvalidateVisual();
@@ -558,9 +683,8 @@ namespace AvaloniaApplication1.Views
             {
                 var point = e.GetPosition(this);
 
-                // Calculate new grid position
-                int newCol = (int)Math.Max(0, Math.Floor(point.X / CellWidth));
-                int newRow = (int)Math.Max(0, Math.Floor(point.Y / CellHeight));
+                double newCol = Math.Max(0, Math.Round(point.X / CellWidth));
+                double newRow = Math.Max(0, Math.Round(point.Y / CellHeight));
 
                 // Update the VM (which updates the UI via bindings)
                 _dragVm.Row = newRow;
@@ -575,8 +699,14 @@ namespace AvaloniaApplication1.Views
                 InvalidateArrange();
             }
 
-            // Clear drag state and highlight
+            // Clear drag state FIRST so OnPointerCaptureLost doesn't revert anything
             ClearDragState();
+
+            // Release pointer capture
+            if (e.Pointer.Captured == this)
+            {
+                e.Pointer.Capture(null);
+            }
         }
 
         protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
@@ -634,9 +764,9 @@ namespace AvaloniaApplication1.Views
 
             foreach (var child in Children)
             {
-                if (child == _gridOverlay)
+                if (child == _gridOverlay || child == _selectionOverlay)
                 {
-                    // Grid overlay fills entire panel — measured later
+                    // Overlay fills entire panel — measured later
                     continue;
                 }
 
@@ -655,20 +785,22 @@ namespace AvaloniaApplication1.Views
                 }
             }
 
-            // Now measure the grid overlay to fill everything
+            // Now measure the overlays to fill everything
             _gridOverlay?.Measure(new Size(maxWidth, maxHeight));
+            _selectionOverlay?.Measure(new Size(maxWidth, maxHeight));
 
             return new Size(maxWidth, maxHeight);
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            // Arrange grid overlay to fill entire panel
+            // Arrange overlays to fill entire panel
             _gridOverlay?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
+            _selectionOverlay?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
 
             foreach (var child in Children)
             {
-                if (child == _gridOverlay) continue;
+                if (child == _gridOverlay || child == _selectionOverlay) continue;
 
                 if (child.DataContext is WidgetViewModelBase vm)
                 {
@@ -686,6 +818,51 @@ namespace AvaloniaApplication1.Views
             }
 
             return finalSize;
+        }
+
+        protected override void OnKeyDown(Avalonia.Input.KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (!IsDesignMode || SelectedVm == null) return;
+
+            bool isShiftPressed = e.KeyModifiers.HasFlag(Avalonia.Input.KeyModifiers.Shift);
+            double stepX = isShiftPressed ? 1.0 : (1.0 / CellWidth);
+            double stepY = isShiftPressed ? 1.0 : (1.0 / CellHeight);
+
+            bool moved = false;
+            if (e.Key == Avalonia.Input.Key.Left)
+            {
+                SelectedVm.Col -= stepX;
+                SelectedVm.OriginalConfig.Position.Col = SelectedVm.Col;
+                moved = true;
+            }
+            else if (e.Key == Avalonia.Input.Key.Right)
+            {
+                SelectedVm.Col += stepX;
+                SelectedVm.OriginalConfig.Position.Col = SelectedVm.Col;
+                moved = true;
+            }
+            else if (e.Key == Avalonia.Input.Key.Up)
+            {
+                SelectedVm.Row -= stepY;
+                SelectedVm.OriginalConfig.Position.Row = SelectedVm.Row;
+                moved = true;
+            }
+            else if (e.Key == Avalonia.Input.Key.Down)
+            {
+                SelectedVm.Row += stepY;
+                SelectedVm.OriginalConfig.Position.Row = SelectedVm.Row;
+                moved = true;
+            }
+
+            if (moved)
+            {
+                e.Handled = true;
+                InvalidateMeasure();
+                InvalidateArrange();
+                _selectionOverlay?.InvalidateVisual();
+            }
         }
 
         private PipeControl? FindPipeControlRecursive(Control control)

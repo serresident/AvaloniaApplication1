@@ -29,6 +29,9 @@ namespace AvaloniaApplication1.ViewModels
 
         public string SliderTooltipText => "Переместите ползунок или используйте колесо мыши для изменения уставки от 0 до 100. Шаг = 1. Для точного ввода используйте цифровую клавиатуру.";
 
+        public string OpenButtonText => IsRegulating ? "ОТКРЫТЬ (100%)" : "ОТКРЫТЬ";
+        public string CloseButtonText => IsRegulating ? "ЗАКРЫТЬ (0%)" : "ЗАКРЫТЬ";
+
         public string AlarmStateText
         {
             get
@@ -42,6 +45,7 @@ namespace AvaloniaApplication1.ViewModels
         private readonly Action _closeAction;
         private double _preKeypadSetpoint;
         private string _preKeypadText = "0";
+        private bool _isFirstKeypadInput;
 
         public ValveControlPopupViewModel(ValveWidgetViewModel valveViewModel, Action closeAction)
         {
@@ -178,6 +182,7 @@ namespace AvaloniaApplication1.ViewModels
                 // Store backup values for cancellation
                 _preKeypadSetpoint = TempSetpoint;
                 _preKeypadText = SetpointInputText;
+                _isFirstKeypadInput = true;
             }
         }
 
@@ -186,21 +191,30 @@ namespace AvaloniaApplication1.ViewModels
         {
             if (!IsManualMode) return;
 
-            string currentText = SetpointInputText;
-            if (currentText == "0" && c != "00")
+            string currentText;
+            if (_isFirstKeypadInput)
             {
-                currentText = c;
-            }
-            else if (c == "00")
-            {
-                if (currentText != "0" && currentText != "")
-                {
-                    currentText += "00";
-                }
+                _isFirstKeypadInput = false;
+                currentText = (c == "00") ? "0" : c;
             }
             else
             {
-                currentText += c;
+                currentText = SetpointInputText;
+                if (currentText == "0" && c != "00")
+                {
+                    currentText = c;
+                }
+                else if (c == "00")
+                {
+                    if (currentText != "0" && currentText != "")
+                    {
+                        currentText += "00";
+                    }
+                }
+                else
+                {
+                    currentText += c;
+                }
             }
 
             if (double.TryParse(currentText, out double val))
@@ -217,6 +231,7 @@ namespace AvaloniaApplication1.ViewModels
         private void NumpadBackspace()
         {
             if (!IsManualMode) return;
+            _isFirstKeypadInput = false;
 
             if (SetpointInputText.Length > 1)
             {
@@ -237,6 +252,7 @@ namespace AvaloniaApplication1.ViewModels
         private void NumpadClear()
         {
             if (!IsManualMode) return;
+            _isFirstKeypadInput = false;
 
             SetpointInputText = "0";
             TempSetpoint = 0;
@@ -245,7 +261,8 @@ namespace AvaloniaApplication1.ViewModels
         [RelayCommand]
         private void NumpadConfirm()
         {
-            // Close Keypad and accept value (Write Setpoint still needs to be clicked to send to controller)
+            if (!IsManualMode) return;
+            WriteSetpoint();
             IsKeypadVisible = false;
         }
 

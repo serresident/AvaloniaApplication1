@@ -115,26 +115,9 @@
                             IsEnabled="{Binding IsManualMode}"
                             TickFrequency="1" IsSnapToTickEnabled="True"
                             ToolTip.Tip="{Binding SliderTooltipText}"
-                            Height="32" />
+                            Padding="10,0"
+                            Height="38" />
                 </StackPanel>
-
-                <!-- Cutoff Action Buttons (Open/Close, visible only for cutoff) -->
-                <Grid ColumnDefinitions="*,*" IsVisible="{Binding !IsRegulating}">
-                    <Button Grid.Column="0" 
-                            Content="ОТКРЫТЬ" 
-                            Command="{Binding WriteCutoffOpenCommand}"
-                            Background="#008A00" Foreground="White" 
-                            Height="40" Margin="0,0,5,0"
-                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                            FontWeight="Bold" FontSize="14" CornerRadius="4"/>
-                    <Button Grid.Column="1" 
-                            Content="ЗАКРЫТЬ" 
-                            Command="{Binding WriteCutoffCloseCommand}"
-                            Background="#E51400" Foreground="White" 
-                            Height="40" Margin="5,0,0,0"
-                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                            FontWeight="Bold" FontSize="14" CornerRadius="4"/>
-                </Grid>
 
                 <!-- Write Button (for Regulating only) -->
                 <Button Content="Записать значение" 
@@ -144,6 +127,24 @@
                         Background="#007ACC" Foreground="White" 
                         Height="36" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         FontWeight="Bold" FontSize="13" CornerRadius="4" />
+
+                <!-- Action Buttons (Open/Close, visible for both regulating and cutoff) -->
+                <Grid ColumnDefinitions="*,*" IsEnabled="{Binding IsManualMode}">
+                    <Button Grid.Column="0" 
+                            Content="{Binding OpenButtonText}" 
+                            Command="{Binding WriteCutoffOpenCommand}"
+                            Background="#008A00" Foreground="White" 
+                            Height="40" Margin="0,0,4,0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            FontWeight="Bold" FontSize="13" CornerRadius="4"/>
+                    <Button Grid.Column="1" 
+                            Content="{Binding CloseButtonText}" 
+                            Command="{Binding WriteCutoffCloseCommand}"
+                            Background="#E51400" Foreground="White" 
+                            Height="40" Margin="4,0,0,0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            FontWeight="Bold" FontSize="13" CornerRadius="4"/>
+                </Grid>
 
                 <!-- Real-time Indicators Section -->
                 <Border Background="#252526" CornerRadius="6" Padding="10" BorderBrush="#323233" BorderThickness="1">
@@ -194,6 +195,16 @@
                                     </TextBlock.Text>
                                 </TextBlock>
                             </StackPanel>
+                            <!-- Premium Feedback Progress Bar -->
+                            <ProgressBar Minimum="0" Maximum="100" 
+                                         Value="{Binding ValveViewModel.Feedback}" 
+                                         Height="10" 
+                                         Margin="0,4,0,0"
+                                         Foreground="{Binding ValveViewModel.CurrentColor, Converter={StaticResource HexToBrush}}" 
+                                         Background="#1E1E1E" 
+                                         BorderBrush="#3E3E42"
+                                         BorderThickness="1"
+                                         CornerRadius="3" />
                         </StackPanel>
 
                         <!-- Alarm Status -->

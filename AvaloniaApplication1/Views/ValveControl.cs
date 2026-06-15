@@ -211,10 +211,9 @@ namespace AvaloniaApplication1.Views
             var rotationTransform = context.PushTransform(rotationMatrix);
 
             // Inside rotated coordinate space, we draw as if it's horizontal.
-            // We scale relative to the minimum dimension to ensure it fits beautifully.
-            double minSize = Math.Min(w, h);
-            double flowSize = minSize * 0.75;  // width of valve bowtie
-            double crossSize = minSize * 0.45; // height of valve bowtie
+            bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
+            double flowSize = isFlowVertical ? h : w;
+            double crossSize = Thickness * 2.0;
 
             double cx = w / 2;
             double cy = h / 2;
@@ -255,16 +254,8 @@ namespace AvaloniaApplication1.Views
                 actuatorColor = Color.FromRgb(255, 30, 30);
             }
 
-            // 1. Draw horizontal pipe connection stubs
-            double pipeThickness = Thickness;
-            double leftEnd = cx - flowSize / 2 - (ShowFlanges ? (flowSize * 0.06) : 0);
-            double rightStart = cx + flowSize / 2 + (ShowFlanges ? (flowSize * 0.06) : 0);
-            
-            var pipeBrush = new SolidColorBrush(Color.FromRgb(100, 100, 104));
-            var pipePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
-            
-            context.DrawRectangle(pipeBrush, pipePen, new Rect(0, cy - pipeThickness / 2, Math.Max(0, leftEnd), pipeThickness));
-            context.DrawRectangle(pipeBrush, pipePen, new Rect(rightStart, cy - pipeThickness / 2, Math.Max(0, w - rightStart), pipeThickness));
+            // 1. Draw horizontal pipe connection stubs (removed)
+
 
             // 2. Draw Actuator (stem + head)
             DrawActuator(context, cx, cy, flowSize, crossSize, actuatorColor);
@@ -437,12 +428,12 @@ namespace AvaloniaApplication1.Views
             }
         }
 
-        private void DrawFlanges(DrawingContext context, double cx, double cy, double w, double h)
+        private void DrawFlanges(DrawingContext context, double cx, double cy, double flowSize, double crossSize)
         {
-            double left = cx - w / 2;
-            double right = cx + w / 2;
-            double flangeW = Math.Max(2.0, w * 0.06);
-            double flangeH = h * 1.1;
+            double left = cx - flowSize / 2;
+            double right = cx + flowSize / 2;
+            double flangeW = Math.Clamp(Thickness * 0.4, 2.0, 8.0);
+            double flangeH = Thickness * 2.2;
 
             var flangeBrush = new SolidColorBrush(Color.FromRgb(160, 160, 164));
             var flangePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 0.6);

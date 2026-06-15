@@ -15,10 +15,10 @@ namespace AvaloniaApplication1.ViewModels
         private string _title = string.Empty;
 
         [ObservableProperty]
-        private int _row;
+        private double _row;
 
         [ObservableProperty]
-        private int _col;
+        private double _col;
 
         [ObservableProperty]
         private int _sizeX;
