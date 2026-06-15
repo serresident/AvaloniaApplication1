@@ -361,7 +361,14 @@ namespace AvaloniaApplication1.Services
                 }
             }
 
-            ScanWidgets(_config.Dashboard.Widgets);
+            if (_config.Dashboard?.Widgets != null)
+            {
+                ScanWidgets(_config.Dashboard.Widgets);
+            }
+            if (_config.Mimic?.Widgets != null)
+            {
+                ScanWidgets(_config.Mimic.Widgets);
+            }
             return list;
         }
 
