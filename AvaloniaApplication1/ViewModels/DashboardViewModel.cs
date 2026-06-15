@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AvaloniaApplication1.ViewModels
