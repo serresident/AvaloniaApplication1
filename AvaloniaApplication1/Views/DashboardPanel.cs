@@ -431,6 +431,14 @@ namespace AvaloniaApplication1.Views
                         SelectedVm = vm;
                         clickedWidget = true;
 
+                        // Правый клик (ПКМ) — только выделяем виджет,
+                        // НЕ блокируем событие, чтобы ContextMenu сработал
+                        if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+                        {
+                            // Не ставим e.Handled — событие всплывёт к Border.ContextMenu
+                            return;
+                        }
+
                         // Check if click was in the bottom-right corner for resize (36x36 pixels)
                         // ONLY allow resize if the widget was ALREADY selected!
                         var resizeRect = new Rect(childBounds.Right - 36, childBounds.Bottom - 36, 36, 36);

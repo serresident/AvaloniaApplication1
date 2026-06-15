@@ -47,6 +47,10 @@
                                           <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                           <Separator />
                                           <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
+                                          <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                          <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
                                       </ContextMenu>
                                   </Border.ContextMenu>
                                   <Grid ClipToBounds="False">
@@ -55,10 +59,6 @@
                                           <StackPanel Orientation="Horizontal" Spacing="6">
                                               <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                      CommandParameter="{Binding}" />
-                                              <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                              <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                       CommandParameter="{Binding}" />
                                           </StackPanel>
                                       </Border>
@@ -87,6 +87,10 @@
                                           <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                           <Separator />
                                           <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
+                                          <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                          <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
                                       </ContextMenu>
                                   </Border.ContextMenu>
                                   <Grid ClipToBounds="False">
@@ -95,10 +99,6 @@
                                           <StackPanel Orientation="Horizontal" Spacing="6">
                                               <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                      CommandParameter="{Binding}" />
-                                              <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                              <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                       CommandParameter="{Binding}" />
                                           </StackPanel>
                                       </Border>
@@ -126,6 +126,10 @@
                                           <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                           <Separator />
                                           <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
+                                          <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                          <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
                                       </ContextMenu>
                                   </Border.ContextMenu>
                                   <Grid ClipToBounds="False">
@@ -134,10 +138,6 @@
                                           <StackPanel Orientation="Horizontal" Spacing="6">
                                               <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                      CommandParameter="{Binding}" />
-                                              <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                              <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                       CommandParameter="{Binding}" />
                                           </StackPanel>
                                       </Border>
@@ -168,6 +168,10 @@
                                           <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                           <Separator />
                                           <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
+                                          <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                          <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
                                       </ContextMenu>
                                   </Border.ContextMenu>
                                   <Grid ClipToBounds="False">
@@ -178,10 +182,6 @@
                                               <Separator Width="1" Background="#3E3E42" Margin="2,0" />
                                               <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                      CommandParameter="{Binding}" />
-                                              <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                              <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                       CommandParameter="{Binding}" />
                                           </StackPanel>
                                       </Border>
@@ -211,6 +211,10 @@
                                           <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                           <Separator />
                                           <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
+                                          <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                          <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
                                       </ContextMenu>
                                   </Border.ContextMenu>
                                   <Grid ClipToBounds="False">
@@ -219,10 +223,6 @@
                                           <StackPanel Orientation="Horizontal" Spacing="6">
                                               <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                      CommandParameter="{Binding}" />
-                                              <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                              <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                       CommandParameter="{Binding}" />
                                           </StackPanel>
                                       </Border>
@@ -258,6 +258,10 @@
                                           <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                           <Separator />
                                           <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
+                                          <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                          <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
                                       </ContextMenu>
                                   </Border.ContextMenu>
                                   <Grid ClipToBounds="False">
@@ -266,10 +270,6 @@
                                           <StackPanel Orientation="Horizontal" Spacing="6">
                                               <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                      CommandParameter="{Binding}" />
-                                              <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                              <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                       CommandParameter="{Binding}" />
                                           </StackPanel>
                                       </Border>
@@ -306,6 +306,10 @@
                                           <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                           <Separator />
                                           <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
+                                          <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                          <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
                                       </ContextMenu>
                                   </Border.ContextMenu>
                                   <Grid ClipToBounds="False">
@@ -314,10 +318,6 @@
                                           <StackPanel Orientation="Horizontal" Spacing="6">
                                               <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                      CommandParameter="{Binding}" />
-                                              <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                              <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                       CommandParameter="{Binding}" />
                                           </StackPanel>
                                       </Border>
@@ -351,6 +351,10 @@
                                            <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                            <Separator />
                                            <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
                                        </ContextMenu>
                                    </Border.ContextMenu>
                                    <Grid ClipToBounds="False">
@@ -359,10 +363,6 @@
                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                <Button Content="📋" ToolTip.Tip="Копировать" FontSize="11" Width="20" Height="20" Padding="0" Background="Transparent" Foreground="White"
                                                        Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                       CommandParameter="{Binding}" />
-                                               <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                               <Button Content="❌" ToolTip.Tip="Удалить" FontSize="11" Width="20" Height="20" Padding="0" Background="Transparent" Foreground="Red"
-                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                        CommandParameter="{Binding}" />
                                            </StackPanel>
                                        </Border>
@@ -417,6 +417,10 @@
                                            <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                            <Separator />
                                            <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
                                        </ContextMenu>
                                    </Border.ContextMenu>
                                    <Grid ClipToBounds="False">
@@ -425,10 +429,6 @@
                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                        Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                       CommandParameter="{Binding}" />
-                                               <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                               <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                        CommandParameter="{Binding}" />
                                            </StackPanel>
                                        </Border>
@@ -469,6 +469,10 @@
                                            <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                            <Separator />
                                            <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
                                        </ContextMenu>
                                    </Border.ContextMenu>
                                    <Grid ClipToBounds="False">
@@ -477,10 +481,6 @@
                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                        Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                       CommandParameter="{Binding}" />
-                                               <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                               <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                        CommandParameter="{Binding}" />
                                            </StackPanel>
                                        </Border>
@@ -525,6 +525,10 @@
                                            <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                            <Separator />
                                            <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
                                        </ContextMenu>
                                    </Border.ContextMenu>
                                    <Grid ClipToBounds="False">
@@ -533,10 +537,6 @@
                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                        Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                       CommandParameter="{Binding}" />
-                                               <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                               <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                        CommandParameter="{Binding}" />
                                            </StackPanel>
                                        </Border>
@@ -565,6 +565,10 @@
                                           <MenuItem Header="На задний план" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).SendToBackCommand}" CommandParameter="{Binding}" />
                                           <Separator />
                                           <MenuItem Header="Свойства" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).EditWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
+                                          <MenuItem Header="Дублировать" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                          <MenuItem Header="Удалить" Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                          <Separator />
                                       </ContextMenu>
                                   </Border.ContextMenu>
                                   <Grid ClipToBounds="False">
@@ -573,10 +577,6 @@
                                           <StackPanel Orientation="Horizontal" Spacing="6">
                                               <Button Content="📋" ToolTip.Tip="Копировать" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="White"
                                                       Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).DuplicateWidgetCommand}"
-                                                      CommandParameter="{Binding}" />
-                                              <Separator Width="1" Background="#3E3E42" Margin="2,0" />
-                                              <Button Content="❌" ToolTip.Tip="Удалить" FontSize="12" Width="22" Height="22" Padding="0" Background="Transparent" Foreground="Red"
-                                                      Command="{Binding #WidgetsItemsControl.((vm:DashboardViewModel)DataContext).RemoveWidgetCommand}"
                                                       CommandParameter="{Binding}" />
                                           </StackPanel>
                                       </Border>
