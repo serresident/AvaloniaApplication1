@@ -7,6 +7,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using AvaloniaApplication1.ViewModels;
 
 namespace AvaloniaApplication1.Views
@@ -20,8 +21,8 @@ namespace AvaloniaApplication1.Views
         public double CellWidth { get; set; } = 150;
         public double CellHeight { get; set; } = 150;
         public bool ShowHighlight { get; set; }
-        public int HighlightCol { get; set; }
-        public int HighlightRow { get; set; }
+        public double HighlightCol { get; set; }
+        public double HighlightRow { get; set; }
         public int HighlightSizeX { get; set; } = 1;
         public int HighlightSizeY { get; set; } = 1;
 
@@ -201,11 +202,14 @@ namespace AvaloniaApplication1.Views
                     {
                         child.DataContextChanged += Child_DataContextChanged;
                         SubscribeVm(child.DataContext as WidgetViewModelBase);
+                        child.InvalidateMeasure();
+                        child.InvalidateVisual();
                     }
                 }
                 EnsureSelectionOverlayOnTop();
                 InvalidateMeasure();
                 InvalidateArrange();
+                InvalidateVisual();
             };
         }
 
@@ -214,8 +218,11 @@ namespace AvaloniaApplication1.Views
             if (sender is Control child)
             {
                 SubscribeVm(child.DataContext as WidgetViewModelBase);
+                child.InvalidateMeasure();
+                child.InvalidateVisual();
                 InvalidateMeasure();
                 InvalidateArrange();
+                InvalidateVisual();
             }
         }
 
@@ -434,8 +441,13 @@ namespace AvaloniaApplication1.Views
                             _dragOriginalSizeY = vm.SizeY;
                             _isDragging = false;
                             _isResizing = true;
+                            
+                            // Capture pointer for robust drag/resize tracking
+                            e.Pointer.Capture(this);
+                            e.Handled = true;
+                            return;
                         }
-                        else
+                        else if (IsDragHandle(e.Source))
                         {
                             _dragChild = child;
                             _dragVm = vm;
@@ -444,12 +456,17 @@ namespace AvaloniaApplication1.Views
                             _dragOriginalCol = vm.Col;
                             _isDragging = false; // Not dragging until threshold is met
                             _isResizing = false;
+                            
+                            // Capture pointer for robust drag/resize tracking
+                            e.Pointer.Capture(this);
+                            e.Handled = true;
+                            return;
                         }
-                        
-                        // Capture pointer for robust drag/resize tracking
-                        e.Pointer.Capture(this);
-                        e.Handled = true;
-                        return;
+                        else
+                        {
+                            e.Handled = true;
+                            return;
+                        }
                     }
                 }
             }
@@ -518,6 +535,7 @@ namespace AvaloniaApplication1.Views
 
                         // Sibling snapped ports check (10px capture radius)
                         var siblingPipes = FindAllSiblingPipesFor(_draggedPipeControl);
+                        bool snapped = false;
                         foreach (var sibling in siblingPipes)
                         {
                             var otherVm = sibling.DataContext as PipeWidgetViewModel;
@@ -527,7 +545,6 @@ namespace AvaloniaApplication1.Views
                             if (otherPoints.Count < 2) continue;
 
                             var ports = new[] { otherPoints[0], otherPoints[otherPoints.Count - 1] };
-                            bool snapped = false;
                             foreach (var port in ports)
                             {
                                 double dx = (dragAbsX - port.X) * cellSize;
@@ -543,6 +560,63 @@ namespace AvaloniaApplication1.Views
                                 }
                             }
                             if (snapped) break;
+                        }
+
+                        // Valve/Pump snapped ports check if not snapped to sibling pipe (10px snap radius)
+                        if (!snapped)
+                        {
+                            foreach (var child in Children)
+                            {
+                                if (child == _gridOverlay || child == _selectionOverlay) continue;
+                                if (child.DataContext is WidgetViewModelBase widgetVm && 
+                                    (string.Equals(widgetVm.Type, "Valve", StringComparison.OrdinalIgnoreCase) ||
+                                     string.Equals(widgetVm.Type, "Pump", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    int rotation = 0;
+                                    bool isVertical = false;
+                                    var rotProp = widgetVm.GetType().GetProperty("Rotation");
+                                    if (rotProp != null) rotation = (int)(rotProp.GetValue(widgetVm) ?? 0);
+                                    var vertProp = widgetVm.GetType().GetProperty("IsVertical");
+                                    if (vertProp != null) isVertical = (bool)(vertProp.GetValue(widgetVm) ?? false);
+
+                                    int finalRotation = rotation;
+                                    if (finalRotation == 0 && isVertical) finalRotation = 90;
+                                    bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
+
+                                    double sizeX = widgetVm.SizeX;
+                                    double sizeY = widgetVm.SizeY;
+
+                                    // Flanges in grid coordinate units (flange boundaries are aligned to cell edges)
+                                    // Pipe endpoints are centered in cells, so we subtract 0.5 to align cell center to cell edge
+                                    double pX1 = isFlowVertical ? (widgetVm.Col + sizeX / 2.0 - 0.5) : (widgetVm.Col - 0.5);
+                                    double pY1 = isFlowVertical ? (widgetVm.Row - 0.5) : (widgetVm.Row + sizeY / 2.0 - 0.5);
+
+                                    double pX2 = isFlowVertical ? (widgetVm.Col + sizeX / 2.0 - 0.5) : (widgetVm.Col + sizeX - 0.5);
+                                    double pY2 = isFlowVertical ? (widgetVm.Row + sizeY - 0.5) : (widgetVm.Row + sizeY / 2.0 - 0.5);
+
+                                    // Check Port 1
+                                    double dx1 = (dragAbsX - pX1) * cellSize;
+                                    double dy1 = (dragAbsY - pY1) * cellSize;
+                                    double dist1 = Math.Sqrt(dx1 * dx1 + dy1 * dy1);
+                                    if (dist1 <= 10.0)
+                                    {
+                                        dragAbsX = pX1;
+                                        dragAbsY = pY1;
+                                        break;
+                                    }
+
+                                    // Check Port 2
+                                    double dx2 = (dragAbsX - pX2) * cellSize;
+                                    double dy2 = (dragAbsY - pY2) * cellSize;
+                                    double dist2 = Math.Sqrt(dx2 * dx2 + dy2 * dy2);
+                                    if (dist2 <= 10.0)
+                                    {
+                                        dragAbsX = pX2;
+                                        dragAbsY = pY2;
+                                        break;
+                                    }
+                                }
+                            }
                         }
 
                         gridPoints[_draggedPointIndex] = new Point(dragAbsX, dragAbsY);
@@ -637,8 +711,9 @@ namespace AvaloniaApplication1.Views
                 if (_gridOverlay != null)
                 {
                     _gridOverlay.ShowHighlight = true;
-                    _gridOverlay.HighlightCol = (int)Math.Max(0, Math.Floor(point.X / CellWidth));
-                    _gridOverlay.HighlightRow = (int)Math.Max(0, Math.Floor(point.Y / CellHeight));
+                    GetSnappedPosition(_dragVm, point, out double snappedCol, out double snappedRow);
+                    _gridOverlay.HighlightCol = snappedCol;
+                    _gridOverlay.HighlightRow = snappedRow;
                     _gridOverlay.HighlightSizeX = _dragVm.SizeX;
                     _gridOverlay.HighlightSizeY = _dragVm.SizeY;
                     _gridOverlay.InvalidateVisual();
@@ -683,8 +758,7 @@ namespace AvaloniaApplication1.Views
             {
                 var point = e.GetPosition(this);
 
-                double newCol = Math.Max(0, Math.Round(point.X / CellWidth));
-                double newRow = Math.Max(0, Math.Round(point.Y / CellHeight));
+                GetSnappedPosition(_dragVm, point, out double newCol, out double newRow);
 
                 // Update the VM (which updates the UI via bindings)
                 _dragVm.Row = newRow;
@@ -952,6 +1026,118 @@ namespace AvaloniaApplication1.Views
             double dist = Math.Sqrt(Math.Pow(p.X - projection.X, 2) + Math.Pow(p.Y - projection.Y, 2));
 
             return dist <= maxDistance;
+        }
+
+        private void GetSnappedPosition(WidgetViewModelBase vm, Point pointer, out double snappedCol, out double snappedRow)
+        {
+            // Initial candidate column and row based on mouse pointer
+            double dragX = pointer.X - _dragStartPoint.X + _dragOriginalCol * CellWidth;
+            double dragY = pointer.Y - _dragStartPoint.Y + _dragOriginalRow * CellHeight;
+
+            double candCol = Math.Max(0, dragX / CellWidth);
+            double candRow = Math.Max(0, dragY / CellHeight);
+
+            snappedCol = Math.Round(candCol);
+            snappedRow = Math.Round(candRow);
+
+            // Snapping is active for Valve and Pump type widgets
+            bool isValve = string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
+            bool isPump = string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
+            if (!isValve && !isPump) return;
+
+            // Get Valve specific properties
+            int rotation = 0;
+            bool isVertical = false;
+            var rotProp = vm.GetType().GetProperty("Rotation");
+            if (rotProp != null) rotation = (int)(rotProp.GetValue(vm) ?? 0);
+            var vertProp = vm.GetType().GetProperty("IsVertical");
+            if (vertProp != null) isVertical = (bool)(vertProp.GetValue(vm) ?? false);
+
+            int finalRotation = rotation;
+            if (finalRotation == 0 && isVertical) finalRotation = 90;
+            bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
+
+            double sizeX = vm.SizeX;
+            double sizeY = vm.SizeY;
+
+            // Define candidate ports relative to the candidate top-left corner
+            // In cells:
+            double relX1 = isFlowVertical ? (sizeX / 2.0) : 0.0;
+            double relY1 = isFlowVertical ? 0.0 : (sizeY / 2.0);
+
+            double relX2 = isFlowVertical ? (sizeX / 2.0) : sizeX;
+            double relY2 = isFlowVertical ? sizeY : (sizeY / 2.0);
+
+            double snapRadius = 15.0; // pixels
+            bool snapped = false;
+
+            // Gather all pipe endpoints
+            foreach (var child in Children)
+            {
+                if (child == _gridOverlay || child == _selectionOverlay) continue;
+                if (child.DataContext is PipeWidgetViewModel pipeVm)
+                {
+                    var points = pipeVm.GetAbsoluteGridPoints();
+                    if (points.Count < 1) continue;
+
+                    // Endpoints of this pipe
+                    var endpoints = new[] { points[0], points[points.Count - 1] };
+                    foreach (var ep in endpoints)
+                    {
+                        // Check Port 1
+                        double p1X = (candCol + relX1) * CellWidth;
+                        double p1Y = (candRow + relY1) * CellHeight;
+                        double epX = ep.X * CellWidth + CellWidth / 2.0;
+                        double epY = ep.Y * CellHeight + CellHeight / 2.0;
+
+                        double dist1 = Math.Sqrt(Math.Pow(p1X - epX, 2) + Math.Pow(p1Y - epY, 2));
+                        if (dist1 <= snapRadius)
+                        {
+                            // Snap Port 1 to ep
+                            snappedCol = ep.X + 0.5 - relX1;
+                            snappedRow = ep.Y + 0.5 - relY1;
+                            snapped = true;
+                            break;
+                        }
+
+                        // Check Port 2
+                        double p2X = (candCol + relX2) * CellWidth;
+                        double p2Y = (candRow + relY2) * CellHeight;
+                        double epX2 = ep.X * CellWidth + CellWidth / 2.0;
+                        double epY2 = ep.Y * CellHeight + CellHeight / 2.0;
+
+                        double dist2 = Math.Sqrt(Math.Pow(p2X - epX2, 2) + Math.Pow(p2Y - epY2, 2));
+                        if (dist2 <= snapRadius)
+                        {
+                            // Snap Port 2 to ep
+                            snappedCol = ep.X + 0.5 - relX2;
+                            snappedRow = ep.Y + 0.5 - relY2;
+                            snapped = true;
+                            break;
+                        }
+                    }
+                }
+                if (snapped) break;
+            }
+
+            // Keep in bounds
+            snappedCol = Math.Max(0.0, snappedCol);
+            snappedRow = Math.Max(0.0, snappedRow);
+        }
+
+        private bool IsDragHandle(object? source)
+        {
+            if (source is Avalonia.Visual visual)
+            {
+                var current = visual;
+                while (current != null)
+                {
+                    if (current is Control ctrl && ctrl.Name == "DragHandle")
+                        return true;
+                    current = current.GetVisualParent();
+                }
+            }
+            return false;
         }
     }
 }

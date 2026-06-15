@@ -77,6 +77,66 @@ namespace AvaloniaApplication1.ViewModels
         // ===== Design Mode Commands =====
 
         [RelayCommand]
+        private void BringToFront(WidgetViewModelBase? widget)
+        {
+            if (widget == null) return;
+            int index = Widgets.IndexOf(widget);
+            if (index >= 0 && index < Widgets.Count - 1)
+            {
+                Widgets.Move(index, Widgets.Count - 1);
+                
+                var config = _dashboardConfig.Widgets[index];
+                _dashboardConfig.Widgets.RemoveAt(index);
+                _dashboardConfig.Widgets.Add(config);
+            }
+        }
+
+        [RelayCommand]
+        private void BringForward(WidgetViewModelBase? widget)
+        {
+            if (widget == null) return;
+            int index = Widgets.IndexOf(widget);
+            if (index >= 0 && index < Widgets.Count - 1)
+            {
+                Widgets.Move(index, index + 1);
+                
+                var config = _dashboardConfig.Widgets[index];
+                _dashboardConfig.Widgets.RemoveAt(index);
+                _dashboardConfig.Widgets.Insert(index + 1, config);
+            }
+        }
+
+        [RelayCommand]
+        private void SendBackward(WidgetViewModelBase? widget)
+        {
+            if (widget == null) return;
+            int index = Widgets.IndexOf(widget);
+            if (index > 0)
+            {
+                Widgets.Move(index, index - 1);
+                
+                var config = _dashboardConfig.Widgets[index];
+                _dashboardConfig.Widgets.RemoveAt(index);
+                _dashboardConfig.Widgets.Insert(index - 1, config);
+            }
+        }
+
+        [RelayCommand]
+        private void SendToBack(WidgetViewModelBase? widget)
+        {
+            if (widget == null) return;
+            int index = Widgets.IndexOf(widget);
+            if (index > 0)
+            {
+                Widgets.Move(index, 0);
+                
+                var config = _dashboardConfig.Widgets[index];
+                _dashboardConfig.Widgets.RemoveAt(index);
+                _dashboardConfig.Widgets.Insert(0, config);
+            }
+        }
+
+        [RelayCommand]
         private async Task AddWidgetAsync()
         {
             if (_dialogService == null) return;

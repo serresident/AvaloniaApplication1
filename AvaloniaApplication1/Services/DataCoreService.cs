@@ -9,6 +9,8 @@ using AvaloniaApplication1.Models.Config;
 using NModbus;
 using MQTTnet;
 using MQTTnet.Client;
+using Microsoft.Extensions.DependencyInjection;
+using AvaloniaApplication1.ViewModels;
 
 namespace AvaloniaApplication1.Services
 {
@@ -23,6 +25,9 @@ namespace AvaloniaApplication1.Services
         private HmiConfiguration? _config;
         private Random _random = new();
         private double _temperature = 20.0;
+
+        private ModbusServerManager? _modbusServerManager;
+        private SimulationEngine? _simulationEngine;
 
         public event EventHandler<(string ConnId, string Address, object Value)>? TagValueChanged;
 
@@ -45,7 +50,22 @@ namespace AvaloniaApplication1.Services
             // 1. Initialize default/simulated values
             InitializeMockValues();
 
-            // 2. Load configuration and start real Modbus/MQTT drivers
+            // 2. Start Modbus slave server
+            _modbusServerManager = new ModbusServerManager();
+            _simulationEngine = new SimulationEngine();
+            try
+            {
+                _modbusServerManager.Start(502, 1);
+                Console.WriteLine("Background Modbus TCP Slave started on port 502.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to start background Modbus TCP slave on port 502: {ex.Message}");
+                // Notify user gracefully via HMI toast
+                App.Services?.GetService<MainViewModel>()?.ShowToast("Warning: Local Modbus TCP Server failed to bind to port 502. If another simulator is running, close it.");
+            }
+
+            // 3. Load configuration and start real Modbus/MQTT drivers
             Task.Run(async () =>
             {
                 try
@@ -73,6 +93,10 @@ namespace AvaloniaApplication1.Services
 
             _mqttClient?.Dispose();
             _mqttClient = null;
+
+            _modbusServerManager?.Stop();
+            _modbusServerManager = null;
+            _simulationEngine = null;
 
             _pollingTasks.Clear();
         }
@@ -145,86 +169,78 @@ namespace AvaloniaApplication1.Services
 
         private async Task SimulationLoop(CancellationToken ct)
         {
+            var lastTime = DateTime.UtcNow;
+            int secondCounter = 0;
             while (!ct.IsCancellationRequested)
             {
-                await Task.Delay(1000, ct);
+                await Task.Delay(100, ct);
 
-                // Simulate Temperature fluctuating
-                _temperature += (_random.NextDouble() - 0.5) * 2.0;
-                if (_temperature < 0) _temperature = 0;
-                if (_temperature > 100) _temperature = 100;
-                UpdateValue("plc1", "40001", (float)_temperature);
-
-                // ZAS Setpoint tracking
-                var setpoint = GetCurrentValue("mqtt1", "gMqt/ZAS/ZAS_Setpoint_Power") is float s ? s : 200.0f;
-                var currentPower = GetCurrentValue("mqtt1", "gMqt/ZAS/ZAS_Actual_Power") is float p ? p : 150.0f;
-                currentPower += (setpoint - currentPower) * 0.1f + (float)(_random.NextDouble() - 0.5) * 4.0f;
-                if (currentPower < 0) currentPower = 0;
-                if (currentPower > 1000) currentPower = 1000;
-                UpdateValue("mqtt1", "gMqt/ZAS/ZAS_Actual_Power", currentPower);
-
-                // Mixer Mimic Simulation
-                var pumpOn = GetCurrentValue("mqtt1", "gMqt/Mixer/Pump_NS_Status") is bool bp && bp;
-                var vWater = GetCurrentValue("mqtt1", "gMqt/Mixer/Valve_YV_W1") is bool bw && bw;
-                
-                var rawSteamVal = GetCurrentValue("mqtt1", "gMqt/Mixer/Valve_YV_S1");
-                float vSteam = 40.0f;
-                if (rawSteamVal is float fs) vSteam = fs;
-                else if (rawSteamVal is double ds) vSteam = (float)ds;
-                else if (rawSteamVal is int ins) vSteam = ins;
-
-                var vMixed = GetCurrentValue("mqtt1", "gMqt/Mixer/Valve_YV_M1") is bool bm && bm;
-
-                // Tank Level
-                var level = GetCurrentValue("mqtt1", "gMqt/Mixer/Tank_Level") is float lvl ? lvl : 50.0f;
-                double levelDelta = 0;
-                if (pumpOn && vWater) levelDelta += 1.5;
-                if (vMixed) levelDelta -= 1.0;
-                level += (float)levelDelta + (float)(_random.NextDouble() - 0.5) * 0.4f;
-                level = Math.Clamp(level, 0.0f, 100.0f);
-                UpdateValue("mqtt1", "gMqt/Mixer/Tank_Level", level);
-
-                // Pressure
-                var pressure = 1.0f + (level / 40.0f) + (float)(_random.NextDouble() - 0.5) * 0.1f;
-                UpdateValue("mqtt1", "gMqt/Mixer/Tank_Pressure", pressure);
-
-                // Temp
-                double targetTemp = 20.0;
-                if (vWater && vSteam > 0) targetTemp = 15.0 + (vSteam / 100.0) * 80.0;
-                else if (vSteam > 0) targetTemp = 120.0;
-                else if (vWater) targetTemp = 15.0;
-
-                var currentTemp = GetCurrentValue("mqtt1", "gMqt/Mixer/Mixed_Temp") is float ctT ? ctT : 40.0f;
-                currentTemp += (float)((targetTemp - currentTemp) * 0.15 + (_random.NextDouble() - 0.5) * 0.5);
-                UpdateValue("mqtt1", "gMqt/Mixer/Mixed_Temp", currentTemp);
-
-                // GPA 1 to 6 simulation
-                for (int i = 1; i <= 6; i++)
+                // Modbus Simulation Tick
+                if (_modbusServerManager != null && _modbusServerManager.IsRunning && _simulationEngine != null)
                 {
-                    var activePower = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/PPU_Gen_active_power") is float ap ? ap : 1200.0f;
-                    activePower += (float)(_random.NextDouble() - 0.5) * 20.0f;
-                    if (activePower < 0) activePower = 0;
-                    if (activePower > 2000) activePower = 2000;
-                    UpdateValue("mqtt1", $"gMqt/GPA{i}/PPU_Gen_active_power", activePower);
+                    var now = DateTime.UtcNow;
+                    double dt = (now - lastTime).TotalSeconds;
+                    lastTime = now;
+                    if (dt > 1.0) dt = 1.0;
 
-                    var counter = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/PPU_Gen_counter_active_power") is float cVal ? cVal : 18000.0f;
-                    counter += activePower / 3600.0f;
-                    UpdateValue("mqtt1", $"gMqt/GPA{i}/PPU_Gen_counter_active_power", counter);
-
-                    var temp = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/T404") is float tVal ? tVal : 45.0f;
-                    temp += (float)(_random.NextDouble() - 0.5) * 0.5f;
-                    if (temp < 0) temp = 0;
-                    if (temp > 150) temp = 150;
-                    UpdateValue("mqtt1", $"gMqt/GPA{i}/T404", temp);
-
-                    var hours = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/Hours") is float hVal ? hVal : 90000.0f;
-                    hours += 1.0f / 3600.0f;
-                    UpdateValue("mqtt1", $"gMqt/GPA{i}/Hours", hours);
-
-                    if (_random.Next(1, 100) == 50)
+                    try
                     {
-                        var alarm = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/HAS_IN_Word55_0") is bool aBool && aBool;
-                        UpdateValue("mqtt1", $"gMqt/GPA{i}/HAS_IN_Word55_0", !alarm);
+                        _simulationEngine.ReadFromModbus(_modbusServerManager);
+                        _simulationEngine.Tick(dt);
+                        _simulationEngine.WriteToModbus(_modbusServerManager);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in background Modbus simulation tick: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    lastTime = DateTime.UtcNow;
+                }
+
+                // GPA and ZAS Mock Simulation (once per second)
+                secondCounter++;
+                if (secondCounter >= 10)
+                {
+                    secondCounter = 0;
+
+                    // ZAS Setpoint tracking
+                    var setpoint = GetCurrentValue("mqtt1", "gMqt/ZAS/ZAS_Setpoint_Power") is float s ? s : 200.0f;
+                    var currentPower = GetCurrentValue("mqtt1", "gMqt/ZAS/ZAS_Actual_Power") is float p ? p : 150.0f;
+                    currentPower += (setpoint - currentPower) * 0.1f + (float)(_random.NextDouble() - 0.5) * 4.0f;
+                    if (currentPower < 0) currentPower = 0;
+                    if (currentPower > 1000) currentPower = 1000;
+                    UpdateValue("mqtt1", "gMqt/ZAS/ZAS_Actual_Power", currentPower);
+
+                    // GPA 1 to 6 simulation
+                    for (int i = 1; i <= 6; i++)
+                    {
+                        var activePower = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/PPU_Gen_active_power") is float ap ? ap : 1200.0f;
+                        activePower += (float)(_random.NextDouble() - 0.5) * 20.0f;
+                        if (activePower < 0) activePower = 0;
+                        if (activePower > 2000) activePower = 2000;
+                        UpdateValue("mqtt1", $"gMqt/GPA{i}/PPU_Gen_active_power", activePower);
+
+                        var counter = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/PPU_Gen_counter_active_power") is float cVal ? cVal : 18000.0f;
+                        counter += activePower / 3600.0f;
+                        UpdateValue("mqtt1", $"gMqt/GPA{i}/PPU_Gen_counter_active_power", counter);
+
+                        var temp = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/T404") is float tVal ? tVal : 45.0f;
+                        temp += (float)(_random.NextDouble() - 0.5) * 0.5f;
+                        if (temp < 0) temp = 0;
+                        if (temp > 150) temp = 150;
+                        UpdateValue("mqtt1", $"gMqt/GPA{i}/T404", temp);
+
+                        var hours = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/Hours") is float hVal ? hVal : 90000.0f;
+                        hours += 1.0f / 3600.0f;
+                        UpdateValue("mqtt1", $"gMqt/GPA{i}/Hours", hours);
+
+                        if (_random.Next(1, 100) == 50)
+                        {
+                            var alarm = GetCurrentValue("mqtt1", $"gMqt/GPA{i}/HAS_IN_Word55_0") is bool aBool && aBool;
+                            UpdateValue("mqtt1", $"gMqt/GPA{i}/HAS_IN_Word55_0", !alarm);
+                        }
                     }
                 }
             }

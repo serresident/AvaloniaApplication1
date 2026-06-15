@@ -217,134 +217,352 @@ namespace AvaloniaApplication1.Services
                     CellSize = 10,
                     Widgets = new List<WidgetConfig>
                     {
+                        // --- WATER SUPPLY ---
                         new WidgetConfig
                         {
-                            Type = "Tank",
-                            Title = "B4305 Mixer Tank",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Tank_Level", DataType = "Float32" },
-                            Position = new WidgetPosition { Row = 16, Col = 50, SizeX = 12, SizeY = 20 },
-                            MinValue = 0,
-                            MaxValue = 100,
-                            Format = "{0:F1} %"
+                            Type = "Pump",
+                            Title = "Насос воды NS1",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00001", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 4.5, Col = 9.5, SizeX = 6, SizeY = 6 },
+                            ActiveColor = "#00FF00",
+                            InactiveColor = "#FF0000"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "Valve",
+                            Title = "Клапан воды YV1",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00002", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 4.5, Col = 23.5, SizeX = 6, SizeY = 6 },
+                            ValveType = "CutOff",
+                            ActiveColor = "#00FF00",
+                            InactiveColor = "#FF0000",
+                            ActuatorType = "Solenoid",
+                            FeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "10002", DataType = "Bool" }
                         },
                         new WidgetConfig
                         {
                             Type = "Pipe",
-                            Title = "CW Inlet 1",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Pump_NS_Status", DataType = "Bool" },
-                            Position = new WidgetPosition { Row = 24, Col = 4, SizeX = 16, SizeY = 2 },
-                            PipePoints = "0,1;15,1",
+                            Title = "Линия воды 1",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00001", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 6, Col = 4, SizeX = 6, SizeY = 2 },
+                            PipePoints = "0,1;5,1",
                             ActiveColor = "#00AAFF",
                             InactiveColor = "#005588",
                             ShowFlanges = true
                         },
                         new WidgetConfig
                         {
+                            Type = "Pipe",
+                            Title = "Линия воды 2",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00001", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 6, Col = 15, SizeX = 9, SizeY = 2 },
+                            PipePoints = "0,1;8,1",
+                            ActiveColor = "#00AAFF",
+                            InactiveColor = "#005588",
+                            ShowFlanges = true
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "Pipe",
+                            Title = "Линия воды в бак",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00001", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 6, Col = 29, SizeX = 21, SizeY = 16 },
+                            PipePoints = "0,1;17,1;17,15",
+                            ActiveColor = "#00AAFF",
+                            InactiveColor = "#005588",
+                            ShowFlanges = true
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "ValueDisplay",
+                            Title = "Дозатор воды",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "30035", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 12, Col = 10, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F1} л"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "SetValue",
+                            Title = "Уставка воды",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "40005", DataType = "Int16" },
+                            Position = new WidgetPosition { Row = 12, Col = 19, SizeX = 8, SizeY = 4 },
+                            Format = "{0} л",
+                            MinValue = 0,
+                            MaxValue = 1000
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "CommandButton",
+                            Title = "Сбросить дозу",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00010", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 12, Col = 28, SizeX = 8, SizeY = 4 },
+                            ButtonMode = "Pulse"
+                        },
+
+                        // --- FEEDER A ---
+                        new WidgetConfig
+                        {
                             Type = "Pump",
-                            Title = "NS_P4310 Pump",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Pump_NS_Status", DataType = "Bool" },
-                            Position = new WidgetPosition { Row = 22, Col = 20, SizeX = 6, SizeY = 6 },
+                            Title = "Питатель A QS1",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00003", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 24.5, Col = 9.5, SizeX = 6, SizeY = 6 },
                             ActiveColor = "#00FF00",
                             InactiveColor = "#FF0000"
                         },
                         new WidgetConfig
                         {
                             Type = "Pipe",
-                            Title = "CW Inlet 2",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Pump_NS_Status", DataType = "Bool" },
-                            Position = new WidgetPosition { Row = 24, Col = 26, SizeX = 24, SizeY = 2 },
-                            PipePoints = "0,1;23,1",
+                            Title = "Линия подачи A",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00003", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 26, Col = 15, SizeX = 31, SizeY = 2 },
+                            PipePoints = "0,1;30,1",
+                            ActiveColor = "#E5C158",
+                            InactiveColor = "#7F6B2F",
+                            ShowFlanges = true
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "ValueDisplay",
+                            Title = "Вес A в смесители",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "30031", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 31, Col = 10, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F1} кг"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "SetValue",
+                            Title = "Уставка веса A",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "40006", DataType = "Int16" },
+                            Position = new WidgetPosition { Row = 31, Col = 19, SizeX = 8, SizeY = 4 },
+                            Format = "{0} кг",
+                            MinValue = 0,
+                            MaxValue = 500
+                        },
+
+                        // --- FEEDER B ---
+                        new WidgetConfig
+                        {
+                            Type = "Pump",
+                            Title = "Питатель B QS2",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00004", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 38.5, Col = 9.5, SizeX = 6, SizeY = 6 },
+                            ActiveColor = "#00FF00",
+                            InactiveColor = "#FF0000"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "Pipe",
+                            Title = "Линия подачи B",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00004", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 40, Col = 15, SizeX = 31, SizeY = 2 },
+                            PipePoints = "0,1;30,1",
+                            ActiveColor = "#BC7FEB",
+                            InactiveColor = "#613880",
+                            ShowFlanges = true
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "ValueDisplay",
+                            Title = "Вес B в смесители",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "30033", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 45, Col = 10, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F1} кг"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "SetValue",
+                            Title = "Уставка веса B",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "40007", DataType = "Int16" },
+                            Position = new WidgetPosition { Row = 45, Col = 19, SizeX = 8, SizeY = 4 },
+                            Format = "{0} кг",
+                            MinValue = 0,
+                            MaxValue = 500
+                        },
+
+                        // --- MAIN VESSEL ---
+                        new WidgetConfig
+                        {
+                            Type = "Tank",
+                            Title = "Реактор смеситель",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "30029", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 20, Col = 46, SizeX = 16, SizeY = 24 },
+                            MinValue = 0,
+                            MaxValue = 1000,
+                            Format = "{0:F1} кг"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "ValueDisplay",
+                            Title = "Давление реактора",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "30025", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 15, Col = 46, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F2} бар"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "ValueDisplay",
+                            Title = "Температура смеси",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "30023", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 15, Col = 54, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F1} °C"
+                        },
+
+                        // --- TEMP CONTROL ---
+                        new WidgetConfig
+                        {
+                            Type = "CommandButton",
+                            Title = "Нагрев АВТО",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00011", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 4, Col = 68, SizeX = 8, SizeY = 4 },
+                            ButtonMode = "Toggle"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "CommandButton",
+                            Title = "Включить ТЭН",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00006", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 4, Col = 77, SizeX = 8, SizeY = 4 },
+                            ButtonMode = "Toggle"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "SetValue",
+                            Title = "Уставка темп-ры",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "40033", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 9, Col = 68, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F1} °C",
+                            MinValue = 0,
+                            MaxValue = 100
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "ValueDisplay",
+                            Title = "Мощность ТЭНа",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "40025", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 9, Col = 77, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F1} %"
+                        },
+
+                        // --- COOLING LOOP ---
+                        new WidgetConfig
+                        {
+                            Type = "Pump",
+                            Title = "Насос охлаждения",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00007", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 15.5, Col = 67.5, SizeX = 6, SizeY = 6 },
+                            ActiveColor = "#00FF00",
+                            InactiveColor = "#FF0000"
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "Valve",
+                            Title = "Клапан охл.",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "40027", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 15.5, Col = 77.5, SizeX = 6, SizeY = 6 },
+                            ValveType = "Regulating",
+                            ActiveColor = "#00FF00",
+                            InactiveColor = "#FF0000",
+                            ActuatorType = "Diaphragm",
+                            FeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "40027", DataType = "Float32" }
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "Pipe",
+                            Title = "Линия охл. 1",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00007", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 17, Col = 62, SizeX = 6, SizeY = 2 },
+                            PipePoints = "0,1;5,1",
                             ActiveColor = "#00AAFF",
                             InactiveColor = "#005588",
                             ShowFlanges = true
                         },
                         new WidgetConfig
                         {
+                            Type = "Pipe",
+                            Title = "Линия охл. 2",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00007", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 17, Col = 73, SizeX = 5, SizeY = 2 },
+                            PipePoints = "0,1;4,1",
+                            ActiveColor = "#00AAFF",
+                            InactiveColor = "#005588",
+                            ShowFlanges = true
+                        },
+                        new WidgetConfig
+                        {
+                            Type = "Pipe",
+                            Title = "Линия охл. 3",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00007", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 17, Col = 83, SizeX = 7, SizeY = 2 },
+                            PipePoints = "0,1;6,1",
+                            ActiveColor = "#00AAFF",
+                            InactiveColor = "#005588",
+                            ShowFlanges = true
+                        },
+
+                        // --- PRESSURE CONTROL ---
+                        new WidgetConfig
+                        {
                             Type = "Valve",
-                            Title = "YV_W1 Valve",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_W1", DataType = "Bool" },
-                            Position = new WidgetPosition { Row = 22, Col = 36, SizeX = 6, SizeY = 6 },
+                            Title = "Сдув давления",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00005", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 22.5, Col = 67.5, SizeX = 6, SizeY = 6 },
                             ValveType = "CutOff",
                             ActiveColor = "#00FF00",
                             InactiveColor = "#FF0000",
                             ActuatorType = "Solenoid",
-                            FeedbackSource = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_W1_FB", DataType = "Bool" }
+                            FeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "10005", DataType = "Bool" }
                         },
                         new WidgetConfig
                         {
                             Type = "Pipe",
-                            Title = "Steam Inlet 1",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_S1", DataType = "Float32" },
-                            Position = new WidgetPosition { Row = 10, Col = 4, SizeX = 28, SizeY = 10 },
-                            PipePoints = "0,1;20,1;20,9;27,9",
-                            ActiveColor = "#FF5500",
-                            InactiveColor = "#882200",
+                            Title = "Линия сдува",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00005", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 24, Col = 62, SizeX = 6, SizeY = 2 },
+                            PipePoints = "0,1;5,1",
+                            ActiveColor = "#00AAFF",
+                            InactiveColor = "#005588",
                             ShowFlanges = true
                         },
                         new WidgetConfig
                         {
-                            Type = "Valve",
-                            Title = "YV_S1 Regulating",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_S1", DataType = "Float32" },
-                            Position = new WidgetPosition { Row = 16, Col = 32, SizeX = 6, SizeY = 6 },
-                            ValveType = "Regulating",
-                            ActiveColor = "#00FF00",
-                            InactiveColor = "#FF0000",
-                            ActuatorType = "Diaphragm",
-                            FeedbackSource = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_S1_FB", DataType = "Float32" },
-                            ModeSource = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_S1_Mode", DataType = "Bool" },
-                            Tolerance = 10.0,
-                            Rotation = 270 // Vertically rotated!
+                            Type = "SetValue",
+                            Title = "Уставка давл.",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "40029", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 29, Col = 68, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F2} бар",
+                            MinValue = 1,
+                            MaxValue = 6
                         },
                         new WidgetConfig
                         {
-                            Type = "Pipe",
-                            Title = "Steam Inlet 2",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_S1", DataType = "Float32" },
-                            Position = new WidgetPosition { Row = 18, Col = 38, SizeX = 12, SizeY = 2 },
-                            PipePoints = "0,1;11,1",
-                            ActiveColor = "#FF5500",
-                            InactiveColor = "#882200",
-                            ShowFlanges = true
+                            Type = "SetValue",
+                            Title = "Уставка сдува %",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "40021", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 29, Col = 77, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F1} %",
+                            MinValue = 0,
+                            MaxValue = 100
                         },
+
+                        // --- DISCHARGE OUTLET ---
                         new WidgetConfig
                         {
                             Type = "Pipe",
-                            Title = "Mixed Outlet",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Pump_NS_Status", DataType = "Bool" },
-                            Position = new WidgetPosition { Row = 26, Col = 62, SizeX = 24, SizeY = 10 },
-                            PipePoints = "0,1;12,1;12,9;23,9",
+                            Title = "Линия слива",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "00001", DataType = "Bool" },
+                            Position = new WidgetPosition { Row = 44, Col = 54, SizeX = 14, SizeY = 10 },
+                            PipePoints = "0,1;0,9;13,9",
                             ActiveColor = "#00FF99",
                             InactiveColor = "#007755",
                             ShowFlanges = true
                         },
                         new WidgetConfig
                         {
-                            Type = "Valve",
-                            Title = "YV_M1 Valve",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_M1", DataType = "Bool" },
-                            Position = new WidgetPosition { Row = 24, Col = 68, SizeX = 6, SizeY = 6 },
-                            ValveType = "CutOff",
-                            ActiveColor = "#00FF00",
-                            InactiveColor = "#FF0000",
-                            ActuatorType = "Solenoid",
-                            FeedbackSource = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Valve_YV_M1_FB", DataType = "Bool" }
-                        },
-                        new WidgetConfig
-                        {
                             Type = "ValueDisplay",
-                            Title = "TE4305 Temp",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Mixed_Temp", DataType = "Float32" },
-                            Position = new WidgetPosition { Row = 10, Col = 54, SizeX = 8, SizeY = 4 },
-                            Format = "{0:F1} °C"
-                        },
-                        new WidgetConfig
-                        {
-                            Type = "ValueDisplay",
-                            Title = "PT4305 Press",
-                            Source = new DataSourceConfig { ConnId = "mqtt1", Address = "gMqt/Mixer/Tank_Pressure", DataType = "Float32" },
-                            Position = new WidgetPosition { Row = 10, Col = 40, SizeX = 8, SizeY = 4 },
-                            Format = "{0:F2} bar"
+                            Title = "Скорость слива",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "30027", DataType = "Float32" },
+                            Position = new WidgetPosition { Row = 45, Col = 68, SizeX = 8, SizeY = 4 },
+                            Format = "{0:F1} л/мин"
                         }
                     }
                 }
