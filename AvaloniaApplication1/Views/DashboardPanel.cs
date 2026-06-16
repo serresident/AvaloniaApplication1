@@ -377,6 +377,8 @@ namespace AvaloniaApplication1.Views
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
+            PipeControl.CloseActiveMenu();
+
             base.OnPointerPressed(e);
 
             if (e.Handled || !IsDesignMode) return;
@@ -491,9 +493,9 @@ namespace AvaloniaApplication1.Views
                             return;
                         }
 
-                        // Check if click was in the bottom-right corner for resize (60x60 pixels)
+                        // Check if click was in the bottom-right corner for resize (20x20 pixels)
                         // ONLY allow resize if the widget was ALREADY selected!
-                        var resizeRect = new Rect(childBounds.Right - 60, childBounds.Bottom - 60, 60, 60);
+                        var resizeRect = new Rect(childBounds.Right - 20, childBounds.Bottom - 20, 20, 20);
                         if (wasSelected && resizeRect.Contains(point))
                         {
                             _dragChild = child;
@@ -714,7 +716,7 @@ namespace AvaloniaApplication1.Views
                                     vm.Col * CellWidth, vm.Row * CellHeight,
                                     vm.SizeX * CellWidth, vm.SizeY * CellHeight);
 
-                                var resizeRect = new Rect(childBounds.Right - 60, childBounds.Bottom - 60, 60, 60);
+                                var resizeRect = new Rect(childBounds.Right - 20, childBounds.Bottom - 20, 20, 20);
                                 if (resizeRect.Contains(point))
                                 {
                                     overResize = true;

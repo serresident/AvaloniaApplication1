@@ -129,6 +129,17 @@ namespace AvaloniaApplication1.Views
                 ThicknessProperty);
         }
 
+        private static ContextMenu? _activeMenu;
+
+        public static void CloseActiveMenu()
+        {
+            if (_activeMenu != null)
+            {
+                _activeMenu.Close();
+                _activeMenu = null;
+            }
+        }
+
         public PipeControl()
         {
             ClipToBounds = false;
@@ -449,7 +460,16 @@ namespace AvaloniaApplication1.Views
 
         public void ShowVertexContextMenu(int pointIndex, Point screenPos)
         {
+            CloseActiveMenu();
+
             var menu = new ContextMenu();
+            _activeMenu = menu;
+            menu.Closed += (s, ev) => {
+                if (_activeMenu == menu)
+                {
+                    _activeMenu = null;
+                }
+            };
 
             var deleteItem = new MenuItem { Header = "Удалить точку" };
             deleteItem.Click += (s, ev) => RemovePointAt(pointIndex);
@@ -531,7 +551,16 @@ namespace AvaloniaApplication1.Views
 
         public void ShowSegmentContextMenu(int segmentIndex, Point screenPos)
         {
+            CloseActiveMenu();
+
             var menu = new ContextMenu();
+            _activeMenu = menu;
+            menu.Closed += (s, ev) => {
+                if (_activeMenu == menu)
+                {
+                    _activeMenu = null;
+                }
+            };
 
             var addItem = new MenuItem { Header = "Добавить точку перегиба" };
             addItem.Click += (s, ev) => AddPointOnSegment(segmentIndex, screenPos);

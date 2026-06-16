@@ -82,6 +82,8 @@ namespace AvaloniaApplication1.Views
 
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
+            PipeControl.CloseActiveMenu();
+
             if (_isSpacePressed && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
                 _isPanning = true;
