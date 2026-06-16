@@ -20,6 +20,10 @@
   - [x] Автозакрытие дублирующихся контекстных меню труб.
   - [x] Запрет на утаскивание заголовков MDI-окон под верхнее меню (Y >= 0).
   - [x] Уменьшение зоны ресайза виджетов с 60px до 20px для исключения ложных срабатываний.
+- [x] **Этап 3.5: Архитектурный рефакторинг и оптимизация телеметрии**
+  - [x] Разметка сетки дашборда на Attached Properties (`Col`, `Row`, `SizeX`, `SizeY`) для декаплинга от VM.
+  - [x] Оптимизация телеметрии (`Setpoint`, `Feedback`, `IsFilled`, `Values`) через `DirectProperty`.
+  - [x] Валидация и коэрсия (Coercion) значений в свойствах для защиты данных.
 - [ ] **Этап 4: Модуль IoT-ретрансляции (Modbus-MQTT Bridge)**
   - [ ] Разработка фоновой службы шлюза для обмена данными.
   - [ ] Карта регистров Modbus TCP/RTU для связи с физическими контроллерами.
@@ -36,7 +40,7 @@ graph TD
     MainGrid -->|Отображает| DV[DashboardView.axaml]
     DV -->|Оборачивает| ScrollViewer[DashboardScrollViewer]
     ScrollViewer -->|Содержит| DP[DashboardPanel.cs]
-    DP -->|Рисует| Grid[Сетка ячеек]
+    DP -->|Размечает| Grid[Сетка ячеек по Attached Properties]
     DP -->|Управляет| Widgets[Виджеты: Valve, Pump, Tank, Pipe]
     Widgets -->|Трубы| PC[PipeControl.cs]
     Widgets -->|Задвижки| VC[ValveControl.cs]
@@ -44,18 +48,20 @@ graph TD
 
 ### Ключевые файлы и их задачи:
 *   [MainWindow.axaml.cs](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/AvaloniaApplication1/MainWindow.axaml.cs) — Управляет поведением MDI-окон (перетаскивание, ресайз, наложение/ZIndex, ограничение по границам `Y >= 0`).
-*   [DashboardPanel.cs](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/AvaloniaApplication1/Views/DashboardPanel.cs) — Главный холст конструктора. Отвечает за позиционирование виджетов по сетке 10x10, алгоритмы привязки (snapping) труб к клапанам, и запуск перемещения/изменения размеров виджетов (зона ресайза `20x20`).
+*   [DashboardPanel.cs](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/AvaloniaApplication1/Views/DashboardPanel.cs) — Главный холст конструктора. Отвечает за позиционирование виджетов по сетке 10x10 с использованием Attached Properties, алгоритмы привязки (snapping) труб к клапанам, и запуск перемещения/изменения размеров виджетов (зона ресайза `20x20`).
 *   [DashboardView.axaml.cs](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/AvaloniaApplication1/Views/DashboardView.axaml.cs) — Отвечает за скролл (панорамирование). Содержит таймер для сглаживания и физику инерции при отпускании мыши.
-*   [PipeControl.cs](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/AvaloniaApplication1/Views/PipeControl.cs) — Кастомный рендеринг труб, фланцев и отводов. Содержит статический метод `CloseActiveMenu()` для уничтожения дублирующих меню.
-*   [ValveControl.cs](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/AvaloniaApplication1/Views/ValveControl.cs) — Отрисовывает задвижки с поддержкой приводов и вращения.
+*   [PipeControl.cs](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/AvaloniaApplication1/Views/PipeControl.cs) — Кастомный рендеринг труб, фланцев и отводов. `IsFilled` переведен на DirectProperty, `Thickness` защищен коэрсией.
+*   [ValveControl.cs](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/AvaloniaApplication1/Views/ValveControl.cs) — Отрисовывает задвижки с поддержкой приводов и вращения. `Setpoint` и `Feedback` переведены на DirectProperty.
+*   [TrendLineControl.cs](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/AvaloniaApplication1/Views/TrendLineControl.cs) — Отрисовывает тренд реального времени. Свойство `Values` переведено на DirectProperty, а `MinY`/`MaxY` защищены коэрсией.
 
 ---
 
 ## 🔄 Актуальный Статус и Восстановление Контекста
 
 *   **Где мы остановились:**
-    *   Все требования по полировке интерфейса (панорамирование, закрытие контекстных меню, границы окон, хит-бокс ресайза) полностью реализованы.
-    *   Успешно разработан и интегрирован механизм **«резиновой связи» (rubber-banding)**: при перетаскивании задвижек и насосов привязанные трубы автоматически растягиваются/сжимаются в реальном времени, следуя за их фланцами. Все обновленные координаты корректно сохраняются в файл конфигурации `config.json`.
+    *   Все требования по полировке интерфейса (панорамирование, закрытие меню, границы окон, зона ресайза) полностью реализованы.
+    *   Внедрен механизм «резиновой связи» (rubber-banding) для сохранения стыков труб и клапанов.
+    *   Проведен глубокий архитектурный рефакторинг: разметка сетки переведена на Attached Properties на элементах управления (декаплинг MVVM), а высокочастотные телеметрические теги оптимизированы через `DirectProperty` (повышение производительности рендеринга мнемосхемы). Реализована автоматическая коэрсия границ свойств.
     *   Ведется журнал прогресса в проекте (файлы в папке `docs/` и текущий `status.md`).
 *   **Текущее состояние сборки:** Сборка успешна, предупреждений об ошибках компиляции нет.
 *   **Следующий шаг:** Переход к проектированию промышленного Modbus-MQTT шлюза (Этап 4).

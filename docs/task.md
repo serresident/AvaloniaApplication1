@@ -52,4 +52,23 @@
   - [x] Обеспечить вызов `NormalizePointsAndSize()` во вьюмодели трубы для автоматической перестройки размеров и сохранения в `config.json`
 - [x] Проверить компиляцию и выполнить верификацию работы «резиновой связи»
 
+# Tasks: Architectural Refactoring — Attached Properties, Direct Properties & Coercion (Сессия 8 — Выполнено)
+
+- [x] Декаплировать координаты разметки в `DashboardPanel.cs` и `DashboardView.axaml` с помощью Attached Properties:
+  - [x] Объявить `Col`, `Row`, `SizeX`, `SizeY` как присоединенные свойства в `DashboardPanel.cs`
+  - [x] Перевести расчеты `MeasureOverride`/`ArrangeOverride` и обработчики драга на их использование
+  - [x] Удалить устаревшие подписки `SubscribeVm` на VM у виджетов
+  - [x] Настроить двухстороннюю привязку свойств разметки в стиле контейнеров `ContentPresenter` в `DashboardView.axaml`
+- [x] Перевести высокочастотную телеметрию на `DirectProperty`:
+  - [x] Свойства `Setpoint` и `Feedback` в `ValveControl.cs`
+  - [x] Свойство `IsFilled` в `PipeControl.cs`
+  - [x] Свойство `Values` в `TrendLineControl.cs`
+- [x] Реализовать защиту данных на этапе коэрсии (Coercion) в свойствах:
+  - [x] `CellWidth` и `CellHeight` в `DashboardPanel` (ограничение `[10.0, 500.0]`)
+  - [x] `Thickness` в `ValveControl` и `PipeControl` (ограничение `[2.0, 50.0]`)
+  - [x] `MinY` и `MaxY` в `TrendLineControl` (ограничение `[-10000.0, 10000.0]`)
+  - [x] Уставки и обратная связь в сеттерах Direct-свойств `ValveControl` (ограничение `[0.0, 100.0]`)
+- [x] Удалить временное логирование в `debug_log.txt` из `DashboardPanel.cs`
+- [x] Верифицировать успешную компиляцию проекта с новыми изменениями
+
 
