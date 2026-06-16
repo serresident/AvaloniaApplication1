@@ -1,3 +1,13 @@
+> [!IMPORTANT]
+> **ПРАВИЛА ДЛЯ ИИ-АГЕНТОВ (AI AGENT GUIDELINES)**:
+> Перед началом любой работы в этом репозитории **ОБЯЗАТЕЛЬНО** изучите документы в каталоге `docs/` для восстановления контекста:
+> 1. **[docs/status.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/status.md)** — Актуальный статус проекта, дорожная карта (Roadmap) и архитектурная карта.
+> 2. **[docs/task.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/task.md)** — Текущий ToDo-лист задач.
+> 3. **[docs/development_log.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/development_log.md)** — Журнал разработки.
+> 4. **[docs/README.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/README.md)** — Регламент ведения документации.
+>
+> Каждый раз при завершении сеанса или перед отправкой финального отчета **вы обязаны** обновить статус в `status.md`, `task.md` и добавить запись в `development_log.md` по регламенту.
+
 # Кроссплатформенная HMI-панель и IoT-шлюз на Avalonia UI
 
 Данный проект представляет собой высокопроизводительную кроссплатформенную HMI-панель (Human-Machine Interface) и IoT-шлюз, разработанный на платформе **.NET 8** с использованием фреймворка **Avalonia UI** и архитектурного паттерна **MVVM** (CommunityToolkit.Mvvm).
