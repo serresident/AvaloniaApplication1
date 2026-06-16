@@ -19,6 +19,8 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _isActive;
 
+        public bool IsSuppressingNormalization { get; set; }
+
         public string PipePoints
         {
             get => OriginalConfig.PipePoints;
@@ -213,7 +215,7 @@ namespace AvaloniaApplication1.ViewModels
 
         public void NormalizePointsAndSize()
         {
-            if (_isNormalizing) return;
+            if (_isNormalizing || IsSuppressingNormalization) return;
             
             var points = GetAbsoluteGridPoints();
             if (points.Count < 2) return;

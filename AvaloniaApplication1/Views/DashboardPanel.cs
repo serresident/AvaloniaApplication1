@@ -225,28 +225,28 @@ namespace AvaloniaApplication1.Views
             });
             ColProperty.Changed.AddClassHandler<Control>((control, args) =>
             {
-                if (control.Parent is DashboardPanel panel)
+                if (control.GetVisualParent() is DashboardPanel panel)
                 {
                     panel._selectionOverlay?.InvalidateVisual();
                 }
             });
             RowProperty.Changed.AddClassHandler<Control>((control, args) =>
             {
-                if (control.Parent is DashboardPanel panel)
+                if (control.GetVisualParent() is DashboardPanel panel)
                 {
                     panel._selectionOverlay?.InvalidateVisual();
                 }
             });
             SizeXProperty.Changed.AddClassHandler<Control>((control, args) =>
             {
-                if (control.Parent is DashboardPanel panel)
+                if (control.GetVisualParent() is DashboardPanel panel)
                 {
                     panel._selectionOverlay?.InvalidateVisual();
                 }
             });
             SizeYProperty.Changed.AddClassHandler<Control>((control, args) =>
             {
-                if (control.Parent is DashboardPanel panel)
+                if (control.GetVisualParent() is DashboardPanel panel)
                 {
                     panel._selectionOverlay?.InvalidateVisual();
                 }
@@ -303,7 +303,7 @@ namespace AvaloniaApplication1.Views
                         SelectedVm = null;
                     }
                 }
-                Avalonia.Threading.Dispatcher.UIThread.Post(() => EnsureSelectionOverlayOnTop());
+                Avalonia.Threading.Dispatcher.UIThread.Post(() => EnsureOverlaysState());
                 InvalidateMeasure();
                 InvalidateArrange();
                 InvalidateVisual();
@@ -348,32 +348,15 @@ namespace AvaloniaApplication1.Views
 
         private void UpdateGridOverlay()
         {
-            if (_isManagingOverlays) return;
-            _isManagingOverlays = true;
-            try
+            if (IsDesignMode)
             {
-                if (IsDesignMode)
-                {
-                    if (_gridOverlay == null)
-                    {
-                        _gridOverlay = new GridOverlay
-                        {
-                            CellWidth = CellWidth,
-                            CellHeight = CellHeight,
-                            IsHitTestVisible = false // Don't intercept clicks
-                        };
-                        Children.Insert(0, _gridOverlay);
-                    }
-                    if (_selectionOverlay == null)
-                    {
-                        _selectionOverlay = new SelectionOverlay(this)
-                        {
-                            IsHitTestVisible = false
-                        };
-                        Children.Add(_selectionOverlay);
-                    }
-                }
-                else
+                EnsureOverlaysState();
+            }
+            else
+            {
+                if (_isManagingOverlays) return;
+                _isManagingOverlays = true;
+                try
                 {
                     if (_gridOverlay != null)
                     {
@@ -386,32 +369,76 @@ namespace AvaloniaApplication1.Views
                         _selectionOverlay = null;
                     }
                 }
+                finally
+                {
+                    _isManagingOverlays = false;
+                }
+            }
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            UpdateGridOverlay();
+        }
+
+        private void EnsureOverlaysState()
+        {
+            if (!IsDesignMode) return;
+            if (_isManagingOverlays) return;
+            
+            _isManagingOverlays = true;
+            try
+            {
+                // Ensure grid overlay is at index 0
+                if (_gridOverlay != null)
+                {
+                    int gridIdx = Children.IndexOf(_gridOverlay);
+                    if (gridIdx != 0)
+                    {
+                        if (gridIdx > 0)
+                        {
+                            Children.RemoveAt(gridIdx);
+                        }
+                        Children.Insert(0, _gridOverlay);
+                    }
+                }
+                else
+                {
+                    _gridOverlay = new GridOverlay
+                    {
+                        CellWidth = CellWidth,
+                        CellHeight = CellHeight,
+                        IsHitTestVisible = false
+                    };
+                    Children.Insert(0, _gridOverlay);
+                }
+
+                // Ensure selection overlay is at the end
+                if (_selectionOverlay != null)
+                {
+                    int selIdx = Children.IndexOf(_selectionOverlay);
+                    if (selIdx != Children.Count - 1)
+                    {
+                        if (selIdx >= 0)
+                        {
+                            Children.RemoveAt(selIdx);
+                        }
+                        Children.Add(_selectionOverlay);
+                    }
+                }
+                else
+                {
+                    _selectionOverlay = new SelectionOverlay(this)
+                    {
+                        IsHitTestVisible = false
+                    };
+                    Children.Add(_selectionOverlay);
+                }
             }
             finally
             {
                 _isManagingOverlays = false;
-            }
-        }
-
-        private void EnsureSelectionOverlayOnTop()
-        {
-            if (IsDesignMode && _selectionOverlay != null)
-            {
-                int index = Children.IndexOf(_selectionOverlay);
-                if (index >= 0 && index < Children.Count - 1)
-                {
-                    if (_isManagingOverlays) return;
-                    _isManagingOverlays = true;
-                    try
-                    {
-                        Children.Remove(_selectionOverlay);
-                        Children.Add(_selectionOverlay);
-                    }
-                    finally
-                    {
-                        _isManagingOverlays = false;
-                    }
-                }
             }
         }
 
@@ -453,6 +480,7 @@ namespace AvaloniaApplication1.Views
                                 {
                                     _draggedPipeControl = pipeControl;
                                     _draggedPointIndex = i;
+                                    pipeVm.IsSuppressingNormalization = true;
                                     e.Pointer.Capture(this);
                                     e.Handled = true;
                                     return;
@@ -583,11 +611,15 @@ namespace AvaloniaApplication1.Views
                                 if (finalRotation == 0 && isVertical) finalRotation = 90;
                                 bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
 
-                                double pX1 = isFlowVertical ? (col + sizeX / 2.0 - 0.5) : (col - 0.5);
-                                double pY1 = isFlowVertical ? (row - 0.5) : (row + sizeY / 2.0 - 0.5);
+                                var graphicsCenter = GetGraphicsCenter(child, vm);
+                                double gridCx = (graphicsCenter.X - CellWidth / 2) / CellWidth;
+                                double gridCy = (graphicsCenter.Y - CellHeight / 2) / CellHeight;
 
-                                double pX2 = isFlowVertical ? (col + sizeX / 2.0 - 0.5) : (col + sizeX - 0.5);
-                                double pY2 = isFlowVertical ? (row + sizeY - 0.5) : (row + sizeY / 2.0 - 0.5);
+                                double pX1 = isFlowVertical ? gridCx : (gridCx - sizeX / 2.0);
+                                double pY1 = isFlowVertical ? (gridCy - sizeY / 2.0) : gridCy;
+
+                                double pX2 = isFlowVertical ? gridCx : (gridCx + sizeX / 2.0);
+                                double pY2 = isFlowVertical ? (gridCy + sizeY / 2.0) : gridCy;
 
                                 foreach (var otherChild in Children)
                                 {
@@ -747,18 +779,16 @@ namespace AvaloniaApplication1.Views
                                     if (finalRotation == 0 && isVertical) finalRotation = 90;
                                     bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
 
-                                    double col = GetCol(child);
-                                    double row = GetRow(child);
                                     double sizeX = GetSizeX(child);
-                                    double sizeY = GetSizeY(child);
+                                    var graphicsCenter = GetGraphicsCenter(child, widgetVm);
+                                    double gridCx = (graphicsCenter.X - CellWidth / 2) / CellWidth;
+                                    double gridCy = (graphicsCenter.Y - CellHeight / 2) / CellHeight;
 
-                                    // Flanges in grid coordinate units (flange boundaries are aligned to cell edges)
-                                    // Pipe endpoints are centered in cells, so we subtract 0.5 to align cell center to cell edge
-                                    double pX1 = isFlowVertical ? (col + sizeX / 2.0 - 0.5) : (col - 0.5);
-                                    double pY1 = isFlowVertical ? (row - 0.5) : (row + sizeY / 2.0 - 0.5);
+                                    double pX1 = isFlowVertical ? gridCx : (gridCx - sizeX / 2.0);
+                                    double pY1 = isFlowVertical ? (gridCy - GetSizeY(child) / 2.0) : gridCy;
 
-                                    double pX2 = isFlowVertical ? (col + sizeX / 2.0 - 0.5) : (col + sizeX - 0.5);
-                                    double pY2 = isFlowVertical ? (row + sizeY - 0.5) : (row + sizeY / 2.0 - 0.5);
+                                    double pX2 = isFlowVertical ? gridCx : (gridCx + sizeX / 2.0);
+                                    double pY2 = isFlowVertical ? (gridCy + GetSizeY(child) / 2.0) : gridCy;
 
                                     // Check Port 1
                                     double dx1 = (dragAbsX - pX1) * cellSize;
@@ -787,17 +817,8 @@ namespace AvaloniaApplication1.Views
 
                         gridPoints[_draggedPointIndex] = new Point(dragAbsX, dragAbsY);
 
-                        Control? pipeContainer = null;
-                        foreach (var c in Children)
-                        {
-                            if (c.DataContext == pipeVm)
-                            {
-                                pipeContainer = c;
-                                break;
-                            }
-                        }
-                        double pipeCol = pipeContainer != null ? GetCol(pipeContainer) : pipeVm.Col;
-                        double pipeRow = pipeContainer != null ? GetRow(pipeContainer) : pipeVm.Row;
+                        double pipeCol = pipeVm.Col;
+                        double pipeRow = pipeVm.Row;
 
                         var relativePoints = gridPoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
                         string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
@@ -909,6 +930,12 @@ namespace AvaloniaApplication1.Views
 
             if (_draggedPipeControl != null)
             {
+                var pipeVm = _draggedPipeControl.DataContext as PipeWidgetViewModel;
+                if (pipeVm != null)
+                {
+                    pipeVm.IsSuppressingNormalization = false;
+                    pipeVm.NormalizePointsAndSize();
+                }
                 _draggedPipeControl = null;
                 _draggedPointIndex = -1;
                 e.Pointer.Capture(null);
@@ -962,12 +989,21 @@ namespace AvaloniaApplication1.Views
 
                         double sizeX = GetSizeX(_dragChild);
                         double sizeY = GetSizeY(_dragChild);
+                        var centerPt = GetGraphicsCenter(_dragChild, _dragVm);
+                        double localOffsetX = centerPt.X - GetCol(_dragChild) * CellWidth;
+                        double localOffsetY = centerPt.Y - GetRow(_dragChild) * CellHeight;
 
-                        double newPX1 = isFlowVertical ? (newCol + sizeX / 2.0 - 0.5) : (newCol - 0.5);
-                        double newPY1 = isFlowVertical ? (newRow - 0.5) : (newRow + sizeY / 2.0 - 0.5);
+                        double cx_new = newCol * CellWidth + localOffsetX;
+                        double cy_new = newRow * CellHeight + localOffsetY;
 
-                        double newPX2 = isFlowVertical ? (newCol + sizeX / 2.0 - 0.5) : (newCol + sizeX - 0.5);
-                        double newPY2 = isFlowVertical ? (newRow + sizeY - 0.5) : (newRow + sizeY / 2.0 - 0.5);
+                        double gridCx_new = (cx_new - CellWidth / 2) / CellWidth;
+                        double gridCy_new = (cy_new - CellHeight / 2) / CellHeight;
+
+                        double newPX1 = isFlowVertical ? gridCx_new : (gridCx_new - sizeX / 2.0);
+                        double newPY1 = isFlowVertical ? (gridCy_new - sizeY / 2.0) : gridCy_new;
+
+                        double newPX2 = isFlowVertical ? gridCx_new : (gridCx_new + sizeX / 2.0);
+                        double newPY2 = isFlowVertical ? (gridCy_new + sizeY / 2.0) : gridCy_new;
 
                         foreach (var conn in _connectedPipePoints)
                         {
@@ -979,17 +1015,8 @@ namespace AvaloniaApplication1.Views
                                 
                                 pipePoints[conn.PointIndex] = new Point(targetX, targetY);
 
-                                Control? pipeContainer = null;
-                                foreach (var c in Children)
-                                {
-                                    if (c.DataContext == conn.PipeVm)
-                                    {
-                                        pipeContainer = c;
-                                        break;
-                                    }
-                                }
-                                double pipeCol = pipeContainer != null ? GetCol(pipeContainer) : conn.PipeVm.Col;
-                                double pipeRow = pipeContainer != null ? GetRow(pipeContainer) : conn.PipeVm.Row;
+                                double pipeCol = conn.PipeVm.Col;
+                                double pipeRow = conn.PipeVm.Row;
 
                                 var relativePoints = pipePoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
                                 string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
@@ -1032,6 +1059,12 @@ namespace AvaloniaApplication1.Views
 
             if (_draggedPipeControl != null)
             {
+                var pipeVm = _draggedPipeControl.DataContext as PipeWidgetViewModel;
+                if (pipeVm != null)
+                {
+                    pipeVm.IsSuppressingNormalization = false;
+                    pipeVm.NormalizePointsAndSize();
+                }
                 _draggedPipeControl = null;
                 _draggedPointIndex = -1;
             }
@@ -1449,6 +1482,89 @@ namespace AvaloniaApplication1.Views
             {
                 var result = FindDragHandleRecursive(child);
                 if (result != null) return result;
+            }
+            return null;
+        }
+
+        private Point GetGraphicsCenter(Control child, WidgetViewModelBase vm)
+        {
+            double col = GetCol(child);
+            double row = GetRow(child);
+            int sizeX = GetSizeX(child);
+            int sizeY = GetSizeY(child);
+
+            // Default center based on layout
+            double defaultCx = col * CellWidth + sizeX * CellWidth / 2;
+            double defaultCy = row * CellHeight + sizeY * CellHeight / 2;
+
+            if (string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase))
+            {
+                var valveControl = FindValveControlRecursive(child);
+                if (valveControl != null)
+                {
+                    var pt = valveControl.TranslatePoint(new Point(valveControl.Bounds.Width / 2, valveControl.Bounds.Height / 2), this);
+                    if (pt.HasValue)
+                    {
+                        return pt.Value;
+                    }
+                }
+            }
+            else if (string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase))
+            {
+                var viewbox = FindViewboxRecursive(child);
+                if (viewbox != null)
+                {
+                    var pt = viewbox.TranslatePoint(new Point(viewbox.Bounds.Width / 2, viewbox.Bounds.Height / 2), this);
+                    if (pt.HasValue)
+                    {
+                        return pt.Value;
+                    }
+                }
+            }
+
+            return new Point(defaultCx, defaultCy);
+        }
+
+        private ValveControl? FindValveControlRecursive(Control control)
+        {
+            if (control is ValveControl valve) return valve;
+            if (control is Panel panel)
+            {
+                foreach (var child in panel.Children)
+                {
+                    var res = FindValveControlRecursive(child);
+                    if (res != null) return res;
+                }
+            }
+            else if (control is ContentControl cc && cc.Content is Control contentControl)
+            {
+                return FindValveControlRecursive(contentControl);
+            }
+            else if (control is ContentPresenter cp && cp.Child is Control childControl)
+            {
+                return FindValveControlRecursive(childControl);
+            }
+            return null;
+        }
+
+        private Viewbox? FindViewboxRecursive(Control control)
+        {
+            if (control is Viewbox viewbox) return viewbox;
+            if (control is Panel panel)
+            {
+                foreach (var child in panel.Children)
+                {
+                    var res = FindViewboxRecursive(child);
+                    if (res != null) return res;
+                }
+            }
+            else if (control is ContentControl cc && cc.Content is Control contentControl)
+            {
+                return FindViewboxRecursive(contentControl);
+            }
+            else if (control is ContentPresenter cp && cp.Child is Control childControl)
+            {
+                return FindViewboxRecursive(childControl);
             }
             return null;
         }

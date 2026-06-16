@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 
 namespace AvaloniaApplication1.Views
 {
@@ -28,8 +29,17 @@ namespace AvaloniaApplication1.Views
             AddHandler(PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel);
             AddHandler(PointerMovedEvent, OnPointerMoved, RoutingStrategies.Tunnel);
             AddHandler(PointerReleasedEvent, OnPointerReleased, RoutingStrategies.Tunnel);
+            AddHandler(PointerCaptureLostEvent, OnPointerCaptureLost, RoutingStrategies.Tunnel);
             
             LostFocus += (s, e) => {
+                var topLevel = Avalonia.Controls.TopLevel.GetTopLevel(this);
+                var newFocus = topLevel?.FocusManager?.GetFocusedElement() as Avalonia.Visual;
+                var current = newFocus;
+                while (current != null)
+                {
+                    if (current == this) return;
+                    current = current.GetVisualParent();
+                }
                 _isSpacePressed = false;
                 _isPanning = false;
                 _panTimer?.Stop();
@@ -59,9 +69,14 @@ namespace AvaloniaApplication1.Views
             }
         }
 
+        private bool IsDesignModeActive()
+        {
+            return DataContext is ViewModels.DashboardViewModel viewModel && viewModel.ProjectContext.IsDesignMode;
+        }
+
         private void OnKeyDown(object? sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space)
+            if (e.Key == Key.Space && IsDesignModeActive())
             {
                 _isSpacePressed = true;
                 UpdateCursor();
@@ -84,7 +99,7 @@ namespace AvaloniaApplication1.Views
         {
             PipeControl.CloseActiveMenu();
 
-            if (_isSpacePressed && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            if (IsDesignModeActive() && _isSpacePressed && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
                 _isPanning = true;
                 _lastPointerPosition = e.GetPosition(this);
@@ -111,6 +126,20 @@ namespace AvaloniaApplication1.Views
         {
             if (_isPanning)
             {
+                var pointerPoint = e.GetCurrentPoint(this);
+                if (!pointerPoint.Properties.IsLeftButtonPressed)
+                {
+                    _isPanning = false;
+                    _velocity = new Avalonia.Vector(0, 0);
+                    _panTimer?.Stop();
+                    if (e.Pointer.Captured == this)
+                    {
+                        e.Pointer.Capture(null);
+                    }
+                    UpdateCursor();
+                    return;
+                }
+
                 var currentPos = e.GetPosition(this);
                 var delta = currentPos - _lastPointerPosition;
 
@@ -209,6 +238,44 @@ namespace AvaloniaApplication1.Views
                     scrollViewer.Offset = _targetOffset;
                     _panTimer?.Stop();
                 }
+            }
+        }
+        protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            var window = Avalonia.Controls.TopLevel.GetTopLevel(this) as Window;
+            if (window != null)
+            {
+                window.Deactivated += Window_Deactivated;
+            }
+        }
+
+        protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            var window = Avalonia.Controls.TopLevel.GetTopLevel(this) as Window;
+            if (window != null)
+            {
+                window.Deactivated -= Window_Deactivated;
+            }
+        }
+
+        private void Window_Deactivated(object? sender, EventArgs e)
+        {
+            _isSpacePressed = false;
+            _isPanning = false;
+            _panTimer?.Stop();
+            UpdateCursor();
+        }
+
+        private void OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+        {
+            if (_isPanning)
+            {
+                _isPanning = false;
+                _velocity = new Avalonia.Vector(0, 0);
+                _panTimer?.Stop();
+                UpdateCursor();
             }
         }
 
