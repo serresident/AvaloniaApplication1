@@ -389,7 +389,24 @@ namespace AvaloniaApplication1.Views
                     headSize * 0.75,
                     Brushes.Black);
 
-                context.DrawText(text, new Point(cx - text.Width / 2, stemTop - rectH + (rectH - text.Height) / 2));
+                double textCx = cx;
+                double textCy = stemTop - rectH / 2;
+
+                int finalRotation = Rotation;
+                if (finalRotation == 0 && IsVertical)
+                {
+                    finalRotation = 90;
+                }
+                double angle = finalRotation * Math.PI / 180.0;
+
+                var textMatrix = Matrix.CreateTranslation(-textCx, -textCy)
+                                 * Matrix.CreateRotation(-angle)
+                                 * Matrix.CreateTranslation(textCx, textCy);
+
+                using (context.PushTransform(textMatrix))
+                {
+                    context.DrawText(text, new Point(textCx - text.Width / 2, textCy - text.Height / 2));
+                }
             }
             else if (string.Equals(ActuatorType, "Diaphragm", StringComparison.OrdinalIgnoreCase))
             {

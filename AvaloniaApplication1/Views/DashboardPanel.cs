@@ -203,9 +203,32 @@ namespace AvaloniaApplication1.Views
                     foreach (Control child in e.NewItems)
                     {
                         child.DataContextChanged += Child_DataContextChanged;
-                        SubscribeVm(child.DataContext as WidgetViewModelBase);
+                        var vm = child.DataContext as WidgetViewModelBase;
+                        SubscribeVm(vm);
+                        if (vm != null && vm.IsSelected)
+                        {
+                            SelectedVm = vm;
+                        }
                         child.InvalidateMeasure();
                         child.InvalidateVisual();
+                    }
+                }
+
+                // Clean orphaned selection reference
+                if (SelectedVm != null)
+                {
+                    bool found = false;
+                    foreach (var child in Children)
+                    {
+                        if (child.DataContext == SelectedVm)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        SelectedVm = null;
                     }
                 }
                 EnsureSelectionOverlayOnTop();
@@ -219,7 +242,31 @@ namespace AvaloniaApplication1.Views
         {
             if (sender is Control child)
             {
-                SubscribeVm(child.DataContext as WidgetViewModelBase);
+                var vm = child.DataContext as WidgetViewModelBase;
+                SubscribeVm(vm);
+                if (vm != null && vm.IsSelected)
+                {
+                    SelectedVm = vm;
+                }
+
+                // Clean orphaned selection reference
+                if (SelectedVm != null)
+                {
+                    bool found = false;
+                    foreach (var c in Children)
+                    {
+                        if (c.DataContext == SelectedVm)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        SelectedVm = null;
+                    }
+                }
+
                 child.InvalidateMeasure();
                 child.InvalidateVisual();
                 InvalidateMeasure();
@@ -431,11 +478,16 @@ namespace AvaloniaApplication1.Views
                         SelectedVm = vm;
                         clickedWidget = true;
 
-                        // Правый клик (ПКМ) — только выделяем виджет,
-                        // НЕ блокируем событие, чтобы ContextMenu сработал
+                        // Правый клик (ПКМ) — выделяем виджет и программно открываем контекстное меню
                         if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
                         {
-                            // Не ставим e.Handled — событие всплывёт к Border.ContextMenu
+                            var dragHandle = FindDragHandleRecursive(child);
+                            if (dragHandle != null && dragHandle.ContextMenu != null)
+                            {
+                                dragHandle.ContextMenu.PlacementTarget = dragHandle;
+                                dragHandle.ContextMenu.Open(dragHandle);
+                            }
+                            e.Handled = true;
                             return;
                         }
 
@@ -1148,6 +1200,18 @@ namespace AvaloniaApplication1.Views
                 }
             }
             return false;
+        }
+
+        private Border? FindDragHandleRecursive(Avalonia.Visual? visual)
+        {
+            if (visual == null) return null;
+            if (visual is Border border && border.Name == "DragHandle") return border;
+            foreach (var child in visual.GetVisualChildren())
+            {
+                var result = FindDragHandleRecursive(child);
+                if (result != null) return result;
+            }
+            return null;
         }
     }
 }

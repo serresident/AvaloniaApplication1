@@ -1,0 +1,22 @@
+--- ContextMenu Opened Diagnostic ---
+Timestamp: 16.06.2026 10:54:52
+Menu: Avalonia.Controls.ContextMenu
+Menu.DataContext: AvaloniaApplication1.ViewModels.ValveWidgetViewModel
+PlacementTarget: Avalonia.Controls.Border
+PlacementTarget.Tag: AvaloniaApplication1.ViewModels.DashboardViewModel
+Parent: Avalonia.Controls.Primitives.Popup
+Parent.Tag: null
+ItemsSource is null
+Items count: 12
+  Item 0: Header='На передний план', Command=CommunityToolkit.Mvvm.Input.RelayCommand`1[[AvaloniaApplication1.ViewModels.WidgetViewModelBase, AvaloniaApplication1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CommandParameter=AvaloniaApplication1.ViewModels.ValveWidgetViewModel, IsEnabled=True
+  Item 1: Header='Переместить вперед', Command=CommunityToolkit.Mvvm.Input.RelayCommand`1[[AvaloniaApplication1.ViewModels.WidgetViewModelBase, AvaloniaApplication1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CommandParameter=AvaloniaApplication1.ViewModels.ValveWidgetViewModel, IsEnabled=True
+  Item 2: Header='Переместить назад', Command=CommunityToolkit.Mvvm.Input.RelayCommand`1[[AvaloniaApplication1.ViewModels.WidgetViewModelBase, AvaloniaApplication1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CommandParameter=AvaloniaApplication1.ViewModels.ValveWidgetViewModel, IsEnabled=True
+  Item 3: Header='На задний план', Command=CommunityToolkit.Mvvm.Input.RelayCommand`1[[AvaloniaApplication1.ViewModels.WidgetViewModelBase, AvaloniaApplication1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CommandParameter=AvaloniaApplication1.ViewModels.ValveWidgetViewModel, IsEnabled=True
+  Item 4: Avalonia.Controls.Separator
+  Item 5: Header='Повернуть', Command=CommunityToolkit.Mvvm.Input.RelayCommand, CommandParameter=null, IsEnabled=True
+  Item 6: Avalonia.Controls.Separator
+  Item 7: Header='Свойства', Command=CommunityToolkit.Mvvm.Input.AsyncRelayCommand`1[[AvaloniaApplication1.ViewModels.WidgetViewModelBase, AvaloniaApplication1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CommandParameter=AvaloniaApplication1.ViewModels.ValveWidgetViewModel, IsEnabled=True
+  Item 8: Avalonia.Controls.Separator
+  Item 9: Header='Дублировать', Command=CommunityToolkit.Mvvm.Input.RelayCommand`1[[AvaloniaApplication1.ViewModels.WidgetViewModelBase, AvaloniaApplication1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CommandParameter=AvaloniaApplication1.ViewModels.ValveWidgetViewModel, IsEnabled=True
+  Item 10: Header='Удалить', Command=CommunityToolkit.Mvvm.Input.RelayCommand`1[[AvaloniaApplication1.ViewModels.WidgetViewModelBase, AvaloniaApplication1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CommandParameter=AvaloniaApplication1.ViewModels.ValveWidgetViewModel, IsEnabled=True
+  Item 11: Avalonia.Controls.Separator

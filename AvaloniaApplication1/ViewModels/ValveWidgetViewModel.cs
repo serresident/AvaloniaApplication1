@@ -384,6 +384,13 @@ namespace AvaloniaApplication1.ViewModels
             }
         }
 
+        [RelayCommand]
+        private void Rotate()
+        {
+            Rotation = (Rotation + 90) % 360;
+            OriginalConfig.Rotation = Rotation;
+        }
+
         public override void Dispose()
         {
             _alarmTimer.Stop();
