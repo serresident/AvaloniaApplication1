@@ -49,7 +49,7 @@
             <Button Grid.Row="3" Grid.Column="2" Content="⌫" Command="{Binding BackspaceCommand}" Background="#8B0000"/>
 
             <Button Grid.Row="4" Grid.Column="0" Content="C" Command="{Binding ClearCommand}" Background="#8B0000"/>
-            <Button Grid.Row="4" Grid.Column="1" Content="Cancel" Command="{Binding CancelCommand}" FontSize="16" Background="#555"/>
+            <Button Grid.Row="4" Grid.Column="1" Content="Cancel" IsCancel="True" Command="{Binding CancelCommand}" FontSize="16" Background="#555"/>
             <Button Grid.Row="4" Grid.Column="2" Content="OK" Command="{Binding ConfirmCommand}" Background="#006400"/>
         </Grid>
     </Grid>

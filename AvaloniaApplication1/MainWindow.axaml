@@ -17,6 +17,10 @@
         <c:BoolToBrushConverter x:Key="MimicTabColor" TrueBrush="#007ACC" FalseBrush="#2D2D30" />
     </Window.Resources>
 
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+E" Command="{Binding ToggleDesignModeCommand}" />
+    </Window.KeyBindings>
+
     <Grid RowDefinitions="Auto,*">
         <Border Grid.Row="0" Background="#333337" Padding="10">
             <Grid ColumnDefinitions="*,Auto">
@@ -48,7 +52,7 @@
                         <Button.Content>
                             <Binding Path="ProjectContext.IsDesignMode">
                                 <Binding.Converter>
-                                    <c:BoolToStringConverter TrueString="Lock Runtime" FalseString="Edit Design" />
+                                    <c:BoolToStringConverter TrueString="Lock Runtime (Ctrl+E)" FalseString="Edit Design (Ctrl+E)" />
                                 </Binding.Converter>
                             </Binding>
                         </Button.Content>

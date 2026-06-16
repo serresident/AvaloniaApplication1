@@ -231,7 +231,7 @@ namespace AvaloniaApplication1.Views
                         SelectedVm = null;
                     }
                 }
-                EnsureSelectionOverlayOnTop();
+                Avalonia.Threading.Dispatcher.UIThread.Post(() => EnsureSelectionOverlayOnTop());
                 InvalidateMeasure();
                 InvalidateArrange();
                 InvalidateVisual();

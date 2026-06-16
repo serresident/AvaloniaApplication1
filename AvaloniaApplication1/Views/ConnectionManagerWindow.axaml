@@ -56,6 +56,7 @@
             <!-- Close button on the left -->
             <Button Grid.Column="0"
                     Content="Close"
+                    IsCancel="True"
                     HorizontalAlignment="Left"
                     Background="#3E3E42" Foreground="White" CornerRadius="6" Padding="20,10" FontSize="14"
                     Click="OnCloseClick" />

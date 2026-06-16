@@ -7,7 +7,7 @@
         x:Class="AvaloniaApplication1.Views.WidgetEditorWindow"
         x:DataType="vm:WidgetEditorViewModel"
         Title="Widget Editor"
-        Width="440" Height="700"
+        Width="440" Height="600"
         MinWidth="400" MinHeight="500"
         WindowStartupLocation="CenterOwner"
         Background="#1E1E1E"
@@ -16,7 +16,7 @@
     <Grid RowDefinitions="*,Auto">
 
         <!-- Scrollable content area -->
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="20,20,20,10">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" ClipToBounds="True" Padding="20,20,20,80">
             <StackPanel Spacing="12">
 
                 <!-- Header -->
@@ -251,6 +251,7 @@
             <Grid ColumnDefinitions="*,12,*">
                 <Button Grid.Column="0" 
                         Content="❌  Cancel" 
+                        IsCancel="True"
                         Command="{Binding CancelCommand}"
                         HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                         Background="#3E3E42" Foreground="White" CornerRadius="6" 

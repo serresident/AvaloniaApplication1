@@ -15,7 +15,7 @@
     <Grid RowDefinitions="*,Auto">
 
         <!-- Scrollable content -->
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="20,20,20,10">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" ClipToBounds="True" Padding="20,20,20,80">
             <StackPanel Spacing="12">
 
                 <!-- Header -->
@@ -61,6 +61,7 @@
             <Grid ColumnDefinitions="*,12,*">
                 <Button Grid.Column="0" 
                         Content="❌  Cancel" 
+                        IsCancel="True"
                         Command="{Binding CancelCommand}"
                         HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                         Background="#3E3E42" Foreground="White" CornerRadius="6" 
