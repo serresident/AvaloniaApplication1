@@ -1,5 +1,5 @@
 --- ContextMenu Opened Diagnostic ---
-Timestamp: 16.06.2026 16:20:31
+Timestamp: 16.06.2026 16:50:36
 Menu: Avalonia.Controls.ContextMenu
 Menu.DataContext: AvaloniaApplication1.ViewModels.ValveWidgetViewModel
 PlacementTarget: Avalonia.Controls.Border
@@ -20,3 +20,1231 @@ Items count: 12
   Item 9: Header='Дублировать', Command=CommunityToolkit.Mvvm.Input.RelayCommand`1[[AvaloniaApplication1.ViewModels.WidgetViewModelBase, AvaloniaApplication1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CommandParameter=AvaloniaApplication1.ViewModels.ValveWidgetViewModel, IsEnabled=True
   Item 10: Header='Удалить', Command=CommunityToolkit.Mvvm.Input.RelayCommand`1[[AvaloniaApplication1.ViewModels.WidgetViewModelBase, AvaloniaApplication1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], CommandParameter=AvaloniaApplication1.ViewModels.ValveWidgetViewModel, IsEnabled=True
   Item 11: Avalonia.Controls.Separator
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 67,5, Row: 22,5, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 67, pY1: 25, pX2: 73, pY2: 25
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=5x=1): (62, 25) ; (67, 25)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 75, newRow: 24
+newPX1: 74,5, newPY1: 26,5, newPX2: 80,5, newPY2: 26,5
+  Pipe Линия сдува updated: (62, 25) ; (74,5, 26,5) (Col=62, Row=25, Size=13x=2)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 75, Row: 24, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 74,5, pY1: 26,5, pX2: 80,5, pY2: 26,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=16x=1): (62, 25) ; (78, 25)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 82, Row: 23, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 81,5, pY1: 25,5, pX2: 87,5, pY2: 25,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=16x=1): (62, 25) ; (78, 25)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 85, Row: 24, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 84,5, pY1: 26,5, pX2: 90,5, pY2: 26,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=16x=1): (62, 25) ; (78, 25)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 78,5, Row: 22,5, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 78, pY1: 25, pX2: 84, pY2: 25
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=16x=1): (62, 25) ; (78, 25)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 80, newRow: 24
+newPX1: 79,5, newPY1: 26,5, newPX2: 85,5, newPY2: 26,5
+  Pipe Линия сдува updated: (62, 25) ; (79,5, 26,5) (Col=62, Row=25, Size=18x=2)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 80, Row: 24, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 79,5, pY1: 26,5, pX2: 85,5, pY2: 26,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=18x=2): (62, 25) ; (79,5, 26,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 89, newRow: 24
+newPX1: 88,5, newPY1: 26,5, newPX2: 94,5, newPY2: 26,5
+  Pipe Линия сдува updated: (62, 25) ; (88,5, 26,5) (Col=62, Row=25, Size=27x=2)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 89, Row: 24, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 88,5, pY1: 26,5, pX2: 94,5, pY2: 26,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=27x=2): (62, 25) ; (88,5, 26,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 94, newRow: 23
+newPX1: 93,5, newPY1: 25,5, newPX2: 99,5, newPY2: 25,5
+  Pipe Линия сдува updated: (62, 25) ; (93,5, 25,5) (Col=62, Row=25, Size=32x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 94, Row: 23, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 93,5, pY1: 25,5, pX2: 99,5, pY2: 25,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=32x=1): (62, 25) ; (93,5, 25,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 101, newRow: 22
+newPX1: 100,5, newPY1: 24,5, newPX2: 106,5, newPY2: 24,5
+  Pipe Линия сдува updated: (62, 24) ; (100,5, 23,5) (Col=62, Row=24, Size=39x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 101, Row: 22, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 100,5, pY1: 24,5, pX2: 106,5, pY2: 24,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=39x=1): (62, 24) ; (100,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 107, Row: 21, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 106,5, pY1: 23,5, pX2: 112,5, pY2: 23,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=39x=1): (62, 24) ; (100,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 114, Row: 20, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 113,5, pY1: 22,5, pX2: 119,5, pY2: 22,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=39x=1): (62, 24) ; (100,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 118, Row: 20, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 117,5, pY1: 22,5, pX2: 123,5, pY2: 22,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=39x=1): (62, 24) ; (100,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 128, Row: 20, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 127,5, pY1: 22,5, pX2: 133,5, pY2: 22,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=39x=1): (62, 24) ; (100,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 106, Row: 20, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 105,5, pY1: 22,5, pX2: 111,5, pY2: 22,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=39x=1): (62, 24) ; (100,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 101, Row: 21, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 100,5, pY1: 23,5, pX2: 106,5, pY2: 23,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=39x=1): (62, 24) ; (100,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 102, newRow: 23
+newPX1: 101,5, newPY1: 25,5, newPX2: 107,5, newPY2: 25,5
+  Pipe Линия сдува updated: (62, 24) ; (101,5, 25,5) (Col=62, Row=24, Size=40x=2)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 102, Row: 23, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 101,5, pY1: 25,5, pX2: 107,5, pY2: 25,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=40x=2): (62, 24) ; (101,5, 25,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 103, newRow: 25
+newPX1: 102,5, newPY1: 27,5, newPX2: 108,5, newPY2: 27,5
+  Pipe Линия сдува updated: (62, 24) ; (102,5, 27,5) (Col=62, Row=24, Size=41x=4)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 103, Row: 25, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 102,5, pY1: 27,5, pX2: 108,5, pY2: 27,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=41x=4): (62, 24) ; (102,5, 27,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 103, newRow: 28
+newPX1: 102,5, newPY1: 30,5, newPX2: 108,5, newPY2: 30,5
+  Pipe Линия сдува updated: (62, 24) ; (102,5, 30,5) (Col=62, Row=24, Size=41x=7)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 103, Row: 28, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 102,5, pY1: 30,5, pX2: 108,5, pY2: 30,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=41x=7): (62, 24) ; (102,5, 30,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 102, newRow: 31
+newPX1: 101,5, newPY1: 33,5, newPX2: 107,5, newPY2: 33,5
+  Pipe Линия сдува updated: (62, 24) ; (101,5, 33,5) (Col=62, Row=24, Size=40x=10)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 102, Row: 31, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 101,5, pY1: 33,5, pX2: 107,5, pY2: 33,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=40x=10): (62, 24) ; (101,5, 33,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 104, newRow: 29
+newPX1: 103,5, newPY1: 31,5, newPX2: 109,5, newPY2: 31,5
+  Pipe Линия сдува updated: (62, 24) ; (103,5, 31,5) (Col=62, Row=24, Size=42x=8)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 104, Row: 29, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 103,5, pY1: 31,5, pX2: 109,5, pY2: 31,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=42x=8): (62, 24) ; (103,5, 31,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 109, newRow: 29
+newPX1: 108,5, newPY1: 31,5, newPX2: 114,5, newPY2: 31,5
+  Pipe Линия сдува updated: (62, 24) ; (108,5, 31,5) (Col=62, Row=24, Size=47x=8)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 109, Row: 29, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 108,5, pY1: 31,5, pX2: 114,5, pY2: 31,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=47x=8): (62, 24) ; (108,5, 31,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 112, newRow: 29
+newPX1: 111,5, newPY1: 31,5, newPX2: 117,5, newPY2: 31,5
+  Pipe Линия сдува updated: (62, 24) ; (111,5, 31,5) (Col=62, Row=24, Size=50x=8)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 112, Row: 29, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 111,5, pY1: 31,5, pX2: 117,5, pY2: 31,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=50x=8): (62, 24) ; (111,5, 31,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 112, newRow: 29
+newPX1: 111,5, newPY1: 31,5, newPX2: 117,5, newPY2: 31,5
+  Pipe Линия сдува updated: (62, 24) ; (111,5, 31,5) (Col=62, Row=24, Size=50x=8)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 112, Row: 29, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 111,5, pY1: 31,5, pX2: 117,5, pY2: 31,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=50x=8): (62, 24) ; (111,5, 31,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 128, newRow: 27
+newPX1: 127,5, newPY1: 29,5, newPX2: 133,5, newPY2: 29,5
+  Pipe Линия сдува updated: (62, 24) ; (127,5, 29,5) (Col=62, Row=24, Size=66x=6)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 128, Row: 27, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 127,5, pY1: 29,5, pX2: 133,5, pY2: 29,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=66x=6): (62, 24) ; (127,5, 29,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 132, newRow: 25
+newPX1: 131,5, newPY1: 27,5, newPX2: 137,5, newPY2: 27,5
+  Pipe Линия сдува updated: (62, 24) ; (131,5, 27,5) (Col=62, Row=24, Size=70x=4)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 132, Row: 25, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 131,5, pY1: 27,5, pX2: 137,5, pY2: 27,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=70x=4): (62, 24) ; (131,5, 27,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 133, newRow: 22
+newPX1: 132,5, newPY1: 24,5, newPX2: 138,5, newPY2: 24,5
+  Pipe Линия сдува updated: (62, 24) ; (132,5, 24,5) (Col=62, Row=24, Size=71x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 133, Row: 22, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 132,5, pY1: 24,5, pX2: 138,5, pY2: 24,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=71x=1): (62, 24) ; (132,5, 24,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 118, newRow: 21
+newPX1: 117,5, newPY1: 23,5, newPX2: 123,5, newPY2: 23,5
+  Pipe Линия сдува updated: (62, 23) ; (117,5, 22,5) (Col=62, Row=23, Size=56x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 118, Row: 21, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 117,5, pY1: 23,5, pX2: 123,5, pY2: 23,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=23, Size=56x=1): (62, 23) ; (117,5, 22,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 112, Row: 20, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 111,5, pY1: 22,5, pX2: 117,5, pY2: 22,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=23, Size=56x=1): (62, 23) ; (117,5, 22,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 112, newRow: 25
+newPX1: 111,5, newPY1: 27,5, newPX2: 117,5, newPY2: 27,5
+  Pipe Линия сдува updated: (62, 23) ; (117,5, 27,5) (Col=62, Row=23, Size=56x=5)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 112, Row: 25, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 111,5, pY1: 27,5, pX2: 117,5, pY2: 27,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=23, Size=56x=5): (62, 23) ; (117,5, 27,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 98, newRow: 24
+newPX1: 97,5, newPY1: 26,5, newPX2: 103,5, newPY2: 26,5
+  Pipe Линия сдува updated: (62, 23) ; (103,5, 26,5) (Col=62, Row=23, Size=42x=4)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 98, Row: 24, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 97,5, pY1: 26,5, pX2: 103,5, pY2: 26,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=23, Size=36x=4): (62, 23) ; (97,5, 26,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 114, newRow: 25
+newPX1: 113,5, newPY1: 27,5, newPX2: 119,5, newPY2: 27,5
+  Pipe Линия сдува updated: (62, 23) ; (113,5, 27,5) (Col=62, Row=23, Size=52x=5)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 114, Row: 25, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 113,5, pY1: 27,5, pX2: 119,5, pY2: 27,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=23, Size=52x=5): (62, 23) ; (113,5, 27,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 123, newRow: 25
+newPX1: 122,5, newPY1: 27,5, newPX2: 128,5, newPY2: 27,5
+  Pipe Линия сдува updated: (62, 23) ; (122,5, 27,5) (Col=62, Row=23, Size=61x=5)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 123, Row: 25, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 122,5, pY1: 27,5, pX2: 128,5, pY2: 27,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=23, Size=61x=5): (62, 23) ; (122,5, 27,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 59, newRow: 21
+newPX1: 58,5, newPY1: 23,5, newPX2: 64,5, newPY2: 23,5
+  Pipe Линия сдува updated: (58, 23) ; (54,5, 23,5) (Col=58, Row=23, Size=4x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 67,5, Row: 22,5, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 67, pY1: 25, pX2: 73, pY2: 25
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=5x=1): (62, 25) ; (67, 25)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 73, newRow: 22
+newPX1: 72,5, newPY1: 24,5, newPX2: 78,5, newPY2: 24,5
+  Pipe Линия сдува updated: (62, 24) ; (72,5, 23,5) (Col=62, Row=24, Size=11x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 73, Row: 22, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 72,5, pY1: 24,5, pX2: 78,5, pY2: 24,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=11x=1): (62, 24) ; (72,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 79, Row: 23, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 78,5, pY1: 25,5, pX2: 84,5, pY2: 25,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=11x=1): (62, 24) ; (72,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 67,5, Row: 22,5, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 67, pY1: 25, pX2: 73, pY2: 25
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=5x=1): (62, 25) ; (67, 25)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 77, newRow: 22
+newPX1: 76,5, newPY1: 24,5, newPX2: 82,5, newPY2: 24,5
+  Pipe Линия сдува updated: (62, 25) ; (76,5, 24,5) (Col=62, Row=24, Size=15x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 77, Row: 22, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 76,5, pY1: 24,5, pX2: 82,5, pY2: 24,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=15x=1): (62, 25) ; (76,5, 24,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 89, newRow: 20
+newPX1: 88,5, newPY1: 22,5, newPX2: 94,5, newPY2: 22,5
+  Pipe Линия сдува updated: (62, 25) ; (88,5, 22,5) (Col=62, Row=22, Size=27x=3)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 89, Row: 20, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 88,5, pY1: 22,5, pX2: 94,5, pY2: 22,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=22, Size=27x=3): (62, 25) ; (88,5, 22,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 97, newRow: 18
+newPX1: 96,5, newPY1: 20,5, newPX2: 102,5, newPY2: 20,5
+  Pipe Линия сдува updated: (62, 25) ; (96,5, 20,5) (Col=62, Row=20, Size=35x=5)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 97, Row: 18, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 96,5, pY1: 20,5, pX2: 102,5, pY2: 20,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=20, Size=35x=5): (62, 25) ; (96,5, 20,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 101, newRow: 11
+newPX1: 100,5, newPY1: 13,5, newPX2: 106,5, newPY2: 13,5
+  Pipe Линия сдува updated: (62, 25) ; (100,5, 13,5) (Col=62, Row=13, Size=39x=12)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 101, Row: 11, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 100,5, pY1: 13,5, pX2: 106,5, pY2: 13,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=13, Size=39x=12): (62, 25) ; (100,5, 13,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 86, newRow: 25
+newPX1: 85,5, newPY1: 27,5, newPX2: 91,5, newPY2: 27,5
+  Pipe Линия сдува updated: (62, 25) ; (85,5, 27,5) (Col=62, Row=25, Size=24x=3)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 86, Row: 25, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 85,5, pY1: 27,5, pX2: 91,5, pY2: 27,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=24x=3): (62, 25) ; (85,5, 27,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 87, newRow: 19
+newPX1: 86,5, newPY1: 21,5, newPX2: 92,5, newPY2: 21,5
+  Pipe Линия сдува updated: (62, 25) ; (86,5, 21,5) (Col=62, Row=21, Size=25x=4)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 87, Row: 19, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 86,5, pY1: 21,5, pX2: 92,5, pY2: 21,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=21, Size=25x=4): (62, 25) ; (86,5, 21,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 90, newRow: 25
+newPX1: 89,5, newPY1: 27,5, newPX2: 95,5, newPY2: 27,5
+  Pipe Линия сдува updated: (62, 25) ; (89,5, 27,5) (Col=62, Row=25, Size=28x=3)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 90, Row: 25, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 89,5, pY1: 27,5, pX2: 95,5, pY2: 27,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=28x=3): (62, 25) ; (89,5, 27,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 69, newRow: 23
+newPX1: 68,5, newPY1: 25,5, newPX2: 74,5, newPY2: 25,5
+  Pipe Линия сдува updated: (62, 25) ; (68,5, 25,5) (Col=62, Row=25, Size=7x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 69, Row: 23, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 68,5, pY1: 25,5, pX2: 74,5, pY2: 25,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=7x=1): (62, 25) ; (68,5, 25,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 77, newRow: 23
+newPX1: 76,5, newPY1: 25,5, newPX2: 82,5, newPY2: 25,5
+  Pipe Линия сдува updated: (62, 25) ; (76,5, 25,5) (Col=62, Row=25, Size=15x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 77, Row: 23, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 76,5, pY1: 25,5, pX2: 82,5, pY2: 25,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=15x=1): (62, 25) ; (76,5, 25,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 84, newRow: 21
+newPX1: 83,5, newPY1: 23,5, newPX2: 89,5, newPY2: 23,5
+  Pipe Линия сдува updated: (62, 25) ; (83,5, 23,5) (Col=62, Row=23, Size=22x=2)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 84, Row: 21, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 83,5, pY1: 23,5, pX2: 89,5, pY2: 23,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=23, Size=22x=2): (62, 25) ; (83,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 91, newRow: 19
+newPX1: 90,5, newPY1: 21,5, newPX2: 96,5, newPY2: 21,5
+  Pipe Линия сдува updated: (62, 25) ; (90,5, 21,5) (Col=62, Row=21, Size=29x=4)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 91, Row: 19, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 90,5, pY1: 21,5, pX2: 96,5, pY2: 21,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=21, Size=29x=4): (62, 25) ; (90,5, 21,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 97, newRow: 13
+newPX1: 96,5, newPY1: 15,5, newPX2: 102,5, newPY2: 15,5
+  Pipe Линия сдува updated: (62, 25) ; (96,5, 15,5) (Col=62, Row=15, Size=35x=10)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 97, Row: 13, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 96,5, pY1: 15,5, pX2: 102,5, pY2: 15,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=15, Size=35x=10): (62, 25) ; (96,5, 15,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 77, newRow: 24
+newPX1: 76,5, newPY1: 26,5, newPX2: 82,5, newPY2: 26,5
+  Pipe Линия сдува updated: (62, 25) ; (76,5, 26,5) (Col=62, Row=25, Size=15x=2)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 77, Row: 24, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 76,5, pY1: 26,5, pX2: 82,5, pY2: 26,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=25, Size=15x=2): (62, 25) ; (76,5, 26,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 89, newRow: 22
+newPX1: 88,5, newPY1: 24,5, newPX2: 94,5, newPY2: 24,5
+  Pipe Линия сдува updated: (62, 25) ; (88,5, 24,5) (Col=62, Row=24, Size=27x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 89, Row: 22, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 88,5, pY1: 24,5, pX2: 94,5, pY2: 24,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=27x=1): (62, 25) ; (88,5, 24,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 76, newRow: 21
+newPX1: 75,5, newPY1: 23,5, newPX2: 81,5, newPY2: 23,5
+  Pipe Линия сдува updated: (62, 25) ; (75,5, 23,5) (Col=62, Row=23, Size=14x=2)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 76, Row: 21, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 75,5, pY1: 23,5, pX2: 81,5, pY2: 23,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=23, Size=14x=2): (62, 25) ; (75,5, 23,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 78, newRow: 22
+newPX1: 77,5, newPY1: 24,5, newPX2: 83,5, newPY2: 24,5
+  Pipe Линия сдува updated: (62, 25) ; (77,5, 24,5) (Col=62, Row=24, Size=16x=1)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 78, Row: 22, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 77,5, pY1: 24,5, pX2: 83,5, pY2: 24,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=24, Size=16x=1): (62, 25) ; (77,5, 24,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 97, newRow: 14
+newPX1: 96,5, newPY1: 16,5, newPX2: 102,5, newPY2: 16,5
+  Pipe Линия сдува updated: (62, 25) ; (96,5, 16,5) (Col=62, Row=16, Size=35x=9)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 97, Row: 14, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 96,5, pY1: 16,5, pX2: 102,5, pY2: 16,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=14, Size=35x=11): (62, 25) ; (91, 25) ; (91, 16) ; (96,8, 14,45)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 104, Row: 18, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 103,5, pY1: 20,5, pX2: 109,5, pY2: 20,5
+Connected count: 0
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=14, Size=35x=11): (62, 25) ; (91, 25) ; (91, 16) ; (96,8, 14,45)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 97,3, Row: 11,95, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 96,8, pY1: 14,45, pX2: 102,8, pY2: 14,45
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=14, Size=35x=11): (62, 25) ; (91, 25) ; (91, 16) ; (96,8, 14,45)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 102, newRow: 14
+newPX1: 101,5, newPY1: 16,5, newPX2: 107,5, newPY2: 16,5
+  Pipe Линия сдува updated: (62, 25) ; (91, 25) ; (91, 16) ; (101,5, 16,5) (Col=62, Row=16, Size=40x=9)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 102, Row: 14, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 101,5, pY1: 16,5, pX2: 107,5, pY2: 16,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=16, Size=40x=9): (62, 25) ; (91, 25) ; (91, 16) ; (101,5, 16,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 99, newRow: 13
+newPX1: 98,5, newPY1: 15,5, newPX2: 104,5, newPY2: 15,5
+  Pipe Линия сдува updated: (62, 25) ; (91, 25) ; (91, 16) ; (98,5, 15,5) (Col=62, Row=15, Size=37x=10)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 99, Row: 13, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 98,5, pY1: 15,5, pX2: 104,5, pY2: 15,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=15, Size=37x=10): (62, 25) ; (91, 25) ; (91, 16) ; (98,5, 15,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 102, newRow: 13
+newPX1: 101,5, newPY1: 15,5, newPX2: 107,5, newPY2: 15,5
+  Pipe Линия сдува updated: (62, 25) ; (91, 25) ; (91, 16) ; (101,5, 15,5) (Col=62, Row=15, Size=40x=10)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 102, Row: 13, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 101,5, pY1: 15,5, pX2: 107,5, pY2: 15,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=15, Size=40x=10): (62, 25) ; (91, 25) ; (91, 16) ; (101,5, 15,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 102, newRow: 16
+newPX1: 101,5, newPY1: 18,5, newPX2: 107,5, newPY2: 18,5
+  Pipe Линия сдува updated: (62, 25) ; (91, 25) ; (91, 16) ; (101,5, 18,5) (Col=62, Row=16, Size=40x=9)
+--- Drag Start Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+Col: 102, Row: 16, SizeX: 6, SizeY: 6
+IsVertical: False, Rotation: 0, isFlowVertical: False
+pX1: 101,5, pY1: 18,5, pX2: 107,5, pY2: 18,5
+Connected count: 1
+All pipe points checked:
+  Pipe Линия воды 1 (Col=4, Row=7, Size=5x=1): (4, 7) ; (9, 7)
+  Pipe Линия воды 2 (Col=15, Row=7, Size=8x=1): (15, 7) ; (23, 7)
+  Pipe Линия воды в бак (Col=29, Row=7, Size=17x=14): (29, 7) ; (46, 7) ; (46, 21)
+  Pipe Линия подачи A (Col=15, Row=27, Size=30x=1): (15, 27) ; (45, 27)
+  Pipe Линия подачи B (Col=15, Row=41, Size=30x=1): (15, 41) ; (45, 41)
+  Pipe Линия охл. 1 (Col=62, Row=18, Size=5x=1): (62, 18) ; (67, 18)
+  Pipe Линия охл. 2 (Col=73, Row=18, Size=4x=1): (73, 18) ; (77, 18)
+  Pipe Линия охл. 3 (Col=83, Row=18, Size=6x=1): (83, 18) ; (89, 18)
+  Pipe Линия сдува (Col=62, Row=16, Size=40x=9): (62, 25) ; (91, 25) ; (91, 16) ; (101,5, 18,5)
+  Pipe Линия слива (Col=54, Row=45, Size=13x=8): (54, 45) ; (54, 53) ; (67, 53)
+--- Drag End Diagnostic ---
+Widget Type: Valve, Title: Сдув давления
+newCol: 102, newRow: 13
+newPX1: 101,5, newPY1: 15,5, newPX2: 107,5, newPY2: 15,5
+  Pipe Линия сдува updated: (62, 25) ; (91, 25) ; (91, 16) ; (101,5, 15,5) (Col=62, Row=15, Size=40x=10)

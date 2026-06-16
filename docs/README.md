@@ -7,6 +7,7 @@
 1. **[implementation_plan.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/implementation_plan.md)** — План реализации текущей крупной фичи (сейчас: Режим Мнемосхемы).
 2. **[task.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/task.md)** — Интерактивный список задач (ToDo-лист) с отметками о выполнении (`[x]` — выполнено, `[ ]` — не выполнено).
 3. **[development_log.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/development_log.md)** — Журнал разработки (Development Log). Содержит хронологический список внесенных изменений, достигнутых вех и корректировок ТЗ по датам.
+4. **[preprompt.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/preprompt.md)** — Системные правила по архитектуре (Avalonia UI / HMI SCADA) и экономии токенов.
 
 ---
 

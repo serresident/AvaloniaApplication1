@@ -5,6 +5,7 @@
 > 2. **[docs/task.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/task.md)** — Текущий ToDo-лист задач.
 > 3. **[docs/development_log.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/development_log.md)** — Журнал разработки.
 > 4. **[docs/README.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/README.md)** — Регламент ведения документации.
+> 5. **[docs/preprompt.md](file:///c:/Users/ess2/source/repos/AvaloniaApplication1/docs/preprompt.md)** — Системные правила по архитектуре (Avalonia UI / HMI SCADA) и экономии токенов.
 >
 > Каждый раз при завершении сеанса или перед отправкой финального отчета **вы обязаны** обновить статус в `status.md`, `task.md` и добавить запись в `development_log.md` по регламенту.
 

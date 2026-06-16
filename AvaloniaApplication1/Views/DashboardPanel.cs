@@ -163,6 +163,14 @@ namespace AvaloniaApplication1.Views
         private PipeControl? _draggedPipeControl;
         private int _draggedPointIndex = -1;
 
+        private struct ConnectedPipePoint
+        {
+            public PipeWidgetViewModel PipeVm;
+            public int PointIndex;
+            public bool IsPort1;
+        }
+        private List<ConnectedPipePoint> _connectedPipePoints = new();
+
         // Grid overlay control
         private GridOverlay? _gridOverlay;
         private SelectionOverlay? _selectionOverlay;
@@ -521,6 +529,82 @@ namespace AvaloniaApplication1.Views
                             _isDragging = false; // Not dragging until threshold is met
                             _isResizing = false;
                             
+                            // Collect connected pipes for rubber-banding
+                            _connectedPipePoints.Clear();
+                            bool isValve = string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
+                            bool isPump = string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
+                            if (isValve || isPump)
+                            {
+                                int rotation = 0;
+                                bool isVertical = false;
+                                var rotProp = vm.GetType().GetProperty("Rotation");
+                                if (rotProp != null) rotation = (int)(rotProp.GetValue(vm) ?? 0);
+                                var vertProp = vm.GetType().GetProperty("IsVertical");
+                                if (vertProp != null) isVertical = (bool)(vertProp.GetValue(vm) ?? false);
+
+                                int finalRotation = rotation;
+                                if (finalRotation == 0 && isVertical) finalRotation = 90;
+                                bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
+
+                                double sizeX = vm.SizeX;
+                                double sizeY = vm.SizeY;
+
+                                double pX1 = isFlowVertical ? (vm.Col + sizeX / 2.0 - 0.5) : (vm.Col - 0.5);
+                                double pY1 = isFlowVertical ? (vm.Row - 0.5) : (vm.Row + sizeY / 2.0 - 0.5);
+
+                                double pX2 = isFlowVertical ? (vm.Col + sizeX / 2.0 - 0.5) : (vm.Col + sizeX - 0.5);
+                                double pY2 = isFlowVertical ? (vm.Row + sizeY - 0.5) : (vm.Row + sizeY / 2.0 - 0.5);
+
+                                foreach (var otherChild in Children)
+                                {
+                                    if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
+                                    if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
+                                    {
+                                        var points = pipeVm.GetAbsoluteGridPoints();
+                                        for (int i = 0; i < points.Count; i++)
+                                        {
+                                            var pt = points[i];
+                                            if (Math.Abs(pt.X - pX1) < 0.01 && Math.Abs(pt.Y - pY1) < 0.01)
+                                            {
+                                                _connectedPipePoints.Add(new ConnectedPipePoint
+                                                {
+                                                    PipeVm = pipeVm,
+                                                    PointIndex = i,
+                                                    IsPort1 = true
+                                                });
+                                            }
+                                            else if (Math.Abs(pt.X - pX2) < 0.01 && Math.Abs(pt.Y - pY2) < 0.01)
+                                            {
+                                                _connectedPipePoints.Add(new ConnectedPipePoint
+                                                {
+                                                    PipeVm = pipeVm,
+                                                    PointIndex = i,
+                                                    IsPort1 = false
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                                System.IO.File.AppendAllText(@"c:\Users\ess2\source\repos\AvaloniaApplication1\debug_log.txt",
+                                     $"--- Drag Start Diagnostic ---\n" +
+                                     $"Widget Type: {vm.Type}, Title: {vm.Title}\n" +
+                                     $"Col: {vm.Col}, Row: {vm.Row}, SizeX: {vm.SizeX}, SizeY: {vm.SizeY}\n" +
+                                     $"IsVertical: {isVertical}, Rotation: {rotation}, isFlowVertical: {isFlowVertical}\n" +
+                                     $"pX1: {pX1}, pY1: {pY1}, pX2: {pX2}, pY2: {pY2}\n" +
+                                     $"Connected count: {_connectedPipePoints.Count}\n" +
+                                     $"All pipe points checked:\n");
+                                 foreach (var otherChild in Children)
+                                 {
+                                     if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
+                                     {
+                                         var points = pipeVm.GetAbsoluteGridPoints();
+                                         string ptsStr = string.Join(" ; ", points.Select(pt => $"({pt.X}, {pt.Y})"));
+                                         System.IO.File.AppendAllText(@"c:\Users\ess2\source\repos\AvaloniaApplication1\debug_log.txt",
+                                             $"  Pipe {pipeVm.Title} (Col={pipeVm.Col}, Row={pipeVm.Row}, Size={pipeVm.SizeX}x={pipeVm.SizeY}): {ptsStr}\n");
+                                     }
+                                 }
+                            }
+
                             // Capture pointer for robust drag/resize tracking
                             e.Pointer.Capture(this);
                             e.Handled = true;
@@ -824,6 +908,68 @@ namespace AvaloniaApplication1.Views
 
                 GetSnappedPosition(_dragVm, point, out double newCol, out double newRow);
 
+                // Update connected pipes for rubber-banding
+                if (_connectedPipePoints.Count > 0)
+                {
+                    bool isValve = string.Equals(_dragVm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
+                    bool isPump = string.Equals(_dragVm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
+                    if (isValve || isPump)
+                    {
+                        int rotation = 0;
+                        bool isVertical = false;
+                        var rotProp = _dragVm.GetType().GetProperty("Rotation");
+                        if (rotProp != null) rotation = (int)(rotProp.GetValue(_dragVm) ?? 0);
+                        var vertProp = _dragVm.GetType().GetProperty("IsVertical");
+                        if (vertProp != null) isVertical = (bool)(vertProp.GetValue(_dragVm) ?? false);
+
+                        int finalRotation = rotation;
+                        if (finalRotation == 0 && isVertical) finalRotation = 90;
+                        bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
+
+                        double sizeX = _dragVm.SizeX;
+                        double sizeY = _dragVm.SizeY;
+
+                        double newPX1 = isFlowVertical ? (newCol + sizeX / 2.0 - 0.5) : (newCol - 0.5);
+                        double newPY1 = isFlowVertical ? (newRow - 0.5) : (newRow + sizeY / 2.0 - 0.5);
+
+                        double newPX2 = isFlowVertical ? (newCol + sizeX / 2.0 - 0.5) : (newCol + sizeX - 0.5);
+                        double newPY2 = isFlowVertical ? (newRow + sizeY - 0.5) : (newRow + sizeY / 2.0 - 0.5);
+
+                        foreach (var conn in _connectedPipePoints)
+                        {
+                            var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
+                            if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
+                            {
+                                double targetX = conn.IsPort1 ? newPX1 : newPX2;
+                                double targetY = conn.IsPort1 ? newPY1 : newPY2;
+                                
+                                pipePoints[conn.PointIndex] = new Point(targetX, targetY);
+
+                                var relativePoints = pipePoints.Select(p => new Point(p.X - conn.PipeVm.Col, p.Y - conn.PipeVm.Row)).ToList();
+                                string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                                
+                                if (conn.PipeVm.PipePoints != newPointsStr)
+                                {
+                                    conn.PipeVm.PipePoints = newPointsStr;
+                                     // conn.PipeVm.OriginalConfig.PipePoints = newPointsStr; // Ensure it is saved to JSON
+                                 }
+                            }
+                        }
+                        System.IO.File.AppendAllText(@"c:\Users\ess2\source\repos\AvaloniaApplication1\debug_log.txt",
+                            $"--- Drag End Diagnostic ---\n" +
+                            $"Widget Type: {_dragVm.Type}, Title: {_dragVm.Title}\n" +
+                            $"newCol: {newCol}, newRow: {newRow}\n" +
+                            $"newPX1: {newPX1}, newPY1: {newPY1}, newPX2: {newPX2}, newPY2: {newPY2}\n");
+                        foreach (var conn in _connectedPipePoints)
+                        {
+                            var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
+                            string ptsStr = string.Join(" ; ", pipePoints.Select(pt => $"({pt.X}, {pt.Y})"));
+                            System.IO.File.AppendAllText(@"c:\Users\ess2\source\repos\AvaloniaApplication1\debug_log.txt",
+                                $"  Pipe {conn.PipeVm.Title} updated: {ptsStr} (Col={conn.PipeVm.Col}, Row={conn.PipeVm.Row}, Size={conn.PipeVm.SizeX}x={conn.PipeVm.SizeY})\n");
+                        }
+                    }
+                }
+
                 // Update the VM (which updates the UI via bindings)
                 _dragVm.Row = newRow;
                 _dragVm.Col = newCol;
@@ -880,6 +1026,7 @@ namespace AvaloniaApplication1.Views
             _dragVm = null;
             _isDragging = false;
             _isResizing = false;
+            _connectedPipePoints.Clear();
 
             if (_gridOverlay != null)
             {
