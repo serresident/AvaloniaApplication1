@@ -17,6 +17,8 @@ namespace AvaloniaApplication1.ViewModels
         public double MinValue => OriginalConfig.MinValue;
         public double MaxValue => OriginalConfig.MaxValue == 0 ? 100 : OriginalConfig.MaxValue;
         public string Format => string.IsNullOrEmpty(OriginalConfig.Format) ? "{0:F1} %" : OriginalConfig.Format;
+        public string ValueColor => string.IsNullOrEmpty(OriginalConfig.ValueColor) ? "#E5C158" : OriginalConfig.ValueColor;
+        public double ValueFontSize => OriginalConfig.ValueFontSize <= 0 ? 14 : OriginalConfig.ValueFontSize;
 
         public TankWidgetViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)

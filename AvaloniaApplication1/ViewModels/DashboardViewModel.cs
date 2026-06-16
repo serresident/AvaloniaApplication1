@@ -224,8 +224,10 @@ namespace AvaloniaApplication1.ViewModels
                 var newVm = CreateWidgetViewModel(result);
                 if (newVm != null && vmIndex >= 0)
                 {
+                    newVm.IsSelected = widget.IsSelected;
                     newVm.PropertyChanged += OnWidgetPropertyChanged;
-                    Widgets[vmIndex] = newVm;
+                    Widgets.RemoveAt(vmIndex);
+                    Widgets.Insert(vmIndex, newVm);
                     ResolvePipeConnections();
                 }
             }

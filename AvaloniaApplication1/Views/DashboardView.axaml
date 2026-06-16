@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,7 +15,7 @@
      </UserControl.Resources>
 
      <Grid>
-         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+         <ScrollViewer Name="DashboardScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
              <LayoutTransformControl Name="ZoomControl">
                  <LayoutTransformControl.LayoutTransform>
                      <ScaleTransform ScaleX="{Binding ZoomScale}" ScaleY="{Binding ZoomScale}" />
@@ -34,7 +34,7 @@
                               <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
                                   <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                       <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                      <TextBlock Text="{Binding DisplayValue}" Foreground="#00FF00" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" />
+                                      <TextBlock Text="{Binding DisplayValue}" Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}" FontSize="{Binding ValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" />
                                   </StackPanel>
                               </Border>
                               <!-- Design Overlay -->
@@ -205,7 +205,7 @@
                                           <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="13" HorizontalAlignment="Center" Margin="0,0,0,6" />
                                           <Border Background="#1E1E1E" BorderBrush="#007ACC" BorderThickness="1" CornerRadius="4" Padding="12,6">
                                               <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
-                                                  <TextBlock Text="{Binding DisplayValue}" Foreground="#FFD700" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" />
+                                                  <TextBlock Text="{Binding DisplayValue}" Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}" FontSize="{Binding ValueFontSize}" FontWeight="Bold" VerticalAlignment="Center" />
                                                   <TextBlock Text="✏️" Foreground="#888" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" />
                                               </StackPanel>
                                           </Border>
@@ -395,7 +395,7 @@
                                            </Border>
                                        </Grid>
                                        
-                                       <TextBlock Grid.Row="2" Text="{Binding DisplayValue}" Foreground="#E5C158" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,4" />
+                                       <TextBlock Grid.Row="2" Text="{Binding DisplayValue}" Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}" FontSize="{Binding ValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,4" />
                                    </Grid>
                                </Border>
 

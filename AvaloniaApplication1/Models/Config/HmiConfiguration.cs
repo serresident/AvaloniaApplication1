@@ -112,6 +112,10 @@ namespace AvaloniaApplication1.Models.Config
         public bool AlarmDisabled { get; set; } = false;
         public double Tolerance { get; set; } = 10.0;
         public DataSourceConfig? ModeSource { get; set; }
+        
+        // ValueDisplay: custom color and font size
+        public string ValueColor { get; set; } = string.Empty;
+        public double ValueFontSize { get; set; } = 0;
     }
 
     public class DataSourceConfig

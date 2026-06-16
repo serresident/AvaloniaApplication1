@@ -19,6 +19,8 @@ namespace AvaloniaApplication1.ViewModels
         public double MinValue => OriginalConfig.MinValue;
         public double MaxValue => OriginalConfig.MaxValue;
         public string Format => string.IsNullOrEmpty(OriginalConfig.Format) ? "{0}" : OriginalConfig.Format;
+        public string ValueColor => string.IsNullOrEmpty(OriginalConfig.ValueColor) ? "#FFD700" : OriginalConfig.ValueColor;
+        public double ValueFontSize => OriginalConfig.ValueFontSize <= 0 ? 22 : OriginalConfig.ValueFontSize;
 
         public SetValueViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)

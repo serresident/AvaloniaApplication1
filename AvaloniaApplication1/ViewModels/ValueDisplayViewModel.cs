@@ -27,6 +27,8 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         public string Format => string.IsNullOrEmpty(OriginalConfig.Format) ? "{0}" : OriginalConfig.Format;
+        public string ValueColor => string.IsNullOrEmpty(OriginalConfig.ValueColor) ? "#00FF00" : OriginalConfig.ValueColor;
+        public double ValueFontSize => OriginalConfig.ValueFontSize <= 0 ? 28 : OriginalConfig.ValueFontSize;
 
         private void UpdateDisplayValue()
         {

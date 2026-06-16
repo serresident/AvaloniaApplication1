@@ -491,9 +491,9 @@ namespace AvaloniaApplication1.Views
                             return;
                         }
 
-                        // Check if click was in the bottom-right corner for resize (36x36 pixels)
+                        // Check if click was in the bottom-right corner for resize (60x60 pixels)
                         // ONLY allow resize if the widget was ALREADY selected!
-                        var resizeRect = new Rect(childBounds.Right - 36, childBounds.Bottom - 36, 36, 36);
+                        var resizeRect = new Rect(childBounds.Right - 60, childBounds.Bottom - 60, 60, 60);
                         if (wasSelected && resizeRect.Contains(point))
                         {
                             _dragChild = child;
@@ -613,7 +613,7 @@ namespace AvaloniaApplication1.Views
                                 double dy = (dragAbsY - port.Y) * cellSize;
                                 double dist = Math.Sqrt(dx * dx + dy * dy);
 
-                                if (dist <= 10.0) // 10px snap radius
+                                if (dist <= 20.0) // 20px snap radius (was 10px)
                                 {
                                     dragAbsX = port.X;
                                     dragAbsY = port.Y;
@@ -624,7 +624,7 @@ namespace AvaloniaApplication1.Views
                             if (snapped) break;
                         }
 
-                        // Valve/Pump snapped ports check if not snapped to sibling pipe (10px snap radius)
+                        // Valve/Pump snapped ports check if not snapped to sibling pipe (20px snap radius)
                         if (!snapped)
                         {
                             foreach (var child in Children)
@@ -660,7 +660,7 @@ namespace AvaloniaApplication1.Views
                                     double dx1 = (dragAbsX - pX1) * cellSize;
                                     double dy1 = (dragAbsY - pY1) * cellSize;
                                     double dist1 = Math.Sqrt(dx1 * dx1 + dy1 * dy1);
-                                    if (dist1 <= 10.0)
+                                    if (dist1 <= 20.0) // 20px snap radius (was 10px)
                                     {
                                         dragAbsX = pX1;
                                         dragAbsY = pY1;
@@ -671,7 +671,7 @@ namespace AvaloniaApplication1.Views
                                     double dx2 = (dragAbsX - pX2) * cellSize;
                                     double dy2 = (dragAbsY - pY2) * cellSize;
                                     double dist2 = Math.Sqrt(dx2 * dx2 + dy2 * dy2);
-                                    if (dist2 <= 10.0)
+                                    if (dist2 <= 20.0) // 20px snap radius (was 10px)
                                     {
                                         dragAbsX = pX2;
                                         dragAbsY = pY2;
@@ -714,7 +714,7 @@ namespace AvaloniaApplication1.Views
                                     vm.Col * CellWidth, vm.Row * CellHeight,
                                     vm.SizeX * CellWidth, vm.SizeY * CellHeight);
 
-                                var resizeRect = new Rect(childBounds.Right - 36, childBounds.Bottom - 36, 36, 36);
+                                var resizeRect = new Rect(childBounds.Right - 60, childBounds.Bottom - 60, 60, 60);
                                 if (resizeRect.Contains(point))
                                 {
                                     overResize = true;
@@ -1130,21 +1130,17 @@ namespace AvaloniaApplication1.Views
             double relX2 = isFlowVertical ? (sizeX / 2.0) : sizeX;
             double relY2 = isFlowVertical ? sizeY : (sizeY / 2.0);
 
-            double snapRadius = 15.0; // pixels
+            double snapRadius = 20.0; // pixels (was 15.0)
             bool snapped = false;
 
-            // Gather all pipe endpoints
+            // 1. Try to snap ports to any pipe vertex (2D snapping)
             foreach (var child in Children)
             {
                 if (child == _gridOverlay || child == _selectionOverlay) continue;
                 if (child.DataContext is PipeWidgetViewModel pipeVm)
                 {
                     var points = pipeVm.GetAbsoluteGridPoints();
-                    if (points.Count < 1) continue;
-
-                    // Endpoints of this pipe
-                    var endpoints = new[] { points[0], points[points.Count - 1] };
-                    foreach (var ep in endpoints)
+                    foreach (var ep in points)
                     {
                         // Check Port 1
                         double p1X = (candCol + relX1) * CellWidth;
@@ -1165,10 +1161,8 @@ namespace AvaloniaApplication1.Views
                         // Check Port 2
                         double p2X = (candCol + relX2) * CellWidth;
                         double p2Y = (candRow + relY2) * CellHeight;
-                        double epX2 = ep.X * CellWidth + CellWidth / 2.0;
-                        double epY2 = ep.Y * CellHeight + CellHeight / 2.0;
 
-                        double dist2 = Math.Sqrt(Math.Pow(p2X - epX2, 2) + Math.Pow(p2Y - epY2, 2));
+                        double dist2 = Math.Sqrt(Math.Pow(p2X - epX, 2) + Math.Pow(p2Y - epY, 2));
                         if (dist2 <= snapRadius)
                         {
                             // Snap Port 2 to ep
@@ -1180,6 +1174,70 @@ namespace AvaloniaApplication1.Views
                     }
                 }
                 if (snapped) break;
+            }
+
+            // 2. If not snapped to a vertex, try to snap to horizontal/vertical segments (1D snapping perpendicular to flow)
+            if (!snapped)
+            {
+                foreach (var child in Children)
+                {
+                    if (child == _gridOverlay || child == _selectionOverlay) continue;
+                    if (child.DataContext is PipeWidgetViewModel pipeVm)
+                    {
+                        var points = pipeVm.GetAbsoluteGridPoints();
+                        for (int i = 0; i < points.Count - 1; i++)
+                        {
+                            var pt1 = points[i];
+                            var pt2 = points[i + 1];
+
+                            // Horizontal segment (align Y of horizontal valve flow to horizontal pipe)
+                            if (Math.Abs(pt1.Y - pt2.Y) < 0.01 && !isFlowVertical)
+                            {
+                                double pY = (candRow + relY1) * CellHeight;
+                                double segY = pt1.Y * CellHeight + CellHeight / 2.0;
+                                double distY = Math.Abs(pY - segY);
+
+                                if (distY <= snapRadius)
+                                {
+                                    // Check if valve overlaps or is close horizontally to the segment
+                                    double minX = Math.Min(pt1.X, pt2.X) - 0.5;
+                                    double maxX = Math.Max(pt1.X, pt2.X) + 0.5;
+                                    double valveCenterCol = candCol + sizeX / 2.0;
+
+                                    if (valveCenterCol >= minX && valveCenterCol <= maxX)
+                                    {
+                                        snappedRow = pt1.Y + 0.5 - relY1;
+                                        snapped = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            // Vertical segment (align X of vertical valve flow to vertical pipe)
+                            else if (Math.Abs(pt1.X - pt2.X) < 0.01 && isFlowVertical)
+                            {
+                                double pX = (candCol + relX1) * CellWidth;
+                                double segX = pt1.X * CellWidth + CellWidth / 2.0;
+                                double distX = Math.Abs(pX - segX);
+
+                                if (distX <= snapRadius)
+                                {
+                                    // Check if valve overlaps or is close vertically to the segment
+                                    double minY = Math.Min(pt1.Y, pt2.Y) - 0.5;
+                                    double maxY = Math.Max(pt1.Y, pt2.Y) + 0.5;
+                                    double valveCenterRow = candRow + sizeY / 2.0;
+
+                                    if (valveCenterRow >= minY && valveCenterRow <= maxY)
+                                    {
+                                        snappedCol = pt1.X + 0.5 - relX1;
+                                        snapped = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (snapped) break;
+                }
             }
 
             // Keep in bounds

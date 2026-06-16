@@ -49,6 +49,12 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string _format = "{0}";
 
+        [ObservableProperty]
+        private string _valueColor = string.Empty;
+
+        [ObservableProperty]
+        private double _valueFontSize;
+
         // --- Widget-specific: CommandButton ---
         public string[] AvailableButtonModes => ButtonModes.All;
 
@@ -206,6 +212,14 @@ namespace AvaloniaApplication1.ViewModels
                 Tolerance = existingConfig.Tolerance == 0 ? 10.0 : existingConfig.Tolerance;
                 ModeConnectionId = existingConfig.ModeSource?.ConnId;
                 ModeAddress = existingConfig.ModeSource?.Address ?? string.Empty;
+
+                ValueColor = string.IsNullOrEmpty(existingConfig.ValueColor) 
+                    ? (existingConfig.Type == "SetValue" ? "#FFD700" : (existingConfig.Type == "Tank" ? "#E5C158" : "#00FF00"))
+                    : existingConfig.ValueColor;
+                
+                ValueFontSize = existingConfig.ValueFontSize <= 0
+                    ? (existingConfig.Type == "SetValue" ? 22 : (existingConfig.Type == "Tank" ? 14 : 28))
+                    : existingConfig.ValueFontSize;
             }
             else
             {
@@ -218,6 +232,8 @@ namespace AvaloniaApplication1.ViewModels
 
         private void SetDefaultSizes(string type)
         {
+            ValueColor = "#00FF00";
+            ValueFontSize = 28;
             switch (type)
             {
                 case "Valve":
@@ -228,15 +244,24 @@ namespace AvaloniaApplication1.ViewModels
                 case "Tank":
                     SizeX = 12;
                     SizeY = 20;
+                    ValueColor = "#E5C158";
+                    ValueFontSize = 14;
                     break;
                 case "Pipe":
                     SizeX = 16;
                     SizeY = 2;
                     break;
                 case "ValueDisplay":
+                    SizeX = 8;
+                    SizeY = 4;
+                    ValueColor = "#00FF00";
+                    ValueFontSize = 28;
+                    break;
                 case "SetValue":
                     SizeX = 8;
                     SizeY = 4;
+                    ValueColor = "#FFD700";
+                    ValueFontSize = 22;
                     break;
                 case "RealTimeTrend":
                     SizeX = 16;
@@ -336,7 +361,9 @@ namespace AvaloniaApplication1.ViewModels
                 Tolerance = Tolerance == 0 ? 10.0 : Tolerance,
                 ModeSource = !string.IsNullOrEmpty(ModeAddress)
                     ? new DataSourceConfig { ConnId = ModeConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" }
-                    : null
+                    : null,
+                ValueColor = ValueColor,
+                ValueFontSize = ValueFontSize
             };
         }
     }
