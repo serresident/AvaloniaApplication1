@@ -292,6 +292,7 @@
                                               StartFitting="{Binding StartFitting}"
                                               EndFitting="{Binding EndFitting}"
                                               IsDesignMode="{Binding ProjectContext.IsDesignMode}"
+                                              IsEditingVertices="{Binding IsEditingVertices}"
                                               ActiveColor="{Binding ActiveColor}"
                                               InactiveColor="{Binding InactiveColor}"
                                               IsFilled="{Binding IsActive}"
@@ -310,6 +311,9 @@
                                            <Separator />
                                            <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
                                            <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                            <Separator />
+                                            <MenuItem Header="Редактировать вершины" Command="{Binding ToggleEditingVerticesCommand}" IsVisible="{Binding !IsEditingVertices}" />
+                                            <MenuItem Header="Завершить редактирование" Command="{Binding ToggleEditingVerticesCommand}" IsVisible="{Binding IsEditingVertices}" />
                                            <Separator />
                                        </ContextMenu>
                                    </Border.ContextMenu>

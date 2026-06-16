@@ -185,7 +185,14 @@ namespace AvaloniaApplication1.Views
             {
                 if (_selectedVm != value)
                 {
-                    if (_selectedVm != null) _selectedVm.IsSelected = false;
+                    if (_selectedVm != null)
+                    {
+                        _selectedVm.IsSelected = false;
+                        if (_selectedVm is PipeWidgetViewModel oldPipe)
+                        {
+                            oldPipe.IsEditingVertices = false;
+                        }
+                    }
                     _selectedVm = value;
                     if (_selectedVm != null) _selectedVm.IsSelected = true;
                     InvalidateVisual();
@@ -462,6 +469,8 @@ namespace AvaloniaApplication1.Views
 
                 if (child.DataContext is PipeWidgetViewModel pipeVm)
                 {
+                    if (!pipeVm.IsEditingVertices) continue;
+
                     var pipeControl = FindPipeControlRecursive(child);
                     if (pipeControl != null)
                     {
@@ -507,6 +516,8 @@ namespace AvaloniaApplication1.Views
 
                     if (child.DataContext is PipeWidgetViewModel pipeVm)
                     {
+                        if (!pipeVm.IsEditingVertices) continue;
+
                         var pipeControl = FindPipeControlRecursive(child);
                         if (pipeControl != null)
                         {
@@ -600,26 +611,7 @@ namespace AvaloniaApplication1.Views
                             bool isPump = string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
                             if (isValve || isPump)
                             {
-                                int rotation = 0;
-                                bool isVertical = false;
-                                var rotProp = vm.GetType().GetProperty("Rotation");
-                                if (rotProp != null) rotation = (int)(rotProp.GetValue(vm) ?? 0);
-                                var vertProp = vm.GetType().GetProperty("IsVertical");
-                                if (vertProp != null) isVertical = (bool)(vertProp.GetValue(vm) ?? false);
-
-                                int finalRotation = rotation;
-                                if (finalRotation == 0 && isVertical) finalRotation = 90;
-                                bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
-
-                                var graphicsCenter = GetGraphicsCenter(child, vm);
-                                double gridCx = (graphicsCenter.X - CellWidth / 2) / CellWidth;
-                                double gridCy = (graphicsCenter.Y - CellHeight / 2) / CellHeight;
-
-                                double pX1 = isFlowVertical ? gridCx : (gridCx - sizeX / 2.0);
-                                double pY1 = isFlowVertical ? (gridCy - sizeY / 2.0) : gridCy;
-
-                                double pX2 = isFlowVertical ? gridCx : (gridCx + sizeX / 2.0);
-                                double pY2 = isFlowVertical ? (gridCy + sizeY / 2.0) : gridCy;
+                                var (p1, p2) = GetVisualPortsInGrid(child, vm);
 
                                 foreach (var otherChild in Children)
                                 {
@@ -630,7 +622,7 @@ namespace AvaloniaApplication1.Views
                                         for (int i = 0; i < points.Count; i++)
                                         {
                                             var pt = points[i];
-                                            if (Math.Abs(pt.X - pX1) < 0.01 && Math.Abs(pt.Y - pY1) < 0.01)
+                                            if (Math.Abs(pt.X - p1.X) < 0.01 && Math.Abs(pt.Y - p1.Y) < 0.01)
                                             {
                                                 _connectedPipePoints.Add(new ConnectedPipePoint
                                                 {
@@ -639,7 +631,7 @@ namespace AvaloniaApplication1.Views
                                                     IsPort1 = true
                                                 });
                                             }
-                                            else if (Math.Abs(pt.X - pX2) < 0.01 && Math.Abs(pt.Y - pY2) < 0.01)
+                                            else if (Math.Abs(pt.X - p2.X) < 0.01 && Math.Abs(pt.Y - p2.Y) < 0.01)
                                             {
                                                 _connectedPipePoints.Add(new ConnectedPipePoint
                                                 {
@@ -768,47 +760,29 @@ namespace AvaloniaApplication1.Views
                                     (string.Equals(widgetVm.Type, "Valve", StringComparison.OrdinalIgnoreCase) ||
                                      string.Equals(widgetVm.Type, "Pump", StringComparison.OrdinalIgnoreCase)))
                                 {
-                                    int rotation = 0;
-                                    bool isVertical = false;
-                                    var rotProp = widgetVm.GetType().GetProperty("Rotation");
-                                    if (rotProp != null) rotation = (int)(rotProp.GetValue(widgetVm) ?? 0);
-                                    var vertProp = widgetVm.GetType().GetProperty("IsVertical");
-                                    if (vertProp != null) isVertical = (bool)(vertProp.GetValue(widgetVm) ?? false);
-
-                                    int finalRotation = rotation;
-                                    if (finalRotation == 0 && isVertical) finalRotation = 90;
-                                    bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
-
-                                    double sizeX = GetSizeX(child);
-                                    var graphicsCenter = GetGraphicsCenter(child, widgetVm);
-                                    double gridCx = (graphicsCenter.X - CellWidth / 2) / CellWidth;
-                                    double gridCy = (graphicsCenter.Y - CellHeight / 2) / CellHeight;
-
-                                    double pX1 = isFlowVertical ? gridCx : (gridCx - sizeX / 2.0);
-                                    double pY1 = isFlowVertical ? (gridCy - GetSizeY(child) / 2.0) : gridCy;
-
-                                    double pX2 = isFlowVertical ? gridCx : (gridCx + sizeX / 2.0);
-                                    double pY2 = isFlowVertical ? (gridCy + GetSizeY(child) / 2.0) : gridCy;
+                                    var (p1, p2) = GetVisualPortsInGrid(child, widgetVm);
 
                                     // Check Port 1
-                                    double dx1 = (dragAbsX - pX1) * cellSize;
-                                    double dy1 = (dragAbsY - pY1) * cellSize;
+                                    double dx1 = (dragAbsX - p1.X) * cellSize;
+                                    double dy1 = (dragAbsY - p1.Y) * cellSize;
                                     double dist1 = Math.Sqrt(dx1 * dx1 + dy1 * dy1);
-                                    if (dist1 <= 20.0) // 20px snap radius (was 10px)
+                                    if (dist1 <= 20.0) // 20px snap radius
                                     {
-                                        dragAbsX = pX1;
-                                        dragAbsY = pY1;
+                                        dragAbsX = p1.X;
+                                        dragAbsY = p1.Y;
+                                        snapped = true;
                                         break;
                                     }
 
                                     // Check Port 2
-                                    double dx2 = (dragAbsX - pX2) * cellSize;
-                                    double dy2 = (dragAbsY - pY2) * cellSize;
+                                    double dx2 = (dragAbsX - p2.X) * cellSize;
+                                    double dy2 = (dragAbsY - p2.Y) * cellSize;
                                     double dist2 = Math.Sqrt(dx2 * dx2 + dy2 * dy2);
-                                    if (dist2 <= 20.0) // 20px snap radius (was 10px)
+                                    if (dist2 <= 20.0) // 20px snap radius
                                     {
-                                        dragAbsX = pX2;
-                                        dragAbsY = pY2;
+                                        dragAbsX = p2.X;
+                                        dragAbsY = p2.Y;
+                                        snapped = true;
                                         break;
                                     }
                                 }
@@ -976,42 +950,17 @@ namespace AvaloniaApplication1.Views
                     bool isPump = string.Equals(_dragVm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
                     if (isValve || isPump)
                     {
-                        int rotation = 0;
-                        bool isVertical = false;
-                        var rotProp = _dragVm.GetType().GetProperty("Rotation");
-                        if (rotProp != null) rotation = (int)(rotProp.GetValue(_dragVm) ?? 0);
-                        var vertProp = _dragVm.GetType().GetProperty("IsVertical");
-                        if (vertProp != null) isVertical = (bool)(vertProp.GetValue(_dragVm) ?? false);
-
-                        int finalRotation = rotation;
-                        if (finalRotation == 0 && isVertical) finalRotation = 90;
-                        bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
-
-                        double sizeX = GetSizeX(_dragChild);
-                        double sizeY = GetSizeY(_dragChild);
-                        var centerPt = GetGraphicsCenter(_dragChild, _dragVm);
-                        double localOffsetX = centerPt.X - GetCol(_dragChild) * CellWidth;
-                        double localOffsetY = centerPt.Y - GetRow(_dragChild) * CellHeight;
-
-                        double cx_new = newCol * CellWidth + localOffsetX;
-                        double cy_new = newRow * CellHeight + localOffsetY;
-
-                        double gridCx_new = (cx_new - CellWidth / 2) / CellWidth;
-                        double gridCy_new = (cy_new - CellHeight / 2) / CellHeight;
-
-                        double newPX1 = isFlowVertical ? gridCx_new : (gridCx_new - sizeX / 2.0);
-                        double newPY1 = isFlowVertical ? (gridCy_new - sizeY / 2.0) : gridCy_new;
-
-                        double newPX2 = isFlowVertical ? gridCx_new : (gridCx_new + sizeX / 2.0);
-                        double newPY2 = isFlowVertical ? (gridCy_new + sizeY / 2.0) : gridCy_new;
+                        double deltaCol = newCol - _dragOriginalCol;
+                        double deltaRow = newRow - _dragOriginalRow;
 
                         foreach (var conn in _connectedPipePoints)
                         {
                             var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
                             if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
                             {
-                                double targetX = conn.IsPort1 ? newPX1 : newPX2;
-                                double targetY = conn.IsPort1 ? newPY1 : newPY2;
+                                var oldPt = pipePoints[conn.PointIndex];
+                                double targetX = oldPt.X + deltaCol;
+                                double targetY = oldPt.Y + deltaRow;
                                 
                                 pipePoints[conn.PointIndex] = new Point(targetX, targetY);
 
@@ -1333,16 +1282,13 @@ namespace AvaloniaApplication1.Views
             if (finalRotation == 0 && isVertical) finalRotation = 90;
             bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
 
-            double sizeX = GetSizeX(child);
-            double sizeY = GetSizeY(child);
-
-            // Define candidate ports relative to the candidate top-left corner
-            // In cells:
-            double relX1 = isFlowVertical ? (sizeX / 2.0) : 0.0;
-            double relY1 = isFlowVertical ? 0.0 : (sizeY / 2.0);
-
-            double relX2 = isFlowVertical ? (sizeX / 2.0) : sizeX;
-            double relY2 = isFlowVertical ? sizeY : (sizeY / 2.0);
+            var (p1Grid, p2Grid) = GetVisualPortsInGrid(child, vm);
+            double col = GetCol(child);
+            double row = GetRow(child);
+            double relX1 = p1Grid.X - col;
+            double relY1 = p1Grid.Y - row;
+            double relX2 = p2Grid.X - col;
+            double relY2 = p2Grid.Y - row;
 
             double snapRadius = 20.0; // pixels (was 15.0)
             bool snapped = false;
@@ -1366,8 +1312,8 @@ namespace AvaloniaApplication1.Views
                         if (dist1 <= snapRadius)
                         {
                             // Snap Port 1 to ep
-                            snappedCol = ep.X + 0.5 - relX1;
-                            snappedRow = ep.Y + 0.5 - relY1;
+                            snappedCol = ep.X - relX1;
+                            snappedRow = ep.Y - relY1;
                             snapped = true;
                             break;
                         }
@@ -1380,8 +1326,8 @@ namespace AvaloniaApplication1.Views
                         if (dist2 <= snapRadius)
                         {
                             // Snap Port 2 to ep
-                            snappedCol = ep.X + 0.5 - relX2;
-                            snappedRow = ep.Y + 0.5 - relY2;
+                            snappedCol = ep.X - relX2;
+                            snappedRow = ep.Y - relY2;
                             snapped = true;
                             break;
                         }
@@ -1393,6 +1339,12 @@ namespace AvaloniaApplication1.Views
             // 2. If not snapped to a vertex, try to snap to horizontal/vertical segments (1D snapping perpendicular to flow)
             if (!snapped)
             {
+                var centerPt = GetGraphicsCenter(child, vm);
+                double localOffsetX = centerPt.X - col * CellWidth;
+                double localOffsetY = centerPt.Y - row * CellHeight;
+                double graphicsCenterCol = candCol + (localOffsetX / CellWidth);
+                double graphicsCenterRow = candRow + (localOffsetY / CellHeight);
+
                 foreach (var otherChild in Children)
                 {
                     if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
@@ -1407,20 +1359,17 @@ namespace AvaloniaApplication1.Views
                             // Horizontal segment (align Y of horizontal valve flow to horizontal pipe)
                             if (Math.Abs(pt1.Y - pt2.Y) < 0.01 && !isFlowVertical)
                             {
-                                double pY = (candRow + relY1) * CellHeight;
-                                double segY = pt1.Y * CellHeight + CellHeight / 2.0;
-                                double distY = Math.Abs(pY - segY);
+                                double distY = Math.Abs((candRow + relY1) - pt1.Y) * CellHeight;
 
                                 if (distY <= snapRadius)
                                 {
                                     // Check if valve overlaps or is close horizontally to the segment
                                     double minX = Math.Min(pt1.X, pt2.X) - 0.5;
                                     double maxX = Math.Max(pt1.X, pt2.X) + 0.5;
-                                    double valveCenterCol = candCol + sizeX / 2.0;
 
-                                    if (valveCenterCol >= minX && valveCenterCol <= maxX)
+                                    if (graphicsCenterCol >= minX && graphicsCenterCol <= maxX)
                                     {
-                                        snappedRow = pt1.Y + 0.5 - relY1;
+                                        snappedRow = pt1.Y - relY1;
                                         snapped = true;
                                         break;
                                     }
@@ -1429,20 +1378,17 @@ namespace AvaloniaApplication1.Views
                             // Vertical segment (align X of vertical valve flow to vertical pipe)
                             else if (Math.Abs(pt1.X - pt2.X) < 0.01 && isFlowVertical)
                             {
-                                double pX = (candCol + relX1) * CellWidth;
-                                double segX = pt1.X * CellWidth + CellWidth / 2.0;
-                                double distX = Math.Abs(pX - segX);
+                                double distX = Math.Abs((candCol + relX1) - pt1.X) * CellWidth;
 
                                 if (distX <= snapRadius)
                                 {
                                     // Check if valve overlaps or is close vertically to the segment
                                     double minY = Math.Min(pt1.Y, pt2.Y) - 0.5;
                                     double maxY = Math.Max(pt1.Y, pt2.Y) + 0.5;
-                                    double valveCenterRow = candRow + sizeY / 2.0;
 
-                                    if (valveCenterRow >= minY && valveCenterRow <= maxY)
+                                    if (graphicsCenterRow >= minY && graphicsCenterRow <= maxY)
                                     {
-                                        snappedCol = pt1.X + 0.5 - relX1;
+                                        snappedCol = pt1.X - relX1;
                                         snapped = true;
                                         break;
                                     }
@@ -1523,6 +1469,101 @@ namespace AvaloniaApplication1.Views
             }
 
             return new Point(defaultCx, defaultCy);
+        }
+
+        private (Point p1, Point p2) GetVisualPortsInGrid(Control child, WidgetViewModelBase vm)
+        {
+            double col = GetCol(child);
+            double row = GetRow(child);
+            int sizeX = GetSizeX(child);
+            int sizeY = GetSizeY(child);
+
+            int rotation = 0;
+            bool isVertical = false;
+            var rotProp = vm.GetType().GetProperty("Rotation");
+            if (rotProp != null) rotation = (int)(rotProp.GetValue(vm) ?? 0);
+            var vertProp = vm.GetType().GetProperty("IsVertical");
+            if (vertProp != null) isVertical = (bool)(vertProp.GetValue(vm) ?? false);
+
+            int finalRotation = rotation;
+            if (finalRotation == 0 && isVertical) finalRotation = 90;
+            bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
+
+            double fallbackRelX1 = isFlowVertical ? (sizeX / 2.0) : 0.0;
+            double fallbackRelY1 = isFlowVertical ? 0.0 : (sizeY / 2.0);
+            double fallbackRelX2 = isFlowVertical ? (sizeX / 2.0) : sizeX;
+            double fallbackRelY2 = isFlowVertical ? sizeY : (sizeY / 2.0);
+
+            var fallbackP1 = new Point(col + fallbackRelX1, row + fallbackRelY1);
+            var fallbackP2 = new Point(col + fallbackRelX2, row + fallbackRelY2);
+
+            var centerPt = GetGraphicsCenter(child, vm);
+            double localOffsetX = centerPt.X - col * CellWidth;
+            double localOffsetY = centerPt.Y - row * CellHeight;
+            double gridCx = col + localOffsetX / CellWidth;
+            double gridCy = row + localOffsetY / CellHeight;
+
+            if (string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase))
+            {
+                var valveControl = FindValveControlRecursive(child);
+                if (valveControl != null && valveControl.Bounds.Width > 0 && valveControl.Bounds.Height > 0)
+                {
+                    double w = valveControl.Bounds.Width;
+                    double h = valveControl.Bounds.Height;
+                    double flowSize = isFlowVertical ? h : w;
+                    
+                    double angle = finalRotation * Math.PI / 180.0;
+                    var lp1 = new Point(w / 2.0 - flowSize / 2.0, h / 2.0);
+                    var lp2 = new Point(w / 2.0 + flowSize / 2.0, h / 2.0);
+                    
+                    var lp1Rot = RotatePoint(lp1, new Point(w / 2.0, h / 2.0), angle);
+                    var lp2Rot = RotatePoint(lp2, new Point(w / 2.0, h / 2.0), angle);
+                    
+                    var p1PixelOpt = valveControl.TranslatePoint(lp1Rot, this);
+                    var p2PixelOpt = valveControl.TranslatePoint(lp2Rot, this);
+                    
+                    if (p1PixelOpt.HasValue && p2PixelOpt.HasValue)
+                    {
+                        var p1Grid = new Point(
+                            (p1PixelOpt.Value.X - CellWidth / 2.0) / CellWidth,
+                            (p1PixelOpt.Value.Y - CellHeight / 2.0) / CellHeight);
+                        var p2Grid = new Point(
+                            (p2PixelOpt.Value.X - CellWidth / 2.0) / CellWidth,
+                            (p2PixelOpt.Value.Y - CellHeight / 2.0) / CellHeight);
+                        return (p1Grid, p2Grid);
+                    }
+                }
+            }
+            else if (string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase))
+            {
+                var viewbox = FindViewboxRecursive(child);
+                if (viewbox != null && viewbox.Bounds.Width > 0 && viewbox.Bounds.Height > 0)
+                {
+                    double w = viewbox.Bounds.Width;
+                    double h = viewbox.Bounds.Height;
+                    
+                    double flowSize = isFlowVertical ? h : w;
+                    double halfFlowGrid = (flowSize / 2.0) / (isFlowVertical ? CellHeight : CellWidth);
+
+                    var p1Grid = isFlowVertical ? new Point(gridCx, gridCy - halfFlowGrid) : new Point(gridCx - halfFlowGrid, gridCy);
+                    var p2Grid = isFlowVertical ? new Point(gridCx, gridCy + halfFlowGrid) : new Point(gridCx + halfFlowGrid, gridCy);
+                    return (p1Grid, p2Grid);
+                }
+            }
+
+            return (fallbackP1, fallbackP2);
+        }
+
+        private static Point RotatePoint(Point p, Point origin, double angleRad)
+        {
+            double cos = Math.Cos(angleRad);
+            double sin = Math.Sin(angleRad);
+            double dx = p.X - origin.X;
+            double dy = p.Y - origin.Y;
+            return new Point(
+                origin.X + dx * cos - dy * sin,
+                origin.Y + dx * sin + dy * cos
+            );
         }
 
         private ValveControl? FindValveControlRecursive(Control control)

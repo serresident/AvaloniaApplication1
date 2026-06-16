@@ -19,6 +19,15 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _isActive;
 
+        [ObservableProperty]
+        private bool _isEditingVertices;
+
+        [CommunityToolkit.Mvvm.Input.RelayCommand]
+        private void ToggleEditingVertices()
+        {
+            IsEditingVertices = !IsEditingVertices;
+        }
+
         public bool IsSuppressingNormalization { get; set; }
 
         public string PipePoints

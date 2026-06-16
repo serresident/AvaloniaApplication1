@@ -35,6 +35,9 @@ namespace AvaloniaApplication1.Views
         public static readonly StyledProperty<bool> IsDesignModeProperty =
             AvaloniaProperty.Register<PipeControl, bool>(nameof(IsDesignMode), false);
 
+        public static readonly StyledProperty<bool> IsEditingVerticesProperty =
+            AvaloniaProperty.Register<PipeControl, bool>(nameof(IsEditingVertices), false);
+
         public static readonly StyledProperty<Color> ActiveColorProperty =
             AvaloniaProperty.Register<PipeControl, Color>(nameof(ActiveColor), Colors.DodgerBlue);
 
@@ -95,6 +98,12 @@ namespace AvaloniaApplication1.Views
             set => SetValue(IsDesignModeProperty, value);
         }
 
+        public bool IsEditingVertices
+        {
+            get => GetValue(IsEditingVerticesProperty);
+            set => SetValue(IsEditingVerticesProperty, value);
+        }
+
         public Color ActiveColor
         {
             get => GetValue(ActiveColorProperty);
@@ -129,6 +138,7 @@ namespace AvaloniaApplication1.Views
                 StartFittingProperty,
                 EndFittingProperty,
                 IsDesignModeProperty,
+                IsEditingVerticesProperty,
                 ActiveColorProperty,
                 InactiveColorProperty,
                 IsFilledProperty,
@@ -256,7 +266,7 @@ namespace AvaloniaApplication1.Views
             }
 
             // 4. Markers in Design Mode
-            if (IsDesignMode)
+            if (IsDesignMode && IsEditingVertices)
             {
                 var markerBrush = Brushes.White;
                 var markerPen = new Pen(Brushes.DodgerBlue, 2);
