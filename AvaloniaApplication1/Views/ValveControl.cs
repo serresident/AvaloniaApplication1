@@ -20,11 +20,19 @@ namespace AvaloniaApplication1.Views
         public static readonly StyledProperty<bool> IsOpenProperty =
             AvaloniaProperty.Register<ValveControl, bool>(nameof(IsOpen), false);
 
-        public static readonly StyledProperty<double> SetpointProperty =
-            AvaloniaProperty.Register<ValveControl, double>(nameof(Setpoint), 0.0);
+        private double _setpoint = 0.0;
+        public static readonly DirectProperty<ValveControl, double> SetpointProperty =
+            AvaloniaProperty.RegisterDirect<ValveControl, double>(
+                nameof(Setpoint),
+                o => o.Setpoint,
+                (o, v) => o.Setpoint = v);
 
-        public static readonly StyledProperty<double> FeedbackProperty =
-            AvaloniaProperty.Register<ValveControl, double>(nameof(Feedback), 0.0);
+        private double _feedback = 0.0;
+        public static readonly DirectProperty<ValveControl, double> FeedbackProperty =
+            AvaloniaProperty.RegisterDirect<ValveControl, double>(
+                nameof(Feedback),
+                o => o.Feedback,
+                (o, v) => o.Feedback = v);
 
         public static readonly StyledProperty<bool> HasFeedbackSourceProperty =
             AvaloniaProperty.Register<ValveControl, bool>(nameof(HasFeedbackSource), false);
@@ -60,7 +68,9 @@ namespace AvaloniaApplication1.Views
             AvaloniaProperty.Register<ValveControl, bool>(nameof(ShowStaticAlarmIcon), false);
 
         public static readonly StyledProperty<double> ThicknessProperty =
-            AvaloniaProperty.Register<ValveControl, double>(nameof(Thickness), 12.0);
+            AvaloniaProperty.Register<ValveControl, double>(nameof(Thickness), 12.0, coerce: CoerceThickness);
+
+        private static double CoerceThickness(AvaloniaObject inst, double val) => Math.Clamp(val, 2.0, 50.0);
 
         // --- Properties wrappers ---
 
@@ -78,14 +88,22 @@ namespace AvaloniaApplication1.Views
 
         public double Setpoint
         {
-            get => GetValue(SetpointProperty);
-            set => SetValue(SetpointProperty, value);
+            get => _setpoint;
+            set
+            {
+                var coerced = Math.Clamp(value, 0.0, 100.0);
+                SetAndRaise(SetpointProperty, ref _setpoint, coerced);
+            }
         }
 
         public double Feedback
         {
-            get => GetValue(FeedbackProperty);
-            set => SetValue(FeedbackProperty, value);
+            get => _feedback;
+            set
+            {
+                var coerced = Math.Clamp(value, 0.0, 100.0);
+                SetAndRaise(FeedbackProperty, ref _feedback, coerced);
+            }
         }
 
         public bool HasFeedbackSource

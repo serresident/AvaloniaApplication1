@@ -83,22 +83,35 @@ namespace AvaloniaApplication1.Views
 
             if (_panel.IsDesignMode && _panel.SelectedVm != null)
             {
-                double x = _panel.SelectedVm.Col * _panel.CellWidth;
-                double y = _panel.SelectedVm.Row * _panel.CellHeight;
-                double w = _panel.SelectedVm.SizeX * _panel.CellWidth;
-                double h = _panel.SelectedVm.SizeY * _panel.CellHeight;
+                Control? selectedControl = null;
+                foreach (var child in _panel.Children)
+                {
+                    if (child.DataContext == _panel.SelectedVm)
+                    {
+                        selectedControl = child;
+                        break;
+                    }
+                }
 
-                var fillBrush = new SolidColorBrush(Color.FromArgb(30, 0, 122, 255));
-                var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 2.0);
-                
-                context.DrawRectangle(fillBrush, borderPen, new Rect(x, y, w, h), 4, 4);
+                if (selectedControl != null)
+                {
+                    double x = DashboardPanel.GetCol(selectedControl) * _panel.CellWidth;
+                    double y = DashboardPanel.GetRow(selectedControl) * _panel.CellHeight;
+                    double w = DashboardPanel.GetSizeX(selectedControl) * _panel.CellWidth;
+                    double h = DashboardPanel.GetSizeY(selectedControl) * _panel.CellHeight;
 
-                var handleBrush = Brushes.White;
-                var handlePen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 1.5);
-                context.DrawEllipse(handleBrush, handlePen, new Point(x, y), 4, 4);
-                context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y), 4, 4);
-                context.DrawEllipse(handleBrush, handlePen, new Point(x, y + h), 4, 4);
-                context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y + h), 4, 4);
+                    var fillBrush = new SolidColorBrush(Color.FromArgb(30, 0, 122, 255));
+                    var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 2.0);
+                    
+                    context.DrawRectangle(fillBrush, borderPen, new Rect(x, y, w, h), 4, 4);
+
+                    var handleBrush = Brushes.White;
+                    var handlePen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 1.5);
+                    context.DrawEllipse(handleBrush, handlePen, new Point(x, y), 4, 4);
+                    context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y), 4, 4);
+                    context.DrawEllipse(handleBrush, handlePen, new Point(x, y + h), 4, 4);
+                    context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y + h), 4, 4);
+                }
             }
         }
     }
@@ -106,10 +119,36 @@ namespace AvaloniaApplication1.Views
     public class DashboardPanel : Panel
     {
         public static readonly StyledProperty<double> CellWidthProperty =
-            AvaloniaProperty.Register<DashboardPanel, double>(nameof(CellWidth), 150.0);
+            AvaloniaProperty.Register<DashboardPanel, double>(nameof(CellWidth), 150.0, coerce: CoerceCellSize);
 
         public static readonly StyledProperty<double> CellHeightProperty =
-            AvaloniaProperty.Register<DashboardPanel, double>(nameof(CellHeight), 150.0);
+            AvaloniaProperty.Register<DashboardPanel, double>(nameof(CellHeight), 150.0, coerce: CoerceCellSize);
+
+        public static readonly AttachedProperty<double> ColProperty =
+            AvaloniaProperty.RegisterAttached<DashboardPanel, Control, double>("Col", 0.0);
+
+        public static readonly AttachedProperty<double> RowProperty =
+            AvaloniaProperty.RegisterAttached<DashboardPanel, Control, double>("Row", 0.0);
+
+        public static readonly AttachedProperty<int> SizeXProperty =
+            AvaloniaProperty.RegisterAttached<DashboardPanel, Control, int>("SizeX", 1);
+
+        public static readonly AttachedProperty<int> SizeYProperty =
+            AvaloniaProperty.RegisterAttached<DashboardPanel, Control, int>("SizeY", 1);
+
+        public static double GetCol(Control element) => element.GetValue(ColProperty);
+        public static void SetCol(Control element, double value) => element.SetValue(ColProperty, value);
+
+        public static double GetRow(Control element) => element.GetValue(RowProperty);
+        public static void SetRow(Control element, double value) => element.SetValue(RowProperty, value);
+
+        public static int GetSizeX(Control element) => element.GetValue(SizeXProperty);
+        public static void SetSizeX(Control element, int value) => element.SetValue(SizeXProperty, value);
+
+        public static int GetSizeY(Control element) => element.GetValue(SizeYProperty);
+        public static void SetSizeY(Control element, int value) => element.SetValue(SizeYProperty, value);
+
+        private static double CoerceCellSize(AvaloniaObject inst, double val) => Math.Clamp(val, 10.0, 500.0);
 
         public double CellWidth
         {
@@ -178,11 +217,39 @@ namespace AvaloniaApplication1.Views
 
         static DashboardPanel()
         {
-            AffectsMeasure<DashboardPanel>(CellWidthProperty, CellHeightProperty);
-            AffectsArrange<DashboardPanel>(CellWidthProperty, CellHeightProperty);
+            AffectsMeasure<DashboardPanel>(CellWidthProperty, CellHeightProperty, ColProperty, RowProperty, SizeXProperty, SizeYProperty);
+            AffectsArrange<DashboardPanel>(CellWidthProperty, CellHeightProperty, ColProperty, RowProperty, SizeXProperty, SizeYProperty);
             IsDesignModeProperty.Changed.AddClassHandler<DashboardPanel>((panel, args) =>
             {
                 panel.UpdateGridOverlay();
+            });
+            ColProperty.Changed.AddClassHandler<Control>((control, args) =>
+            {
+                if (control.Parent is DashboardPanel panel)
+                {
+                    panel._selectionOverlay?.InvalidateVisual();
+                }
+            });
+            RowProperty.Changed.AddClassHandler<Control>((control, args) =>
+            {
+                if (control.Parent is DashboardPanel panel)
+                {
+                    panel._selectionOverlay?.InvalidateVisual();
+                }
+            });
+            SizeXProperty.Changed.AddClassHandler<Control>((control, args) =>
+            {
+                if (control.Parent is DashboardPanel panel)
+                {
+                    panel._selectionOverlay?.InvalidateVisual();
+                }
+            });
+            SizeYProperty.Changed.AddClassHandler<Control>((control, args) =>
+            {
+                if (control.Parent is DashboardPanel panel)
+                {
+                    panel._selectionOverlay?.InvalidateVisual();
+                }
             });
         }
 
@@ -192,7 +259,6 @@ namespace AvaloniaApplication1.Views
             foreach (var child in Children)
             {
                 child.DataContextChanged += Child_DataContextChanged;
-                SubscribeVm(child.DataContext as WidgetViewModelBase);
             }
 
             Children.CollectionChanged += (s, e) =>
@@ -203,7 +269,6 @@ namespace AvaloniaApplication1.Views
                     foreach (Control child in e.OldItems)
                     {
                         child.DataContextChanged -= Child_DataContextChanged;
-                        UnsubscribeVm(child.DataContext as WidgetViewModelBase);
                     }
                 }
                 if (e.NewItems != null)
@@ -212,7 +277,6 @@ namespace AvaloniaApplication1.Views
                     {
                         child.DataContextChanged += Child_DataContextChanged;
                         var vm = child.DataContext as WidgetViewModelBase;
-                        SubscribeVm(vm);
                         if (vm != null && vm.IsSelected)
                         {
                             SelectedVm = vm;
@@ -251,7 +315,6 @@ namespace AvaloniaApplication1.Views
             if (sender is Control child)
             {
                 var vm = child.DataContext as WidgetViewModelBase;
-                SubscribeVm(vm);
                 if (vm != null && vm.IsSelected)
                 {
                     SelectedVm = vm;
@@ -280,37 +343,6 @@ namespace AvaloniaApplication1.Views
                 InvalidateMeasure();
                 InvalidateArrange();
                 InvalidateVisual();
-            }
-        }
-
-        private void SubscribeVm(WidgetViewModelBase? vm)
-        {
-            if (vm != null)
-            {
-                vm.PropertyChanged -= Vm_PropertyChanged;
-                vm.PropertyChanged += Vm_PropertyChanged;
-            }
-        }
-
-        private void UnsubscribeVm(WidgetViewModelBase? vm)
-        {
-            if (vm != null)
-            {
-                vm.PropertyChanged -= Vm_PropertyChanged;
-            }
-        }
-
-        private void Vm_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(WidgetViewModelBase.Col) ||
-                e.PropertyName == nameof(WidgetViewModelBase.Row) ||
-                e.PropertyName == nameof(WidgetViewModelBase.SizeX) ||
-                e.PropertyName == nameof(WidgetViewModelBase.SizeY))
-            {
-                InvalidateMeasure();
-                InvalidateArrange();
-                InvalidateVisual();
-                _selectionOverlay?.InvalidateVisual();
             }
         }
 
@@ -478,9 +510,14 @@ namespace AvaloniaApplication1.Views
 
                 if (child.DataContext is WidgetViewModelBase vm)
                 {
+                    double col = GetCol(child);
+                    double row = GetRow(child);
+                    int sizeX = GetSizeX(child);
+                    int sizeY = GetSizeY(child);
+
                     var childBounds = new Rect(
-                        vm.Col * CellWidth, vm.Row * CellHeight,
-                        vm.SizeX * CellWidth, vm.SizeY * CellHeight);
+                        col * CellWidth, row * CellHeight,
+                        sizeX * CellWidth, sizeY * CellHeight);
 
                     if (childBounds.Contains(point))
                     {
@@ -509,8 +546,8 @@ namespace AvaloniaApplication1.Views
                             _dragChild = child;
                             _dragVm = vm;
                             _dragStartPoint = point;
-                            _dragOriginalSizeX = vm.SizeX;
-                            _dragOriginalSizeY = vm.SizeY;
+                            _dragOriginalSizeX = sizeX;
+                            _dragOriginalSizeY = sizeY;
                             _isDragging = false;
                             _isResizing = true;
                             
@@ -524,8 +561,8 @@ namespace AvaloniaApplication1.Views
                             _dragChild = child;
                             _dragVm = vm;
                             _dragStartPoint = point;
-                            _dragOriginalRow = vm.Row;
-                            _dragOriginalCol = vm.Col;
+                            _dragOriginalRow = row;
+                            _dragOriginalCol = col;
                             _isDragging = false; // Not dragging until threshold is met
                             _isResizing = false;
                             
@@ -546,14 +583,11 @@ namespace AvaloniaApplication1.Views
                                 if (finalRotation == 0 && isVertical) finalRotation = 90;
                                 bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
 
-                                double sizeX = vm.SizeX;
-                                double sizeY = vm.SizeY;
+                                double pX1 = isFlowVertical ? (col + sizeX / 2.0 - 0.5) : (col - 0.5);
+                                double pY1 = isFlowVertical ? (row - 0.5) : (row + sizeY / 2.0 - 0.5);
 
-                                double pX1 = isFlowVertical ? (vm.Col + sizeX / 2.0 - 0.5) : (vm.Col - 0.5);
-                                double pY1 = isFlowVertical ? (vm.Row - 0.5) : (vm.Row + sizeY / 2.0 - 0.5);
-
-                                double pX2 = isFlowVertical ? (vm.Col + sizeX / 2.0 - 0.5) : (vm.Col + sizeX - 0.5);
-                                double pY2 = isFlowVertical ? (vm.Row + sizeY - 0.5) : (vm.Row + sizeY / 2.0 - 0.5);
+                                double pX2 = isFlowVertical ? (col + sizeX / 2.0 - 0.5) : (col + sizeX - 0.5);
+                                double pY2 = isFlowVertical ? (row + sizeY - 0.5) : (row + sizeY / 2.0 - 0.5);
 
                                 foreach (var otherChild in Children)
                                 {
@@ -585,24 +619,6 @@ namespace AvaloniaApplication1.Views
                                         }
                                     }
                                 }
-                                System.IO.File.AppendAllText(@"c:\Users\ess2\source\repos\AvaloniaApplication1\debug_log.txt",
-                                     $"--- Drag Start Diagnostic ---\n" +
-                                     $"Widget Type: {vm.Type}, Title: {vm.Title}\n" +
-                                     $"Col: {vm.Col}, Row: {vm.Row}, SizeX: {vm.SizeX}, SizeY: {vm.SizeY}\n" +
-                                     $"IsVertical: {isVertical}, Rotation: {rotation}, isFlowVertical: {isFlowVertical}\n" +
-                                     $"pX1: {pX1}, pY1: {pY1}, pX2: {pX2}, pY2: {pY2}\n" +
-                                     $"Connected count: {_connectedPipePoints.Count}\n" +
-                                     $"All pipe points checked:\n");
-                                 foreach (var otherChild in Children)
-                                 {
-                                     if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
-                                     {
-                                         var points = pipeVm.GetAbsoluteGridPoints();
-                                         string ptsStr = string.Join(" ; ", points.Select(pt => $"({pt.X}, {pt.Y})"));
-                                         System.IO.File.AppendAllText(@"c:\Users\ess2\source\repos\AvaloniaApplication1\debug_log.txt",
-                                             $"  Pipe {pipeVm.Title} (Col={pipeVm.Col}, Row={pipeVm.Row}, Size={pipeVm.SizeX}x={pipeVm.SizeY}): {ptsStr}\n");
-                                     }
-                                 }
                             }
 
                             // Capture pointer for robust drag/resize tracking
@@ -731,16 +747,18 @@ namespace AvaloniaApplication1.Views
                                     if (finalRotation == 0 && isVertical) finalRotation = 90;
                                     bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
 
-                                    double sizeX = widgetVm.SizeX;
-                                    double sizeY = widgetVm.SizeY;
+                                    double col = GetCol(child);
+                                    double row = GetRow(child);
+                                    double sizeX = GetSizeX(child);
+                                    double sizeY = GetSizeY(child);
 
                                     // Flanges in grid coordinate units (flange boundaries are aligned to cell edges)
                                     // Pipe endpoints are centered in cells, so we subtract 0.5 to align cell center to cell edge
-                                    double pX1 = isFlowVertical ? (widgetVm.Col + sizeX / 2.0 - 0.5) : (widgetVm.Col - 0.5);
-                                    double pY1 = isFlowVertical ? (widgetVm.Row - 0.5) : (widgetVm.Row + sizeY / 2.0 - 0.5);
+                                    double pX1 = isFlowVertical ? (col + sizeX / 2.0 - 0.5) : (col - 0.5);
+                                    double pY1 = isFlowVertical ? (row - 0.5) : (row + sizeY / 2.0 - 0.5);
 
-                                    double pX2 = isFlowVertical ? (widgetVm.Col + sizeX / 2.0 - 0.5) : (widgetVm.Col + sizeX - 0.5);
-                                    double pY2 = isFlowVertical ? (widgetVm.Row + sizeY - 0.5) : (widgetVm.Row + sizeY / 2.0 - 0.5);
+                                    double pX2 = isFlowVertical ? (col + sizeX / 2.0 - 0.5) : (col + sizeX - 0.5);
+                                    double pY2 = isFlowVertical ? (row + sizeY - 0.5) : (row + sizeY / 2.0 - 0.5);
 
                                     // Check Port 1
                                     double dx1 = (dragAbsX - pX1) * cellSize;
@@ -769,7 +787,19 @@ namespace AvaloniaApplication1.Views
 
                         gridPoints[_draggedPointIndex] = new Point(dragAbsX, dragAbsY);
 
-                        var relativePoints = gridPoints.Select(p => new Point(p.X - pipeVm.Col, p.Y - pipeVm.Row)).ToList();
+                        Control? pipeContainer = null;
+                        foreach (var c in Children)
+                        {
+                            if (c.DataContext == pipeVm)
+                            {
+                                pipeContainer = c;
+                                break;
+                            }
+                        }
+                        double pipeCol = pipeContainer != null ? GetCol(pipeContainer) : pipeVm.Col;
+                        double pipeRow = pipeContainer != null ? GetRow(pipeContainer) : pipeVm.Row;
+
+                        var relativePoints = gridPoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
                         string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
 
                         if (pipeVm.PipePoints != newPointsStr)
@@ -796,9 +826,13 @@ namespace AvaloniaApplication1.Views
                             // ONLY show resize cursor if this widget is the currently selected one!
                             if (SelectedVm == vm)
                             {
+                                double col = GetCol(child);
+                                double row = GetRow(child);
+                                int sizeX = GetSizeX(child);
+                                int sizeY = GetSizeY(child);
                                 var childBounds = new Rect(
-                                    vm.Col * CellWidth, vm.Row * CellHeight,
-                                    vm.SizeX * CellWidth, vm.SizeY * CellHeight);
+                                    col * CellWidth, row * CellHeight,
+                                    sizeX * CellWidth, sizeY * CellHeight);
 
                                 var resizeRect = new Rect(childBounds.Right - 20, childBounds.Bottom - 20, 20, 20);
                                 if (resizeRect.Contains(point))
@@ -833,8 +867,8 @@ namespace AvaloniaApplication1.Views
                 if (_gridOverlay != null)
                 {
                     _gridOverlay.ShowHighlight = true;
-                    _gridOverlay.HighlightCol = (int)Math.Round(_dragVm.Col);
-                    _gridOverlay.HighlightRow = (int)Math.Round(_dragVm.Row);
+                    _gridOverlay.HighlightCol = (int)Math.Round(GetCol(_dragChild));
+                    _gridOverlay.HighlightRow = (int)Math.Round(GetRow(_dragChild));
                     _gridOverlay.HighlightSizeX = newSizeX;
                     _gridOverlay.HighlightSizeY = newSizeY;
                     _gridOverlay.InvalidateVisual();
@@ -859,11 +893,11 @@ namespace AvaloniaApplication1.Views
                 if (_gridOverlay != null)
                 {
                     _gridOverlay.ShowHighlight = true;
-                    GetSnappedPosition(_dragVm, point, out double snappedCol, out double snappedRow);
+                    GetSnappedPosition(_dragChild, point, out double snappedCol, out double snappedRow);
                     _gridOverlay.HighlightCol = snappedCol;
                     _gridOverlay.HighlightRow = snappedRow;
-                    _gridOverlay.HighlightSizeX = _dragVm.SizeX;
-                    _gridOverlay.HighlightSizeY = _dragVm.SizeY;
+                    _gridOverlay.HighlightSizeX = GetSizeX(_dragChild);
+                    _gridOverlay.HighlightSizeY = GetSizeY(_dragChild);
                     _gridOverlay.InvalidateVisual();
                 }
             }
@@ -902,11 +936,11 @@ namespace AvaloniaApplication1.Views
                 InvalidateMeasure();
                 InvalidateArrange();
             }
-            else if (_isDragging && _dragVm != null)
+            else if (_isDragging && _dragVm != null && _dragChild != null)
             {
                 var point = e.GetPosition(this);
 
-                GetSnappedPosition(_dragVm, point, out double newCol, out double newRow);
+                GetSnappedPosition(_dragChild, point, out double newCol, out double newRow);
 
                 // Update connected pipes for rubber-banding
                 if (_connectedPipePoints.Count > 0)
@@ -926,8 +960,8 @@ namespace AvaloniaApplication1.Views
                         if (finalRotation == 0 && isVertical) finalRotation = 90;
                         bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
 
-                        double sizeX = _dragVm.SizeX;
-                        double sizeY = _dragVm.SizeY;
+                        double sizeX = GetSizeX(_dragChild);
+                        double sizeY = GetSizeY(_dragChild);
 
                         double newPX1 = isFlowVertical ? (newCol + sizeX / 2.0 - 0.5) : (newCol - 0.5);
                         double newPY1 = isFlowVertical ? (newRow - 0.5) : (newRow + sizeY / 2.0 - 0.5);
@@ -945,27 +979,26 @@ namespace AvaloniaApplication1.Views
                                 
                                 pipePoints[conn.PointIndex] = new Point(targetX, targetY);
 
-                                var relativePoints = pipePoints.Select(p => new Point(p.X - conn.PipeVm.Col, p.Y - conn.PipeVm.Row)).ToList();
+                                Control? pipeContainer = null;
+                                foreach (var c in Children)
+                                {
+                                    if (c.DataContext == conn.PipeVm)
+                                    {
+                                        pipeContainer = c;
+                                        break;
+                                    }
+                                }
+                                double pipeCol = pipeContainer != null ? GetCol(pipeContainer) : conn.PipeVm.Col;
+                                double pipeRow = pipeContainer != null ? GetRow(pipeContainer) : conn.PipeVm.Row;
+
+                                var relativePoints = pipePoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
                                 string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
                                 
                                 if (conn.PipeVm.PipePoints != newPointsStr)
                                 {
                                     conn.PipeVm.PipePoints = newPointsStr;
-                                     // conn.PipeVm.OriginalConfig.PipePoints = newPointsStr; // Ensure it is saved to JSON
-                                 }
+                                }
                             }
-                        }
-                        System.IO.File.AppendAllText(@"c:\Users\ess2\source\repos\AvaloniaApplication1\debug_log.txt",
-                            $"--- Drag End Diagnostic ---\n" +
-                            $"Widget Type: {_dragVm.Type}, Title: {_dragVm.Title}\n" +
-                            $"newCol: {newCol}, newRow: {newRow}\n" +
-                            $"newPX1: {newPX1}, newPY1: {newPY1}, newPX2: {newPX2}, newPY2: {newPY2}\n");
-                        foreach (var conn in _connectedPipePoints)
-                        {
-                            var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
-                            string ptsStr = string.Join(" ; ", pipePoints.Select(pt => $"({pt.X}, {pt.Y})"));
-                            System.IO.File.AppendAllText(@"c:\Users\ess2\source\repos\AvaloniaApplication1\debug_log.txt",
-                                $"  Pipe {conn.PipeVm.Title} updated: {ptsStr} (Col={conn.PipeVm.Col}, Row={conn.PipeVm.Row}, Size={conn.PipeVm.SizeX}x={conn.PipeVm.SizeY})\n");
                         }
                     }
                 }
@@ -1055,19 +1088,17 @@ namespace AvaloniaApplication1.Views
                     continue;
                 }
 
-                if (child.DataContext is WidgetViewModelBase vm)
-                {
-                    double w = vm.SizeX * CellWidth;
-                    double h = vm.SizeY * CellHeight;
-                    child.Measure(new Size(w, h));
+                double col = GetCol(child);
+                double row = GetRow(child);
+                int sizeX = GetSizeX(child);
+                int sizeY = GetSizeY(child);
 
-                    maxWidth = Math.Max(maxWidth, (vm.Col + vm.SizeX) * CellWidth);
-                    maxHeight = Math.Max(maxHeight, (vm.Row + vm.SizeY) * CellHeight);
-                }
-                else
-                {
-                    child.Measure(availableSize);
-                }
+                double w = sizeX * CellWidth;
+                double h = sizeY * CellHeight;
+                child.Measure(new Size(w, h));
+
+                maxWidth = Math.Max(maxWidth, (col + sizeX) * CellWidth);
+                maxHeight = Math.Max(maxHeight, (row + sizeY) * CellHeight);
             }
 
             // Now measure the overlays to fill everything
@@ -1087,19 +1118,17 @@ namespace AvaloniaApplication1.Views
             {
                 if (child == _gridOverlay || child == _selectionOverlay) continue;
 
-                if (child.DataContext is WidgetViewModelBase vm)
-                {
-                    double x = vm.Col * CellWidth;
-                    double y = vm.Row * CellHeight;
-                    double w = vm.SizeX * CellWidth;
-                    double h = vm.SizeY * CellHeight;
-                    
-                    child.Arrange(new Rect(x, y, w, h));
-                }
-                else
-                {
-                    child.Arrange(new Rect(new Point(), child.DesiredSize));
-                }
+                double col = GetCol(child);
+                double row = GetRow(child);
+                int sizeX = GetSizeX(child);
+                int sizeY = GetSizeY(child);
+
+                double x = col * CellWidth;
+                double y = row * CellHeight;
+                double w = sizeX * CellWidth;
+                double h = sizeY * CellHeight;
+                
+                child.Arrange(new Rect(x, y, w, h));
             }
 
             return finalSize;
@@ -1239,8 +1268,9 @@ namespace AvaloniaApplication1.Views
             return dist <= maxDistance;
         }
 
-        private void GetSnappedPosition(WidgetViewModelBase vm, Point pointer, out double snappedCol, out double snappedRow)
+        private void GetSnappedPosition(Control child, Point pointer, out double snappedCol, out double snappedRow)
         {
+            var vm = child.DataContext as WidgetViewModelBase;
             // Initial candidate column and row based on mouse pointer
             double dragX = pointer.X - _dragStartPoint.X + _dragOriginalCol * CellWidth;
             double dragY = pointer.Y - _dragStartPoint.Y + _dragOriginalRow * CellHeight;
@@ -1250,6 +1280,8 @@ namespace AvaloniaApplication1.Views
 
             snappedCol = Math.Round(candCol);
             snappedRow = Math.Round(candRow);
+
+            if (vm == null) return;
 
             // Snapping is active for Valve and Pump type widgets
             bool isValve = string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
@@ -1268,8 +1300,8 @@ namespace AvaloniaApplication1.Views
             if (finalRotation == 0 && isVertical) finalRotation = 90;
             bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
 
-            double sizeX = vm.SizeX;
-            double sizeY = vm.SizeY;
+            double sizeX = GetSizeX(child);
+            double sizeY = GetSizeY(child);
 
             // Define candidate ports relative to the candidate top-left corner
             // In cells:
@@ -1283,10 +1315,10 @@ namespace AvaloniaApplication1.Views
             bool snapped = false;
 
             // 1. Try to snap ports to any pipe vertex (2D snapping)
-            foreach (var child in Children)
+            foreach (var otherChild in Children)
             {
-                if (child == _gridOverlay || child == _selectionOverlay) continue;
-                if (child.DataContext is PipeWidgetViewModel pipeVm)
+                if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
+                if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
                 {
                     var points = pipeVm.GetAbsoluteGridPoints();
                     foreach (var ep in points)
@@ -1328,10 +1360,10 @@ namespace AvaloniaApplication1.Views
             // 2. If not snapped to a vertex, try to snap to horizontal/vertical segments (1D snapping perpendicular to flow)
             if (!snapped)
             {
-                foreach (var child in Children)
+                foreach (var otherChild in Children)
                 {
-                    if (child == _gridOverlay || child == _selectionOverlay) continue;
-                    if (child.DataContext is PipeWidgetViewModel pipeVm)
+                    if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
+                    if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
                     {
                         var points = pipeVm.GetAbsoluteGridPoints();
                         for (int i = 0; i < points.Count - 1; i++)

@@ -21,6 +21,14 @@
                      <ScaleTransform ScaleX="{Binding ZoomScale}" ScaleY="{Binding ZoomScale}" />
                  </LayoutTransformControl.LayoutTransform>
                  <ItemsControl ItemsSource="{Binding Widgets}" x:Name="WidgetsItemsControl">
+                     <ItemsControl.Styles>
+                         <Style Selector="ContentPresenter" x:DataType="vm:WidgetViewModelBase">
+                             <Setter Property="v:DashboardPanel.Col" Value="{Binding Col, Mode=TwoWay}" />
+                             <Setter Property="v:DashboardPanel.Row" Value="{Binding Row, Mode=TwoWay}" />
+                             <Setter Property="v:DashboardPanel.SizeX" Value="{Binding SizeX, Mode=TwoWay}" />
+                             <Setter Property="v:DashboardPanel.SizeY" Value="{Binding SizeY, Mode=TwoWay}" />
+                         </Style>
+                     </ItemsControl.Styles>
                      <ItemsControl.ItemsPanel>
                          <ItemsPanelTemplate>
                              <v:DashboardPanel CellWidth="{Binding CellWidth}" CellHeight="{Binding CellHeight}" Margin="10" IsDesignMode="{Binding ProjectContext.IsDesignMode}" Background="Transparent" />

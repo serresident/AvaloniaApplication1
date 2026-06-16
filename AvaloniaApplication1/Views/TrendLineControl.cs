@@ -10,14 +10,18 @@ namespace AvaloniaApplication1.Views
 {
     public class TrendLineControl : Control
     {
-        public static readonly StyledProperty<IEnumerable?> ValuesProperty =
-            AvaloniaProperty.Register<TrendLineControl, IEnumerable?>(nameof(Values));
+        private IEnumerable? _values;
+        public static readonly DirectProperty<TrendLineControl, IEnumerable?> ValuesProperty =
+            AvaloniaProperty.RegisterDirect<TrendLineControl, IEnumerable?>(
+                nameof(Values),
+                o => o.Values,
+                (o, v) => o.Values = v);
 
         public static readonly StyledProperty<double> MinYProperty =
-            AvaloniaProperty.Register<TrendLineControl, double>(nameof(MinY), 0.0);
+            AvaloniaProperty.Register<TrendLineControl, double>(nameof(MinY), 0.0, coerce: CoerceMinY);
 
         public static readonly StyledProperty<double> MaxYProperty =
-            AvaloniaProperty.Register<TrendLineControl, double>(nameof(MaxY), 100.0);
+            AvaloniaProperty.Register<TrendLineControl, double>(nameof(MaxY), 100.0, coerce: CoerceMaxY);
 
         public static readonly StyledProperty<IBrush?> LineBrushProperty =
             AvaloniaProperty.Register<TrendLineControl, IBrush?>(nameof(LineBrush));
@@ -25,10 +29,20 @@ namespace AvaloniaApplication1.Views
         public static readonly StyledProperty<IBrush?> AreaBrushProperty =
             AvaloniaProperty.Register<TrendLineControl, IBrush?>(nameof(AreaBrush));
 
+        private static double CoerceMinY(AvaloniaObject inst, double val) => Math.Clamp(val, -10000.0, 10000.0);
+        private static double CoerceMaxY(AvaloniaObject inst, double val) => Math.Clamp(val, -10000.0, 10000.0);
+
         public IEnumerable? Values
         {
-            get => GetValue(ValuesProperty);
-            set => SetValue(ValuesProperty, value);
+            get => _values;
+            set
+            {
+                var old = _values;
+                if (SetAndRaise(ValuesProperty, ref _values, value))
+                {
+                    OnValuesChanged(old, value);
+                }
+            }
         }
 
         public double MinY
@@ -58,10 +72,6 @@ namespace AvaloniaApplication1.Views
         static TrendLineControl()
         {
             AffectsRender<TrendLineControl>(ValuesProperty, MinYProperty, MaxYProperty, LineBrushProperty, AreaBrushProperty);
-            ValuesProperty.Changed.AddClassHandler<TrendLineControl>((control, args) =>
-            {
-                control.OnValuesChanged(args.OldValue as IEnumerable, args.NewValue as IEnumerable);
-            });
         }
 
         private void OnValuesChanged(IEnumerable? oldValue, IEnumerable? newValue)

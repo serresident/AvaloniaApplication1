@@ -41,11 +41,17 @@ namespace AvaloniaApplication1.Views
         public static readonly StyledProperty<Color> InactiveColorProperty =
             AvaloniaProperty.Register<PipeControl, Color>(nameof(InactiveColor), Colors.Gray);
 
-        public static readonly StyledProperty<bool> IsFilledProperty =
-            AvaloniaProperty.Register<PipeControl, bool>(nameof(IsFilled), false);
+        private bool _isFilled = false;
+        public static readonly DirectProperty<PipeControl, bool> IsFilledProperty =
+            AvaloniaProperty.RegisterDirect<PipeControl, bool>(
+                nameof(IsFilled),
+                o => o.IsFilled,
+                (o, v) => o.IsFilled = v);
 
         public static readonly StyledProperty<double> ThicknessProperty =
-            AvaloniaProperty.Register<PipeControl, double>(nameof(Thickness), 12.0);
+            AvaloniaProperty.Register<PipeControl, double>(nameof(Thickness), 12.0, coerce: CoerceThickness);
+
+        private static double CoerceThickness(AvaloniaObject inst, double val) => Math.Clamp(val, 2.0, 50.0);
 
         public string Points
         {
@@ -103,8 +109,8 @@ namespace AvaloniaApplication1.Views
 
         public bool IsFilled
         {
-            get => GetValue(IsFilledProperty);
-            set => SetValue(IsFilledProperty, value);
+            get => _isFilled;
+            set => SetAndRaise(IsFilledProperty, ref _isFilled, value);
         }
 
         public double Thickness
