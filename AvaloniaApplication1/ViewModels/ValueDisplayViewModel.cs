@@ -12,7 +12,7 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string _displayValue = "---";
 
-        public ValueDisplayViewModel(ValueDisplayConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public ValueDisplayViewModel(ValueDisplayConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateDisplayValue();

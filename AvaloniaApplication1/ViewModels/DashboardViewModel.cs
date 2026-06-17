@@ -11,7 +11,7 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class DashboardViewModel : ViewModelBase
     {
-        private readonly IMockDataService _mockDataService;
+        private readonly IDataCoreService _mockDataService;
         private readonly IDialogService? _dialogService;
         private readonly IWidgetFactory _widgetFactory;
         private readonly HmiConfiguration _config;
@@ -29,7 +29,7 @@ namespace AvaloniaApplication1.ViewModels
 
         public DashboardViewModel(
             DashboardConfig dashboardConfig, 
-            IMockDataService mockDataService, 
+            IDataCoreService mockDataService, 
             IProjectContextService projectContext,
             HmiConfiguration config,
             IDialogService? dialogService,

@@ -24,7 +24,7 @@ namespace AvaloniaApplication1.ViewModels
         public string ValueColor => string.IsNullOrEmpty(TypedConfig.ValueColor) ? "#FFD700" : TypedConfig.ValueColor;
         public double ValueFontSize => TypedConfig.ValueFontSize <= 0 ? 22 : TypedConfig.ValueFontSize;
 
-        public SetValueViewModel(SetValueConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public SetValueViewModel(SetValueConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateDisplayValue();

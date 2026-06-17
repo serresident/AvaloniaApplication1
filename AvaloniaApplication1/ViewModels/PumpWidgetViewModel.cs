@@ -26,7 +26,7 @@ namespace AvaloniaApplication1.ViewModels
         public string ActiveColor => string.IsNullOrEmpty(TypedConfig.ActiveColor) ? "#00FF00" : TypedConfig.ActiveColor;
         public string InactiveColor => string.IsNullOrEmpty(TypedConfig.InactiveColor) ? "#FF0000" : TypedConfig.InactiveColor;
 
-        public PumpWidgetViewModel(PumpConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public PumpWidgetViewModel(PumpConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateState();

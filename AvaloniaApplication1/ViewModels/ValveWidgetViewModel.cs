@@ -84,7 +84,7 @@ namespace AvaloniaApplication1.ViewModels
         private double? _lastPopupX;
         private double? _lastPopupY;
 
-        public ValveWidgetViewModel(ValveConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public ValveWidgetViewModel(ValveConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             HasFeedbackSource = !string.IsNullOrEmpty(config.FeedbackSource?.Address);

@@ -1,11 +1,16 @@
 using System;
 
+using System.Threading.Tasks;
+
 namespace AvaloniaApplication1.Services
 {
     public interface IDataCoreService
     {
-        void Start();
-        void Stop();
+        Task StartAsync();
+        Task StopAsync();
+        
+        // Publish external tags to the core bus (e.g. from simulation)
+        void PublishTag(Models.TagData tag);
         
         // Reactive stream for tag updates
         IObservable<Models.TagData> TagUpdates { get; }

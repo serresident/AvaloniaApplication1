@@ -8,7 +8,7 @@ namespace AvaloniaApplication1.ViewModels
     {
         public CommandButtonConfig TypedConfig => (CommandButtonConfig)OriginalConfig;
 
-        public CommandButtonViewModel(CommandButtonConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public CommandButtonViewModel(CommandButtonConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
         }

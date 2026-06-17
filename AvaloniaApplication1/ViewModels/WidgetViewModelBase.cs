@@ -10,7 +10,7 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class WidgetViewModelBase : ViewModelBase, IDisposable
     {
-        public readonly IMockDataService DataService;
+        public readonly IDataCoreService DataService;
         protected readonly CompositeDisposable Disposables = new();
 
         [ObservableProperty]
@@ -44,7 +44,7 @@ namespace AvaloniaApplication1.ViewModels
         /// </summary>
         public WidgetConfig OriginalConfig { get; }
 
-        public WidgetViewModelBase(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext)
+        public WidgetViewModelBase(WidgetConfig config, IDataCoreService dataService, IProjectContextService projectContext)
         {
             DataService = dataService;
             ProjectContext = projectContext;
@@ -60,6 +60,12 @@ namespace AvaloniaApplication1.ViewModels
             // --- Rx.NET Data Routing (Phase 1) ---
             if (Source != null && !string.IsNullOrEmpty(Source.ConnId) && !string.IsNullOrEmpty(Source.Address))
             {
+                var initialVal = DataService.GetCurrentValue(Source.ConnId, Source.Address);
+                if (initialVal != null)
+                {
+                    OnTagValueUpdated(initialVal);
+                }
+
                 DataService.TagUpdates
                     .Where(tag => tag.ConnId == Source.ConnId && tag.Address == Source.Address)
                     .Sample(TimeSpan.FromMilliseconds(100)) // Throttle updates to ~10Hz max per widget

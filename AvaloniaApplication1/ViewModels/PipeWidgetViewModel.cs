@@ -138,7 +138,7 @@ namespace AvaloniaApplication1.ViewModels
 
         public List<PipeWidgetViewModel> ConnectedPipes { get; } = new();
 
-        public PipeWidgetViewModel(PipeConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public PipeWidgetViewModel(PipeConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             NormalizePointsAndSize();

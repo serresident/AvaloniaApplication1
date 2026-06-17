@@ -22,7 +22,7 @@ namespace AvaloniaApplication1.ViewModels
         public string ValueColor => string.IsNullOrEmpty(TypedConfig.ValueColor) ? "#E5C158" : TypedConfig.ValueColor;
         public double ValueFontSize => TypedConfig.ValueFontSize <= 0 ? 14 : TypedConfig.ValueFontSize;
 
-        public TankWidgetViewModel(TankConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public TankWidgetViewModel(TankConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateState();

@@ -33,7 +33,7 @@ namespace AvaloniaApplication1.Services
         {
             if (MainWindow == null || App.Services == null) return;
 
-            var mockDataService = App.Services.GetRequiredService<IMockDataService>();
+            var dataCoreService = App.Services.GetRequiredService<IDataCoreService>();
             var projectContext = App.Services.GetRequiredService<IProjectContextService>();
             var dialogService = App.Services.GetRequiredService<IDialogService>();
             var widgetFactory = App.Services.GetRequiredService<IWidgetFactory>();
@@ -45,7 +45,13 @@ namespace AvaloniaApplication1.Services
                 Connections = new List<ConnectionConfig>() // Container doesn't manage connections
             };
             
-            var dashboardVm = new DashboardViewModel(config, mockDataService, projectContext, containerConfig, dialogService, widgetFactory);
+            var dashboardVm = new DashboardViewModel(
+                config, 
+                dataCoreService, 
+                projectContext,
+                containerConfig,
+                dialogService,
+                widgetFactory);
             
             var window = new Window
             {

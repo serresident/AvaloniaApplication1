@@ -6,10 +6,10 @@ namespace AvaloniaApplication1.ViewModels
 {
     public class WidgetFactory : IWidgetFactory
     {
-        private readonly IMockDataService _dataService;
+        private readonly IDataCoreService _dataService;
         private readonly IProjectContextService _projectContext;
 
-        public WidgetFactory(IMockDataService dataService, IProjectContextService projectContext)
+        public WidgetFactory(IDataCoreService dataService, IProjectContextService projectContext)
         {
             _dataService = dataService;
             _projectContext = projectContext;

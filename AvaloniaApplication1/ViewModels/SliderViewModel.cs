@@ -14,7 +14,7 @@ namespace AvaloniaApplication1.ViewModels
 
         private bool _isUpdatingFromSource;
 
-        public SliderViewModel(SliderConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public SliderViewModel(SliderConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateFromSource();

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -12,9 +13,10 @@ using AvaloniaApplication1.Services.Protocols;
 
 namespace AvaloniaApplication1.Services
 {
-    public class DataCoreService : IDataCoreService, IMockDataService, IDisposable
+    public class DataCoreService : IDataCoreService, IDisposable
     {
         private readonly IConfigurationService _configService;
+        private readonly IProtocolDriverFactory _driverFactory;
         private readonly ConcurrentDictionary<string, IProtocolDriver> _drivers = new();
         private readonly ConcurrentDictionary<string, object> _currentValuesCache = new();
         
@@ -23,124 +25,85 @@ namespace AvaloniaApplication1.Services
         public IObservable<TagData> TagUpdates => _unifiedTagStream;
 
         private CancellationTokenSource? _cts;
-        
-        // Background simulator instance
-        private MockProtocolDriver? _backgroundSimulator;
-        private CancellationTokenSource? _simCts;
+        private CompositeDisposable _disposables = new();
 
-        public DataCoreService(IConfigurationService configService)
+        public DataCoreService(IConfigurationService configService, IProtocolDriverFactory driverFactory)
         {
             _configService = configService;
+            _driverFactory = driverFactory;
         }
 
-        public void Start()
+        public async Task StartAsync()
         {
             if (_cts != null) return;
             _cts = new CancellationTokenSource();
+            _disposables = new CompositeDisposable();
 
-            Task.Run(async () =>
+            try
             {
-                try
+                var config = await _configService.LoadConfigurationAsync();
+                if (config?.Connections == null) return;
+
+                var allTags = ExtractAllTags(config).ToList();
+
+                foreach (var conn in config.Connections)
                 {
-                    var config = await _configService.LoadConfigurationAsync();
-                    if (config?.Connections == null) return;
+                    var tagsForConn = allTags.Where(t => t.ConnId == conn.Id);
+                    var driver = _driverFactory.CreateDriver(conn, tagsForConn);
 
-                    var allTags = ExtractAllTags(config).ToList();
-
-                    foreach (var conn in config.Connections)
+                    if (driver == null)
                     {
-                        IProtocolDriver driver;
-
-                        if (conn.Type == "MQTT")
-                        {
-                            var mqttTopics = allTags.Where(t => t.ConnId == conn.Id && t.Address != null).Select(t => t.Address!).Distinct();
-                            driver = new MqttProtocolDriver(conn, mqttTopics);
-                        }
-                        else if (conn.Type == "ModbusTCP" || conn.Type == "ModbusRTUOverTCP")
-                        {
-                            var modbusTags = allTags.Where(t => t.ConnId == conn.Id);
-                            driver = new ModbusProtocolDriver(conn, modbusTags);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Unknown connection type {conn.Type} for {conn.Id}");
-                            continue;
-                        }
-
-                        _drivers[conn.Id] = driver;
-
-                        // Route all driver events into the unified stream
-                        driver.TagUpdates.Subscribe(tag => 
-                        {
-                            var key = $"{tag.ConnId}_{tag.Address}";
-                            _currentValuesCache[key] = tag.Value;
-                            _unifiedTagStream.OnNext(tag);
-                        });
-
-                        await driver.StartAsync(_cts.Token);
+                        Console.WriteLine($"Unknown or unsupported connection type {conn.Type} for {conn.Id}");
+                        continue;
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"DataCoreService Start Failed: {ex.Message}");
-                }
-            });
-        }
 
-        public void StartSimulation()
-        {
-            if (_simCts != null) return;
-            _simCts = new CancellationTokenSource();
+                    _drivers[conn.Id] = driver;
 
-            _backgroundSimulator = new MockProtocolDriver("mqtt1"); // Primary mock connection ID
-            
-            _backgroundSimulator.TagUpdates.Subscribe(tag => 
+                    // Route all driver events into the unified stream safely
+                    driver.TagUpdates
+                        .Subscribe(tag => PublishTag(tag))
+                        .DisposeWith(_disposables);
+
+                    // Background start
+                    _ = driver.StartAsync(_cts.Token);
+                }
+            }
+            catch (Exception ex)
             {
-                _unifiedTagStream.OnNext(tag);
-                var key = $"{tag.ConnId}_{tag.Address}";
-                _currentValuesCache[key] = tag.Value;
-                try { System.IO.File.AppendAllText("tag_updates.log", $"{DateTime.Now:HH:mm:ss.fff} | SIM: {key}={tag.Value}\n"); } catch {}
-            });
-
-            _ = _backgroundSimulator.StartAsync(_simCts.Token);
+                Console.WriteLine($"DataCoreService Start Failed: {ex.Message}");
+            }
         }
 
-        public void Stop()
+        public void PublishTag(TagData tag)
+        {
+            var key = $"{tag.ConnId}_{tag.Address}";
+            _currentValuesCache[key] = tag.Value;
+            _unifiedTagStream.OnNext(tag);
+        }
+
+        public async Task StopAsync()
         {
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
 
+            _disposables.Dispose();
+
+            var stopTasks = _drivers.Values.Select(driver => driver.StopAsync());
+            await Task.WhenAll(stopTasks);
+
             foreach (var driver in _drivers.Values)
             {
-                driver.StopAsync().Wait();
                 driver.Dispose();
             }
             _drivers.Clear();
             _currentValuesCache.Clear();
         }
 
-        public void StopSimulation()
-        {
-            _simCts?.Cancel();
-            _simCts = null;
-            
-            _backgroundSimulator?.StopAsync().Wait();
-            _backgroundSimulator?.Dispose();
-            _backgroundSimulator = null;
-        }
-
-        public void ResetSimulation()
-        {
-            _backgroundSimulator?.ResetSimulation();
-        }
-
         public void WriteCommand(string connId, string address, object value)
         {
             // Optimistic update
-            var key = $"{connId}_{address}";
-            _currentValuesCache[key] = value;
-            _unifiedTagStream.OnNext(new TagData(connId, address, value));
+            PublishTag(new TagData(connId, address, value));
 
             if (_drivers.TryGetValue(connId, out var driver))
             {
@@ -157,12 +120,8 @@ namespace AvaloniaApplication1.Services
 
         public void Dispose()
         {
-            Stop();
-            
-            _simCts?.Cancel();
-            _backgroundSimulator?.StopAsync().Wait();
-            _backgroundSimulator?.Dispose();
-            
+            // Fallback for dispose
+            StopAsync().Wait();
             _unifiedTagStream.Dispose();
         }
 

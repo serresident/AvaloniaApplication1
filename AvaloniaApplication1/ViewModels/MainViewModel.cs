@@ -13,7 +13,8 @@ namespace AvaloniaApplication1.ViewModels
     public partial class MainViewModel : ViewModelBase
     {
         private readonly IConfigurationService _configurationService;
-        private readonly IMockDataService _mockDataService;
+        private readonly IDataCoreService _dataCoreService;
+        private readonly ISimulationService _simulationService;
         private readonly IDialogService _dialogService;
         private readonly IWidgetFactory _widgetFactory;
         private HmiConfiguration? _currentConfig;
@@ -62,19 +63,18 @@ namespace AvaloniaApplication1.ViewModels
 
         public MainViewModel(
             IConfigurationService configurationService, 
-            IMockDataService mockDataService, 
+            IDataCoreService dataCoreService, 
+            ISimulationService simulationService,
             IProjectContextService projectContext,
             IDialogService dialogService,
             IWidgetFactory widgetFactory)
         {
             _configurationService = configurationService;
-            _mockDataService = mockDataService;
+            _dataCoreService = dataCoreService;
+            _simulationService = simulationService;
             _dialogService = dialogService;
             _widgetFactory = widgetFactory;
             ProjectContext = projectContext;
-
-            // Start communication drivers & simulation
-            _mockDataService.StartSimulation();
 
             // Load configuration
             _ = LoadConfigAsync();
@@ -87,19 +87,19 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         [ObservableProperty]
-        private bool _isSimulationRunning = true;
+        private bool _isSimulationRunning = false;
 
         [RelayCommand]
-        private void ToggleSimulation()
+        private async Task ToggleSimulationAsync()
         {
             if (IsSimulationRunning)
             {
-                _mockDataService.StopSimulation();
+                await _simulationService.StopSimulationAsync();
                 IsSimulationRunning = false;
             }
             else
             {
-                _mockDataService.StartSimulation();
+                await _simulationService.StartSimulationAsync();
                 IsSimulationRunning = true;
             }
         }
@@ -107,7 +107,7 @@ namespace AvaloniaApplication1.ViewModels
         [RelayCommand]
         private void ResetSimulation()
         {
-            _mockDataService.ResetSimulation();
+            _simulationService.ResetSimulation();
         }
 
         [RelayCommand]
@@ -146,7 +146,7 @@ namespace AvaloniaApplication1.ViewModels
 
             var dashboardVm = new DashboardViewModel(
                 config, 
-                _mockDataService, 
+                _dataCoreService, 
                 ProjectContext,
                 _currentConfig,
                 _dialogService,
@@ -191,14 +191,6 @@ namespace AvaloniaApplication1.ViewModels
         {
             _currentConfig = await _configurationService.LoadConfigurationAsync();
 
-            _mainDashboard = new DashboardViewModel(
-                _currentConfig.Dashboard, 
-                _mockDataService, 
-                ProjectContext,
-                _currentConfig,
-                _dialogService,
-                _widgetFactory);
-
             if (_currentConfig.Mimic == null)
             {
                 _currentConfig.Mimic = new DashboardConfig();
@@ -209,19 +201,24 @@ namespace AvaloniaApplication1.ViewModels
                 _currentConfig.Mimic.CellSize = 10;
             }
 
+            _mainDashboard = new DashboardViewModel(
+                _currentConfig.Dashboard, 
+                _dataCoreService, 
+                ProjectContext,
+                _currentConfig,
+                _dialogService,
+                _widgetFactory);
+
             _mimicDashboard = new DashboardViewModel(
                 _currentConfig.Mimic, 
-                _mockDataService, 
+                _dataCoreService, 
                 ProjectContext,
                 _currentConfig,
                 _dialogService,
                 _widgetFactory);
 
             // Start background polling for Modbus/MQTT drivers
-            if (_mockDataService is IDataCoreService core)
-            {
-                core.Start();
-            }
+            _ = _dataCoreService.StartAsync();
 
             Dashboard = _mainDashboard;
             IsMimicActive = false;

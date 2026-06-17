@@ -20,7 +20,7 @@ namespace AvaloniaApplication1.ViewModels
         public double MaxY => TypedConfig.MaxValue;
         public string Format => string.IsNullOrEmpty(TypedConfig.Format) ? "{0}" : TypedConfig.Format;
 
-        public RealTimeTrendViewModel(RealTimeTrendConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public RealTimeTrendViewModel(RealTimeTrendConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             // Pre-fill history queue
