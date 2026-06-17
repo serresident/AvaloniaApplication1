@@ -8,10 +8,12 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class PilotLightViewModel : WidgetViewModelBase
     {
+        public PilotLightConfig TypedConfig => (PilotLightConfig)OriginalConfig;
+
         [ObservableProperty]
         private bool _isOn;
 
-        public PilotLightViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public PilotLightViewModel(PilotLightConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateState();

@@ -6,7 +6,9 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class CommandButtonViewModel : WidgetViewModelBase
     {
-        public CommandButtonViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public CommandButtonConfig TypedConfig => (CommandButtonConfig)OriginalConfig;
+
+        public CommandButtonViewModel(CommandButtonConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
         }

@@ -1,0 +1,15 @@
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\bin\Debug\net10.0\Patcher3.exe
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\bin\Debug\net10.0\Patcher3.deps.json
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\bin\Debug\net10.0\Patcher3.runtimeconfig.json
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\bin\Debug\net10.0\Patcher3.dll
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\bin\Debug\net10.0\Patcher3.pdb
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\Patcher3.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\Patcher3.AssemblyInfoInputs.cache
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\Patcher3.AssemblyInfo.cs
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\Patcher3.csproj.CoreCompileInputs.cache
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\Patcher3.sourcelink.json
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\Patcher3.dll
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\refint\Patcher3.dll
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\Patcher3.pdb
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\Patcher3.genruntimeconfig.cache
+C:\Users\adm\projects\AvaloniaApplication1\scratch\Patcher3\obj\Debug\net10.0\ref\Patcher3.dll

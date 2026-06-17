@@ -7,12 +7,14 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class SliderViewModel : WidgetViewModelBase
     {
+        public SliderConfig TypedConfig => (SliderConfig)OriginalConfig;
+
         [ObservableProperty]
         private double _sliderValue;
 
         private bool _isUpdatingFromSource;
 
-        public SliderViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public SliderViewModel(SliderConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateFromSource();

@@ -22,8 +22,8 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _isKeypadVisible;
 
-        public bool HasModeTag => ValveViewModel.OriginalConfig.ModeSource != null && 
-                                  !string.IsNullOrEmpty(ValveViewModel.OriginalConfig.ModeSource.Address);
+        public bool HasModeTag => ValveViewModel.TypedConfig.ModeSource != null && 
+                                  !string.IsNullOrEmpty(ValveViewModel.TypedConfig.ModeSource.Address);
 
         public bool IsRegulating => string.Equals(ValveViewModel.ValveType, "Regulating", StringComparison.OrdinalIgnoreCase);
 
@@ -60,8 +60,8 @@ namespace AvaloniaApplication1.ViewModels
             if (HasModeTag)
             {
                 var modeVal = ValveViewModel.DataService.GetCurrentValue(
-                    ValveViewModel.OriginalConfig.ModeSource!.ConnId, 
-                    ValveViewModel.OriginalConfig.ModeSource.Address);
+                    ValveViewModel.TypedConfig.ModeSource!.ConnId, 
+                    ValveViewModel.TypedConfig.ModeSource.Address);
                 
                 // true = Auto, false = Manual
                 if (modeVal is bool b) IsManualMode = !b;
@@ -101,7 +101,7 @@ namespace AvaloniaApplication1.ViewModels
             {
                 // auto = true (1), manual = false (0)
                 object writeVal = !value;
-                var modeSrc = ValveViewModel.OriginalConfig.ModeSource!;
+                var modeSrc = ValveViewModel.TypedConfig.ModeSource!;
                 if (modeSrc.DataType == "Float32" || modeSrc.DataType == "Float")
                     writeVal = !value ? 1.0f : 0.0f;
                 else if (modeSrc.DataType == "Int16" || modeSrc.DataType == "Int32")
@@ -127,7 +127,7 @@ namespace AvaloniaApplication1.ViewModels
 
                 // Write TempSetpoint to backing tag
                 object valToWrite = TempSetpoint;
-                var source = ValveViewModel.OriginalConfig.Source;
+                var source = ValveViewModel.TypedConfig.Source;
                 if (source.DataType == "Float32" || source.DataType == "Float")
                     valToWrite = (float)TempSetpoint;
                 else if (source.DataType == "Int16")
@@ -158,7 +158,7 @@ namespace AvaloniaApplication1.ViewModels
         private void WriteCutoff(bool open)
         {
             object valToWrite = open;
-            var source = ValveViewModel.OriginalConfig.Source;
+            var source = ValveViewModel.TypedConfig.Source;
             if (source.DataType == "Float32" || source.DataType == "Float")
                 valToWrite = open ? 100.0f : 0.0f;
             else if (source.DataType == "Int16" || source.DataType == "Int32")

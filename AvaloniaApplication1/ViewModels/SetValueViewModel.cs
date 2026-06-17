@@ -10,19 +10,21 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class SetValueViewModel : WidgetViewModelBase
     {
+        public SetValueConfig TypedConfig => (SetValueConfig)OriginalConfig;
+
         [ObservableProperty]
         private string _displayValue = "---";
 
         [ObservableProperty]
         private double _rawValue;
 
-        public double MinValue => OriginalConfig.MinValue;
-        public double MaxValue => OriginalConfig.MaxValue;
-        public string Format => string.IsNullOrEmpty(OriginalConfig.Format) ? "{0}" : OriginalConfig.Format;
-        public string ValueColor => string.IsNullOrEmpty(OriginalConfig.ValueColor) ? "#FFD700" : OriginalConfig.ValueColor;
-        public double ValueFontSize => OriginalConfig.ValueFontSize <= 0 ? 22 : OriginalConfig.ValueFontSize;
+        public double MinValue => TypedConfig.MinValue;
+        public double MaxValue => TypedConfig.MaxValue;
+        public string Format => string.IsNullOrEmpty(TypedConfig.Format) ? "{0}" : TypedConfig.Format;
+        public string ValueColor => string.IsNullOrEmpty(TypedConfig.ValueColor) ? "#FFD700" : TypedConfig.ValueColor;
+        public double ValueFontSize => TypedConfig.ValueFontSize <= 0 ? 22 : TypedConfig.ValueFontSize;
 
-        public SetValueViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public SetValueViewModel(SetValueConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateDisplayValue();

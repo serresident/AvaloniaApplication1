@@ -155,7 +155,7 @@ namespace AvaloniaApplication1.Services
                 foreach (var w in widgets)
                 {
                     if (w.Source != null) list.Add(w.Source);
-                    Scan(w.Children);
+                    if (w is ContainerButtonConfig cb && cb.Children != null) Scan(cb.Children);
                 }
             }
 

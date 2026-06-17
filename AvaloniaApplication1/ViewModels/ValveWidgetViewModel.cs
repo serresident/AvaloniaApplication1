@@ -16,6 +16,8 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class ValveWidgetViewModel : WidgetViewModelBase
     {
+        public ValveConfig TypedConfig => (ValveConfig)OriginalConfig;
+
         [ObservableProperty]
         private bool _isOpen;
 
@@ -70,9 +72,9 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _isManualMode = true;
 
-        public string ValveType => string.IsNullOrEmpty(OriginalConfig.ValveType) ? "CutOff" : OriginalConfig.ValveType;
-        public string ActiveColor => string.IsNullOrEmpty(OriginalConfig.ActiveColor) ? "#00FF00" : OriginalConfig.ActiveColor;
-        public string InactiveColor => string.IsNullOrEmpty(OriginalConfig.InactiveColor) ? "#FF0000" : OriginalConfig.InactiveColor;
+        public string ValveType => string.IsNullOrEmpty(TypedConfig.ValveType) ? "CutOff" : TypedConfig.ValveType;
+        public string ActiveColor => string.IsNullOrEmpty(TypedConfig.ActiveColor) ? "#00FF00" : TypedConfig.ActiveColor;
+        public string InactiveColor => string.IsNullOrEmpty(TypedConfig.InactiveColor) ? "#FF0000" : TypedConfig.InactiveColor;
 
         public bool IsRegulating => string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase);
 
@@ -82,7 +84,7 @@ namespace AvaloniaApplication1.ViewModels
         private double? _lastPopupX;
         private double? _lastPopupY;
 
-        public ValveWidgetViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public ValveWidgetViewModel(ValveConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             HasFeedbackSource = !string.IsNullOrEmpty(config.FeedbackSource?.Address);
@@ -116,7 +118,7 @@ namespace AvaloniaApplication1.ViewModels
             _alarmTimer.Start();
 
             // Set up reactive subscriptions for extra sources
-            var fbSource = OriginalConfig.FeedbackSource;
+            var fbSource = TypedConfig.FeedbackSource;
             if (fbSource != null && !string.IsNullOrEmpty(fbSource.ConnId) && !string.IsNullOrEmpty(fbSource.Address))
             {
                 DataService.TagUpdates
@@ -127,7 +129,7 @@ namespace AvaloniaApplication1.ViewModels
                     .DisposeWith(Disposables);
             }
 
-            var modeSrc = OriginalConfig.ModeSource;
+            var modeSrc = TypedConfig.ModeSource;
             if (modeSrc != null && !string.IsNullOrEmpty(modeSrc.ConnId) && !string.IsNullOrEmpty(modeSrc.Address))
             {
                 DataService.TagUpdates
@@ -200,7 +202,7 @@ namespace AvaloniaApplication1.ViewModels
 
         private void UpdateFeedback()
         {
-            var fbSource = OriginalConfig.FeedbackSource;
+            var fbSource = TypedConfig.FeedbackSource;
             if (fbSource == null || string.IsNullOrEmpty(fbSource.Address)) return;
 
             var fbVal = DataService.GetCurrentValue(fbSource.ConnId, fbSource.Address);
@@ -227,7 +229,7 @@ namespace AvaloniaApplication1.ViewModels
 
         private void UpdateModeState()
         {
-            var modeSrc = OriginalConfig.ModeSource;
+            var modeSrc = TypedConfig.ModeSource;
             if (modeSrc == null || string.IsNullOrEmpty(modeSrc.Address))
             {
                 IsManualMode = true;
@@ -250,7 +252,7 @@ namespace AvaloniaApplication1.ViewModels
 
         partial void OnIsManualModeChanged(bool value)
         {
-            var modeSrc = OriginalConfig.ModeSource;
+            var modeSrc = TypedConfig.ModeSource;
             if (modeSrc != null && !string.IsNullOrEmpty(modeSrc.Address))
             {
                 object writeVal = !value; // Auto = true, Manual = false
@@ -266,7 +268,7 @@ namespace AvaloniaApplication1.ViewModels
         partial void OnAlarmDisabledChanged(bool value)
         {
             // Persist locally in config if desired, but keep in memory for now
-            OriginalConfig.AlarmDisabled = value;
+            TypedConfig.AlarmDisabled = value;
             EvaluateAlarm();
         }
 
@@ -394,7 +396,7 @@ namespace AvaloniaApplication1.ViewModels
         private void Rotate()
         {
             Rotation = (Rotation + 90) % 360;
-            OriginalConfig.Rotation = Rotation;
+            TypedConfig.Rotation = Rotation;
         }
 
         public override void Dispose()

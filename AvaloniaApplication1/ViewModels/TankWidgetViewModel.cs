@@ -8,19 +8,21 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class TankWidgetViewModel : WidgetViewModelBase
     {
+        public TankConfig TypedConfig => (TankConfig)OriginalConfig;
+
         [ObservableProperty]
         private double _currentLevel;
 
         [ObservableProperty]
         private string _displayValue = "---";
 
-        public double MinValue => OriginalConfig.MinValue;
-        public double MaxValue => OriginalConfig.MaxValue == 0 ? 100 : OriginalConfig.MaxValue;
-        public string Format => string.IsNullOrEmpty(OriginalConfig.Format) ? "{0:F1} %" : OriginalConfig.Format;
-        public string ValueColor => string.IsNullOrEmpty(OriginalConfig.ValueColor) ? "#E5C158" : OriginalConfig.ValueColor;
-        public double ValueFontSize => OriginalConfig.ValueFontSize <= 0 ? 14 : OriginalConfig.ValueFontSize;
+        public double MinValue => TypedConfig.MinValue;
+        public double MaxValue => TypedConfig.MaxValue == 0 ? 100 : TypedConfig.MaxValue;
+        public string Format => string.IsNullOrEmpty(TypedConfig.Format) ? "{0:F1} %" : TypedConfig.Format;
+        public string ValueColor => string.IsNullOrEmpty(TypedConfig.ValueColor) ? "#E5C158" : TypedConfig.ValueColor;
+        public double ValueFontSize => TypedConfig.ValueFontSize <= 0 ? 14 : TypedConfig.ValueFontSize;
 
-        public TankWidgetViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public TankWidgetViewModel(TankConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateState();

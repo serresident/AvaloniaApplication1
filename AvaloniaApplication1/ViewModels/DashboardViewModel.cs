@@ -13,6 +13,7 @@ namespace AvaloniaApplication1.ViewModels
     {
         private readonly IMockDataService _mockDataService;
         private readonly IDialogService? _dialogService;
+        private readonly IWidgetFactory _widgetFactory;
         private readonly HmiConfiguration _config;
         private readonly DashboardConfig _dashboardConfig;
 
@@ -31,10 +32,12 @@ namespace AvaloniaApplication1.ViewModels
             IMockDataService mockDataService, 
             IProjectContextService projectContext,
             HmiConfiguration config,
-            IDialogService? dialogService)
+            IDialogService? dialogService,
+            IWidgetFactory widgetFactory)
         {
             _mockDataService = mockDataService;
             _dialogService = dialogService;
+            _widgetFactory = widgetFactory;
             _config = config;
             _dashboardConfig = dashboardConfig;
             ProjectContext = projectContext;
@@ -61,21 +64,7 @@ namespace AvaloniaApplication1.ViewModels
 
         private WidgetViewModelBase? CreateWidgetViewModel(WidgetConfig widgetConfig)
         {
-            return widgetConfig.Type switch
-            {
-                "ValueDisplay" => new ValueDisplayViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "PilotLight" => new PilotLightViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "ContainerButton" => new ContainerButtonViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "CommandButton" => new CommandButtonViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "Slider" => new SliderViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "SetValue" => new SetValueViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "RealTimeTrend" => new RealTimeTrendViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "Pipe" => new PipeWidgetViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "Valve" => new ValveWidgetViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "Tank" => new TankWidgetViewModel(widgetConfig, _mockDataService, ProjectContext),
-                "Pump" => new PumpWidgetViewModel(widgetConfig, _mockDataService, ProjectContext),
-                _ => new WidgetViewModelBase(widgetConfig, _mockDataService, ProjectContext)
-            };
+            return _widgetFactory.CreateWidgetViewModel(widgetConfig);
         }
 
         // ===== Design Mode Commands =====

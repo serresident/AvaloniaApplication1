@@ -47,6 +47,7 @@ namespace AvaloniaApplication1
             services.AddSingleton<IDialogService, DialogService>();
 
             // ViewModels
+            services.AddSingleton<IWidgetFactory, WidgetFactory>();
             services.AddSingleton<MainViewModel>();
         }
     }

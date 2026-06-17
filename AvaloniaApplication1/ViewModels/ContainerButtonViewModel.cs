@@ -10,10 +10,12 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class ContainerButtonViewModel : WidgetViewModelBase
     {
+        public ContainerButtonConfig TypedConfig => (ContainerButtonConfig)OriginalConfig;
+
         private readonly List<WidgetConfig> _childrenConfig;
         private readonly IDialogService? _dialogService;
 
-        public ContainerButtonViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public ContainerButtonViewModel(ContainerButtonConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             _childrenConfig = config.Children ?? new List<WidgetConfig>();

@@ -36,6 +36,7 @@ namespace AvaloniaApplication1.Services
             var mockDataService = App.Services.GetRequiredService<IMockDataService>();
             var projectContext = App.Services.GetRequiredService<IProjectContextService>();
             var dialogService = App.Services.GetRequiredService<IDialogService>();
+            var widgetFactory = App.Services.GetRequiredService<IWidgetFactory>();
             
             // Create a minimal HmiConfiguration for the container context
             var containerConfig = new HmiConfiguration
@@ -44,7 +45,7 @@ namespace AvaloniaApplication1.Services
                 Connections = new List<ConnectionConfig>() // Container doesn't manage connections
             };
             
-            var dashboardVm = new DashboardViewModel(config, mockDataService, projectContext, containerConfig, dialogService);
+            var dashboardVm = new DashboardViewModel(config, mockDataService, projectContext, containerConfig, dialogService, widgetFactory);
             
             var window = new Window
             {

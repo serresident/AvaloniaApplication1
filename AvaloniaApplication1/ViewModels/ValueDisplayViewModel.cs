@@ -7,10 +7,12 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class ValueDisplayViewModel : WidgetViewModelBase
     {
+        public ValueDisplayConfig TypedConfig => (ValueDisplayConfig)OriginalConfig;
+
         [ObservableProperty]
         private string _displayValue = "---";
 
-        public ValueDisplayViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public ValueDisplayViewModel(ValueDisplayConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateDisplayValue();
@@ -22,9 +24,9 @@ namespace AvaloniaApplication1.ViewModels
             UpdateDisplayValue(newValue);
         }
 
-        public string Format => string.IsNullOrEmpty(OriginalConfig.Format) ? "{0}" : OriginalConfig.Format;
-        public string ValueColor => string.IsNullOrEmpty(OriginalConfig.ValueColor) ? "#00FF00" : OriginalConfig.ValueColor;
-        public double ValueFontSize => OriginalConfig.ValueFontSize <= 0 ? 28 : OriginalConfig.ValueFontSize;
+        public string Format => string.IsNullOrEmpty(TypedConfig.Format) ? "{0}" : TypedConfig.Format;
+        public string ValueColor => string.IsNullOrEmpty(TypedConfig.ValueColor) ? "#00FF00" : TypedConfig.ValueColor;
+        public double ValueFontSize => TypedConfig.ValueFontSize <= 0 ? 28 : TypedConfig.ValueFontSize;
 
         private void UpdateDisplayValue(object? val = null)
         {

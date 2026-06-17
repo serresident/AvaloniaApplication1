@@ -13,6 +13,8 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class PipeWidgetViewModel : WidgetViewModelBase
     {
+        public PipeConfig TypedConfig => (PipeConfig)OriginalConfig;
+
         [ObservableProperty]
         private string _currentColor = "#555555";
 
@@ -32,12 +34,12 @@ namespace AvaloniaApplication1.ViewModels
 
         public string PipePoints
         {
-            get => OriginalConfig.PipePoints;
+            get => TypedConfig.PipePoints;
             set
             {
-                if (OriginalConfig.PipePoints != value)
+                if (TypedConfig.PipePoints != value)
                 {
-                    OriginalConfig.PipePoints = value;
+                    TypedConfig.PipePoints = value;
                     OnPropertyChanged(nameof(PipePoints));
                     NormalizePointsAndSize();
                 }
@@ -46,12 +48,12 @@ namespace AvaloniaApplication1.ViewModels
 
         public double Thickness
         {
-            get => OriginalConfig.Thickness == 0 ? 12.0 : OriginalConfig.Thickness;
+            get => TypedConfig.Thickness == 0 ? 12.0 : TypedConfig.Thickness;
             set
             {
-                if (OriginalConfig.Thickness != value)
+                if (TypedConfig.Thickness != value)
                 {
-                    OriginalConfig.Thickness = value;
+                    TypedConfig.Thickness = value;
                     OnPropertyChanged(nameof(Thickness));
                 }
             }
@@ -59,12 +61,12 @@ namespace AvaloniaApplication1.ViewModels
 
         public string StartFitting
         {
-            get => string.IsNullOrEmpty(OriginalConfig.StartFitting) ? "None" : OriginalConfig.StartFitting;
+            get => string.IsNullOrEmpty(TypedConfig.StartFitting) ? "None" : TypedConfig.StartFitting;
             set
             {
-                if (OriginalConfig.StartFitting != value)
+                if (TypedConfig.StartFitting != value)
                 {
-                    OriginalConfig.StartFitting = value;
+                    TypedConfig.StartFitting = value;
                     OnPropertyChanged(nameof(StartFitting));
                 }
             }
@@ -72,12 +74,12 @@ namespace AvaloniaApplication1.ViewModels
 
         public string EndFitting
         {
-            get => string.IsNullOrEmpty(OriginalConfig.EndFitting) ? "None" : OriginalConfig.EndFitting;
+            get => string.IsNullOrEmpty(TypedConfig.EndFitting) ? "None" : TypedConfig.EndFitting;
             set
             {
-                if (OriginalConfig.EndFitting != value)
+                if (TypedConfig.EndFitting != value)
                 {
-                    OriginalConfig.EndFitting = value;
+                    TypedConfig.EndFitting = value;
                     OnPropertyChanged(nameof(EndFitting));
                 }
             }
@@ -87,15 +89,15 @@ namespace AvaloniaApplication1.ViewModels
         {
             get
             {
-                string colorStr = string.IsNullOrEmpty(OriginalConfig.ActiveColor) ? "#00FFCC" : OriginalConfig.ActiveColor;
+                string colorStr = string.IsNullOrEmpty(TypedConfig.ActiveColor) ? "#00FFCC" : TypedConfig.ActiveColor;
                 return Color.TryParse(colorStr, out var c) ? c : Colors.DodgerBlue;
             }
             set
             {
                 string colorStr = value.ToString();
-                if (OriginalConfig.ActiveColor != colorStr)
+                if (TypedConfig.ActiveColor != colorStr)
                 {
-                    OriginalConfig.ActiveColor = colorStr;
+                    TypedConfig.ActiveColor = colorStr;
                     OnPropertyChanged(nameof(ActiveColor));
                     UpdateState();
                 }
@@ -106,15 +108,15 @@ namespace AvaloniaApplication1.ViewModels
         {
             get
             {
-                string colorStr = string.IsNullOrEmpty(OriginalConfig.InactiveColor) ? "#555555" : OriginalConfig.InactiveColor;
+                string colorStr = string.IsNullOrEmpty(TypedConfig.InactiveColor) ? "#555555" : TypedConfig.InactiveColor;
                 return Color.TryParse(colorStr, out var c) ? c : Colors.Gray;
             }
             set
             {
                 string colorStr = value.ToString();
-                if (OriginalConfig.InactiveColor != colorStr)
+                if (TypedConfig.InactiveColor != colorStr)
                 {
-                    OriginalConfig.InactiveColor = colorStr;
+                    TypedConfig.InactiveColor = colorStr;
                     OnPropertyChanged(nameof(InactiveColor));
                     UpdateState();
                 }
@@ -123,12 +125,12 @@ namespace AvaloniaApplication1.ViewModels
 
         public bool ShowFlanges
         {
-            get => OriginalConfig.ShowFlanges;
+            get => TypedConfig.ShowFlanges;
             set
             {
-                if (OriginalConfig.ShowFlanges != value)
+                if (TypedConfig.ShowFlanges != value)
                 {
-                    OriginalConfig.ShowFlanges = value;
+                    TypedConfig.ShowFlanges = value;
                     OnPropertyChanged(nameof(ShowFlanges));
                 }
             }
@@ -136,7 +138,7 @@ namespace AvaloniaApplication1.ViewModels
 
         public List<PipeWidgetViewModel> ConnectedPipes { get; } = new();
 
-        public PipeWidgetViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public PipeWidgetViewModel(PipeConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             NormalizePointsAndSize();
@@ -246,9 +248,9 @@ namespace AvaloniaApplication1.ViewModels
                 if (SizeX != newSizeX) { SizeX = newSizeX; OriginalConfig.Position.SizeX = newSizeX; }
                 if (SizeY != newSizeY) { SizeY = newSizeY; OriginalConfig.Position.SizeY = newSizeY; }
 
-                if (OriginalConfig.PipePoints != newPipePoints)
+                if (TypedConfig.PipePoints != newPipePoints)
                 {
-                    OriginalConfig.PipePoints = newPipePoints;
+                    TypedConfig.PipePoints = newPipePoints;
                     OnPropertyChanged(nameof(PipePoints));
                 }
             }

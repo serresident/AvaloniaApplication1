@@ -188,38 +188,17 @@ namespace AvaloniaApplication1.ViewModels
                 SelectedDataType = string.IsNullOrEmpty(existingConfig.Source.DataType) 
                     ? DataTypes.All[0] 
                     : existingConfig.Source.DataType;
-                Format = existingConfig.Format;
-                SelectedButtonMode = existingConfig.ButtonMode;
-                MinValue = existingConfig.MinValue;
-                MaxValue = existingConfig.MaxValue;
-                TrueColor = existingConfig.TrueColor;
-                FalseColor = existingConfig.FalseColor;
-                PipePoints = existingConfig.PipePoints;
-                ActiveColor = string.IsNullOrEmpty(existingConfig.ActiveColor) ? "#00FF00" : existingConfig.ActiveColor;
-                InactiveColor = string.IsNullOrEmpty(existingConfig.InactiveColor) ? "#FF0000" : existingConfig.InactiveColor;
-                SelectedValveType = string.IsNullOrEmpty(existingConfig.ValveType) ? "CutOff" : existingConfig.ValveType;
-                ShowFlanges = existingConfig.ShowFlanges;
-                Thickness = existingConfig.Thickness == 0 ? 12.0 : existingConfig.Thickness;
-                SelectedStartFitting = string.IsNullOrEmpty(existingConfig.StartFitting) ? "None" : existingConfig.StartFitting;
-                SelectedEndFitting = string.IsNullOrEmpty(existingConfig.EndFitting) ? "None" : existingConfig.EndFitting;
-                FeedbackConnectionId = existingConfig.FeedbackSource?.ConnId;
-                FeedbackAddress = existingConfig.FeedbackSource?.Address ?? string.Empty;
-                ControlWindowWidth = existingConfig.ControlWindowWidth > 0 ? existingConfig.ControlWindowWidth : 320;
-                ControlWindowHeight = existingConfig.ControlWindowHeight > 0 ? existingConfig.ControlWindowHeight : 280;
-                IsVertical = existingConfig.IsVertical;
-                SelectedActuatorType = string.IsNullOrEmpty(existingConfig.ActuatorType) ? "Solenoid" : existingConfig.ActuatorType;
-                SelectedRotation = existingConfig.Rotation;
-                Tolerance = existingConfig.Tolerance == 0 ? 10.0 : existingConfig.Tolerance;
-                ModeConnectionId = existingConfig.ModeSource?.ConnId;
-                ModeAddress = existingConfig.ModeSource?.Address ?? string.Empty;
 
-                ValueColor = string.IsNullOrEmpty(existingConfig.ValueColor) 
-                    ? (existingConfig.Type == "SetValue" ? "#FFD700" : (existingConfig.Type == "Tank" ? "#E5C158" : "#00FF00"))
-                    : existingConfig.ValueColor;
-                
-                ValueFontSize = existingConfig.ValueFontSize <= 0
-                    ? (existingConfig.Type == "SetValue" ? 22 : (existingConfig.Type == "Tank" ? 14 : 28))
-                    : existingConfig.ValueFontSize;
+                if (existingConfig is ValueDisplayConfig vd) { Format = vd.Format; ValueColor = vd.ValueColor; ValueFontSize = vd.ValueFontSize; }
+                if (existingConfig is PilotLightConfig pl) { TrueColor = pl.TrueColor; FalseColor = pl.FalseColor; }
+                if (existingConfig is CommandButtonConfig cb) { SelectedButtonMode = cb.ButtonMode; }
+                if (existingConfig is SliderConfig sl) { MinValue = sl.MinValue; MaxValue = sl.MaxValue; }
+                if (existingConfig is SetValueConfig sv) { Format = sv.Format; MinValue = sv.MinValue; MaxValue = sv.MaxValue; ValueColor = sv.ValueColor; ValueFontSize = sv.ValueFontSize; }
+                if (existingConfig is RealTimeTrendConfig rt) { Format = rt.Format; MinValue = rt.MinValue; MaxValue = rt.MaxValue; }
+                if (existingConfig is PipeConfig pc) { PipePoints = pc.PipePoints; ActiveColor = pc.ActiveColor; InactiveColor = pc.InactiveColor; ShowFlanges = pc.ShowFlanges; Thickness = pc.Thickness; SelectedStartFitting = pc.StartFitting; SelectedEndFitting = pc.EndFitting; }
+                if (existingConfig is ValveConfig vc) { SelectedValveType = vc.ValveType; ActiveColor = vc.ActiveColor; InactiveColor = vc.InactiveColor; FeedbackConnectionId = vc.FeedbackSource?.ConnId; FeedbackAddress = vc.FeedbackSource?.Address ?? string.Empty; IsVertical = vc.IsVertical; SelectedActuatorType = vc.ActuatorType; SelectedRotation = vc.Rotation; Tolerance = vc.Tolerance; ModeConnectionId = vc.ModeSource?.ConnId; ModeAddress = vc.ModeSource?.Address ?? string.Empty; }
+                if (existingConfig is TankConfig tc) { Format = tc.Format; MinValue = tc.MinValue; MaxValue = tc.MaxValue; ValueColor = tc.ValueColor; ValueFontSize = tc.ValueFontSize; }
+                if (existingConfig is PumpConfig pu) { ActiveColor = pu.ActiveColor; InactiveColor = pu.InactiveColor; ControlWindowWidth = pu.ControlWindowWidth; ControlWindowHeight = pu.ControlWindowHeight; }
             }
             else
             {
@@ -319,52 +298,39 @@ namespace AvaloniaApplication1.ViewModels
 
         public WidgetConfig ToWidgetConfig()
         {
-            return new WidgetConfig
+            WidgetConfig config = SelectedWidgetType switch
             {
-                Type = SelectedWidgetType,
-                Title = Title,
-                Position = new WidgetPosition
-                {
-                    Row = Row,
-                    Col = Col,
-                    SizeX = SizeX,
-                    SizeY = SizeY
+                "ValueDisplay" => new ValueDisplayConfig { Format = Format, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
+                "PilotLight" => new PilotLightConfig { TrueColor = TrueColor, FalseColor = FalseColor },
+                "CommandButton" => new CommandButtonConfig { ButtonMode = SelectedButtonMode },
+                "Slider" => new SliderConfig { MinValue = MinValue, MaxValue = MaxValue },
+                "SetValue" => new SetValueConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
+                "RealTimeTrend" => new RealTimeTrendConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue },
+                "Pipe" => new PipeConfig { PipePoints = PipePoints, ActiveColor = ActiveColor, InactiveColor = InactiveColor, ShowFlanges = ShowFlanges, Thickness = Thickness, StartFitting = SelectedStartFitting, EndFitting = SelectedEndFitting },
+                "Valve" => new ValveConfig { 
+                    ValveType = SelectedValveType, 
+                    ActiveColor = ActiveColor, 
+                    InactiveColor = InactiveColor, 
+                    FeedbackSource = !string.IsNullOrEmpty(FeedbackAddress) ? new DataSourceConfig { ConnId = SelectedConnectionId ?? string.Empty, Address = FeedbackAddress, DataType = SelectedDataType } : null,
+                    IsVertical = IsVertical,
+                    ActuatorType = SelectedActuatorType,
+                    Rotation = SelectedRotation,
+                    AlarmDisabled = false,
+                    Tolerance = Tolerance == 0 ? 10.0 : Tolerance,
+                    ModeSource = !string.IsNullOrEmpty(ModeAddress) ? new DataSourceConfig { ConnId = SelectedConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" } : null
                 },
-                Source = new DataSourceConfig
-                {
-                    ConnId = SelectedConnectionId ?? string.Empty,
-                    Address = Address,
-                    DataType = SelectedDataType
-                },
-                Format = Format,
-                ButtonMode = SelectedButtonMode,
-                MinValue = MinValue,
-                MaxValue = MaxValue,
-                TrueColor = TrueColor,
-                FalseColor = FalseColor,
-                PipePoints = PipePoints,
-                ActiveColor = ActiveColor,
-                InactiveColor = InactiveColor,
-                ValveType = SelectedValveType,
-                ShowFlanges = ShowFlanges,
-                Thickness = Thickness,
-                StartFitting = SelectedStartFitting,
-                EndFitting = SelectedEndFitting,
-                FeedbackSource = !string.IsNullOrEmpty(FeedbackAddress) 
-                    ? new DataSourceConfig { ConnId = FeedbackConnectionId ?? string.Empty, Address = FeedbackAddress, DataType = SelectedDataType }
-                    : null,
-                ControlWindowWidth = ControlWindowWidth,
-                ControlWindowHeight = ControlWindowHeight,
-                IsVertical = IsVertical,
-                ActuatorType = SelectedActuatorType,
-                Rotation = SelectedRotation,
-                Tolerance = Tolerance == 0 ? 10.0 : Tolerance,
-                ModeSource = !string.IsNullOrEmpty(ModeAddress)
-                    ? new DataSourceConfig { ConnId = ModeConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" }
-                    : null,
-                ValueColor = ValueColor,
-                ValueFontSize = ValueFontSize
+                "Tank" => new TankConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
+                "Pump" => new PumpConfig { ActiveColor = ActiveColor, InactiveColor = InactiveColor, ControlWindowWidth = ControlWindowWidth, ControlWindowHeight = ControlWindowHeight },
+                "ContainerButton" => new ContainerButtonConfig(),
+                _ => new WidgetConfigBase()
             };
+
+            config.Type = SelectedWidgetType;
+            config.Title = Title;
+            config.Position = new WidgetPosition { Row = Row, Col = Col, SizeX = SizeX, SizeY = SizeY };
+            config.Source = new DataSourceConfig { ConnId = SelectedConnectionId ?? string.Empty, Address = Address, DataType = SelectedDataType };
+
+            return config;
         }
     }
 }

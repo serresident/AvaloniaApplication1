@@ -15,6 +15,7 @@ namespace AvaloniaApplication1.ViewModels
         private readonly IConfigurationService _configurationService;
         private readonly IMockDataService _mockDataService;
         private readonly IDialogService _dialogService;
+        private readonly IWidgetFactory _widgetFactory;
         private HmiConfiguration? _currentConfig;
 
         public IProjectContextService ProjectContext { get; }
@@ -63,11 +64,13 @@ namespace AvaloniaApplication1.ViewModels
             IConfigurationService configurationService, 
             IMockDataService mockDataService, 
             IProjectContextService projectContext,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            IWidgetFactory widgetFactory)
         {
             _configurationService = configurationService;
             _mockDataService = mockDataService;
             _dialogService = dialogService;
+            _widgetFactory = widgetFactory;
             ProjectContext = projectContext;
 
             // Start communication drivers & simulation
@@ -122,7 +125,8 @@ namespace AvaloniaApplication1.ViewModels
                 _mockDataService, 
                 ProjectContext,
                 _currentConfig,
-                _dialogService);
+                _dialogService,
+                _widgetFactory);
 
             return OpenChildWindow(title, (object)dashboardVm);
         }
@@ -168,7 +172,8 @@ namespace AvaloniaApplication1.ViewModels
                 _mockDataService, 
                 ProjectContext,
                 _currentConfig,
-                _dialogService);
+                _dialogService,
+                _widgetFactory);
 
             if (_currentConfig.Mimic == null)
             {
@@ -185,7 +190,8 @@ namespace AvaloniaApplication1.ViewModels
                 _mockDataService, 
                 ProjectContext,
                 _currentConfig,
-                _dialogService);
+                _dialogService,
+                _widgetFactory);
 
             Dashboard = _mainDashboard;
             IsMimicActive = false;

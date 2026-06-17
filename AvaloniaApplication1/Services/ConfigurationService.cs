@@ -65,59 +65,59 @@ namespace AvaloniaApplication1.Services
         {
             return new List<WidgetConfig>
             {
-                new WidgetConfig
-                {
-                    Type = "ValueDisplay",
+                new ValueDisplayConfig
+                        {
+                            Type = "ValueDisplay",
                     Title = "Gen Active Power",
                     Source = new DataSourceConfig { ConnId = "mqtt1", Address = $"gMqt/GPA{gpaNum}/PPU_Gen_active_power", DataType = "Float32" },
                     Position = new WidgetPosition { Row = 0, Col = 0, SizeX = 1, SizeY = 1 },
                     Format = "{0:F0} kW"
                 },
-                new WidgetConfig
-                {
-                    Type = "ValueDisplay",
+                new ValueDisplayConfig
+                        {
+                            Type = "ValueDisplay",
                     Title = "Gen Active Energy",
                     Source = new DataSourceConfig { ConnId = "mqtt1", Address = $"gMqt/GPA{gpaNum}/PPU_Gen_counter_active_power", DataType = "Float32" },
                     Position = new WidgetPosition { Row = 0, Col = 1, SizeX = 1, SizeY = 1 },
                     Format = "{0:F1} kWh"
                 },
-                new WidgetConfig
-                {
-                    Type = "ValueDisplay",
+                new ValueDisplayConfig
+                        {
+                            Type = "ValueDisplay",
                     Title = "Exhaust Temp T404",
                     Source = new DataSourceConfig { ConnId = "mqtt1", Address = $"gMqt/GPA{gpaNum}/T404", DataType = "Float32" },
                     Position = new WidgetPosition { Row = 1, Col = 0, SizeX = 1, SizeY = 1 },
                     Format = "{0:F1} °C"
                 },
-                new WidgetConfig
-                {
-                    Type = "ValueDisplay",
+                new ValueDisplayConfig
+                        {
+                            Type = "ValueDisplay",
                     Title = "Operating Hours",
                     Source = new DataSourceConfig { ConnId = "mqtt1", Address = $"gMqt/GPA{gpaNum}/Hours", DataType = "Float32" },
                     Position = new WidgetPosition { Row = 1, Col = 1, SizeX = 1, SizeY = 1 },
                     Format = "{0:F0} h"
                 },
-                new WidgetConfig
-                {
-                    Type = "PilotLight",
+                new PilotLightConfig
+                        {
+                            Type = "PilotLight",
                     Title = "Status MWM",
                     Source = new DataSourceConfig { ConnId = "mqtt1", Address = $"gMqt/GPA{gpaNum}/Status_MWM", DataType = "Bool" },
                     Position = new WidgetPosition { Row = 0, Col = 2, SizeX = 1, SizeY = 1 },
                     TrueColor = "#00FF00",
                     FalseColor = "#440000"
                 },
-                new WidgetConfig
-                {
-                    Type = "PilotLight",
+                new PilotLightConfig
+                        {
+                            Type = "PilotLight",
                     Title = "Word55 Warning",
                     Source = new DataSourceConfig { ConnId = "mqtt1", Address = $"gMqt/GPA{gpaNum}/HAS_IN_Word55_0", DataType = "Bool" },
                     Position = new WidgetPosition { Row = 1, Col = 2, SizeX = 1, SizeY = 1 },
                     TrueColor = "#FFCC00",
                     FalseColor = "#443300"
                 },
-                new WidgetConfig
-                {
-                    Type = "RealTimeTrend",
+                new RealTimeTrendConfig
+                        {
+                            Type = "RealTimeTrend",
                     Title = $"GPA {gpaNum} Power Trend",
                     Source = new DataSourceConfig { ConnId = "mqtt1", Address = $"gMqt/GPA{gpaNum}/PPU_Gen_active_power", DataType = "Float32" },
                     Position = new WidgetPosition { Row = 2, Col = 0, SizeX = 3, SizeY = 2 },
@@ -141,7 +141,7 @@ namespace AvaloniaApplication1.Services
                 {
                     Widgets = new List<WidgetConfig>
                     {
-                        new WidgetConfig
+                        new ValueDisplayConfig
                         {
                             Type = "ValueDisplay",
                             Title = "ZAS Actual Power",
@@ -149,7 +149,7 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 0, Col = 0, SizeX = 1, SizeY = 1 },
                             Format = "{0:F1} kW"
                         },
-                        new WidgetConfig
+                        new SetValueConfig
                         {
                             Type = "SetValue",
                             Title = "ZAS Power Setpoint",
@@ -159,7 +159,7 @@ namespace AvaloniaApplication1.Services
                             MinValue = 0,
                             MaxValue = 1000
                         },
-                        new WidgetConfig
+                        new RealTimeTrendConfig
                         {
                             Type = "RealTimeTrend",
                             Title = "ZAS Power History",
@@ -168,42 +168,42 @@ namespace AvaloniaApplication1.Services
                             MinValue = 0,
                             MaxValue = 500
                         },
-                        new WidgetConfig
+                        new ContainerButtonConfig
                         {
                             Type = "ContainerButton",
                             Title = "GPA 1 Unit",
                             Position = new WidgetPosition { Row = 0, Col = 2, SizeX = 1, SizeY = 1 },
                             Children = CreateGpaChildren(1)
                         },
-                        new WidgetConfig
+                        new ContainerButtonConfig
                         {
                             Type = "ContainerButton",
                             Title = "GPA 2 Unit",
                             Position = new WidgetPosition { Row = 0, Col = 3, SizeX = 1, SizeY = 1 },
                             Children = CreateGpaChildren(2)
                         },
-                        new WidgetConfig
+                        new ContainerButtonConfig
                         {
                             Type = "ContainerButton",
                             Title = "GPA 3 Unit",
                             Position = new WidgetPosition { Row = 1, Col = 2, SizeX = 1, SizeY = 1 },
                             Children = CreateGpaChildren(3)
                         },
-                        new WidgetConfig
+                        new ContainerButtonConfig
                         {
                             Type = "ContainerButton",
                             Title = "GPA 4 Unit",
                             Position = new WidgetPosition { Row = 1, Col = 3, SizeX = 1, SizeY = 1 },
                             Children = CreateGpaChildren(4)
                         },
-                        new WidgetConfig
+                        new ContainerButtonConfig
                         {
                             Type = "ContainerButton",
                             Title = "GPA 5 Unit",
                             Position = new WidgetPosition { Row = 2, Col = 2, SizeX = 1, SizeY = 1 },
                             Children = CreateGpaChildren(5)
                         },
-                        new WidgetConfig
+                        new ContainerButtonConfig
                         {
                             Type = "ContainerButton",
                             Title = "GPA 6 Unit",
@@ -218,7 +218,7 @@ namespace AvaloniaApplication1.Services
                     Widgets = new List<WidgetConfig>
                     {
                         // --- WATER SUPPLY ---
-                        new WidgetConfig
+                        new PumpConfig
                         {
                             Type = "Pump",
                             Title = "Насос воды NS1",
@@ -227,7 +227,7 @@ namespace AvaloniaApplication1.Services
                             ActiveColor = "#00FF00",
                             InactiveColor = "#FF0000"
                         },
-                        new WidgetConfig
+                        new ValveConfig
                         {
                             Type = "Valve",
                             Title = "Клапан воды YV1",
@@ -239,7 +239,7 @@ namespace AvaloniaApplication1.Services
                             ActuatorType = "Solenoid",
                             FeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "10002", DataType = "Bool" }
                         },
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия воды 1",
@@ -250,7 +250,7 @@ namespace AvaloniaApplication1.Services
                             InactiveColor = "#005588",
                             ShowFlanges = true
                         },
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия воды 2",
@@ -261,7 +261,7 @@ namespace AvaloniaApplication1.Services
                             InactiveColor = "#005588",
                             ShowFlanges = true
                         },
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия воды в бак",
@@ -272,7 +272,7 @@ namespace AvaloniaApplication1.Services
                             InactiveColor = "#005588",
                             ShowFlanges = true
                         },
-                        new WidgetConfig
+                        new ValueDisplayConfig
                         {
                             Type = "ValueDisplay",
                             Title = "Дозатор воды",
@@ -280,7 +280,7 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 12, Col = 10, SizeX = 8, SizeY = 4 },
                             Format = "{0:F1} л"
                         },
-                        new WidgetConfig
+                        new SetValueConfig
                         {
                             Type = "SetValue",
                             Title = "Уставка воды",
@@ -290,7 +290,7 @@ namespace AvaloniaApplication1.Services
                             MinValue = 0,
                             MaxValue = 1000
                         },
-                        new WidgetConfig
+                        new CommandButtonConfig
                         {
                             Type = "CommandButton",
                             Title = "Сбросить дозу",
@@ -300,7 +300,7 @@ namespace AvaloniaApplication1.Services
                         },
 
                         // --- FEEDER A ---
-                        new WidgetConfig
+                        new PumpConfig
                         {
                             Type = "Pump",
                             Title = "Питатель A QS1",
@@ -309,7 +309,7 @@ namespace AvaloniaApplication1.Services
                             ActiveColor = "#00FF00",
                             InactiveColor = "#FF0000"
                         },
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия подачи A",
@@ -320,7 +320,7 @@ namespace AvaloniaApplication1.Services
                             InactiveColor = "#7F6B2F",
                             ShowFlanges = true
                         },
-                        new WidgetConfig
+                        new ValueDisplayConfig
                         {
                             Type = "ValueDisplay",
                             Title = "Вес A в смесители",
@@ -328,7 +328,7 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 31, Col = 10, SizeX = 8, SizeY = 4 },
                             Format = "{0:F1} кг"
                         },
-                        new WidgetConfig
+                        new SetValueConfig
                         {
                             Type = "SetValue",
                             Title = "Уставка веса A",
@@ -340,7 +340,7 @@ namespace AvaloniaApplication1.Services
                         },
 
                         // --- FEEDER B ---
-                        new WidgetConfig
+                        new PumpConfig
                         {
                             Type = "Pump",
                             Title = "Питатель B QS2",
@@ -349,7 +349,7 @@ namespace AvaloniaApplication1.Services
                             ActiveColor = "#00FF00",
                             InactiveColor = "#FF0000"
                         },
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия подачи B",
@@ -360,7 +360,7 @@ namespace AvaloniaApplication1.Services
                             InactiveColor = "#613880",
                             ShowFlanges = true
                         },
-                        new WidgetConfig
+                        new ValueDisplayConfig
                         {
                             Type = "ValueDisplay",
                             Title = "Вес B в смесители",
@@ -368,7 +368,7 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 45, Col = 10, SizeX = 8, SizeY = 4 },
                             Format = "{0:F1} кг"
                         },
-                        new WidgetConfig
+                        new SetValueConfig
                         {
                             Type = "SetValue",
                             Title = "Уставка веса B",
@@ -380,7 +380,7 @@ namespace AvaloniaApplication1.Services
                         },
 
                         // --- MAIN VESSEL ---
-                        new WidgetConfig
+                        new TankConfig
                         {
                             Type = "Tank",
                             Title = "Реактор смеситель",
@@ -390,7 +390,7 @@ namespace AvaloniaApplication1.Services
                             MaxValue = 1000,
                             Format = "{0:F1} кг"
                         },
-                        new WidgetConfig
+                        new ValueDisplayConfig
                         {
                             Type = "ValueDisplay",
                             Title = "Давление реактора",
@@ -398,7 +398,7 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 15, Col = 46, SizeX = 8, SizeY = 4 },
                             Format = "{0:F2} бар"
                         },
-                        new WidgetConfig
+                        new ValueDisplayConfig
                         {
                             Type = "ValueDisplay",
                             Title = "Температура смеси",
@@ -408,7 +408,7 @@ namespace AvaloniaApplication1.Services
                         },
 
                         // --- TEMP CONTROL ---
-                        new WidgetConfig
+                        new CommandButtonConfig
                         {
                             Type = "CommandButton",
                             Title = "Нагрев АВТО",
@@ -416,7 +416,7 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 4, Col = 68, SizeX = 8, SizeY = 4 },
                             ButtonMode = "Toggle"
                         },
-                        new WidgetConfig
+                        new CommandButtonConfig
                         {
                             Type = "CommandButton",
                             Title = "Включить ТЭН",
@@ -424,7 +424,7 @@ namespace AvaloniaApplication1.Services
                             Position = new WidgetPosition { Row = 4, Col = 77, SizeX = 8, SizeY = 4 },
                             ButtonMode = "Toggle"
                         },
-                        new WidgetConfig
+                        new SetValueConfig
                         {
                             Type = "SetValue",
                             Title = "Уставка темп-ры",
@@ -434,7 +434,7 @@ namespace AvaloniaApplication1.Services
                             MinValue = 0,
                             MaxValue = 100
                         },
-                        new WidgetConfig
+                        new ValueDisplayConfig
                         {
                             Type = "ValueDisplay",
                             Title = "Мощность ТЭНа",
@@ -444,7 +444,7 @@ namespace AvaloniaApplication1.Services
                         },
 
                         // --- COOLING LOOP ---
-                        new WidgetConfig
+                        new PumpConfig
                         {
                             Type = "Pump",
                             Title = "Насос охлаждения",
@@ -453,7 +453,7 @@ namespace AvaloniaApplication1.Services
                             ActiveColor = "#00FF00",
                             InactiveColor = "#FF0000"
                         },
-                        new WidgetConfig
+                        new ValveConfig
                         {
                             Type = "Valve",
                             Title = "Клапан охл.",
@@ -465,7 +465,7 @@ namespace AvaloniaApplication1.Services
                             ActuatorType = "Diaphragm",
                             FeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "40027", DataType = "Float32" }
                         },
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия охл. 1",
@@ -476,7 +476,7 @@ namespace AvaloniaApplication1.Services
                             InactiveColor = "#005588",
                             ShowFlanges = true
                         },
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия охл. 2",
@@ -487,7 +487,7 @@ namespace AvaloniaApplication1.Services
                             InactiveColor = "#005588",
                             ShowFlanges = true
                         },
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия охл. 3",
@@ -500,7 +500,7 @@ namespace AvaloniaApplication1.Services
                         },
 
                         // --- PRESSURE CONTROL ---
-                        new WidgetConfig
+                        new ValveConfig
                         {
                             Type = "Valve",
                             Title = "Сдув давления",
@@ -512,7 +512,7 @@ namespace AvaloniaApplication1.Services
                             ActuatorType = "Solenoid",
                             FeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "10005", DataType = "Bool" }
                         },
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия сдува",
@@ -523,7 +523,7 @@ namespace AvaloniaApplication1.Services
                             InactiveColor = "#005588",
                             ShowFlanges = true
                         },
-                        new WidgetConfig
+                        new SetValueConfig
                         {
                             Type = "SetValue",
                             Title = "Уставка давл.",
@@ -533,7 +533,7 @@ namespace AvaloniaApplication1.Services
                             MinValue = 1,
                             MaxValue = 6
                         },
-                        new WidgetConfig
+                        new SetValueConfig
                         {
                             Type = "SetValue",
                             Title = "Уставка сдува %",
@@ -545,7 +545,7 @@ namespace AvaloniaApplication1.Services
                         },
 
                         // --- DISCHARGE OUTLET ---
-                        new WidgetConfig
+                        new PipeConfig
                         {
                             Type = "Pipe",
                             Title = "Линия слива",
@@ -556,7 +556,7 @@ namespace AvaloniaApplication1.Services
                             InactiveColor = "#007755",
                             ShowFlanges = true
                         },
-                        new WidgetConfig
+                        new ValueDisplayConfig
                         {
                             Type = "ValueDisplay",
                             Title = "Скорость слива",

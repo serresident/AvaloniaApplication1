@@ -12,6 +12,8 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class PumpWidgetViewModel : WidgetViewModelBase
     {
+        public PumpConfig TypedConfig => (PumpConfig)OriginalConfig;
+
         [ObservableProperty]
         private bool _isRunning;
 
@@ -21,10 +23,10 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string _currentColor = "#FF0000";
 
-        public string ActiveColor => string.IsNullOrEmpty(OriginalConfig.ActiveColor) ? "#00FF00" : OriginalConfig.ActiveColor;
-        public string InactiveColor => string.IsNullOrEmpty(OriginalConfig.InactiveColor) ? "#FF0000" : OriginalConfig.InactiveColor;
+        public string ActiveColor => string.IsNullOrEmpty(TypedConfig.ActiveColor) ? "#00FF00" : TypedConfig.ActiveColor;
+        public string InactiveColor => string.IsNullOrEmpty(TypedConfig.InactiveColor) ? "#FF0000" : TypedConfig.InactiveColor;
 
-        public PumpWidgetViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public PumpWidgetViewModel(PumpConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             UpdateState();
@@ -82,7 +84,7 @@ namespace AvaloniaApplication1.ViewModels
             var widgets = new List<WidgetConfig>
             {
                 // Status Display
-                new WidgetConfig
+                new ValueDisplayConfig
                 {
                     Type = "ValueDisplay",
                     Title = "Pump Status",
@@ -92,7 +94,7 @@ namespace AvaloniaApplication1.ViewModels
                 },
 
                 // Start/Stop Toggle Button
-                new WidgetConfig
+                new CommandButtonConfig
                 {
                     Type = "CommandButton",
                     Title = "START / STOP",

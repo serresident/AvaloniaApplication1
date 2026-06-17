@@ -9,16 +9,18 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class RealTimeTrendViewModel : WidgetViewModelBase
     {
+        public RealTimeTrendConfig TypedConfig => (RealTimeTrendConfig)OriginalConfig;
+
         [ObservableProperty]
         private string _latestValueDisplay = "---";
 
         public ObservableCollection<double> Values { get; } = new();
 
-        public double MinY => OriginalConfig.MinValue;
-        public double MaxY => OriginalConfig.MaxValue;
-        public string Format => string.IsNullOrEmpty(OriginalConfig.Format) ? "{0}" : OriginalConfig.Format;
+        public double MinY => TypedConfig.MinValue;
+        public double MaxY => TypedConfig.MaxValue;
+        public string Format => string.IsNullOrEmpty(TypedConfig.Format) ? "{0}" : TypedConfig.Format;
 
-        public RealTimeTrendViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
+        public RealTimeTrendViewModel(RealTimeTrendConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
             // Pre-fill history queue

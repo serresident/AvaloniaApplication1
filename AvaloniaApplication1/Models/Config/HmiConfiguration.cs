@@ -21,15 +21,10 @@ namespace AvaloniaApplication1.Models.Config
     public class ConnectionConfig
     {
         public string Id { get; set; } = string.Empty;
-        
-        // ModbusTCP, ModbusRTUOverTCP, MQTT
         public string Type { get; set; } = string.Empty; 
-        
         public string Host { get; set; } = "127.0.0.1";
         public int Port { get; set; } = 502;
         public int PollIntervalMs { get; set; } = 500;
-        
-        // ABCD, CDAB, BADC, DCBA
         public string ByteOrder { get; set; } = "ABCD"; 
     }
 
@@ -38,8 +33,6 @@ namespace AvaloniaApplication1.Models.Config
         public string Name { get; set; } = string.Empty;
         public BridgeEndpoint Source { get; set; } = new();
         public BridgeEndpoint Destination { get; set; } = new();
-        
-        // BiDir, SrcToDst
         public string Direction { get; set; } = "SrcToDst"; 
     }
 
@@ -55,67 +48,104 @@ namespace AvaloniaApplication1.Models.Config
         public List<WidgetConfig> Widgets { get; set; } = new();
     }
 
-    public class WidgetConfig
+    [JsonConverter(typeof(WidgetJsonConverter))]
+    public abstract class WidgetConfig
     {
-        // ValueDisplay, PilotLight, ContainerButton, CommandButton, Slider, RealTimeTrend, Pipe, Valve, Tank, Pump
         public string Type { get; set; } = string.Empty; 
         public string Title { get; set; } = string.Empty;
         public DataSourceConfig Source { get; set; } = new();
         public WidgetPosition Position { get; set; } = new();
-        
-        // Only for ContainerButton
-        public List<WidgetConfig> Children { get; set; } = new(); 
+    }
 
-        // ValueDisplay: display format string, e.g. "{0:F2} °C"
+    // Generic fallback for unknown widgets
+    public class WidgetConfigBase : WidgetConfig { }
+
+    public class ValueDisplayConfig : WidgetConfig
+    {
         public string Format { get; set; } = "{0}";
+        public string ValueColor { get; set; } = string.Empty;
+        public double ValueFontSize { get; set; } = 0;
+    }
 
-        // CommandButton: Toggle | Momentary | SetValue
-        public string ButtonMode { get; set; } = "Toggle";
-
-        // Slider: range limits
-        public double MinValue { get; set; } = 0;
-        public double MaxValue { get; set; } = 100;
-
-        // PilotLight: custom colors
+    public class PilotLightConfig : WidgetConfig
+    {
         public string TrueColor { get; set; } = "#00FF00";
         public string FalseColor { get; set; } = "#440000";
+    }
 
-        // Pipe: custom segments points, e.g. "0,0;100,0;100,50"
+    public class ContainerButtonConfig : WidgetConfig
+    {
+        public List<WidgetConfig> Children { get; set; } = new();
+    }
+
+    public class CommandButtonConfig : WidgetConfig
+    {
+        // Toggle | Momentary | SetValue
+        public string ButtonMode { get; set; } = "Toggle";
+    }
+
+    public class SliderConfig : WidgetConfig
+    {
+        public double MinValue { get; set; } = 0;
+        public double MaxValue { get; set; } = 100;
+    }
+
+    public class SetValueConfig : WidgetConfig
+    {
+        public string Format { get; set; } = "{0}";
+        public double MinValue { get; set; } = 0;
+        public double MaxValue { get; set; } = 100;
+        public string ValueColor { get; set; } = string.Empty;
+        public double ValueFontSize { get; set; } = 0;
+    }
+
+    public class RealTimeTrendConfig : WidgetConfig
+    {
+        public string Format { get; set; } = "{0}";
+        public double MinValue { get; set; } = 0;
+        public double MaxValue { get; set; } = 100;
+    }
+
+    public class PipeConfig : WidgetConfig
+    {
         public string PipePoints { get; set; } = string.Empty;
-
-        // Colors for pipes and valves
         public string ActiveColor { get; set; } = string.Empty;
         public string InactiveColor { get; set; } = string.Empty;
-
-        // Valve: CutOff | Regulating
-        public string ValveType { get; set; } = "CutOff";
-
-        // Flange rendering option
         public bool ShowFlanges { get; set; } = true;
-
-        // Pipe settings
         public double Thickness { get; set; } = 12.0;
         public string StartFitting { get; set; } = "None";
         public string EndFitting { get; set; } = "None";
+    }
 
-        // Feedback source for regulating valves (separate from main Source)
+    public class ValveConfig : WidgetConfig
+    {
+        public string ValveType { get; set; } = "CutOff";
+        public string ActiveColor { get; set; } = string.Empty;
+        public string InactiveColor { get; set; } = string.Empty;
         public DataSourceConfig? FeedbackSource { get; set; }
-
-        // Control window dimensions (for valve/pump MDI popup)
-        public double ControlWindowWidth { get; set; } = 0;
-        public double ControlWindowHeight { get; set; } = 0;
-
-        // Valve properties
         public bool IsVertical { get; set; } = false;
         public string ActuatorType { get; set; } = "Solenoid";
         public int Rotation { get; set; } = 0;
         public bool AlarmDisabled { get; set; } = false;
         public double Tolerance { get; set; } = 10.0;
         public DataSourceConfig? ModeSource { get; set; }
-        
-        // ValueDisplay: custom color and font size
+    }
+
+    public class TankConfig : WidgetConfig
+    {
+        public string Format { get; set; } = "{0}";
+        public double MinValue { get; set; } = 0;
+        public double MaxValue { get; set; } = 100;
         public string ValueColor { get; set; } = string.Empty;
         public double ValueFontSize { get; set; } = 0;
+    }
+
+    public class PumpConfig : WidgetConfig
+    {
+        public string ActiveColor { get; set; } = string.Empty;
+        public string InactiveColor { get; set; } = string.Empty;
+        public double ControlWindowWidth { get; set; } = 0;
+        public double ControlWindowHeight { get; set; } = 0;
     }
 
     public class DataSourceConfig
