@@ -60,5 +60,39 @@ namespace AvaloniaApplication1.ViewModels
                 Height = _preMinimizeHeight;
             }
         }
+
+        public void Move(double deltaX, double deltaY, double startX, double startY, double maxBoundsX, double maxBoundsY)
+        {
+            double targetX = startX + deltaX;
+            double targetY = startY + deltaY;
+
+            if (maxBoundsY > 0)
+            {
+                targetY = Math.Clamp(targetY, 0, Math.Max(0, maxBoundsY - 36));
+                targetX = Math.Clamp(targetX, -Width + 100, Math.Max(100, maxBoundsX - 100));
+            }
+            else
+            {
+                targetY = Math.Max(0, targetY);
+            }
+
+            X = targetX;
+            Y = targetY;
+        }
+
+        public void Resize(double deltaX, double deltaY, double startWidth, double startHeight, double maxBoundsX, double maxBoundsY)
+        {
+            double newWidth = Math.Max(200, startWidth + deltaX);
+            double newHeight = Math.Max(120, startHeight + deltaY);
+
+            if (maxBoundsX > 0 && maxBoundsY > 0)
+            {
+                newWidth = Math.Min(newWidth, Math.Max(200, maxBoundsX - X));
+                newHeight = Math.Min(newHeight, Math.Max(120, maxBoundsY - Y));
+            }
+
+            Width = newWidth;
+            Height = newHeight;
+        }
     }
 }

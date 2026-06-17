@@ -87,23 +87,11 @@ namespace AvaloniaApplication1
                 double deltaX = currentPointerPos.X - _dragStartPointerPos.X;
                 double deltaY = currentPointerPos.Y - _dragStartPointerPos.Y;
 
-                double targetX = _dragStartWindowX + deltaX;
-                double targetY = _dragStartWindowY + deltaY;
-
                 var canvas = _draggedTitleBar.FindAncestorOfType<Canvas>();
-                if (canvas != null)
-                {
-                    double width = _draggedWindowVm.Width;
-                    targetY = Math.Clamp(targetY, 0, Math.Max(0, canvas.Bounds.Height - 36));
-                    targetX = Math.Clamp(targetX, -width + 100, Math.Max(100, canvas.Bounds.Width - 100));
-                }
-                else
-                {
-                    targetY = Math.Max(0, targetY);
-                }
+                double maxBoundsX = canvas?.Bounds.Width ?? 0;
+                double maxBoundsY = canvas?.Bounds.Height ?? 0;
 
-                _draggedWindowVm.X = targetX;
-                _draggedWindowVm.Y = targetY;
+                _draggedWindowVm.Move(deltaX, deltaY, _dragStartWindowX, _dragStartWindowY, maxBoundsX, maxBoundsY);
 
                 e.Handled = true;
             }
@@ -148,18 +136,11 @@ namespace AvaloniaApplication1
                 double deltaX = currentPointerPos.X - _resizeStartPointerPos.X;
                 double deltaY = currentPointerPos.Y - _resizeStartPointerPos.Y;
 
-                double newWidth = Math.Max(200, _resizeStartWidth + deltaX);
-                double newHeight = Math.Max(120, _resizeStartHeight + deltaY);
-
                 var canvas = _resizeHandle.FindAncestorOfType<Canvas>();
-                if (canvas != null)
-                {
-                    newWidth = Math.Min(newWidth, Math.Max(200, canvas.Bounds.Width - _resizedWindowVm.X));
-                    newHeight = Math.Min(newHeight, Math.Max(120, canvas.Bounds.Height - _resizedWindowVm.Y));
-                }
+                double maxBoundsX = canvas?.Bounds.Width ?? 0;
+                double maxBoundsY = canvas?.Bounds.Height ?? 0;
 
-                _resizedWindowVm.Width = newWidth;
-                _resizedWindowVm.Height = newHeight;
+                _resizedWindowVm.Resize(deltaX, deltaY, _resizeStartWidth, _resizeStartHeight, maxBoundsX, maxBoundsY);
 
                 e.Handled = true;
             }

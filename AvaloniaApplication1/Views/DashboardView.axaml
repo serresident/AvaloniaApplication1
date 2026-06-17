@@ -7,7 +7,8 @@
              xmlns:c="clr-namespace:AvaloniaApplication1.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="AvaloniaApplication1.Views.DashboardView"
-             x:DataType="vm:DashboardViewModel">
+             x:DataType="vm:DashboardViewModel"
+             x:CompileBindings="True">
 
      <UserControl.Resources>
          <c:BoolToBrushConverter x:Key="BoolToColor" TrueBrush="#FF0000" FalseBrush="#440000" />

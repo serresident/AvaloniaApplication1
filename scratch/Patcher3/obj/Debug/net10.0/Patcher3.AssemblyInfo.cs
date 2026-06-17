@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Patcher3")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e04ede4903a6b424f070a95fe9c3d724a70189de")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a787429f033fa0e465d577677369407d9d3281d9")]
 [assembly: System.Reflection.AssemblyProductAttribute("Patcher3")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Patcher3")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

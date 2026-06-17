@@ -8,6 +8,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AvaloniaApplication1.MainWindow"
         x:DataType="vm:MainViewModel"
+        x:CompileBindings="True"
         Title="Avalonia HMI Dashboard"
         Background="#1E1E1E">
 

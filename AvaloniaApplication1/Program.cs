@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
+using Avalonia.ReactiveUI;
 
 namespace AvaloniaApplication1
 {
@@ -22,6 +23,7 @@ namespace AvaloniaApplication1
                 .WithDeveloperTools()
 #endif
                 .WithInterFont()
+                .UseReactiveUI()
                 .LogToTrace();
     }
 }

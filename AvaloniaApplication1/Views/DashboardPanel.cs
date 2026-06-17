@@ -16,106 +16,6 @@ namespace AvaloniaApplication1.Views
     /// A lightweight control drawn underneath the widgets to show grid lines and drag highlight.
     /// Added as first child of DashboardPanel when in design mode.
     /// </summary>
-    public class GridOverlay : Control
-    {
-        public double CellWidth { get; set; } = 150;
-        public double CellHeight { get; set; } = 150;
-        public bool ShowHighlight { get; set; }
-        public double HighlightCol { get; set; }
-        public double HighlightRow { get; set; }
-        public int HighlightSizeX { get; set; } = 1;
-        public int HighlightSizeY { get; set; } = 1;
-
-        public override void Render(DrawingContext context)
-        {
-            base.Render(context);
-
-            // Draw grid lines
-            var pen = new Pen(new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)), 1,
-                new DashStyle(new double[] { 4, 4 }, 0));
-
-            double width = Bounds.Width;
-            double height = Bounds.Height;
-
-            for (double x = 0; x <= width; x += CellWidth)
-            {
-                context.DrawLine(pen, new Point(x, 0), new Point(x, height));
-            }
-
-            for (double y = 0; y <= height; y += CellHeight)
-            {
-                context.DrawLine(pen, new Point(0, y), new Point(width, y));
-            }
-
-            // Draw drop target highlight while dragging
-            if (ShowHighlight)
-            {
-                var highlightBrush = new SolidColorBrush(Color.FromArgb(60, 0, 122, 204));
-                var highlightRect = new Rect(
-                    HighlightCol * CellWidth, HighlightRow * CellHeight,
-                    HighlightSizeX * CellWidth, HighlightSizeY * CellHeight);
-
-                context.DrawRectangle(highlightBrush, null, highlightRect);
-
-                var borderPen = new Pen(new SolidColorBrush(Color.FromArgb(180, 0, 122, 204)), 2);
-                context.DrawRectangle(null, borderPen, highlightRect);
-            }
-        }
-    }
-
-    /// <summary>
-    /// A lightweight control drawn on top of the widgets to show selection highlight.
-    /// Added as last child of DashboardPanel when in design mode.
-    /// </summary>
-    public class SelectionOverlay : Control
-    {
-        private readonly DashboardPanel _panel;
-
-        public SelectionOverlay(DashboardPanel panel)
-        {
-            _panel = panel;
-            IsHitTestVisible = false;
-        }
-
-        public override void Render(DrawingContext context)
-        {
-            base.Render(context);
-
-            if (_panel.IsDesignMode && _panel.SelectedVm != null)
-            {
-                Control? selectedControl = null;
-                foreach (var child in _panel.Children)
-                {
-                    if (child.DataContext == _panel.SelectedVm)
-                    {
-                        selectedControl = child;
-                        break;
-                    }
-                }
-
-                if (selectedControl != null)
-                {
-                    double x = DashboardPanel.GetCol(selectedControl) * _panel.CellWidth;
-                    double y = DashboardPanel.GetRow(selectedControl) * _panel.CellHeight;
-                    double w = DashboardPanel.GetSizeX(selectedControl) * _panel.CellWidth;
-                    double h = DashboardPanel.GetSizeY(selectedControl) * _panel.CellHeight;
-
-                    var fillBrush = new SolidColorBrush(Color.FromArgb(30, 0, 122, 255));
-                    var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 2.0);
-                    
-                    context.DrawRectangle(fillBrush, borderPen, new Rect(x, y, w, h), 4, 4);
-
-                    var handleBrush = Brushes.White;
-                    var handlePen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 1.5);
-                    context.DrawEllipse(handleBrush, handlePen, new Point(x, y), 4, 4);
-                    context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y), 4, 4);
-                    context.DrawEllipse(handleBrush, handlePen, new Point(x, y + h), 4, 4);
-                    context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y + h), 4, 4);
-                }
-            }
-        }
-    }
-
     public class DashboardPanel : Panel
     {
         public static readonly StyledProperty<double> CellWidthProperty =
@@ -148,7 +48,7 @@ namespace AvaloniaApplication1.Views
         public static int GetSizeY(Control element) => element.GetValue(SizeYProperty);
         public static void SetSizeY(Control element, int value) => element.SetValue(SizeYProperty, value);
 
-        private static double CoerceCellSize(AvaloniaObject inst, double val) => Math.Clamp(val, 10.0, 500.0);
+        private static double CoerceCellSize(AvaloniaObject inst, double val) => AvaloniaApplication1.Views.DashboardPanelHelpers.GridMathHelper.CoerceCellSize(inst, val);
 
         public double CellWidth
         {
@@ -1238,171 +1138,12 @@ namespace AvaloniaApplication1.Views
 
         private bool IsPointNearSegment(Point p, Point s1, Point s2, double maxDistance)
         {
-            double l2 = Math.Pow(s1.X - s2.X, 2) + Math.Pow(s1.Y - s2.Y, 2);
-            if (l2 == 0) return Math.Sqrt(Math.Pow(p.X - s1.X, 2) + Math.Pow(p.Y - s1.Y, 2)) <= maxDistance;
-
-            double t = ((p.X - s1.X) * (s2.X - s1.X) + (p.Y - s1.Y) * (s2.Y - s1.Y)) / l2;
-            t = Math.Clamp(t, 0.0, 1.0);
-
-            var projection = new Point(s1.X + t * (s2.X - s1.X), s1.Y + t * (s2.Y - s1.Y));
-            double dist = Math.Sqrt(Math.Pow(p.X - projection.X, 2) + Math.Pow(p.Y - projection.Y, 2));
-
-            return dist <= maxDistance;
+            return AvaloniaApplication1.Views.DashboardPanelHelpers.GridMathHelper.IsPointNearSegment(p, s1, s2, maxDistance);
         }
 
         private void GetSnappedPosition(Control child, Point pointer, out double snappedCol, out double snappedRow)
         {
-            var vm = child.DataContext as WidgetViewModelBase;
-            // Initial candidate column and row based on mouse pointer
-            double dragX = pointer.X - _dragStartPoint.X + _dragOriginalCol * CellWidth;
-            double dragY = pointer.Y - _dragStartPoint.Y + _dragOriginalRow * CellHeight;
-
-            double candCol = Math.Max(0, dragX / CellWidth);
-            double candRow = Math.Max(0, dragY / CellHeight);
-
-            snappedCol = Math.Round(candCol);
-            snappedRow = Math.Round(candRow);
-
-            if (vm == null) return;
-
-            // Snapping is active for Valve and Pump type widgets
-            bool isValve = string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
-            bool isPump = string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
-            if (!isValve && !isPump) return;
-
-            // Get Valve specific properties
-            int rotation = 0;
-            bool isVertical = false;
-            var rotProp = vm.GetType().GetProperty("Rotation");
-            if (rotProp != null) rotation = (int)(rotProp.GetValue(vm) ?? 0);
-            var vertProp = vm.GetType().GetProperty("IsVertical");
-            if (vertProp != null) isVertical = (bool)(vertProp.GetValue(vm) ?? false);
-
-            int finalRotation = rotation;
-            if (finalRotation == 0 && isVertical) finalRotation = 90;
-            bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
-
-            var (p1Grid, p2Grid) = GetVisualPortsInGrid(child, vm);
-            double col = GetCol(child);
-            double row = GetRow(child);
-            double relX1 = p1Grid.X - col;
-            double relY1 = p1Grid.Y - row;
-            double relX2 = p2Grid.X - col;
-            double relY2 = p2Grid.Y - row;
-
-            double snapRadius = 20.0; // pixels (was 15.0)
-            bool snapped = false;
-
-            // 1. Try to snap ports to any pipe vertex (2D snapping)
-            foreach (var otherChild in Children)
-            {
-                if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
-                if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
-                {
-                    var points = pipeVm.GetAbsoluteGridPoints();
-                    foreach (var ep in points)
-                    {
-                        // Check Port 1
-                        double p1X = (candCol + relX1) * CellWidth;
-                        double p1Y = (candRow + relY1) * CellHeight;
-                        double epX = ep.X * CellWidth + CellWidth / 2.0;
-                        double epY = ep.Y * CellHeight + CellHeight / 2.0;
-
-                        double dist1 = Math.Sqrt(Math.Pow(p1X - epX, 2) + Math.Pow(p1Y - epY, 2));
-                        if (dist1 <= snapRadius)
-                        {
-                            // Snap Port 1 to ep
-                            snappedCol = ep.X - relX1;
-                            snappedRow = ep.Y - relY1;
-                            snapped = true;
-                            break;
-                        }
-
-                        // Check Port 2
-                        double p2X = (candCol + relX2) * CellWidth;
-                        double p2Y = (candRow + relY2) * CellHeight;
-
-                        double dist2 = Math.Sqrt(Math.Pow(p2X - epX, 2) + Math.Pow(p2Y - epY, 2));
-                        if (dist2 <= snapRadius)
-                        {
-                            // Snap Port 2 to ep
-                            snappedCol = ep.X - relX2;
-                            snappedRow = ep.Y - relY2;
-                            snapped = true;
-                            break;
-                        }
-                    }
-                }
-                if (snapped) break;
-            }
-
-            // 2. If not snapped to a vertex, try to snap to horizontal/vertical segments (1D snapping perpendicular to flow)
-            if (!snapped)
-            {
-                var centerPt = GetGraphicsCenter(child, vm);
-                double localOffsetX = centerPt.X - col * CellWidth;
-                double localOffsetY = centerPt.Y - row * CellHeight;
-                double graphicsCenterCol = candCol + (localOffsetX / CellWidth);
-                double graphicsCenterRow = candRow + (localOffsetY / CellHeight);
-
-                foreach (var otherChild in Children)
-                {
-                    if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
-                    if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
-                    {
-                        var points = pipeVm.GetAbsoluteGridPoints();
-                        for (int i = 0; i < points.Count - 1; i++)
-                        {
-                            var pt1 = points[i];
-                            var pt2 = points[i + 1];
-
-                            // Horizontal segment (align Y of horizontal valve flow to horizontal pipe)
-                            if (Math.Abs(pt1.Y - pt2.Y) < 0.01 && !isFlowVertical)
-                            {
-                                double distY = Math.Abs((candRow + relY1) - pt1.Y) * CellHeight;
-
-                                if (distY <= snapRadius)
-                                {
-                                    // Check if valve overlaps or is close horizontally to the segment
-                                    double minX = Math.Min(pt1.X, pt2.X) - 0.5;
-                                    double maxX = Math.Max(pt1.X, pt2.X) + 0.5;
-
-                                    if (graphicsCenterCol >= minX && graphicsCenterCol <= maxX)
-                                    {
-                                        snappedRow = pt1.Y - relY1;
-                                        snapped = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            // Vertical segment (align X of vertical valve flow to vertical pipe)
-                            else if (Math.Abs(pt1.X - pt2.X) < 0.01 && isFlowVertical)
-                            {
-                                double distX = Math.Abs((candCol + relX1) - pt1.X) * CellWidth;
-
-                                if (distX <= snapRadius)
-                                {
-                                    // Check if valve overlaps or is close vertically to the segment
-                                    double minY = Math.Min(pt1.Y, pt2.Y) - 0.5;
-                                    double maxY = Math.Max(pt1.Y, pt2.Y) + 0.5;
-
-                                    if (graphicsCenterRow >= minY && graphicsCenterRow <= maxY)
-                                    {
-                                        snappedCol = pt1.X - relX1;
-                                        snapped = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (snapped) break;
-                }
-            }
-
-            // Keep in bounds
-            snappedCol = Math.Max(0.0, snappedCol);
-            snappedRow = Math.Max(0.0, snappedRow);
+            AvaloniaApplication1.Views.DashboardPanelHelpers.GridMathHelper.GetSnappedPosition(pointer, CellWidth, CellHeight, out snappedCol, out snappedRow);
         }
 
         private bool IsDragHandle(object? source)
@@ -1556,14 +1297,7 @@ namespace AvaloniaApplication1.Views
 
         private static Point RotatePoint(Point p, Point origin, double angleRad)
         {
-            double cos = Math.Cos(angleRad);
-            double sin = Math.Sin(angleRad);
-            double dx = p.X - origin.X;
-            double dy = p.Y - origin.Y;
-            return new Point(
-                origin.X + dx * cos - dy * sin,
-                origin.Y + dx * sin + dy * cos
-            );
+            return AvaloniaApplication1.Views.DashboardPanelHelpers.GridMathHelper.RotatePoint(p, origin, angleRad);
         }
 
         private ValveControl? FindValveControlRecursive(Control control)
