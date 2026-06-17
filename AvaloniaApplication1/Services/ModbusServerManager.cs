@@ -54,10 +54,10 @@ namespace AvaloniaApplication1.Services
                 _slaveNetwork.AddSlave(_slave);
 
                 // Initialize registers up to index 100 to avoid out-of-bounds client requests
-                _slave.DataStore.HoldingRegisters.WritePoints(0, new ushort[100]);
-                _slave.DataStore.InputRegisters.WritePoints(0, new ushort[100]);
-                _slave.DataStore.CoilDiscretes.WritePoints(0, new bool[100]);
-                _slave.DataStore.CoilInputs.WritePoints(0, new bool[100]);
+                _slave.DataStore.HoldingRegisters.WritePoints(1, new ushort[100]);
+                _slave.DataStore.InputRegisters.WritePoints(1, new ushort[100]);
+                _slave.DataStore.CoilDiscretes.WritePoints(1, new bool[100]);
+                _slave.DataStore.CoilInputs.WritePoints(1, new bool[100]);
 
                 _cts = new CancellationTokenSource();
                 // NModbus v3 requires calling ListenAsync to accept connections in the background
@@ -65,8 +65,9 @@ namespace AvaloniaApplication1.Services
 
                 IsRunning = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"ModbusServerManager Start failed: {ex.Message}");
                 Stop();
                 throw;
             }

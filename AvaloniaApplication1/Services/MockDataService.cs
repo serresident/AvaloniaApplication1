@@ -54,6 +54,12 @@ namespace AvaloniaApplication1.Services
             _cts = null;
         }
 
+        public void ResetSimulation()
+        {
+            // Reset mock states if necessary
+            _temperature = 20.0;
+        }
+
         public object? GetCurrentValue(string connId, string address)
         {
             var key = $"{connId}_{address}";

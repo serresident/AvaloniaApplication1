@@ -86,6 +86,30 @@ namespace AvaloniaApplication1.ViewModels
             ProjectContext.IsDesignMode = !ProjectContext.IsDesignMode;
         }
 
+        [ObservableProperty]
+        private bool _isSimulationRunning = true;
+
+        [RelayCommand]
+        private void ToggleSimulation()
+        {
+            if (IsSimulationRunning)
+            {
+                _mockDataService.StopSimulation();
+                IsSimulationRunning = false;
+            }
+            else
+            {
+                _mockDataService.StartSimulation();
+                IsSimulationRunning = true;
+            }
+        }
+
+        [RelayCommand]
+        private void ResetSimulation()
+        {
+            _mockDataService.ResetSimulation();
+        }
+
         [RelayCommand]
         private void ShowDashboard()
         {
@@ -192,6 +216,12 @@ namespace AvaloniaApplication1.ViewModels
                 _currentConfig,
                 _dialogService,
                 _widgetFactory);
+
+            // Start background polling for Modbus/MQTT drivers
+            if (_mockDataService is IDataCoreService core)
+            {
+                core.Start();
+            }
 
             Dashboard = _mainDashboard;
             IsMimicActive = false;

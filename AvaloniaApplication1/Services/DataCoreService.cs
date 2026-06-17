@@ -23,6 +23,10 @@ namespace AvaloniaApplication1.Services
         public IObservable<TagData> TagUpdates => _unifiedTagStream;
 
         private CancellationTokenSource? _cts;
+        
+        // Background simulator instance
+        private MockProtocolDriver? _backgroundSimulator;
+        private CancellationTokenSource? _simCts;
 
         public DataCoreService(IConfigurationService configService)
         {
@@ -41,7 +45,7 @@ namespace AvaloniaApplication1.Services
                     var config = await _configService.LoadConfigurationAsync();
                     if (config?.Connections == null) return;
 
-                    var allTags = ExtractAllTags(config);
+                    var allTags = ExtractAllTags(config).ToList();
 
                     foreach (var conn in config.Connections)
                     {
@@ -85,21 +89,20 @@ namespace AvaloniaApplication1.Services
 
         public void StartSimulation()
         {
-            if (_cts != null) return;
-            _cts = new CancellationTokenSource();
+            if (_simCts != null) return;
+            _simCts = new CancellationTokenSource();
 
-            var driver = new MockProtocolDriver("mqtt1"); // Primary mock connection ID
+            _backgroundSimulator = new MockProtocolDriver("mqtt1"); // Primary mock connection ID
             
-            _drivers[driver.ConnectionId] = driver;
-            
-            driver.TagUpdates.Subscribe(tag => 
+            _backgroundSimulator.TagUpdates.Subscribe(tag => 
             {
+                _unifiedTagStream.OnNext(tag);
                 var key = $"{tag.ConnId}_{tag.Address}";
                 _currentValuesCache[key] = tag.Value;
-                _unifiedTagStream.OnNext(tag);
+                try { System.IO.File.AppendAllText("tag_updates.log", $"{DateTime.Now:HH:mm:ss.fff} | SIM: {key}={tag.Value}\n"); } catch {}
             });
 
-            _ = driver.StartAsync(_cts.Token);
+            _ = _backgroundSimulator.StartAsync(_simCts.Token);
         }
 
         public void Stop()
@@ -117,7 +120,20 @@ namespace AvaloniaApplication1.Services
             _currentValuesCache.Clear();
         }
 
-        public void StopSimulation() => Stop();
+        public void StopSimulation()
+        {
+            _simCts?.Cancel();
+            _simCts = null;
+            
+            _backgroundSimulator?.StopAsync().Wait();
+            _backgroundSimulator?.Dispose();
+            _backgroundSimulator = null;
+        }
+
+        public void ResetSimulation()
+        {
+            _backgroundSimulator?.ResetSimulation();
+        }
 
         public void WriteCommand(string connId, string address, object value)
         {
@@ -142,6 +158,11 @@ namespace AvaloniaApplication1.Services
         public void Dispose()
         {
             Stop();
+            
+            _simCts?.Cancel();
+            _backgroundSimulator?.StopAsync().Wait();
+            _backgroundSimulator?.Dispose();
+            
             _unifiedTagStream.Dispose();
         }
 
@@ -155,6 +176,13 @@ namespace AvaloniaApplication1.Services
                 foreach (var w in widgets)
                 {
                     if (w.Source != null) list.Add(w.Source);
+
+                    if (w is ValveConfig vc)
+                    {
+                        if (vc.FeedbackSource != null) list.Add(vc.FeedbackSource);
+                        if (vc.ModeSource != null) list.Add(vc.ModeSource);
+                    }
+
                     if (w is ContainerButtonConfig cb && cb.Children != null) Scan(cb.Children);
                 }
             }

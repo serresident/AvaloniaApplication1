@@ -36,8 +36,9 @@ namespace AvaloniaApplication1.Services.Protocols
             {
                 _modbusServerManager.Start(502, 1);
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"MockProtocolDriver caught ModbusServerManager Start error: {ex.Message}");
                 // Port might be in use, ignore for pure mock
             }
 
@@ -63,6 +64,14 @@ namespace AvaloniaApplication1.Services.Protocols
         {
             _modbusServerManager?.Stop();
             return Task.CompletedTask;
+        }
+
+        public void ResetSimulation()
+        {
+            _simulationEngine.ResetTotalizer = true;
+            // Optionally reset internal mock state
+            _zasActualPower = 150.0f;
+            _zasSetpointPower = 200.0f;
         }
 
         public void Dispose()

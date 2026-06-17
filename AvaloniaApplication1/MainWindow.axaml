@@ -47,6 +47,23 @@
                             Background="#008A00"
                             Foreground="White" CornerRadius="4" Padding="10,5"
                             IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+                    <Button Command="{Binding ToggleSimulationCommand}"
+                            Background="{Binding IsSimulationRunning, Converter={StaticResource BoolToColor}}"
+                            Foreground="White" CornerRadius="4" Padding="10,5"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}">
+                        <Button.Content>
+                            <Binding Path="IsSimulationRunning">
+                                <Binding.Converter>
+                                    <c:BoolToStringConverter TrueString="⏹ Stop Sim" FalseString="▶ Start Sim" />
+                                </Binding.Converter>
+                            </Binding>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{Binding ResetSimulationCommand}"
+                            Content="🔄 Reset Sim"
+                            Background="#5A5A5A"
+                            Foreground="White" CornerRadius="4" Padding="10,5"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
                     <Button Command="{Binding ToggleDesignModeCommand}" 
                             Background="{Binding ProjectContext.IsDesignMode, Converter={StaticResource BoolToColor}}" 
                             Foreground="White" CornerRadius="4" Padding="10,5">

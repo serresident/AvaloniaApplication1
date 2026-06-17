@@ -6,6 +6,7 @@ namespace AvaloniaApplication1.Services
     {
         void StartSimulation();
         void StopSimulation();
+        void ResetSimulation();
         
         // Reactive stream for tag updates
         IObservable<Models.TagData> TagUpdates { get; }
