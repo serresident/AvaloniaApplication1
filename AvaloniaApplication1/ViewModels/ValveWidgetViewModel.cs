@@ -7,6 +7,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Linq;
 using Avalonia.Threading;
+using System.Reactive.Linq;
+using System.Reactive.Disposables;
+using ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AvaloniaApplication1.ViewModels
@@ -112,32 +115,35 @@ namespace AvaloniaApplication1.ViewModels
             };
             _alarmTimer.Start();
 
-            DataService.TagValueChanged += OnTagValueChanged;
+            // Set up reactive subscriptions for extra sources
+            var fbSource = OriginalConfig.FeedbackSource;
+            if (fbSource != null && !string.IsNullOrEmpty(fbSource.ConnId) && !string.IsNullOrEmpty(fbSource.Address))
+            {
+                DataService.TagUpdates
+                    .Where(t => t.ConnId == fbSource.ConnId && t.Address == fbSource.Address)
+                    .Sample(TimeSpan.FromMilliseconds(100))
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => UpdateFeedback())
+                    .DisposeWith(Disposables);
+            }
+
+            var modeSrc = OriginalConfig.ModeSource;
+            if (modeSrc != null && !string.IsNullOrEmpty(modeSrc.ConnId) && !string.IsNullOrEmpty(modeSrc.Address))
+            {
+                DataService.TagUpdates
+                    .Where(t => t.ConnId == modeSrc.ConnId && t.Address == modeSrc.Address)
+                    .Sample(TimeSpan.FromMilliseconds(100))
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => UpdateModeState())
+                    .DisposeWith(Disposables);
+            }
+
             UpdateState();
         }
 
-        private void OnTagValueChanged(object? sender, (string ConnId, string Address, object Value) e)
+        protected override void OnTagValueUpdated(object newValue)
         {
-            if (Source != null && e.ConnId == Source.ConnId && e.Address == Source.Address)
-            {
-                Dispatcher.UIThread.Post(UpdateState);
-            }
-
-            // Handle feedback source separately
-            var fbSource = OriginalConfig.FeedbackSource;
-            if (fbSource != null && !string.IsNullOrEmpty(fbSource.Address) &&
-                e.ConnId == fbSource.ConnId && e.Address == fbSource.Address)
-            {
-                Dispatcher.UIThread.Post(UpdateFeedback);
-            }
-
-            // Handle mode source separately
-            var modeSrc = OriginalConfig.ModeSource;
-            if (modeSrc != null && !string.IsNullOrEmpty(modeSrc.Address) &&
-                e.ConnId == modeSrc.ConnId && e.Address == modeSrc.Address)
-            {
-                Dispatcher.UIThread.Post(UpdateModeState);
-            }
+            UpdateState();
         }
 
         private void UpdateState()
@@ -394,7 +400,6 @@ namespace AvaloniaApplication1.ViewModels
         public override void Dispose()
         {
             _alarmTimer.Stop();
-            DataService.TagValueChanged -= OnTagValueChanged;
             base.Dispose();
         }
     }

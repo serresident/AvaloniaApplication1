@@ -7,8 +7,8 @@ namespace AvaloniaApplication1.Services
         void StartSimulation();
         void StopSimulation();
         
-        // Event fired when a simulated tag value changes
-        event EventHandler<(string ConnId, string Address, object Value)>? TagValueChanged;
+        // Reactive stream for tag updates
+        IObservable<Models.TagData> TagUpdates { get; }
         
         // Method for UI to "write" a command back (will just loop back in mock)
         void WriteCommand(string connId, string address, object value);

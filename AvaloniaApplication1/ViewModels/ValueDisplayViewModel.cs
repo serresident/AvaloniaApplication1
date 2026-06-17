@@ -2,7 +2,6 @@ using System;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Avalonia.Threading;
 
 namespace AvaloniaApplication1.ViewModels
 {
@@ -14,26 +13,24 @@ namespace AvaloniaApplication1.ViewModels
         public ValueDisplayViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
-            DataService.TagValueChanged += OnTagValueChanged;
             UpdateDisplayValue();
         }
 
-        private void OnTagValueChanged(object? sender, (string ConnId, string Address, object Value) e)
+        // Rx.NET subscription automatically calls this on the MainThread
+        protected override void OnTagValueUpdated(object newValue)
         {
-            if (Source != null && e.ConnId == Source.ConnId && e.Address == Source.Address)
-            {
-                Dispatcher.UIThread.Post(UpdateDisplayValue);
-            }
+            UpdateDisplayValue(newValue);
         }
 
         public string Format => string.IsNullOrEmpty(OriginalConfig.Format) ? "{0}" : OriginalConfig.Format;
         public string ValueColor => string.IsNullOrEmpty(OriginalConfig.ValueColor) ? "#00FF00" : OriginalConfig.ValueColor;
         public double ValueFontSize => OriginalConfig.ValueFontSize <= 0 ? 28 : OriginalConfig.ValueFontSize;
 
-        private void UpdateDisplayValue()
+        private void UpdateDisplayValue(object? val = null)
         {
             if (Source == null) return;
-            var val = DataService.GetCurrentValue(Source.ConnId, Source.Address);
+            val ??= DataService.GetCurrentValue(Source.ConnId, Source.Address);
+
             if (val != null)
             {
                 try
@@ -49,12 +46,6 @@ namespace AvaloniaApplication1.ViewModels
             {
                 DisplayValue = "---";
             }
-        }
-
-        public override void Dispose()
-        {
-            DataService.TagValueChanged -= OnTagValueChanged;
-            base.Dispose();
         }
     }
 }

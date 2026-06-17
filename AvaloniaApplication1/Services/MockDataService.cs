@@ -7,7 +7,8 @@ namespace AvaloniaApplication1.Services
 {
     public class MockDataService : IMockDataService
     {
-        public event EventHandler<(string ConnId, string Address, object Value)>? TagValueChanged;
+        private readonly System.Reactive.Subjects.Subject<Models.TagData> _tagUpdates = new();
+        public IObservable<Models.TagData> TagUpdates => _tagUpdates;
 
         private readonly ConcurrentDictionary<string, object> _currentValues = new();
         private CancellationTokenSource? _cts;
@@ -63,7 +64,7 @@ namespace AvaloniaApplication1.Services
         {
             var key = $"{connId}_{address}";
             _currentValues[key] = value;
-            TagValueChanged?.Invoke(this, (connId, address, value));
+            _tagUpdates.OnNext(new Models.TagData(connId, address, value));
         }
 
         private async Task SimulationLoop(CancellationToken ct)
@@ -164,7 +165,7 @@ namespace AvaloniaApplication1.Services
         {
             var key = $"{connId}_{address}";
             _currentValues[key] = value;
-            TagValueChanged?.Invoke(this, (connId, address, value));
+            _tagUpdates.OnNext(new Models.TagData(connId, address, value));
         }
     }
 }

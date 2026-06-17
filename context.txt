@@ -1,0 +1,2 @@
+You are working on the AvaloniaApplication1 project.
+CRITICAL AGENT INSTRUCTION: You MUST read the contents of `docs\readme.md` (System Guidelines) and `docs\progress.md` before making any changes. The architectural rules defined in `docs\readme.md` are absolute and must be followed.

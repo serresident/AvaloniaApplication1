@@ -27,16 +27,12 @@ namespace AvaloniaApplication1.ViewModels
         public PumpWidgetViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
-            DataService.TagValueChanged += OnTagValueChanged;
             UpdateState();
         }
 
-        private void OnTagValueChanged(object? sender, (string ConnId, string Address, object Value) e)
+        protected override void OnTagValueUpdated(object newValue)
         {
-            if (Source != null && e.ConnId == Source.ConnId && e.Address == Source.Address)
-            {
-                Dispatcher.UIThread.Post(UpdateState);
-            }
+            UpdateState();
         }
 
         private void UpdateState()
@@ -125,7 +121,6 @@ namespace AvaloniaApplication1.ViewModels
 
         public override void Dispose()
         {
-            DataService.TagValueChanged -= OnTagValueChanged;
             base.Dispose();
         }
     }

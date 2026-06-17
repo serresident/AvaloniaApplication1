@@ -21,8 +21,6 @@ namespace AvaloniaApplication1.ViewModels
         public RealTimeTrendViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
-            DataService.TagValueChanged += OnTagValueChanged;
-            
             // Pre-fill history queue
             double initialVal = 0.0;
             if (Source != null)
@@ -48,12 +46,9 @@ namespace AvaloniaApplication1.ViewModels
             }
         }
 
-        private void OnTagValueChanged(object? sender, (string ConnId, string Address, object Value) e)
+        protected override void OnTagValueUpdated(object newValue)
         {
-            if (Source != null && e.ConnId == Source.ConnId && e.Address == Source.Address)
-            {
-                Dispatcher.UIThread.Post(() => AddValue(e.Value));
-            }
+            AddValue(newValue);
         }
 
         private void AddValue(object valObj)
@@ -89,7 +84,6 @@ namespace AvaloniaApplication1.ViewModels
 
         public override void Dispose()
         {
-            DataService.TagValueChanged -= OnTagValueChanged;
             base.Dispose();
         }
     }

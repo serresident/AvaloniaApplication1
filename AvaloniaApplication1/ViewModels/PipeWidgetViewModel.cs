@@ -139,17 +139,13 @@ namespace AvaloniaApplication1.ViewModels
         public PipeWidgetViewModel(WidgetConfig config, IMockDataService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
         {
-            DataService.TagValueChanged += OnTagValueChanged;
             NormalizePointsAndSize();
             UpdateState();
         }
 
-        private void OnTagValueChanged(object? sender, (string ConnId, string Address, object Value) e)
+        protected override void OnTagValueUpdated(object newValue)
         {
-            if (Source != null && e.ConnId == Source.ConnId && e.Address == Source.Address)
-            {
-                Dispatcher.UIThread.Post(UpdateState);
-            }
+            UpdateState();
         }
 
         public List<Point> GetAbsoluteGridPoints()
@@ -264,7 +260,6 @@ namespace AvaloniaApplication1.ViewModels
 
         public override void Dispose()
         {
-            DataService.TagValueChanged -= OnTagValueChanged;
             base.Dispose();
         }
     }
