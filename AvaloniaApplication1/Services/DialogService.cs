@@ -12,6 +12,8 @@ namespace AvaloniaApplication1.Services
 {
     public class DialogService : IDialogService
     {
+        private double? _lastNumpadX;
+        private double? _lastNumpadY;
         private readonly IDataCoreService _dataCoreService;
         private readonly IProjectContextService _projectContext;
         private readonly IWidgetFactory _widgetFactory;
@@ -38,11 +40,11 @@ namespace AvaloniaApplication1.Services
             
             if (childWindow != null)
             {
-                // Set position relative to the caller if provided
-                if (x.HasValue && y.HasValue)
+                // Use remembered position if available, otherwise default
+                if (_lastNumpadX.HasValue && _lastNumpadY.HasValue)
                 {
-                    childWindow.X = x.Value;
-                    childWindow.Y = y.Value;
+                    childWindow.X = _lastNumpadX.Value;
+                    childWindow.Y = _lastNumpadY.Value;
                 }
                 else
                 {
@@ -57,12 +59,22 @@ namespace AvaloniaApplication1.Services
                 vm.OnConfirm = (val) => 
                 {
                     tcs.TrySetResult(val);
+                    if (childWindow != null)
+                    {
+                        _lastNumpadX = childWindow.X;
+                        _lastNumpadY = childWindow.Y;
+                    }
                     childWindow.CloseCommand.Execute(null);
                 };
                 
                 vm.OnCancel = () => 
                 {
                     tcs.TrySetResult(null);
+                    if (childWindow != null)
+                    {
+                        _lastNumpadX = childWindow.X;
+                        _lastNumpadY = childWindow.Y;
+                    }
                     childWindow.CloseCommand.Execute(null);
                 };
 
@@ -70,6 +82,11 @@ namespace AvaloniaApplication1.Services
                 var originalClose = childWindow.CloseAction;
                 childWindow.CloseAction = () =>
                 {
+                    if (childWindow != null)
+                    {
+                        _lastNumpadX = childWindow.X;
+                        _lastNumpadY = childWindow.Y;
+                    }
                     tcs.TrySetResult(null);
                     originalClose?.Invoke();
                 };

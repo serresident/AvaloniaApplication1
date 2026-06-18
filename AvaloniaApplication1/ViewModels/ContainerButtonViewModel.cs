@@ -13,6 +13,8 @@ namespace AvaloniaApplication1.ViewModels
         public ContainerButtonConfig TypedConfig => (ContainerButtonConfig)OriginalConfig;
 
         private ChildWindowViewModel? _controlWindow;
+        private double? _lastPopupX;
+        private double? _lastPopupY;
         private readonly List<WidgetConfig> _childrenConfig;
         public ContainerButtonViewModel(ContainerButtonConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
             : base(config, dataService, projectContext)
@@ -39,9 +41,20 @@ namespace AvaloniaApplication1.ViewModels
                 _controlWindow = ChildWindowService.OpenChildWindow(Title, (object)dashboardConfig);
                 if (_controlWindow != null)
                 {
+                    if (_lastPopupX.HasValue && _lastPopupY.HasValue)
+                    {
+                        _controlWindow.X = _lastPopupX.Value;
+                        _controlWindow.Y = _lastPopupY.Value;
+                    }
+
                     var originalClose = _controlWindow.CloseAction;
                     _controlWindow.CloseAction = () =>
                     {
+                        if (_controlWindow != null)
+                        {
+                            _lastPopupX = _controlWindow.X;
+                            _lastPopupY = _controlWindow.Y;
+                        }
                         originalClose?.Invoke();
                         _controlWindow = null;
                     };

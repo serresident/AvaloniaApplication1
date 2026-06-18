@@ -341,25 +341,18 @@ namespace AvaloniaApplication1.ViewModels
 
             // Create window frame
             _controlWindow = ChildWindowService?.OpenChildWindow(titleToFind, popupVm);
-            Console.WriteLine($"[ValveWidget] _controlWindow = {_controlWindow != null}");
             if (_controlWindow != null)
             {
                 // Position window
-                if (ProjectContext.IsDesignMode)
+                if (_lastPopupX.HasValue && _lastPopupY.HasValue)
                 {
-                    _controlWindow.X = 100;
-                    _controlWindow.Y = 100;
+                    _controlWindow.X = _lastPopupX.Value;
+                    _controlWindow.Y = _lastPopupY.Value;
                 }
                 else
                 {
-                    double cellWidth = 150;
-                    double cellHeight = 150;
-                    double valveX = Col * cellWidth;
-                    double valveY = Row * cellHeight;
-                    double valveHeight = SizeY * cellHeight;
-                    
-                    _controlWindow.X = valveX;
-                    _controlWindow.Y = valveY + valveHeight + 10;
+                    _controlWindow.X = 100;
+                    _controlWindow.Y = 100;
                 }
 
                 _controlWindow.Content = popupVm;

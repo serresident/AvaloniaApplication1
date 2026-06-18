@@ -27,6 +27,7 @@
             <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
                     <TextBlock Text="HMI Dashboard" Foreground="White" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <TextBlock Text="{Binding ActiveChildWindows.Count, StringFormat='Windows: {0}'}" Foreground="Red" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" />
                     <Button Command="{Binding ShowDashboardCommand}"
                             Content="📊 Дашборд"
                             Background="{Binding IsMimicActive, Converter={StaticResource DashboardTabColor}}"
@@ -90,20 +91,20 @@
             </ContentControl>
 
             <!-- Child Windows Overlay -->
-            <ItemsControl ItemsSource="{Binding ActiveChildWindows}">
+            <ItemsControl ItemsSource="{Binding ActiveChildWindows}" ZIndex="100" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas />
+                        <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
-                <ItemsControl.Styles>
-                    <Style Selector="ItemsControl > ContentPresenter" x:DataType="vm:ChildWindowViewModel">
-                        <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}" />
-                        <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}" />
-                        <Setter Property="ZIndex" Value="{Binding ZIndex, Mode=TwoWay}" />
-                    </Style>
-                </ItemsControl.Styles>
+                <ItemsControl.ItemContainerTheme>
+                    <ControlTheme TargetType="ContentPresenter" x:DataType="vm:ChildWindowViewModel">
+                        <Setter Property="Canvas.Left" Value="{Binding X}" />
+                        <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                        <Setter Property="ZIndex" Value="{Binding ZIndex}" />
+                    </ControlTheme>
+                </ItemsControl.ItemContainerTheme>
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:ChildWindowViewModel}">
@@ -112,8 +113,8 @@
                                 BorderBrush="#4E4E50" 
                                 BorderThickness="2" 
                                 CornerRadius="8" 
-                                Width="{Binding Width, Mode=TwoWay}" 
-                                Height="{Binding Height, Mode=TwoWay}"
+                                Width="{Binding Width}" 
+                                Height="{Binding Height}"
                                 BoxShadow="0 8 24 0 #AA000000"
                                 ClipToBounds="True">
                             <Grid RowDefinitions="Auto,*">
