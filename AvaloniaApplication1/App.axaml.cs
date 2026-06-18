@@ -25,11 +25,13 @@ namespace AvaloniaApplication1
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
 
+            var mainVm = Services.GetRequiredService<MainViewModel>();
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = Services.GetRequiredService<MainViewModel>()
+                    DataContext = mainVm
                 };
             }
 
@@ -58,6 +60,9 @@ namespace AvaloniaApplication1
             
             services.AddSingleton<SimulationService>();
             services.AddSingleton<ISimulationService>(sp => sp.GetRequiredService<SimulationService>());
+            
+            services.AddSingleton<AlarmNotificationService>();
+            services.AddSingleton<IAlarmNotificationService>(sp => sp.GetRequiredService<AlarmNotificationService>());
             
             services.AddSingleton<IDialogService, DialogService>();
 

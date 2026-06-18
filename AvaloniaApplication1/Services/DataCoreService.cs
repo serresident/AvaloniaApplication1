@@ -13,7 +13,7 @@ using AvaloniaApplication1.Services.Protocols;
 
 namespace AvaloniaApplication1.Services
 {
-    public class DataCoreService : IDataCoreService, IDisposable
+    public class DataCoreService : IDataCoreService, IDisposable, IAsyncDisposable
     {
         private readonly IConfigurationService _configService;
         private readonly IProtocolDriverFactory _driverFactory;
@@ -65,7 +65,7 @@ namespace AvaloniaApplication1.Services
                         .DisposeWith(_disposables);
 
                     // Background start
-                    _ = driver.StartAsync(_cts.Token);
+                    driver.StartAsync(_cts.Token).FireAndForget(context: $"Driver.{conn.Id}");
                 }
             }
             catch (Exception ex)
@@ -108,7 +108,8 @@ namespace AvaloniaApplication1.Services
             if (_drivers.TryGetValue(connId, out var driver))
             {
                 // Fire and forget Command Bus
-                _ = Task.Run(() => driver.WriteAsync(address, value, CancellationToken.None));
+                Task.Run(() => driver.WriteAsync(address, value, CancellationToken.None))
+                    .FireAndForget(context: $"WriteCommand.{connId}");
             }
         }
 
@@ -120,8 +121,15 @@ namespace AvaloniaApplication1.Services
 
         public void Dispose()
         {
-            // Fallback for dispose
-            StopAsync().Wait();
+            // Синхронная версия — безопасна только из non-async контекста (финализатор, тесты)
+            _cts?.Cancel();
+            _disposables.Dispose();
+            _unifiedTagStream.Dispose();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await StopAsync();
             _unifiedTagStream.Dispose();
         }
 

@@ -12,31 +12,79 @@ namespace AvaloniaApplication1.Services
 {
     public class DialogService : IDialogService
     {
+        private readonly IDataCoreService _dataCoreService;
+        private readonly IProjectContextService _projectContext;
+        private readonly IWidgetFactory _widgetFactory;
+
+        public DialogService(IDataCoreService dataCoreService, IProjectContextService projectContext, IWidgetFactory widgetFactory)
+        {
+            _dataCoreService = dataCoreService;
+            _projectContext = projectContext;
+            _widgetFactory = widgetFactory;
+        }
+
+        public IChildWindowService? ChildWindowService { get; set; }
+
         private Window? MainWindow => (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
 
-        public async Task<string?> ShowNumpadAsync(string title, string initialValue)
+        public async Task<string?> ShowNumpadAsync(string title, string initialValue, double? x = null, double? y = null)
         {
-            if (MainWindow == null) return null;
+            if (ChildWindowService == null) return null;
+
+            var tcs = new TaskCompletionSource<string?>();
 
             var vm = new NumpadViewModel { InputValue = initialValue };
-            var window = new NumpadWindow
+            var childWindow = ChildWindowService.OpenChildWindow(title, vm);
+            
+            if (childWindow != null)
             {
-                DataContext = vm,
-                Title = title
-            };
+                // Set position relative to the caller if provided
+                if (x.HasValue && y.HasValue)
+                {
+                    childWindow.X = x.Value;
+                    childWindow.Y = y.Value;
+                }
+                else
+                {
+                    childWindow.X = 100;
+                    childWindow.Y = 100;
+                }
+                
+                // Numpad doesn't need to be resizable, lock sizes
+                childWindow.Width = 320;
+                childWindow.Height = 400;
 
-            var result = await window.ShowDialog<string?>(MainWindow);
-            return result;
+                vm.OnConfirm = (val) => 
+                {
+                    tcs.TrySetResult(val);
+                    childWindow.CloseCommand.Execute(null);
+                };
+                
+                vm.OnCancel = () => 
+                {
+                    tcs.TrySetResult(null);
+                    childWindow.CloseCommand.Execute(null);
+                };
+
+                // Handle window close via X button
+                var originalClose = childWindow.CloseAction;
+                childWindow.CloseAction = () =>
+                {
+                    tcs.TrySetResult(null);
+                    originalClose?.Invoke();
+                };
+            }
+            else
+            {
+                return null;
+            }
+
+            return await tcs.Task;
         }
 
         public async Task ShowContainerDashboardAsync(string title, DashboardConfig config)
         {
-            if (MainWindow == null || App.Services == null) return;
-
-            var dataCoreService = App.Services.GetRequiredService<IDataCoreService>();
-            var projectContext = App.Services.GetRequiredService<IProjectContextService>();
-            var dialogService = App.Services.GetRequiredService<IDialogService>();
-            var widgetFactory = App.Services.GetRequiredService<IWidgetFactory>();
+            if (MainWindow == null) return;
             
             // Create a minimal HmiConfiguration for the container context
             var containerConfig = new HmiConfiguration
@@ -47,23 +95,30 @@ namespace AvaloniaApplication1.Services
             
             var dashboardVm = new DashboardViewModel(
                 config, 
-                dataCoreService, 
-                projectContext,
+                _dataCoreService, 
+                _projectContext,
                 containerConfig,
-                dialogService,
-                widgetFactory);
+                this,
+                _widgetFactory);
             
-            var window = new Window
+            try
             {
-                Title = title,
-                Width = 800,
-                Height = 600,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Background = Avalonia.Media.Brush.Parse("#1E1E1E"),
-                Content = new DashboardView { DataContext = dashboardVm }
-            };
+                var window = new Window
+                {
+                    Title = title,
+                    Width = 800,
+                    Height = 600,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Background = Avalonia.Media.Brush.Parse("#1E1E1E"),
+                    Content = new DashboardView { DataContext = dashboardVm }
+                };
 
-            await window.ShowDialog(MainWindow);
+                await window.ShowDialog(MainWindow);
+            }
+            finally
+            {
+                dashboardVm.Dispose();
+            }
         }
 
         // ===== Design Mode Dialogs =====

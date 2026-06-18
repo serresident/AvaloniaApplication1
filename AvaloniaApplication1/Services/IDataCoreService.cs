@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace AvaloniaApplication1.Services
 {
-    public interface IDataCoreService
+    public interface IDataCoreService : IAsyncDisposable
     {
         Task StartAsync();
         Task StopAsync();

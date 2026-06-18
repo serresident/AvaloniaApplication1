@@ -13,6 +13,10 @@ namespace AvaloniaApplication1.ViewModels
         public readonly IDataCoreService DataService;
         protected readonly CompositeDisposable Disposables = new();
 
+        public IAlarmNotificationService? AlarmService { get; set; }
+        public IChildWindowService? ChildWindowService { get; set; }
+        public IDialogService? DialogService { get; set; }
+
         [ObservableProperty]
         private string _type = string.Empty;
 

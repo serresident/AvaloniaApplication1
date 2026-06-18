@@ -8,7 +8,7 @@ using AvaloniaApplication1.Models.Config;
 
 namespace AvaloniaApplication1.Services
 {
-    public class SimulationService : ISimulationService, IDisposable
+    public class SimulationService : ISimulationService, IDisposable, IAsyncDisposable
     {
         private readonly IDataCoreService _dataCore;
         private readonly IConfigurationService _configService;
@@ -41,7 +41,7 @@ namespace AvaloniaApplication1.Services
                     _simSubscriptions.Add(sub);
                     _backgroundSimulators.Add(sim);
 
-                    _ = sim.StartAsync(_simCts.Token);
+                    sim.StartAsync(_simCts.Token).FireAndForget(context: "SimulationService.Start");
                 }
             }
         }
@@ -72,8 +72,13 @@ namespace AvaloniaApplication1.Services
 
         public void Dispose()
         {
-            // Run synchronously for finalizer/dispose path, though ideally we are correctly managed via DI
-            StopSimulationAsync().Wait();
+            _simCts?.Cancel();
+            _simSubscriptions.Dispose();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await StopSimulationAsync();
         }
     }
 }

@@ -10,8 +10,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AvaloniaApplication1.ViewModels
 {
-    public partial class MainViewModel : ViewModelBase
+    public partial class MainViewModel : ViewModelBase, IDisposable, IChildWindowService
     {
+        #region Constants
+        private const int LegacyCellSizeLarge  = 160;
+        private const int LegacyCellSizeSmall  = 20;
+        private const int DefaultMimicCellSize = 10;
+        #endregion
+
         private readonly IConfigurationService _configurationService;
         private readonly IDataCoreService _dataCoreService;
         private readonly ISimulationService _simulationService;
@@ -76,8 +82,19 @@ namespace AvaloniaApplication1.ViewModels
             _widgetFactory = widgetFactory;
             ProjectContext = projectContext;
 
+            if (_widgetFactory is WidgetFactory factory)
+            {
+                factory.ChildWindowService = this;
+                factory.DialogService = _dialogService;
+            }
+            
+            if (_dialogService is AvaloniaApplication1.Services.DialogService ds)
+            {
+                ds.ChildWindowService = this;
+            }
+
             // Load configuration
-            _ = LoadConfigAsync();
+            LoadConfigAsync().FireAndForget(context: "MainViewModel.ctor");
         }
 
         [RelayCommand]
@@ -140,24 +157,21 @@ namespace AvaloniaApplication1.ViewModels
             await _dialogService.ShowConnectionManagerAsync(_currentConfig);
         }
 
-        public ChildWindowViewModel? OpenChildWindow(string title, DashboardConfig config)
-        {
-            if (_currentConfig == null) return null;
-
-            var dashboardVm = new DashboardViewModel(
-                config, 
-                _dataCoreService, 
-                ProjectContext,
-                _currentConfig,
-                _dialogService,
-                _widgetFactory);
-
-            return OpenChildWindow(title, (object)dashboardVm);
-        }
-
         public ChildWindowViewModel? OpenChildWindow(string title, object content)
         {
+            Console.WriteLine($"[MainVM] OpenChildWindow called. title={title}, _currentConfig={_currentConfig != null}, content type={content?.GetType().Name}");
             if (_currentConfig == null) return null;
+
+            if (content is DashboardConfig config)
+            {
+                content = new DashboardViewModel(
+                    config, 
+                    _dataCoreService, 
+                    ProjectContext,
+                    _currentConfig,
+                    _dialogService,
+                    _widgetFactory);
+            }
 
             var childWindow = new ChildWindowViewModel(title, content);
             
@@ -196,9 +210,9 @@ namespace AvaloniaApplication1.ViewModels
                 _currentConfig.Mimic = new DashboardConfig();
             }
 
-            if (_currentConfig.Mimic.CellSize == 160 || _currentConfig.Mimic.CellSize == 0 || _currentConfig.Mimic.CellSize == 20)
+            if (_currentConfig.Mimic.CellSize == LegacyCellSizeLarge || _currentConfig.Mimic.CellSize == 0 || _currentConfig.Mimic.CellSize == LegacyCellSizeSmall)
             {
-                _currentConfig.Mimic.CellSize = 10;
+                _currentConfig.Mimic.CellSize = DefaultMimicCellSize;
             }
 
             _mainDashboard = new DashboardViewModel(
@@ -218,10 +232,20 @@ namespace AvaloniaApplication1.ViewModels
                 _widgetFactory);
 
             // Start background polling for Modbus/MQTT drivers
-            _ = _dataCoreService.StartAsync();
+            _dataCoreService.StartAsync().FireAndForget(context: "MainViewModel.LoadConfig");
 
             Dashboard = _mainDashboard;
             IsMimicActive = false;
+        }
+
+        public void Dispose()
+        {
+            _toastTimer?.Stop();
+            _mainDashboard?.Dispose();
+            _mimicDashboard?.Dispose();
+            foreach (var cw in ActiveChildWindows)
+                (cw.Content as IDisposable)?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

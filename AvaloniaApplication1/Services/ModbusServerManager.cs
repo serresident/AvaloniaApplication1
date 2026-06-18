@@ -61,7 +61,7 @@ namespace AvaloniaApplication1.Services
 
                 _cts = new CancellationTokenSource();
                 // NModbus v3 requires calling ListenAsync to accept connections in the background
-                _ = _slaveNetwork.ListenAsync(_cts.Token);
+                _slaveNetwork.ListenAsync(_cts.Token).FireAndForget(context: "ModbusServerManager");
 
                 IsRunning = true;
             }

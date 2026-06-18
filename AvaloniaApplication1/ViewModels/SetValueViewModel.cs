@@ -62,10 +62,13 @@ namespace AvaloniaApplication1.ViewModels
         {
             if (ProjectContext.IsDesignMode) return;
 
-            var dialogService = App.Services?.GetService(typeof(IDialogService)) as IDialogService;
-            if (dialogService == null) return;
+            if (DialogService == null) return;
 
-            var result = await dialogService.ShowNumpadAsync(Title, RawValue.ToString("G"));
+            // Estimate coordinates (bottom right of the caller widget)
+            double x = (Col * 150) + 100;
+            double y = (Row * 150) + 100;
+
+            var result = await DialogService.ShowNumpadAsync(Title, RawValue.ToString("G"), x, y);
             if (result != null && double.TryParse(result, out double parsedVal))
             {
                 // Clamp the value to configured Min/Max

@@ -5,29 +5,18 @@ using AvaloniaApplication1.ViewModels;
 
 namespace AvaloniaApplication1.Views
 {
-    public partial class NumpadWindow : Window
+    public partial class NumpadView : UserControl
     {
-        public NumpadWindow()
+        public NumpadView()
         {
             InitializeComponent();
+            Focusable = true;
         }
 
-        protected override void OnDataContextChanged(EventArgs e)
+        protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
         {
-            base.OnDataContextChanged(e);
-            
-            if (DataContext is NumpadViewModel vm)
-            {
-                vm.OnConfirm = (val) => 
-                {
-                    Close(val);
-                };
-                
-                vm.OnCancel = () => 
-                {
-                    Close(null);
-                };
-            }
+            base.OnAttachedToVisualTree(e);
+            this.Focus();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

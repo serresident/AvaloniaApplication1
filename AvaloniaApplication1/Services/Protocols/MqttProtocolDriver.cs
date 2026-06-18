@@ -60,7 +60,7 @@ namespace AvaloniaApplication1.Services.Protocols
             };
 
             // Reconnection loop
-            _ = Task.Run(async () =>
+            Task.Run(async () =>
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
@@ -86,7 +86,7 @@ namespace AvaloniaApplication1.Services.Protocols
 
                     await Task.Delay(5000, cancellationToken);
                 }
-            }, cancellationToken);
+            }, cancellationToken).FireAndForget(context: "MqttProtocolDriver");
         }
 
         public async Task WriteAsync(string address, object value, CancellationToken cancellationToken)

@@ -43,7 +43,7 @@ namespace AvaloniaApplication1.Services.Protocols
             }
 
             // 3. Start background mock loop
-            _ = Task.Run(() => MockLoop(cancellationToken), cancellationToken);
+            Task.Run(() => MockLoop(cancellationToken), cancellationToken).FireAndForget(context: "MockProtocolDriver");
 
             return Task.CompletedTask;
         }
@@ -56,7 +56,7 @@ namespace AvaloniaApplication1.Services.Protocols
                 _zasSetpointPower = fVal;
             }
 
-            _tagUpdates.OnNext(new TagData(ConnectionId, address, value));
+            _tagUpdates.OnNext(new TagData(ConnectionId, address, value ?? new object()));
             return Task.CompletedTask;
         }
 

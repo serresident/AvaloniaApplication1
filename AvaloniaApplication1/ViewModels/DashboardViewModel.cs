@@ -9,7 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AvaloniaApplication1.ViewModels
 {
-    public partial class DashboardViewModel : ViewModelBase
+    public partial class DashboardViewModel : ViewModelBase, IDisposable
     {
         private readonly IDataCoreService _mockDataService;
         private readonly IDialogService? _dialogService;
@@ -300,6 +300,16 @@ namespace AvaloniaApplication1.ViewModels
         private bool ArePointsClose(Avalonia.Point p1, Avalonia.Point p2)
         {
             return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2)) <= 1.1;
+        }
+
+        public void Dispose()
+        {
+            foreach (var widget in Widgets)
+            {
+                widget.PropertyChanged -= OnWidgetPropertyChanged;
+                widget.Dispose();
+            }
+            Widgets.Clear();
         }
     }
 }

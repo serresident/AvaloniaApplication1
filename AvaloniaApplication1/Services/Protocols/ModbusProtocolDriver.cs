@@ -35,7 +35,7 @@ namespace AvaloniaApplication1.Services.Protocols
         public Task StartAsync(CancellationToken cancellationToken)
         {
             // Start the polling loop in the background
-            _ = Task.Run(() => PollModbusLoop(cancellationToken), cancellationToken);
+            Task.Run(() => PollModbusLoop(cancellationToken), cancellationToken).FireAndForget(context: "ModbusProtocolDriver");
             return Task.CompletedTask;
         }
 

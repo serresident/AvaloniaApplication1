@@ -69,14 +69,9 @@ namespace AvaloniaApplication1.ViewModels
         {
             if (ProjectContext.IsDesignMode || Source == null) return;
 
-            var mainVm = App.Services?.GetService<MainViewModel>();
-            if (mainVm == null) return;
-
-            var titleToFind = $"{Title} [Control]";
-            var existing = mainVm.ActiveChildWindows.FirstOrDefault(w => w.Title == titleToFind);
-            if (existing != null)
+            if (_controlWindow != null)
             {
-                existing.CloseAction?.Invoke();
+                _controlWindow.CloseAction?.Invoke();
                 _controlWindow = null;
                 return;
             }
@@ -109,7 +104,7 @@ namespace AvaloniaApplication1.ViewModels
                 Widgets = widgets
             };
 
-            _controlWindow = mainVm.OpenChildWindow($"{Title} [Control]", dashboardConfig);
+            _controlWindow = ChildWindowService?.OpenChildWindow($"{Title} [Control]", (object)dashboardConfig);
             if (_controlWindow != null)
             {
                 var originalClose = _controlWindow.CloseAction;

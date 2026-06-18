@@ -16,6 +16,16 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class ValveWidgetViewModel : WidgetViewModelBase
     {
+        #region Constants
+        private const int RegulatingWindowWidth  = 450;
+        private const int CutOffWindowWidth      = 340;
+        private const int KeypadExtraWidth       = 190;
+        private const int RegulatingWindowHeight = 400;
+        private const int CutOffWindowHeight     = 350;
+        private const double DefaultTolerance    = 10.0;
+        private const int AlarmFlashIntervalMs   = 500;
+        #endregion
+
         public ValveConfig TypedConfig => (ValveConfig)OriginalConfig;
 
         [ObservableProperty]
@@ -63,6 +73,19 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _isAlarmFlashing;
 
+        partial void OnIsAlarmFlashingChanged(bool value)
+        {
+            if (value)
+            {
+                _alarmTimer?.Start();
+            }
+            else
+            {
+                _alarmTimer?.Stop();
+                IsAlarmFlashState = false;
+            }
+        }
+
         [ObservableProperty]
         private bool _isAlarmFlashState;
 
@@ -93,7 +116,7 @@ namespace AvaloniaApplication1.ViewModels
 
             // Load new config values
             Rotation = config.Rotation;
-            Tolerance = config.Tolerance == 0 ? 10.0 : config.Tolerance;
+            Tolerance = config.Tolerance == 0 ? DefaultTolerance : config.Tolerance;
             AlarmDisabled = config.AlarmDisabled;
 
             // Initialize Mode
@@ -102,20 +125,15 @@ namespace AvaloniaApplication1.ViewModels
             // Set up 500ms alarm flashing timer
             _alarmTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(500)
+                Interval = TimeSpan.FromMilliseconds(AlarmFlashIntervalMs)
             };
             _alarmTimer.Tick += (s, e) =>
             {
-                if (IsAlarmFlashing)
-                {
-                    IsAlarmFlashState = !IsAlarmFlashState;
-                }
-                else
-                {
-                    IsAlarmFlashState = false;
-                }
+                IsAlarmFlashState = !IsAlarmFlashState;
             };
-            _alarmTimer.Start();
+            
+            if (IsAlarmFlashing)
+                _alarmTimer.Start();
 
             // Set up reactive subscriptions for extra sources
             var fbSource = TypedConfig.FeedbackSource;
@@ -161,9 +179,7 @@ namespace AvaloniaApplication1.ViewModels
             {
                 if (!IsRegulating)
                 {
-                    if (val is bool b) IsOpen = b;
-                    else if (val is int i) IsOpen = i > 0;
-                    else if (double.TryParse(val.ToString(), out double num)) IsOpen = num > 0;
+                    IsOpen = TagValueConverter.ToBool(val);
                     
                     DisplayValue = IsOpen ? "ОТКРЫТ" : "ЗАКРЫТ";
                     CurrentColor = IsOpen ? ActiveColor : InactiveColor;
@@ -171,13 +187,11 @@ namespace AvaloniaApplication1.ViewModels
                 }
                 else // Regulating
                 {
-                    if (double.TryParse(val.ToString(), out double dVal))
-                    {
-                        CurrentValue = dVal;
-                        Setpoint = Math.Clamp(dVal, 0, 100);
-                        DisplayValue = $"{CurrentValue:F1} %";
-                        CurrentColor = CurrentValue > 0 ? ActiveColor : InactiveColor;
-                    }
+                    double dVal = TagValueConverter.ToDouble(val);
+                    CurrentValue = dVal;
+                    Setpoint = Math.Clamp(dVal, 0, 100);
+                    DisplayValue = $"{CurrentValue:F1} %";
+                    CurrentColor = CurrentValue > 0 ? ActiveColor : InactiveColor;
                 }
             }
             else
@@ -210,16 +224,12 @@ namespace AvaloniaApplication1.ViewModels
             {
                 if (IsRegulating)
                 {
-                    if (double.TryParse(fbVal.ToString(), out double dFb))
-                    {
-                        Feedback = Math.Clamp(dFb, 0, 100);
-                    }
+                    double dFb = TagValueConverter.ToDouble(fbVal);
+                    Feedback = Math.Clamp(dFb, 0, 100);
                 }
                 else // CutOff
                 {
-                    if (fbVal is bool b) IsOpen = b;
-                    else if (fbVal is int i) IsOpen = i > 0;
-                    else if (double.TryParse(fbVal.ToString(), out double num)) IsOpen = num > 0;
+                    IsOpen = TagValueConverter.ToBool(fbVal);
                     Feedback = IsOpen ? 100 : 0;
                 }
             }
@@ -240,9 +250,7 @@ namespace AvaloniaApplication1.ViewModels
             if (mVal != null)
             {
                 // auto = true, manual = false
-                if (mVal is bool b) IsManualMode = !b;
-                else if (mVal is int i) IsManualMode = (i == 0);
-                else if (double.TryParse(mVal.ToString(), out double num)) IsManualMode = (num == 0);
+                IsManualMode = !TagValueConverter.ToBool(mVal);
             }
             else
             {
@@ -300,14 +308,10 @@ namespace AvaloniaApplication1.ViewModels
                 _wasAlarmActive = true;
                 if (!AlarmDisabled)
                 {
-                    var mainVm = App.Services?.GetService<MainViewModel>();
-                    if (mainVm != null)
-                    {
-                        string ctrlStr = IsRegulating ? $"{Setpoint:F0}%" : (Setpoint > 0 ? "ОТКРЫТ" : "ЗАКРЫТ");
-                        string fbStr = IsRegulating ? $"{Feedback:F0}%" : (IsOpen ? "ОТКРЫТ" : "ЗАКРЫТ");
-                        
-                        mainVm.ShowToast($"Ошибка рассогласования [{Title}]: управление = {ctrlStr}, обратная связь = {fbStr}");
-                    }
+                    string ctrlStr = IsRegulating ? $"{Setpoint:F0}%" : (Setpoint > 0 ? "ОТКРЫТ" : "ЗАКРЫТ");
+                    string fbStr = IsRegulating ? $"{Feedback:F0}%" : (IsOpen ? "ОТКРЫТ" : "ЗАКРЫТ");
+                    
+                    AlarmService?.ShowAlarm($"Ошибка рассогласования [{Title}]", $"управление = {ctrlStr}, обратная связь = {fbStr}");
                 }
             }
             else if (!IsAlarmActive)
@@ -321,50 +325,49 @@ namespace AvaloniaApplication1.ViewModels
         [RelayCommand]
         private void OpenControlPopup()
         {
+            Console.WriteLine($"[ValveWidget] OpenControlPopup called. IsDesignMode={ProjectContext.IsDesignMode}, Source={Source?.Address}, ChildWindowService={ChildWindowService != null}");
             if (ProjectContext.IsDesignMode || Source == null) return;
 
-            var mainVm = App.Services?.GetService<MainViewModel>();
-            if (mainVm == null) return;
-
-            var titleToFind = $"Управление клапаном {Title}";
-            var existing = mainVm.ActiveChildWindows.FirstOrDefault(w => w.Title == titleToFind);
-            if (existing != null)
+            if (_controlWindow != null)
             {
-                existing.CloseCommand.Execute(null);
+                _controlWindow.CloseCommand.Execute(null);
                 _controlWindow = null;
                 return;
             }
 
+            var titleToFind = $"Управление клапаном {Title}";
+            ValveControlPopupViewModel? popupVm = null;
+            popupVm = new ValveControlPopupViewModel(this, () => _controlWindow?.CloseCommand.Execute(null));
+
             // Create window frame
-            _controlWindow = mainVm.OpenChildWindow(titleToFind, new object());
+            _controlWindow = ChildWindowService?.OpenChildWindow(titleToFind, popupVm);
+            Console.WriteLine($"[ValveWidget] _controlWindow = {_controlWindow != null}");
             if (_controlWindow != null)
             {
                 // Position window
-                if (_lastPopupX.HasValue && _lastPopupY.HasValue)
+                if (ProjectContext.IsDesignMode)
                 {
-                    _controlWindow.X = _lastPopupX.Value;
-                    _controlWindow.Y = _lastPopupY.Value;
+                    _controlWindow.X = 100;
+                    _controlWindow.Y = 100;
                 }
                 else
                 {
-                    double cellWidth = mainVm.Dashboard?.CellWidth ?? 150;
-                    double cellHeight = mainVm.Dashboard?.CellHeight ?? 150;
+                    double cellWidth = 150;
+                    double cellHeight = 150;
                     double valveX = Col * cellWidth;
                     double valveY = Row * cellHeight;
                     double valveHeight = SizeY * cellHeight;
-
-                    _controlWindow.X = Math.Max(10, valveX - 80);
-                    _controlWindow.Y = Math.Max(10, valveY + valveHeight + 10);
+                    
+                    _controlWindow.X = valveX;
+                    _controlWindow.Y = valveY + valveHeight + 10;
                 }
 
-                // Instantiate Popup VM and link to window Content
-                var popupVm = new ValveControlPopupViewModel(this, () => _controlWindow?.CloseCommand.Execute(null));
                 _controlWindow.Content = popupVm;
 
                 // Adjust width dynamically
-                int baseWidth = IsRegulating ? 450 : 340;
-                _controlWindow.Width = popupVm.IsKeypadVisible ? (baseWidth + 190) : baseWidth;
-                _controlWindow.Height = IsRegulating ? 400 : 350;
+                int baseWidth = IsRegulating ? RegulatingWindowWidth : CutOffWindowWidth;
+                _controlWindow.Width = popupVm.IsKeypadVisible ? (baseWidth + KeypadExtraWidth) : baseWidth;
+                _controlWindow.Height = IsRegulating ? RegulatingWindowHeight : CutOffWindowHeight;
 
                 var originalClose = _controlWindow.CloseAction;
                 _controlWindow.CloseAction = () =>
@@ -385,8 +388,8 @@ namespace AvaloniaApplication1.ViewModels
                 {
                     if (e.PropertyName == nameof(ValveControlPopupViewModel.IsKeypadVisible) && _controlWindow != null)
                     {
-                        int currentBase = IsRegulating ? 450 : 340;
-                        _controlWindow.Width = popupVm.IsKeypadVisible ? (currentBase + 190) : currentBase;
+                        int currentBase = IsRegulating ? RegulatingWindowWidth : CutOffWindowWidth;
+                        _controlWindow.Width = popupVm.IsKeypadVisible ? (currentBase + KeypadExtraWidth) : currentBase;
                     }
                 };
             }

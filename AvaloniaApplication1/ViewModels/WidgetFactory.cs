@@ -8,16 +8,21 @@ namespace AvaloniaApplication1.ViewModels
     {
         private readonly IDataCoreService _dataService;
         private readonly IProjectContextService _projectContext;
+        private readonly IAlarmNotificationService _alarmService;
+        public IChildWindowService? ChildWindowService { get; set; }
+        public IDialogService? DialogService { get; set; }
 
-        public WidgetFactory(IDataCoreService dataService, IProjectContextService projectContext)
+        public WidgetFactory(IDataCoreService dataService, IProjectContextService projectContext,
+            IAlarmNotificationService alarmService)
         {
             _dataService = dataService;
             _projectContext = projectContext;
+            _alarmService = alarmService;
         }
 
         public WidgetViewModelBase CreateWidgetViewModel(WidgetConfig config)
         {
-            return config switch
+            WidgetViewModelBase vm = config switch
             {
                 ValueDisplayConfig c => new ValueDisplayViewModel(c, _dataService, _projectContext),
                 PilotLightConfig c => new PilotLightViewModel(c, _dataService, _projectContext),
@@ -32,6 +37,12 @@ namespace AvaloniaApplication1.ViewModels
                 PumpConfig c => new PumpWidgetViewModel(c, _dataService, _projectContext),
                 _ => throw new ArgumentException($"Unknown widget config type: {config.GetType().Name}")
             };
+
+            vm.AlarmService = _alarmService;
+            vm.ChildWindowService = ChildWindowService;
+            vm.DialogService = DialogService;
+
+            return vm;
         }
     }
 }

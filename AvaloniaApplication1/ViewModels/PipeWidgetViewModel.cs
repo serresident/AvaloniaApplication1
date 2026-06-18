@@ -208,11 +208,7 @@ namespace AvaloniaApplication1.ViewModels
             bool active = false;
             if (val != null)
             {
-                if (val is bool b) active = b;
-                else if (val is int i) active = i > 0;
-                else if (val is float f) active = f > 0;
-                else if (val is double d) active = d > 0;
-                else if (double.TryParse(val.ToString(), out double dVal)) active = dVal > 0;
+                active = TagValueConverter.ToBool(val);
             }
 
             UpdateNetworkState(active);

@@ -6,7 +6,7 @@ namespace AvaloniaApplication1.Services
 {
     public interface IDialogService
     {
-        Task<string?> ShowNumpadAsync(string title, string initialValue);
+        Task<string?> ShowNumpadAsync(string title, string initialValue, double? x = null, double? y = null);
         Task ShowContainerDashboardAsync(string title, DashboardConfig config);
 
         // Design Mode dialogs
