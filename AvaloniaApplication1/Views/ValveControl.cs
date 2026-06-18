@@ -212,8 +212,15 @@ namespace AvaloniaApplication1.Views
             double h = Bounds.Height;
             if (w < 6 || h < 6) return;
 
-            // Center of the control
-            var center = new Point(w / 2, h / 2);
+            double availableH = h;
+            bool willShowFeedback = string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase) && HasFeedbackSource && ShowFeedbackBar;
+            if (willShowFeedback)
+            {
+                availableH -= 18; // Reserve 18 pixels at the bottom for the feedback bar
+            }
+
+            // Center of the valve portion
+            var center = new Point(w / 2, availableH / 2);
 
             // Compute angle from Rotation (0, 90, 180, 270)
             int finalRotation = Rotation;
@@ -230,11 +237,11 @@ namespace AvaloniaApplication1.Views
 
             // Inside rotated coordinate space, we draw as if it's horizontal.
             bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
-            double flowSize = isFlowVertical ? h : w;
+            double flowSize = isFlowVertical ? availableH : w;
             double crossSize = Thickness * 2.0;
 
             double cx = w / 2;
-            double cy = h / 2;
+            double cy = availableH / 2;
 
             // Parse configured colors
             Color activeCol = ParseHexColor(ActiveColor);
@@ -308,10 +315,10 @@ namespace AvaloniaApplication1.Views
             rotationTransform.Dispose();
 
             // 6. Draw Feedback Bar outside of the rotation (at the bottom) if enabled
-            if (string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase) && HasFeedbackSource && ShowFeedbackBar)
+            if (willShowFeedback)
             {
                 double feedback = Math.Clamp(Feedback, 0, 100);
-                DrawFeedbackBar(context, w, h - 16, 14, feedback, activeCol, greyCol);
+                DrawFeedbackBar(context, w, availableH + 2, 14, feedback, activeCol, greyCol);
             }
 
             // 7. Draw Flashing Alarm Border around final bounds (not rotated)
