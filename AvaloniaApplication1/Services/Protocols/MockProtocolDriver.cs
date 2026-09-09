@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,7 +52,7 @@ namespace AvaloniaApplication1.Services.Protocols
         public Task WriteAsync(string address, object value, CancellationToken cancellationToken)
         {
             // In mock mode, writing simply echoes the value back as the new state
-            if (address == "gMqt/ZAS/ZAS_Setpoint_Power" && float.TryParse(value?.ToString(), out float fVal))
+            if (address == "gMqt/ZAS/ZAS_Setpoint_Power" && float.TryParse(value?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out float fVal))
             {
                 _zasSetpointPower = fVal;
             }

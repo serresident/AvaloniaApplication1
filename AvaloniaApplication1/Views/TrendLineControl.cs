@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -127,7 +128,7 @@ namespace AvaloniaApplication1.Views
                 {
                     if (item is double d) valList.Add(d);
                     else if (item is float f) valList.Add(f);
-                    else if (item != null && double.TryParse(item.ToString(), out double parsed)) valList.Add(parsed);
+                    else if (item != null && double.TryParse(item.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed)) valList.Add(parsed);
                 }
             }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -48,11 +49,11 @@ namespace AvaloniaApplication1.Services.Protocols
                 // and let the view model handle it. For now, doing a basic heuristic or returning float/bool.
                 
                 object parsedVal = payload;
-                if (payload == "1" || payload.ToLower() == "true")
+                if (payload == "1" || payload.Equals("true", StringComparison.OrdinalIgnoreCase))
                     parsedVal = true;
-                else if (payload == "0" || payload.ToLower() == "false")
+                else if (payload == "0" || payload.Equals("false", StringComparison.OrdinalIgnoreCase))
                     parsedVal = false;
-                else if (float.TryParse(payload, out float fVal)) 
+                else if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float fVal)) 
                     parsedVal = fVal;
 
                 _tagUpdates.OnNext(new TagData(ConnectionId, topic, parsedVal));

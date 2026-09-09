@@ -48,9 +48,7 @@ namespace AvaloniaApplication1.ViewModels
             var val = DataService.GetCurrentValue(Source.ConnId, Source.Address);
             if (val != null)
             {
-                if (val is bool b) IsRunning = b;
-                else if (val is int i) IsRunning = i > 0;
-                else if (double.TryParse(val.ToString(), out double num)) IsRunning = num > 0;
+                IsRunning = TagValueConverter.ToBool(val);
 
                 DisplayValue = IsRunning ? "RUNNING" : "STOPPED";
                 CurrentColor = IsRunning ? ActiveColor : InactiveColor;

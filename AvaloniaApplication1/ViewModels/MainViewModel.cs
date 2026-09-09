@@ -179,6 +179,7 @@ namespace AvaloniaApplication1.ViewModels
             childWindow.CloseAction = () =>
             {
                 ActiveChildWindows.Remove(childWindow);
+                childWindow.Dispose();
                 originalClose?.Invoke();
             };
 
@@ -244,7 +245,8 @@ namespace AvaloniaApplication1.ViewModels
             _mainDashboard?.Dispose();
             _mimicDashboard?.Dispose();
             foreach (var cw in ActiveChildWindows)
-                (cw.Content as IDisposable)?.Dispose();
+                cw.Dispose();
+            ActiveChildWindows.Clear();
             GC.SuppressFinalize(this);
         }
     }

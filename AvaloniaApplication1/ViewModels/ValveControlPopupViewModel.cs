@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -66,7 +67,7 @@ namespace AvaloniaApplication1.ViewModels
                 // true = Auto, false = Manual
                 if (modeVal is bool b) IsManualMode = !b;
                 else if (modeVal is int i) IsManualMode = (i == 0);
-                else if (double.TryParse(modeVal?.ToString(), out double num)) IsManualMode = (num == 0);
+                else if (double.TryParse(modeVal?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double num)) IsManualMode = (num == 0);
                 else IsManualMode = true;
             }
             else
@@ -217,7 +218,7 @@ namespace AvaloniaApplication1.ViewModels
                 }
             }
 
-            if (double.TryParse(currentText, out double val))
+            if (double.TryParse(currentText, NumberStyles.Float, CultureInfo.InvariantCulture, out double val))
             {
                 if (val <= 100)
                 {
@@ -242,7 +243,7 @@ namespace AvaloniaApplication1.ViewModels
                 SetpointInputText = "0";
             }
 
-            if (double.TryParse(SetpointInputText, out double val))
+            if (double.TryParse(SetpointInputText, NumberStyles.Float, CultureInfo.InvariantCulture, out double val))
             {
                 TempSetpoint = val;
             }

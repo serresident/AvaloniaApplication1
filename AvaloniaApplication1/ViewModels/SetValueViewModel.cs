@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
@@ -64,8 +65,8 @@ namespace AvaloniaApplication1.ViewModels
 
             if (DialogService == null) return;
 
-            var result = await DialogService.ShowNumpadAsync(Title, RawValue.ToString("G"), null, null);
-            if (result != null && double.TryParse(result, out double parsedVal))
+            var result = await DialogService.ShowNumpadAsync(Title, RawValue.ToString("G", CultureInfo.InvariantCulture), null, null);
+            if (result != null && double.TryParse(result, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsedVal))
             {
                 // Clamp the value to configured Min/Max
                 parsedVal = Math.Clamp(parsedVal, MinValue, MaxValue);
@@ -102,7 +103,7 @@ namespace AvaloniaApplication1.ViewModels
             if (valObj is short s) { result = s; return true; }
             if (valObj is ushort us) { result = us; return true; }
             if (valObj is uint ui) { result = ui; return true; }
-            return double.TryParse(valObj.ToString(), out result);
+            return double.TryParse(valObj.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
         public override void Dispose()

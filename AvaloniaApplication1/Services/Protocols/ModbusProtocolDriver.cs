@@ -54,12 +54,12 @@ namespace AvaloniaApplication1.Services.Protocols
 
                 if (fc == 1 || fc == 2)
                 {
-                    bool bVal = value is bool b ? b : (double.TryParse(value.ToString(), out double num) && num > 0);
+                    bool bVal = TagValueConverter.ToBool(value);
                     await master.WriteSingleCoilAsync(slaveId, offset, bVal);
                 }
                 else
                 {
-                    double dVal = double.Parse(value.ToString() ?? "0");
+                    double dVal = TagValueConverter.ToDouble(value);
                     var tag = _tagsToPoll.FirstOrDefault(t => t.Address == address);
                     string dataType = tag?.DataType ?? "Float32";
 

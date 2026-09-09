@@ -91,6 +91,18 @@
   - [x] Добавить привязку `IsEditingVertices` и кнопки включения/выключения режима в контекстное меню в `DashboardView.axaml`
   - [x] Проверить сборку проекта и выполнить верификацию
 
+# Tasks: Code Review Fixes & MDI Lifecycle (Сессия 12 — Выполнено)
 
-
-
+- [x] Культуронезависимый парсинг чисел и строк (IFormatProvider & NumberStyles):
+  - [x] `TagValueConverter.cs`: обновить `ToBool` и `ToDouble` на `CultureInfo.InvariantCulture` и `OrdinalIgnoreCase`
+  - [x] `MqttProtocolDriver.cs`: культуронезависимый парсинг вещественного payload и безопасное сравнение булевых строк
+  - [x] `ModbusProtocolDriver.cs`: заменить прямой `double.Parse` на `TagValueConverter.ToDouble` для предотвращения `FormatException`
+  - [x] `MockProtocolDriver.cs`: парсинг `ZAS_Setpoint_Power` через `CultureInfo.InvariantCulture`
+  - [x] `TrendLineControl.cs`: парсинг элементов коллекции точек с `NumberStyles.Float` и `CultureInfo.InvariantCulture`
+  - [x] `PumpWidgetViewModel.cs`: унификация разбора значения через `TagValueConverter.ToBool`
+  - [x] `SetValueViewModel.cs`, `TankWidgetViewModel.cs`, `RealTimeTrendViewModel.cs`, `ValveControlPopupViewModel.cs`: передача `CultureInfo.InvariantCulture` и `NumberStyles.Float`
+- [x] Устранение утечки памяти и подписок MDI-окон (Lifecycle & Disposables):
+  - [x] `ChildWindowViewModel.cs`: реализовать интерфейс `IDisposable`, утилизировать `Content as IDisposable` и очистить `CloseAction`
+  - [x] `MainViewModel.cs`: вызывать `childWindow.Dispose()` в обработчике закрытия окна `CloseAction`
+  - [x] `MainViewModel.cs`: утилизировать все активные окна в `Dispose()`
+- [x] Проверить сборку проекта и устранить предупреждения

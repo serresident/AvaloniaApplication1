@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -68,7 +69,7 @@ namespace AvaloniaApplication1.ViewModels
                 }
                 catch
                 {
-                    LatestValueDisplay = dVal.ToString("F2");
+                    LatestValueDisplay = dVal.ToString("F2", CultureInfo.InvariantCulture);
                 }
             }
         }
@@ -81,7 +82,7 @@ namespace AvaloniaApplication1.ViewModels
             if (valObj is short s) { result = s; return true; }
             if (valObj is ushort us) { result = us; return true; }
             if (valObj is uint ui) { result = ui; return true; }
-            return double.TryParse(valObj.ToString(), out result);
+            return double.TryParse(valObj.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
         public override void Dispose()

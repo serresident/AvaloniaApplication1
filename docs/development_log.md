@@ -164,3 +164,24 @@
 *   **Изменение ТЗ:** Утвержден Кодекс разработки как обязательный закон проектирования, рефакторинга и создания кода для любого ИИ-агента в проекте.
 *   **Следующие шаги:** Исправление выявленных в ходе код-ревью замечаний (культуронезависимый парсинг, утилизация ресурсов) и реализация модуля IoT-ретрансляции (Modbus $\leftrightarrow$ MQTT Bridge).
 
+---
+
+## 📅 09.09.2026 (Сессия 12 — Устранение критических замечаний Код-Ревью согласно Кодексу)
+
+### 📌 Достижение: Культуронезависимый парсинг телеметрии и корректный жизненный цикл MDI-окон
+*   **Культуронезависимый парсинг (`CultureInfo.InvariantCulture`, `NumberStyles.Float`):**
+    *   `TagValueConverter.cs`: в `ToBool` и `ToDouble` задействован `CultureInfo.InvariantCulture`, строковые сравнения переведены на `StringComparison.OrdinalIgnoreCase` (без аллокаций `ToLower()`).
+    *   `MqttProtocolDriver.cs`: устранен критический баг парсинга float из MQTT payload на машинах с русской локалью Windows (`45.5` распознавалось как строка вместо числа). Сравнение "true"/"false" переведено на `OrdinalIgnoreCase`.
+    *   `ModbusProtocolDriver.cs`: устранен опасный вызов `double.Parse(value.ToString() ?? "0")` без провайдера культуры (вызывавший `FormatException` при отправке команд управления в русской локали). Переведен на безопасный `TagValueConverter.ToDouble`.
+    *   `MockProtocolDriver.cs`: приведен к `CultureInfo.InvariantCulture` при эмуляции записи уставок.
+    *   `TrendLineControl.cs`: парсинг коллекций `Values` переведен на `NumberStyles.Float` и `CultureInfo.InvariantCulture`.
+    *   `PumpWidgetViewModel.cs`: логика парсинга дискретных сигналов унифицирована через `TagValueConverter.ToBool`.
+    *   `SetValueViewModel.cs`, `TankWidgetViewModel.cs`, `RealTimeTrendViewModel.cs`, `ValveControlPopupViewModel.cs`: устранены локалезависимые `TryParse` и `ToString()`, внедрены явные `NumberStyles.Float` и `CultureInfo.InvariantCulture`.
+*   **Устранение утечки памяти MDI-окон (Lifecycle & Disposables):**
+    *   `ChildWindowViewModel.cs`: реализован интерфейс `IDisposable`, освобождающий контент окна (`(Content as IDisposable)?.Dispose()`) и обнуляющий делегат `CloseAction`.
+    *   `MainViewModel.cs`: в колбэк закрытия окна `childWindow.CloseAction` внедрен вызов `childWindow.Dispose()`, гарантирующий отписку от `TagUpdates` в Rx.NET при закрытии окон оператором в UI.
+    *   `MainViewModel.Dispose()`: обеспечена полная очистка и утилизация всех активных окон `ActiveChildWindows`.
+*   **Сборка и верификация:** 
+    *   Проект успешно собирается (`dotnet build --no-restore` завершен с `0 ошибок`).
+
+

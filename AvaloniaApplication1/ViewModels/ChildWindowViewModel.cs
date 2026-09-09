@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AvaloniaApplication1.ViewModels
 {
-    public partial class ChildWindowViewModel : ViewModelBase
+    public partial class ChildWindowViewModel : ViewModelBase, IDisposable
     {
         [ObservableProperty]
         private string _title = string.Empty;
@@ -93,6 +93,13 @@ namespace AvaloniaApplication1.ViewModels
 
             Width = newWidth;
             Height = newHeight;
+        }
+
+        public void Dispose()
+        {
+            (Content as IDisposable)?.Dispose();
+            CloseAction = null;
+            GC.SuppressFinalize(this);
         }
     }
 }
