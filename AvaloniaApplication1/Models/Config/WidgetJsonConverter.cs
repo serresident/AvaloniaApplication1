@@ -36,6 +36,9 @@ namespace AvaloniaApplication1.Models.Config
                 "Valve" => JsonSerializer.Deserialize<ValveConfig>(doc.RootElement.GetRawText(), deserializeOptions),
                 "Tank" => JsonSerializer.Deserialize<TankConfig>(doc.RootElement.GetRawText(), deserializeOptions),
                 "Pump" => JsonSerializer.Deserialize<PumpConfig>(doc.RootElement.GetRawText(), deserializeOptions),
+                "HeatExchanger" => JsonSerializer.Deserialize<HeatExchangerConfig>(doc.RootElement.GetRawText(), deserializeOptions),
+                "Reactor" => JsonSerializer.Deserialize<ReactorConfig>(doc.RootElement.GetRawText(), deserializeOptions),
+                "LevelSensor" => JsonSerializer.Deserialize<LevelSensorConfig>(doc.RootElement.GetRawText(), deserializeOptions),
                 _ => JsonSerializer.Deserialize<WidgetConfigBase>(doc.RootElement.GetRawText(), deserializeOptions) // Fallback
             };
 

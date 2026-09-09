@@ -59,6 +59,50 @@ namespace AvaloniaApplication1.Views.DashboardPanelHelpers
             return null;
         }
 
+        public static HeatExchangerControl? FindHeatExchangerControlRecursive(Control control)
+        {
+            if (control is HeatExchangerControl he) return he;
+            if (control is Panel panel)
+            {
+                foreach (var child in panel.Children)
+                {
+                    var res = FindHeatExchangerControlRecursive(child);
+                    if (res != null) return res;
+                }
+            }
+            else if (control is ContentControl cc && cc.Content is Control contentControl)
+            {
+                return FindHeatExchangerControlRecursive(contentControl);
+            }
+            else if (control is ContentPresenter cp && cp.Child is Control childControl)
+            {
+                return FindHeatExchangerControlRecursive(childControl);
+            }
+            return null;
+        }
+
+        public static ReactorControl? FindReactorControlRecursive(Control control)
+        {
+            if (control is ReactorControl reactor) return reactor;
+            if (control is Panel panel)
+            {
+                foreach (var child in panel.Children)
+                {
+                    var res = FindReactorControlRecursive(child);
+                    if (res != null) return res;
+                }
+            }
+            else if (control is ContentControl cc && cc.Content is Control contentControl)
+            {
+                return FindReactorControlRecursive(contentControl);
+            }
+            else if (control is ContentPresenter cp && cp.Child is Control childControl)
+            {
+                return FindReactorControlRecursive(childControl);
+            }
+            return null;
+        }
+
         public static Viewbox? FindViewboxRecursive(Control control)
         {
             if (control is Viewbox viewbox) return viewbox;
@@ -273,6 +317,22 @@ namespace AvaloniaApplication1.Views.DashboardPanelHelpers
                     var p2Grid = isFlowVertical ? new Point(gridCx, gridCy + halfFlowGrid) : new Point(gridCx + halfFlowGrid, gridCy);
                     return (p1Grid, p2Grid);
                 }
+            }
+            else if (string.Equals(vm.Type, "HeatExchanger", StringComparison.OrdinalIgnoreCase))
+            {
+                // Port 1: Верхний левый патрубок (Hot In)
+                var p1Grid = new Point(col + sizeX * 0.22, row);
+                // Port 2: Нижний правый патрубок (Hot Out)
+                var p2Grid = new Point(col + sizeX * 0.78, row + sizeY);
+                return (p1Grid, p2Grid);
+            }
+            else if (string.Equals(vm.Type, "Reactor", StringComparison.OrdinalIgnoreCase))
+            {
+                // Port 1: Верхний загрузочный штуцер
+                var p1Grid = new Point(col + sizeX * 0.2, row);
+                // Port 2: Нижний сливной штуцер
+                var p2Grid = new Point(col + sizeX * 0.5, row + sizeY);
+                return (p1Grid, p2Grid);
             }
 
             return (fallbackP1, fallbackP2);

@@ -510,7 +510,9 @@ namespace AvaloniaApplication1.Views
                             _connectedPipePoints.Clear();
                             bool isValve = string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
                             bool isPump = string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
-                            if (isValve || isPump)
+                            bool isExchanger = string.Equals(vm.Type, "HeatExchanger", StringComparison.OrdinalIgnoreCase);
+                            bool isReactor = string.Equals(vm.Type, "Reactor", StringComparison.OrdinalIgnoreCase);
+                            if (isValve || isPump || isExchanger || isReactor)
                             {
                                 var (p1, p2) = VisualPortHelper.GetVisualPortsInGrid(child, vm, this);
 
@@ -659,7 +661,9 @@ namespace AvaloniaApplication1.Views
                                 if (child == _gridOverlay || child == _selectionOverlay) continue;
                                 if (child.DataContext is WidgetViewModelBase widgetVm && 
                                     (string.Equals(widgetVm.Type, "Valve", StringComparison.OrdinalIgnoreCase) ||
-                                     string.Equals(widgetVm.Type, "Pump", StringComparison.OrdinalIgnoreCase)))
+                                     string.Equals(widgetVm.Type, "Pump", StringComparison.OrdinalIgnoreCase) ||
+                                     string.Equals(widgetVm.Type, "HeatExchanger", StringComparison.OrdinalIgnoreCase) ||
+                                     string.Equals(widgetVm.Type, "Reactor", StringComparison.OrdinalIgnoreCase)))
                                 {
                                     var (p1, p2) = VisualPortHelper.GetVisualPortsInGrid(child, widgetVm, this);
 

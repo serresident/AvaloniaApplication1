@@ -315,7 +315,9 @@
                                             <Separator />
                                             <MenuItem Header="Редактировать вершины" Command="{Binding ToggleEditingVerticesCommand}" IsVisible="{Binding !IsEditingVertices}" />
                                             <MenuItem Header="Завершить редактирование" Command="{Binding ToggleEditingVerticesCommand}" IsVisible="{Binding IsEditingVertices}" />
-                                           <Separator />
+                                            <Separator />
+                                            <MenuItem Header="Автотрассировка (под 90°)" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.AutoRoutePipeCommand}" CommandParameter="{Binding}" />
+                                            <Separator /><Separator />
                                        </ContextMenu>
                                    </Border.ContextMenu>
                                    <Grid ClipToBounds="False">
@@ -462,6 +464,141 @@
 
                                <!-- Design Overlay -->
                                <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
+                                   <Border.ContextMenu>
+                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
+                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                       </ContextMenu>
+                                   </Border.ContextMenu>
+                                   <Grid ClipToBounds="False">
+                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                                   </Grid>
+                               </Border>
+                           </Grid>
+                       </DataTemplate>
+
+                       <!-- HeatExchanger (Теплообменник) -->
+                       <DataTemplate DataType="{x:Type vm:HeatExchangerWidgetViewModel}">
+                           <Grid ClipToBounds="False">
+                               <Border Background="#24262B" BorderBrush="#3E424B" BorderThickness="1.5" CornerRadius="8" Margin="3">
+                                   <Grid RowDefinitions="Auto,*,Auto">
+                                       <TextBlock Grid.Row="0" Text="{Binding Title}" Foreground="LightGray" FontSize="12" HorizontalAlignment="Center" Margin="0,4,0,2" />
+                                       <v:HeatExchangerControl Grid.Row="1"
+                                                              ExchangerType="{Binding ExchangerType}"
+                                                              PrimaryTemp="{Binding PrimaryTemp}"
+                                                              SecondaryTemp="{Binding SecondaryTemp}"
+                                                              ActiveColor="{Binding ActiveColor}"
+                                                              InactiveColor="{Binding InactiveColor}"
+                                                              ShowFlanges="{Binding ShowFlanges}"
+                                                              Margin="6,2" />
+                                       <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,2,0,4">
+                                           <TextBlock Text="{Binding DisplayValue}" FontSize="12" FontWeight="Bold" Foreground="{Binding ActiveColor, Converter={StaticResource HexToBrush}}" />
+                                           <TextBlock Text="{Binding SecondaryTemp, StringFormat=\{0:F1\} °C}" FontSize="11" Foreground="#FFA500" />
+                                       </StackPanel>
+                                   </Grid>
+                               </Border>
+
+                               <!-- Design Overlay -->
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
+                                   <Border.ContextMenu>
+                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
+                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                       </ContextMenu>
+                                   </Border.ContextMenu>
+                                   <Grid ClipToBounds="False">
+                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                                   </Grid>
+                               </Border>
+                           </Grid>
+                       </DataTemplate>
+
+                       <!-- Reactor (Реактор с мешалкой) -->
+                       <DataTemplate DataType="{x:Type vm:ReactorWidgetViewModel}">
+                           <Grid ClipToBounds="False">
+                               <Button Command="{Binding ToggleAgitatorCommand}"
+                                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                       Background="Transparent" BorderThickness="0" Padding="0">
+                                   <Border Background="#24262B" BorderBrush="#3E424B" BorderThickness="1.5" CornerRadius="8" Margin="3">
+                                       <Grid RowDefinitions="Auto,*,Auto">
+                                           <TextBlock Grid.Row="0" Text="{Binding Title}" Foreground="LightGray" FontSize="12" HorizontalAlignment="Center" Margin="0,4,0,2" />
+                                           <v:ReactorControl Grid.Row="1"
+                                                            Level="{Binding CurrentLevel}"
+                                                            Temperature="{Binding Temperature}"
+                                                            IsAgitatorRunning="{Binding IsAgitatorRunning}"
+                                                            HasJacket="{Binding HasJacket}"
+                                                            ActiveColor="{Binding ActiveColor}"
+                                                            InactiveColor="{Binding InactiveColor}"
+                                                            Margin="6,2" />
+                                           <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,2,0,4">
+                                               <TextBlock Text="{Binding DisplayValue}" FontSize="12" FontWeight="Bold" Foreground="{Binding ActiveColor, Converter={StaticResource HexToBrush}}" />
+                                               <TextBlock Text="{Binding Temperature, StringFormat=\{0:F1\} °C}" FontSize="11" Foreground="#FFA500" />
+                                           </StackPanel>
+                                       </Grid>
+                                   </Border>
+                               </Button>
+
+                               <!-- Design Overlay -->
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
+                                   <Border.ContextMenu>
+                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
+                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
+                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
+                                           <Separator />
+                                       </ContextMenu>
+                                   </Border.ContextMenu>
+                                   <Grid ClipToBounds="False">
+                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                                   </Grid>
+                               </Border>
+                           </Grid>
+                       </DataTemplate>
+
+                       <!-- LevelSensor (Датчик уровня LT) -->
+                       <DataTemplate DataType="{x:Type vm:LevelSensorWidgetViewModel}">
+                           <Grid ClipToBounds="False">
+                               <Border Background="#24262B" BorderBrush="#3E424B" BorderThickness="1.5" CornerRadius="8" Margin="3">
+                                   <Grid RowDefinitions="Auto,*,Auto">
+                                       <TextBlock Grid.Row="0" Text="{Binding Title}" Foreground="LightGray" FontSize="12" HorizontalAlignment="Center" Margin="0,4,0,2" />
+                                       <v:LevelSensorControl Grid.Row="1"
+                                                            Value="{Binding CurrentValue}"
+                                                            TagNumber="{Binding TagNumber}"
+                                                            SensorType="{Binding SensorType}"
+                                                            Unit="{Binding Unit}"
+                                                            MinValue="{Binding MinValue}"
+                                                            MaxValue="{Binding MaxValue}"
+                                                            AlarmHigh="{Binding AlarmHigh}"
+                                                            AlarmLow="{Binding AlarmLow}"
+                                                            Margin="4,2" />
+                                       <TextBlock Grid.Row="2" Text="{Binding DisplayValue}" FontSize="12" FontWeight="Bold" Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}" HorizontalAlignment="Center" Margin="0,2,0,4" />
+                                   </Grid>
+                               </Border>
+
+                               <!-- Design Overlay -->
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
                                    <Border.ContextMenu>
                                        <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
                                            <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />

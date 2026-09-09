@@ -35,6 +35,9 @@ namespace AvaloniaApplication1.ViewModels
                 ValveConfig c => new ValveWidgetViewModel(c, _dataService, _projectContext),
                 TankConfig c => new TankWidgetViewModel(c, _dataService, _projectContext),
                 PumpConfig c => new PumpWidgetViewModel(c, _dataService, _projectContext),
+                HeatExchangerConfig c => new HeatExchangerWidgetViewModel(c, _dataService, _projectContext),
+                ReactorConfig c => new ReactorWidgetViewModel(c, _dataService, _projectContext),
+                LevelSensorConfig c => new LevelSensorWidgetViewModel(c, _dataService, _projectContext),
                 _ => throw new ArgumentException($"Unknown widget config type: {config.GetType().Name}")
             };
 

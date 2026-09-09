@@ -135,9 +135,30 @@
   - [x] Проверка локалезависимости и кроссплатформенности
   - [x] Аудит логирования и обработки исключений
 - [x] Сформировать детальный аналитический отчет с оценками и динамикой улучшений
-- [ ] Запланировать следующие инженерные задачи (Phase 3):
-  - [ ] Подключение `Microsoft.Extensions.Logging` и миграция `Console.WriteLine` на `ILogger`
-  - [ ] Культуронезависимый payload в `MqttProtocolDriver.WriteAsync`
-  - [ ] Zero-Allocation оптимизация в `PipeControl.Render`, `GridOverlay.Render` и `SelectionOverlay.Render`
-  - [ ] Ликвидация пустых блоков `catch { }` в `ModbusServerManager.cs` и `MockProtocolDriver.cs`
-  - [ ] Создание проекта модульных тестов `AvaloniaApplication1.Tests`
+
+# Tasks: SCADA Mimic Evolution & MQTT Fix (Сессия 15 — Выполнено)
+
+- [x] Исправление культуронезависимости в `MqttProtocolDriver.WriteAsync`:
+  - [x] Форматирование уставки через `IFormattable` / `CultureInfo.InvariantCulture`
+- [x] Создание алгоритма автотрассировки труб `PipeAutoRouter.cs`:
+  - [x] Ортогональный A* Manhattan маршрутизатор с штрафом за изгибы (90° bends) и обходом препятствий
+  - [x] Удаление коллинеарных промежуточных точек `SimplifyCollinearPoints`
+  - [x] Команда `AutoRoutePipeCommand` в `DashboardViewModel`
+  - [x] Кнопка в контекстном меню трубы в `DashboardView.axaml`
+- [x] Разработка новых промышленных аппаратов SCADA:
+  - [x] **Теплообменник (`HeatExchanger`)**:
+    - [x] `HeatExchangerConfig` в `HmiConfiguration.cs` и десериализатор в `WidgetJsonConverter.cs`
+    - [x] `HeatExchangerControl.cs` с кожухотрубным/пластинчатым рендерингом и фланцами
+    - [x] `HeatExchangerWidgetViewModel.cs` с поддержкой первичного и вторичного контуров
+  - [x] **Реактор с мешалкой (`Reactor`)**:
+    - [x] `ReactorConfig` в `HmiConfiguration.cs`
+    - [x] `ReactorControl.cs` с рубашкой обогрева/охлаждения и анимированным импеллером (~30 FPS)
+    - [x] `ReactorWidgetViewModel.cs` с командами управления мешалкой
+  - [x] **Датчик уровня (`LevelSensor`)**:
+    - [x] `LevelSensorConfig` в `HmiConfiguration.cs`
+    - [x] `LevelSensorControl.cs` со стандартом ISA 5.1 (символ LT), волноводом и аварийными зонами
+    - [x] `LevelSensorWidgetViewModel.cs` с отслеживанием уставок Hi/Lo
+- [x] Поддержка портов прилипания и «резиновых связей» в `VisualPortHelper.cs` и `DashboardPanel.cs`
+- [x] Интеграция в фабрику `WidgetFactory.cs`, редактор `WidgetEditorViewModel.cs` и разметку `DashboardView.axaml`
+- [x] Обновление демонстрационной мнемосхемы в `config.json`
+- [x] Успешная сборка (0 ошибок, 0 предупреждений) и запуск приложения

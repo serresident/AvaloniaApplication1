@@ -12,7 +12,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public static class WidgetTypes
     {
-        public static readonly string[] All = { "ValueDisplay", "PilotLight", "CommandButton", "Slider", "ContainerButton", "SetValue", "RealTimeTrend", "Pipe", "Valve", "Tank", "Pump" };
+        public static readonly string[] All = { "ValueDisplay", "PilotLight", "CommandButton", "Slider", "ContainerButton", "SetValue", "RealTimeTrend", "Pipe", "Valve", "Tank", "Pump", "HeatExchanger", "Reactor", "LevelSensor" };
     }
 
     public static class DataTypes

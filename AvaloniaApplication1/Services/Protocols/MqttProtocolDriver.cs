@@ -94,11 +94,12 @@ namespace AvaloniaApplication1.Services.Protocols
         {
             if (_mqttClient == null || !_mqttClient.IsConnected) return;
 
-            string payload = value.ToString() ?? "";
-            if (value is bool b)
+            string payload = value switch
             {
-                payload = b ? "true" : "false";
-            }
+                bool b => b ? "true" : "false",
+                IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+                _ => value?.ToString() ?? ""
+            };
 
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(address)

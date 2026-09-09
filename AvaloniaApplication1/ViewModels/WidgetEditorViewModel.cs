@@ -199,6 +199,9 @@ namespace AvaloniaApplication1.ViewModels
                 if (existingConfig is ValveConfig vc) { SelectedValveType = vc.ValveType; ActiveColor = vc.ActiveColor; InactiveColor = vc.InactiveColor; FeedbackConnectionId = vc.FeedbackSource?.ConnId; FeedbackAddress = vc.FeedbackSource?.Address ?? string.Empty; IsVertical = vc.IsVertical; SelectedActuatorType = vc.ActuatorType; SelectedRotation = vc.Rotation; Tolerance = vc.Tolerance; ModeConnectionId = vc.ModeSource?.ConnId; ModeAddress = vc.ModeSource?.Address ?? string.Empty; }
                 if (existingConfig is TankConfig tc) { Format = tc.Format; MinValue = tc.MinValue; MaxValue = tc.MaxValue; ValueColor = tc.ValueColor; ValueFontSize = tc.ValueFontSize; }
                 if (existingConfig is PumpConfig pu) { ActiveColor = pu.ActiveColor; InactiveColor = pu.InactiveColor; ControlWindowWidth = pu.ControlWindowWidth; ControlWindowHeight = pu.ControlWindowHeight; }
+                if (existingConfig is HeatExchangerConfig he) { Format = he.Format; ActiveColor = he.ActiveColor; InactiveColor = he.InactiveColor; ShowFlanges = he.ShowFlanges; }
+                if (existingConfig is ReactorConfig re) { Format = re.Format; MinValue = re.MinValue; MaxValue = re.MaxValue; ActiveColor = re.ActiveColor; InactiveColor = re.InactiveColor; }
+                if (existingConfig is LevelSensorConfig ls) { Format = ls.Format; MinValue = ls.MinValue; MaxValue = ls.MaxValue; ValueColor = ls.ValueColor; }
             }
             else
             {
@@ -219,6 +222,21 @@ namespace AvaloniaApplication1.ViewModels
                 case "Pump":
                     SizeX = 6;
                     SizeY = 6;
+                    break;
+                case "HeatExchanger":
+                    SizeX = 14;
+                    SizeY = 8;
+                    ValueColor = "#00FFCC";
+                    break;
+                case "Reactor":
+                    SizeX = 14;
+                    SizeY = 20;
+                    ValueColor = "#00FF00";
+                    break;
+                case "LevelSensor":
+                    SizeX = 6;
+                    SizeY = 10;
+                    ValueColor = "#00B4FF";
                     break;
                 case "Tank":
                     SizeX = 12;
@@ -272,13 +290,13 @@ namespace AvaloniaApplication1.ViewModels
 
         private void UpdateVisibility()
         {
-            ShowValueDisplaySettings = SelectedWidgetType == "ValueDisplay" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "Tank";
+            ShowValueDisplaySettings = SelectedWidgetType == "ValueDisplay" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "Tank" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor" || SelectedWidgetType == "LevelSensor";
             ShowCommandButtonSettings = SelectedWidgetType == "CommandButton";
-            ShowSliderSettings = SelectedWidgetType == "Slider" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "RealTimeTrend" || SelectedWidgetType == "Tank";
+            ShowSliderSettings = SelectedWidgetType == "Slider" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "RealTimeTrend" || SelectedWidgetType == "Tank" || SelectedWidgetType == "Reactor" || SelectedWidgetType == "LevelSensor";
             ShowPilotLightSettings = SelectedWidgetType == "PilotLight";
             ShowPipeSettings = SelectedWidgetType == "Pipe";
             ShowValveSettings = SelectedWidgetType == "Valve";
-            ShowIndustrialSettings = SelectedWidgetType == "Pipe" || SelectedWidgetType == "Valve" || SelectedWidgetType == "Pump";
+            ShowIndustrialSettings = SelectedWidgetType == "Pipe" || SelectedWidgetType == "Valve" || SelectedWidgetType == "Pump" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor";
             ShowRegulatingSettings = SelectedWidgetType == "Valve";
         }
 
@@ -321,6 +339,9 @@ namespace AvaloniaApplication1.ViewModels
                 },
                 "Tank" => new TankConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
                 "Pump" => new PumpConfig { ActiveColor = ActiveColor, InactiveColor = InactiveColor, ControlWindowWidth = ControlWindowWidth, ControlWindowHeight = ControlWindowHeight },
+                "HeatExchanger" => new HeatExchangerConfig { ExchangerType = "ShellAndTube", Format = Format, ActiveColor = ActiveColor, InactiveColor = InactiveColor, ShowFlanges = ShowFlanges },
+                "Reactor" => new ReactorConfig { MinValue = MinValue, MaxValue = MaxValue, Format = Format, HasJacket = true, ActiveColor = ActiveColor, InactiveColor = InactiveColor },
+                "LevelSensor" => new LevelSensorConfig { SensorType = "Radar", TagNumber = Title, Unit = "%", Format = Format, MinValue = MinValue, MaxValue = MaxValue, AlarmHigh = 90, AlarmLow = 10, ValueColor = ValueColor },
                 "ContainerButton" => new ContainerButtonConfig(),
                 _ => new WidgetConfigBase()
             };

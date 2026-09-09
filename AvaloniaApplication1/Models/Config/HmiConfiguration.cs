@@ -148,6 +148,41 @@ namespace AvaloniaApplication1.Models.Config
         public double ControlWindowHeight { get; set; } = 0;
     }
 
+    public class HeatExchangerConfig : WidgetConfig
+    {
+        public string ExchangerType { get; set; } = "ShellAndTube"; // ShellAndTube | Plate
+        public DataSourceConfig? SecondarySource { get; set; }
+        public string Format { get; set; } = "{0:F1} °C";
+        public string ActiveColor { get; set; } = "#00FFCC";
+        public string InactiveColor { get; set; } = "#777777";
+        public bool ShowFlanges { get; set; } = true;
+    }
+
+    public class ReactorConfig : WidgetConfig
+    {
+        public DataSourceConfig? AgitatorSource { get; set; }
+        public DataSourceConfig? TempSource { get; set; }
+        public double MinValue { get; set; } = 0;
+        public double MaxValue { get; set; } = 100;
+        public string Format { get; set; } = "{0:F1} %";
+        public bool HasJacket { get; set; } = true;
+        public string ActiveColor { get; set; } = "#00FF00";
+        public string InactiveColor { get; set; } = "#555555";
+    }
+
+    public class LevelSensorConfig : WidgetConfig
+    {
+        public string SensorType { get; set; } = "Radar"; // Radar | Ultrasonic | Hydrostatic
+        public string TagNumber { get; set; } = "LT-101";
+        public string Unit { get; set; } = "%";
+        public string Format { get; set; } = "{0:F1}";
+        public double MinValue { get; set; } = 0;
+        public double MaxValue { get; set; } = 100;
+        public double AlarmHigh { get; set; } = 90;
+        public double AlarmLow { get; set; } = 10;
+        public string ValueColor { get; set; } = "#FFFFFF";
+    }
+
     public class DataSourceConfig
     {
         public string ConnId { get; set; } = string.Empty;

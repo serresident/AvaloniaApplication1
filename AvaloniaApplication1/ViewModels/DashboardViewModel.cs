@@ -135,6 +135,30 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         [RelayCommand]
+        private void AutoRoutePipe(PipeWidgetViewModel? pipe)
+        {
+            if (pipe == null) return;
+            var absPoints = pipe.GetAbsoluteGridPoints();
+            if (absPoints.Count < 2) return;
+
+            var start = absPoints.First();
+            var end = absPoints.Last();
+
+            // Препятствия: остальные аппараты мнемосхемы
+            var obstacles = Widgets
+                .Where(w => w != pipe && !(w is PipeWidgetViewModel))
+                .Select(w => new Avalonia.Rect(w.Col, w.Row, w.SizeX, w.SizeY));
+
+            var routed = PipeAutoRouter.FindOrthogonalRoute(start, end, obstacles);
+            if (routed.Count >= 2)
+            {
+                pipe.PipePoints = PipeAutoRouter.PointsToPipeString(routed);
+                pipe.NormalizePointsAndSize();
+                ResolvePipeConnections();
+            }
+        }
+
+        [RelayCommand]
         private async Task AddWidgetAsync()
         {
             if (_dialogService == null) return;
