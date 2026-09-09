@@ -17,6 +17,21 @@
 
 ---
 
+## 📜 Кодекс Разработки Проекта (Senior C# / .NET / Avalonia Architect)
+
+Вся разработка, рефакторинг и расширение кодовой базы строго подчиняются **[Кодексу разработки проекта](docs/agent.md)** (также доступен в правилах агента [.agents/rules/agent.md](.agents/rules/agent.md) и [AGENTS.md](AGENTS.md)).
+
+### Главные архитектурные принципы:
+1. **Clean Architecture & SOLID:** Четкое разделение ответственности (`Domain`, `Application`, `Infrastructure`, `Presentation`). ViewModel не работает напрямую с сетью/протоколами; Protocol Drivers изолированы от UI.
+2. **Dependency Injection:** Внедрение зависимостей через конструктор. Запрещен скрытый Service Locator (`App.Services` / `IServiceProvider.GetService`).
+3. **Реактивные потоки (Rx.NET):** Использование `IObservable<T>` для высокочастотной телеметрии вместо обычных `event`. Защита UI-потока через `MainThreadScheduler` и ограничение частоты (`Sample`, `Throttle`, `DistinctUntilChanged`).
+4. **Управление памятью (IDisposable):** Обязательное освобождение всех подписок через `CompositeDisposable` / `DisposeWith`. Запрет «висячих» подписок в долгоживущих сервисах и ViewModel.
+5. **Avalonia MVVM & Compiled Bindings:** Обязательное использование `CompiledBindings="True"` и `x:DataType`. Code-behind (`.axaml.cs`) содержит исключительно инфраструктурную логику контролов/рендеринга без бизнес-логики.
+6. **Асинхронность:** Исключительно `async/await` с обязательной передачей `CancellationToken`. Категорический запрет блокировок (`.Result`, `.Wait()`) и неконтролируемого fire-and-forget.
+7. **Правило минимального изменения:** Исправления и доработки должны быть точечными, архитектурно чистыми и не создавать избыточного техдолга.
+
+---
+
 ## 🏗 Архитектура Проекта (Layers & Directories)
 
 Структура исходного кода разделена на логические уровни в соответствии с MVVM:
