@@ -106,3 +106,21 @@
   - [x] `MainViewModel.cs`: вызывать `childWindow.Dispose()` в обработчике закрытия окна `CloseAction`
   - [x] `MainViewModel.cs`: утилизировать все активные окна в `Dispose()`
 - [x] Проверить сборку проекта и устранить предупреждения
+
+# Tasks: Code Review Stage 2 — Compiler Warnings, Render Allocations & DashboardPanel Decomposition (Сессия 13 — Выполнено)
+
+- [x] Устранение предупреждений компилятора (CS8602, CS8604, NU1603):
+  - [x] `DialogService.cs`: устранить разыменование вероятной пустой ссылки через локальную переменную `targetWindow`
+  - [x] `MainViewModel.cs`: устранить передачу `content` (CS8604) через валидацию и локальную переменную `windowContent`
+  - [x] `AvaloniaApplication1.csproj`: обновить `MQTTnet` до `4.3.6.1152`
+- [x] Оптимизация аллокаций в Render (Custom Controls Zero-Allocation):
+  - [x] `TrendLineControl.cs`: статическое кэширование перьев/кистей (`GridPen`, `DefaultLinePen`, `DefaultAreaBrush`) и переиспользование списков `_valList`, `_points`
+  - [x] `ValveControl.cs`: статическое кэширование перьев и кистей (`ValveBorderPen`, `BoxOutlinePen`, `CenterTrianglePen`, `RedAlarmBorderPen`, `BlackAlarmPen`, `FlangeBrush`, `FlangePen`, `FeedbackBarBgBrush`, `FeedbackBarBgPen`)
+- [x] Изоляция Code-Behind (Раздел 7.3 Кодекса):
+  - [x] `DashboardViewModel.cs`: добавить метод `AdjustZoom(delta)` с инкапсулированным `Math.Clamp`
+  - [x] `DashboardView.axaml.cs`: вызывать `viewModel.AdjustZoom(delta)` вместо прямой мутации состояния из UI-события
+- [x] Декомпозиция God Object `DashboardPanel.cs` (Разделы 1.1, 2.1 Кодекса):
+  - [x] Создать вспомогательный класс `Views/DashboardPanelHelpers/VisualPortHelper.cs`
+  - [x] Вынести рекурсивные методы обхода визуального дерева и геометрический расчет портов прилипания («резиновых связей»)
+  - [x] Разгрузить `DashboardPanel.cs` почти на 300 строк кода
+- [x] Проверить сборку проекта и прогнать тесты

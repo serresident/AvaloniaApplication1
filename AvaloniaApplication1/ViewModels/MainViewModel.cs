@@ -159,12 +159,14 @@ namespace AvaloniaApplication1.ViewModels
 
         public ChildWindowViewModel? OpenChildWindow(string title, object content)
         {
-            Console.WriteLine($"[MainVM] OpenChildWindow called. title={title}, _currentConfig={_currentConfig != null}, content type={content?.GetType().Name}");
+            if (content == null) return null;
+            Console.WriteLine($"[MainVM] OpenChildWindow called. title={title}, _currentConfig={_currentConfig != null}, content type={content.GetType().Name}");
             if (_currentConfig == null) return null;
 
+            object windowContent = content;
             if (content is DashboardConfig config)
             {
-                content = new DashboardViewModel(
+                windowContent = new DashboardViewModel(
                     config, 
                     _dataCoreService, 
                     ProjectContext,
@@ -173,7 +175,7 @@ namespace AvaloniaApplication1.ViewModels
                     _widgetFactory);
             }
 
-            var childWindow = new ChildWindowViewModel(title, content);
+            var childWindow = new ChildWindowViewModel(title, windowContent);
             
             var originalClose = childWindow.CloseAction;
             childWindow.CloseAction = () =>

@@ -286,7 +286,7 @@ namespace AvaloniaApplication1.Views
                 if (DataContext is ViewModels.DashboardViewModel viewModel && viewModel.ProjectContext.IsDesignMode)
                 {
                     double delta = e.Delta.Y > 0 ? 0.1 : -0.1;
-                    viewModel.ZoomScale = Math.Clamp(viewModel.ZoomScale + delta, 0.5, 3.0);
+                    viewModel.AdjustZoom(delta);
                     e.Handled = true;
                 }
             }

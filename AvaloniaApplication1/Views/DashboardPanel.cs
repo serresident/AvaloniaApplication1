@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using AvaloniaApplication1.ViewModels;
+using AvaloniaApplication1.Views.DashboardPanelHelpers;
 
 namespace AvaloniaApplication1.Views
 {
@@ -371,7 +372,7 @@ namespace AvaloniaApplication1.Views
                 {
                     if (!pipeVm.IsEditingVertices) continue;
 
-                    var pipeControl = FindPipeControlRecursive(child);
+                    var pipeControl = VisualPortHelper.FindPipeControlRecursive(child);
                     if (pipeControl != null)
                     {
                         var gridPoints = pipeVm.GetAbsoluteGridPoints();
@@ -418,7 +419,7 @@ namespace AvaloniaApplication1.Views
                     {
                         if (!pipeVm.IsEditingVertices) continue;
 
-                        var pipeControl = FindPipeControlRecursive(child);
+                        var pipeControl = VisualPortHelper.FindPipeControlRecursive(child);
                         if (pipeControl != null)
                         {
                             var gridPoints = pipeVm.GetAbsoluteGridPoints();
@@ -467,7 +468,7 @@ namespace AvaloniaApplication1.Views
                         // Правый клик (ПКМ) — выделяем виджет и программно открываем контекстное меню
                         if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
                         {
-                            var dragHandle = FindDragHandleRecursive(child);
+                            var dragHandle = VisualPortHelper.FindDragHandleRecursive(child);
                             if (dragHandle != null && dragHandle.ContextMenu != null)
                             {
                                 dragHandle.ContextMenu.PlacementTarget = dragHandle;
@@ -495,7 +496,7 @@ namespace AvaloniaApplication1.Views
                             e.Handled = true;
                             return;
                         }
-                        else if (IsDragHandle(e.Source))
+                        else if (VisualPortHelper.IsDragHandle(e.Source))
                         {
                             _dragChild = child;
                             _dragVm = vm;
@@ -511,7 +512,7 @@ namespace AvaloniaApplication1.Views
                             bool isPump = string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
                             if (isValve || isPump)
                             {
-                                var (p1, p2) = GetVisualPortsInGrid(child, vm);
+                                var (p1, p2) = VisualPortHelper.GetVisualPortsInGrid(child, vm, this);
 
                                 foreach (var otherChild in Children)
                                 {
@@ -622,7 +623,7 @@ namespace AvaloniaApplication1.Views
                         }
 
                         // Sibling snapped ports check (10px capture radius)
-                        var siblingPipes = FindAllSiblingPipesFor(_draggedPipeControl);
+                        var siblingPipes = VisualPortHelper.FindAllSiblingPipesFor(this, _draggedPipeControl);
                         bool snapped = false;
                         foreach (var sibling in siblingPipes)
                         {
@@ -660,7 +661,7 @@ namespace AvaloniaApplication1.Views
                                     (string.Equals(widgetVm.Type, "Valve", StringComparison.OrdinalIgnoreCase) ||
                                      string.Equals(widgetVm.Type, "Pump", StringComparison.OrdinalIgnoreCase)))
                                 {
-                                    var (p1, p2) = GetVisualPortsInGrid(child, widgetVm);
+                                    var (p1, p2) = VisualPortHelper.GetVisualPortsInGrid(child, widgetVm, this);
 
                                     // Check Port 1
                                     double dx1 = (dragAbsX - p1.X) * cellSize;
@@ -1061,287 +1062,14 @@ namespace AvaloniaApplication1.Views
             }
         }
 
-        private PipeControl? FindPipeControlRecursive(Control control)
-        {
-            if (control is PipeControl pipe) return pipe;
-            if (control is Panel panel)
-            {
-                foreach (var child in panel.Children)
-                {
-                    var res = FindPipeControlRecursive(child);
-                    if (res != null) return res;
-                }
-            }
-            else if (control is ContentControl cc && cc.Content is Control contentControl)
-            {
-                return FindPipeControlRecursive(contentControl);
-            }
-            else if (control is ContentPresenter cp && cp.Child is Control childControl)
-            {
-                return FindPipeControlRecursive(childControl);
-            }
-            else if (control is Border border && border.Child is Control borderChild)
-            {
-                return FindPipeControlRecursive(borderChild);
-            }
-            return null;
-        }
-
-        private List<PipeControl> FindAllSiblingPipesFor(PipeControl activePipe)
-        {
-            var list = new List<PipeControl>();
-            foreach (var child in Children)
-            {
-                FindPipeControlsRecursive(child, list, activePipe);
-            }
-            return list;
-        }
-
-        private void FindPipeControlsRecursive(Control control, List<PipeControl> result, PipeControl activePipe)
-        {
-            if (control is PipeControl pipe)
-            {
-                if (pipe != activePipe)
-                {
-                    result.Add(pipe);
-                }
-                return;
-            }
-
-            if (control is Panel panel)
-            {
-                foreach (var child in panel.Children)
-                {
-                    FindPipeControlsRecursive(child, result, activePipe);
-                }
-            }
-            else if (control is ContentControl cc && cc.Content is Control contentControl)
-            {
-                FindPipeControlsRecursive(contentControl, result, activePipe);
-            }
-            else if (control is ContentPresenter cp && cp.Child is Control childControl)
-            {
-                FindPipeControlsRecursive(childControl, result, activePipe);
-            }
-            else if (control is Border border && border.Child is Control borderChild)
-            {
-                FindPipeControlsRecursive(borderChild, result, activePipe);
-            }
-            else if (control is Grid grid)
-            {
-                foreach (var child in grid.Children)
-                {
-                    FindPipeControlsRecursive(child, result, activePipe);
-                }
-            }
-        }
-
         private bool IsPointNearSegment(Point p, Point s1, Point s2, double maxDistance)
         {
-            return AvaloniaApplication1.Views.DashboardPanelHelpers.GridMathHelper.IsPointNearSegment(p, s1, s2, maxDistance);
+            return GridMathHelper.IsPointNearSegment(p, s1, s2, maxDistance);
         }
 
         private void GetSnappedPosition(Control child, Point pointer, out double snappedCol, out double snappedRow)
         {
-            AvaloniaApplication1.Views.DashboardPanelHelpers.GridMathHelper.GetSnappedPosition(pointer, CellWidth, CellHeight, out snappedCol, out snappedRow);
-        }
-
-        private bool IsDragHandle(object? source)
-        {
-            if (source is Avalonia.Visual visual)
-            {
-                var current = visual;
-                while (current != null)
-                {
-                    if (current is Control ctrl && ctrl.Name == "DragHandle")
-                        return true;
-                    current = current.GetVisualParent();
-                }
-            }
-            return false;
-        }
-
-        private Border? FindDragHandleRecursive(Avalonia.Visual? visual)
-        {
-            if (visual == null) return null;
-            if (visual is Border border && border.Name == "DragHandle") return border;
-            foreach (var child in visual.GetVisualChildren())
-            {
-                var result = FindDragHandleRecursive(child);
-                if (result != null) return result;
-            }
-            return null;
-        }
-
-        private Point GetGraphicsCenter(Control child, WidgetViewModelBase vm)
-        {
-            double col = GetCol(child);
-            double row = GetRow(child);
-            int sizeX = GetSizeX(child);
-            int sizeY = GetSizeY(child);
-
-            // Default center based on layout
-            double defaultCx = col * CellWidth + sizeX * CellWidth / 2;
-            double defaultCy = row * CellHeight + sizeY * CellHeight / 2;
-
-            if (string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase))
-            {
-                var valveControl = FindValveControlRecursive(child);
-                if (valveControl != null)
-                {
-                    var pt = valveControl.TranslatePoint(new Point(valveControl.Bounds.Width / 2, valveControl.Bounds.Height / 2), this);
-                    if (pt.HasValue)
-                    {
-                        return pt.Value;
-                    }
-                }
-            }
-            else if (string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase))
-            {
-                var viewbox = FindViewboxRecursive(child);
-                if (viewbox != null)
-                {
-                    var pt = viewbox.TranslatePoint(new Point(viewbox.Bounds.Width / 2, viewbox.Bounds.Height / 2), this);
-                    if (pt.HasValue)
-                    {
-                        return pt.Value;
-                    }
-                }
-            }
-
-            return new Point(defaultCx, defaultCy);
-        }
-
-        private (Point p1, Point p2) GetVisualPortsInGrid(Control child, WidgetViewModelBase vm)
-        {
-            double col = GetCol(child);
-            double row = GetRow(child);
-            int sizeX = GetSizeX(child);
-            int sizeY = GetSizeY(child);
-
-            int rotation = 0;
-            bool isVertical = false;
-            var rotProp = vm.GetType().GetProperty("Rotation");
-            if (rotProp != null) rotation = (int)(rotProp.GetValue(vm) ?? 0);
-            var vertProp = vm.GetType().GetProperty("IsVertical");
-            if (vertProp != null) isVertical = (bool)(vertProp.GetValue(vm) ?? false);
-
-            int finalRotation = rotation;
-            if (finalRotation == 0 && isVertical) finalRotation = 90;
-            bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
-
-            double fallbackRelX1 = isFlowVertical ? (sizeX / 2.0) : 0.0;
-            double fallbackRelY1 = isFlowVertical ? 0.0 : (sizeY / 2.0);
-            double fallbackRelX2 = isFlowVertical ? (sizeX / 2.0) : sizeX;
-            double fallbackRelY2 = isFlowVertical ? sizeY : (sizeY / 2.0);
-
-            var fallbackP1 = new Point(col + fallbackRelX1, row + fallbackRelY1);
-            var fallbackP2 = new Point(col + fallbackRelX2, row + fallbackRelY2);
-
-            var centerPt = GetGraphicsCenter(child, vm);
-            double localOffsetX = centerPt.X - col * CellWidth;
-            double localOffsetY = centerPt.Y - row * CellHeight;
-            double gridCx = col + localOffsetX / CellWidth;
-            double gridCy = row + localOffsetY / CellHeight;
-
-            if (string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase))
-            {
-                var valveControl = FindValveControlRecursive(child);
-                if (valveControl != null && valveControl.Bounds.Width > 0 && valveControl.Bounds.Height > 0)
-                {
-                    double w = valveControl.Bounds.Width;
-                    double h = valveControl.Bounds.Height;
-                    double flowSize = isFlowVertical ? h : w;
-                    
-                    double angle = finalRotation * Math.PI / 180.0;
-                    var lp1 = new Point(w / 2.0 - flowSize / 2.0, h / 2.0);
-                    var lp2 = new Point(w / 2.0 + flowSize / 2.0, h / 2.0);
-                    
-                    var lp1Rot = RotatePoint(lp1, new Point(w / 2.0, h / 2.0), angle);
-                    var lp2Rot = RotatePoint(lp2, new Point(w / 2.0, h / 2.0), angle);
-                    
-                    var p1PixelOpt = valveControl.TranslatePoint(lp1Rot, this);
-                    var p2PixelOpt = valveControl.TranslatePoint(lp2Rot, this);
-                    
-                    if (p1PixelOpt.HasValue && p2PixelOpt.HasValue)
-                    {
-                        var p1Grid = new Point(
-                            (p1PixelOpt.Value.X - CellWidth / 2.0) / CellWidth,
-                            (p1PixelOpt.Value.Y - CellHeight / 2.0) / CellHeight);
-                        var p2Grid = new Point(
-                            (p2PixelOpt.Value.X - CellWidth / 2.0) / CellWidth,
-                            (p2PixelOpt.Value.Y - CellHeight / 2.0) / CellHeight);
-                        return (p1Grid, p2Grid);
-                    }
-                }
-            }
-            else if (string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase))
-            {
-                var viewbox = FindViewboxRecursive(child);
-                if (viewbox != null && viewbox.Bounds.Width > 0 && viewbox.Bounds.Height > 0)
-                {
-                    double w = viewbox.Bounds.Width;
-                    double h = viewbox.Bounds.Height;
-                    
-                    double flowSize = isFlowVertical ? h : w;
-                    double halfFlowGrid = (flowSize / 2.0) / (isFlowVertical ? CellHeight : CellWidth);
-
-                    var p1Grid = isFlowVertical ? new Point(gridCx, gridCy - halfFlowGrid) : new Point(gridCx - halfFlowGrid, gridCy);
-                    var p2Grid = isFlowVertical ? new Point(gridCx, gridCy + halfFlowGrid) : new Point(gridCx + halfFlowGrid, gridCy);
-                    return (p1Grid, p2Grid);
-                }
-            }
-
-            return (fallbackP1, fallbackP2);
-        }
-
-        private static Point RotatePoint(Point p, Point origin, double angleRad)
-        {
-            return AvaloniaApplication1.Views.DashboardPanelHelpers.GridMathHelper.RotatePoint(p, origin, angleRad);
-        }
-
-        private ValveControl? FindValveControlRecursive(Control control)
-        {
-            if (control is ValveControl valve) return valve;
-            if (control is Panel panel)
-            {
-                foreach (var child in panel.Children)
-                {
-                    var res = FindValveControlRecursive(child);
-                    if (res != null) return res;
-                }
-            }
-            else if (control is ContentControl cc && cc.Content is Control contentControl)
-            {
-                return FindValveControlRecursive(contentControl);
-            }
-            else if (control is ContentPresenter cp && cp.Child is Control childControl)
-            {
-                return FindValveControlRecursive(childControl);
-            }
-            return null;
-        }
-
-        private Viewbox? FindViewboxRecursive(Control control)
-        {
-            if (control is Viewbox viewbox) return viewbox;
-            if (control is Panel panel)
-            {
-                foreach (var child in panel.Children)
-                {
-                    var res = FindViewboxRecursive(child);
-                    if (res != null) return res;
-                }
-            }
-            else if (control is ContentControl cc && cc.Content is Control contentControl)
-            {
-                return FindViewboxRecursive(contentControl);
-            }
-            else if (control is ContentPresenter cp && cp.Child is Control childControl)
-            {
-                return FindViewboxRecursive(childControl);
-            }
-            return null;
+            GridMathHelper.GetSnappedPosition(pointer, CellWidth, CellHeight, out snappedCol, out snappedRow);
         }
     }
 }

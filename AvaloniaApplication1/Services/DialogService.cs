@@ -40,53 +40,45 @@ namespace AvaloniaApplication1.Services
             
             if (childWindow != null)
             {
+                var targetWindow = childWindow;
                 // Use remembered position if available, otherwise default
                 if (_lastNumpadX.HasValue && _lastNumpadY.HasValue)
                 {
-                    childWindow.X = _lastNumpadX.Value;
-                    childWindow.Y = _lastNumpadY.Value;
+                    targetWindow.X = _lastNumpadX.Value;
+                    targetWindow.Y = _lastNumpadY.Value;
                 }
                 else
                 {
-                    childWindow.X = 100;
-                    childWindow.Y = 100;
+                    targetWindow.X = 100;
+                    targetWindow.Y = 100;
                 }
                 
                 // Numpad doesn't need to be resizable, lock sizes
-                childWindow.Width = 320;
-                childWindow.Height = 400;
+                targetWindow.Width = 320;
+                targetWindow.Height = 400;
 
                 vm.OnConfirm = (val) => 
                 {
                     tcs.TrySetResult(val);
-                    if (childWindow != null)
-                    {
-                        _lastNumpadX = childWindow.X;
-                        _lastNumpadY = childWindow.Y;
-                    }
-                    childWindow.CloseCommand.Execute(null);
+                    _lastNumpadX = targetWindow.X;
+                    _lastNumpadY = targetWindow.Y;
+                    targetWindow.CloseCommand.Execute(null);
                 };
                 
                 vm.OnCancel = () => 
                 {
                     tcs.TrySetResult(null);
-                    if (childWindow != null)
-                    {
-                        _lastNumpadX = childWindow.X;
-                        _lastNumpadY = childWindow.Y;
-                    }
-                    childWindow.CloseCommand.Execute(null);
+                    _lastNumpadX = targetWindow.X;
+                    _lastNumpadY = targetWindow.Y;
+                    targetWindow.CloseCommand.Execute(null);
                 };
 
                 // Handle window close via X button
-                var originalClose = childWindow.CloseAction;
-                childWindow.CloseAction = () =>
+                var originalClose = targetWindow.CloseAction;
+                targetWindow.CloseAction = () =>
                 {
-                    if (childWindow != null)
-                    {
-                        _lastNumpadX = childWindow.X;
-                        _lastNumpadY = childWindow.Y;
-                    }
+                    _lastNumpadX = targetWindow.X;
+                    _lastNumpadY = targetWindow.Y;
                     tcs.TrySetResult(null);
                     originalClose?.Invoke();
                 };

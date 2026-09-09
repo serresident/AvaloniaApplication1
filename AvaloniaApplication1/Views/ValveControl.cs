@@ -199,6 +199,17 @@ namespace AvaloniaApplication1.Views
                 ThicknessProperty);
         }
 
+        private static readonly Color StandardGreyColor = Color.FromRgb(112, 112, 112);
+        private static readonly Pen ValveBorderPen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.2);
+        private static readonly Pen BoxOutlinePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
+        private static readonly Pen CenterTrianglePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
+        private static readonly Pen RedAlarmBorderPen = new Pen(Brushes.Red, 2.5);
+        private static readonly Pen BlackAlarmPen = new Pen(Brushes.Black, 0.8);
+        private static readonly SolidColorBrush FlangeBrush = new SolidColorBrush(Color.FromRgb(160, 160, 164));
+        private static readonly Pen FlangePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 0.6);
+        private static readonly SolidColorBrush FeedbackBarBgBrush = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+        private static readonly Pen FeedbackBarBgPen = new Pen(new SolidColorBrush(Color.FromRgb(80, 80, 80)), 1);
+
         public ValveControl()
         {
             ClipToBounds = false;
@@ -248,7 +259,7 @@ namespace AvaloniaApplication1.Views
             Color inactiveCol = ParseHexColor(InactiveColor);
             
             // Standard HMI dark/light grey for butterflies
-            Color greyCol = Color.FromRgb(112, 112, 112); 
+            Color greyCol = StandardGreyColor; 
 
             Color bodyColor;
             Color actuatorColor;
@@ -307,7 +318,7 @@ namespace AvaloniaApplication1.Views
                     ctx.EndFigure(true);
                 }
                 var triBrush = Brushes.Red;
-                var triPen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
+                var triPen = CenterTrianglePen;
                 context.DrawGeometry(triBrush, triPen, triGeom);
             }
 
@@ -324,14 +335,14 @@ namespace AvaloniaApplication1.Views
             // 7. Draw Flashing Alarm Border around final bounds (not rotated)
             if (IsAlarmFlashing && IsAlarmFlashState)
             {
-                var borderPen = new Pen(Brushes.Red, 2.5);
+                var borderPen = RedAlarmBorderPen;
                 context.DrawRectangle(null, borderPen, new Rect(1, 1, w - 2, h - 2), 4, 4);
             }
 
             // 8. Draw Static Alarm Icon (🔴) in top-right corner if disabled alarm notifications is check and mismatch is present
             if (ShowStaticAlarmIcon)
             {
-                var alarmPen = new Pen(Brushes.Black, 0.8);
+                var alarmPen = BlackAlarmPen;
                 context.DrawEllipse(Brushes.Red, alarmPen, new Point(w - 8, 8), 5, 5);
             }
         }
@@ -365,7 +376,7 @@ namespace AvaloniaApplication1.Views
 
             // Brush & Pen
             var fillBrush = new SolidColorBrush(bodyColor);
-            var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.2);
+            var borderPen = ValveBorderPen;
 
             context.DrawGeometry(fillBrush, borderPen, leftGeom);
             context.DrawGeometry(fillBrush, borderPen, rightGeom);
@@ -401,7 +412,7 @@ namespace AvaloniaApplication1.Views
                 var rect = new Rect(cx - rectW / 2, stemTop - rectH, rectW, rectH);
                 
                 var boxBrush = new SolidColorBrush(actuatorColor); 
-                var boxPen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
+                var boxPen = BoxOutlinePen;
                 context.DrawRectangle(boxBrush, boxPen, rect, 1, 1);
 
                 // Draw letter inside (P for Regulating, S for CutOff)
@@ -477,8 +488,8 @@ namespace AvaloniaApplication1.Views
             double flangeW = Math.Clamp(Thickness * 0.4, 2.0, 8.0);
             double flangeH = Thickness * 2.2;
 
-            var flangeBrush = new SolidColorBrush(Color.FromRgb(160, 160, 164));
-            var flangePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 0.6);
+            var flangeBrush = FlangeBrush;
+            var flangePen = FlangePen;
 
             // Left Flange
             context.DrawRectangle(flangeBrush, flangePen, new Rect(left - flangeW / 2, cy - flangeH / 2, flangeW, flangeH), 0.5, 0.5);
@@ -496,8 +507,8 @@ namespace AvaloniaApplication1.Views
             // Background
             var bgRect = new Rect(barX, barY, barW, barH);
             context.DrawRectangle(
-                new SolidColorBrush(Color.FromRgb(30, 30, 30)),
-                new Pen(new SolidColorBrush(Color.FromRgb(80, 80, 80)), 1),
+                FeedbackBarBgBrush,
+                FeedbackBarBgPen,
                 bgRect, 2, 2);
 
             // Fill

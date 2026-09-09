@@ -27,6 +27,11 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private double _zoomScale = 1.0;
 
+        public void AdjustZoom(double delta)
+        {
+            ZoomScale = Math.Clamp(ZoomScale + delta, 0.5, 3.0);
+        }
+
         public DashboardViewModel(
             DashboardConfig dashboardConfig, 
             IDataCoreService mockDataService, 

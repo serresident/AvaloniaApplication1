@@ -184,4 +184,29 @@
 *   **Сборка и верификация:** 
     *   Проект успешно собирается (`dotnet build --no-restore` завершен с `0 ошибок`).
 
+---
+
+## 📅 09.09.2026 (Сессия 13 — Устранение предупреждений компилятора, оптимизация Render и декомпозиция DashboardPanel)
+
+### 📌 Достижение: Полная ликвидация warning'ов компилятора, Zero-Allocation рендеринг и модульная разгрузка панели мнемосхемы
+*   **Устранение предупреждений компилятора и NuGet:**
+    *   `DialogService.cs`: устранены предупреждения CS8602 (разыменование вероятной пустой ссылки) при обращении к `childWindow.CloseCommand` внутри замыканий за счет локальной непустой переменной `targetWindow`.
+    *   `MainViewModel.cs`: устранено предупреждение CS8604 при передаче аргумента `content` в конструктор `ChildWindowViewModel` за счет проверки на `null` и строгой типизации переменной `windowContent`.
+    *   `AvaloniaApplication1.csproj`: обновлена ссылка пакета `MQTTnet` на версию `4.3.6.1152` для исключения предупреждения NU1603.
+    *   Итог: сборка решения выполняется с 0 предупреждений компилятора C# (`0 ошибок, 0 предупреждений CS`).
+*   **Оптимизация аллокаций в Render (Custom Controls Zero-Allocation):**
+    *   `TrendLineControl.cs`: устранены постоянные аллокации сотен объектов в секунду на кадр (`new Pen`, `new SolidColorBrush`, `new DashStyle`, `new List<double>`, `new List<Point>`). Внедрено статическое кэширование перьев/кистей (`GridPen`, `DefaultLinePen`, `DefaultAreaBrush`) и переиспользование полей списков (`_valList`, `_points`).
+    *   `ValveControl.cs`: вынесены в статические кэшированные поля все перья и кисти (`ValveBorderPen`, `BoxOutlinePen`, `CenterTrianglePen`, `RedAlarmBorderPen`, `BlackAlarmPen`, `FlangeBrush`, `FlangePen`, `FeedbackBarBgBrush`, `FeedbackBarBgPen`, `StandardGreyColor`).
+*   **Изоляция Code-Behind (Раздел 7.3 Кодекса):**
+    *   `DashboardViewModel.cs`: добавлен метод `AdjustZoom(double delta)`, инкапсулирующий логику изменения масштаба и границы `Math.Clamp(..., 0.5, 3.0)`.
+    *   `DashboardView.axaml.cs`: в обработчике колеса мыши устранена прямая мутация свойства `viewModel.ZoomScale` из code-behind, вызов заменен на `viewModel.AdjustZoom(delta)`.
+*   **Декомпозиция God Object `DashboardPanel.cs` (Разделы 1.1, 2.1 Кодекса):**
+    *   Создан специализированный хелпер `Views/DashboardPanelHelpers/VisualPortHelper.cs`.
+    *   В него перенесены рекурсивные методы поиска элементов в визуальном дереве Avalonia (`FindValveControlRecursive`, `FindViewboxRecursive`, `FindPipeControlRecursive`, `FindPipeControlsRecursive`, `FindAllSiblingPipesFor`, `FindDragHandleRecursive`, `IsDragHandle`), а также геометрический расчет графического центра и визуальных портов прилипания («резиновых труб», `GetGraphicsCenter`, `GetVisualPortsInGrid`).
+    *   Размер `DashboardPanel.cs` сокращен почти на 300 строк.
+*   **Сборка и тесты:**
+    *   `dotnet build --no-restore` завершен успешно (0 ошибок, 0 предупреждений кода).
+    *   `dotnet test --no-build` завершен успешно.
+
+
 
