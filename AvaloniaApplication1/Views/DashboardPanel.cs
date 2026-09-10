@@ -444,121 +444,203 @@ namespace AvaloniaApplication1.Views
             }
 
             // Find which child was clicked
-            foreach (var child in Children)
+            Control? clickedChild = null;
+            WidgetViewModelBase? clickedVm = null;
+
+            // 1. Try to find the clicked child via Avalonia's visual tree from e.Source
+            if (e.Source is Visual sourceVisual)
             {
-                if (child == _gridOverlay || child == _selectionOverlay) continue; // Skip overlays
-
-                if (child.DataContext is WidgetViewModelBase vm)
+                var curr = sourceVisual;
+                while (curr != null && curr != this)
                 {
-                    double col = GetCol(child);
-                    double row = GetRow(child);
-                    int sizeX = GetSizeX(child);
-                    int sizeY = GetSizeY(child);
-
-                    var childBounds = new Rect(
-                        col * CellWidth, row * CellHeight,
-                        sizeX * CellWidth, sizeY * CellHeight);
-
-                    if (childBounds.Contains(point))
+                    if (curr.GetVisualParent() == this && curr is Control c && c != _gridOverlay && c != _selectionOverlay)
                     {
-                        bool wasSelected = SelectedVm == vm;
-                        SelectedVm = vm;
-                        clickedWidget = true;
-
-                        // Правый клик (ПКМ) — выделяем виджет и программно открываем контекстное меню
-                        if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+                        if (c.DataContext is WidgetViewModelBase vm)
                         {
-                            var dragHandle = VisualPortHelper.FindDragHandleRecursive(child);
-                            if (dragHandle != null && dragHandle.ContextMenu != null)
+                            // If the source visual is a Pipe, only accept if the click actually hit the pipe control
+                            if (vm is PipeWidgetViewModel)
                             {
-                                dragHandle.ContextMenu.PlacementTarget = dragHandle;
-                                dragHandle.ContextMenu.Open(dragHandle);
-                            }
-                            e.Handled = true;
-                            return;
-                        }
-
-                        // Check if click was in the bottom-right corner for resize (20x20 pixels)
-                        // ONLY allow resize if the widget was ALREADY selected!
-                        var resizeRect = new Rect(childBounds.Right - 20, childBounds.Bottom - 20, 20, 20);
-                        if (wasSelected && resizeRect.Contains(point))
-                        {
-                            _dragChild = child;
-                            _dragVm = vm;
-                            _dragStartPoint = point;
-                            _dragOriginalSizeX = sizeX;
-                            _dragOriginalSizeY = sizeY;
-                            _isDragging = false;
-                            _isResizing = true;
-                            
-                            // Capture pointer for robust drag/resize tracking
-                            e.Pointer.Capture(this);
-                            e.Handled = true;
-                            return;
-                        }
-                        else if (VisualPortHelper.IsDragHandle(e.Source))
-                        {
-                            _dragChild = child;
-                            _dragVm = vm;
-                            _dragStartPoint = point;
-                            _dragOriginalRow = row;
-                            _dragOriginalCol = col;
-                            _isDragging = false; // Not dragging until threshold is met
-                            _isResizing = false;
-                            
-                            // Collect connected pipes for rubber-banding
-                            _connectedPipePoints.Clear();
-                            bool isValve = string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
-                            bool isPump = string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
-                            bool isExchanger = string.Equals(vm.Type, "HeatExchanger", StringComparison.OrdinalIgnoreCase);
-                            bool isReactor = string.Equals(vm.Type, "Reactor", StringComparison.OrdinalIgnoreCase);
-                            if (isValve || isPump || isExchanger || isReactor)
-                            {
-                                var (p1, p2) = VisualPortHelper.GetVisualPortsInGrid(child, vm, this);
-
-                                foreach (var otherChild in Children)
+                                var pipeCtrl = VisualPortHelper.FindPipeControlRecursive(c);
+                                if (pipeCtrl != null && (sourceVisual == pipeCtrl || pipeCtrl.IsVisualAncestorOf(sourceVisual)))
                                 {
-                                    if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
-                                    if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
-                                    {
-                                        var points = pipeVm.GetAbsoluteGridPoints();
-                                        for (int i = 0; i < points.Count; i++)
-                                        {
-                                            var pt = points[i];
-                                            if (Math.Abs(pt.X - p1.X) < 0.01 && Math.Abs(pt.Y - p1.Y) < 0.01)
-                                            {
-                                                _connectedPipePoints.Add(new ConnectedPipePoint
-                                                {
-                                                    PipeVm = pipeVm,
-                                                    PointIndex = i,
-                                                    IsPort1 = true
-                                                });
-                                            }
-                                            else if (Math.Abs(pt.X - p2.X) < 0.01 && Math.Abs(pt.Y - p2.Y) < 0.01)
-                                            {
-                                                _connectedPipePoints.Add(new ConnectedPipePoint
-                                                {
-                                                    PipeVm = pipeVm,
-                                                    PointIndex = i,
-                                                    IsPort1 = false
-                                                });
-                                            }
-                                        }
-                                    }
+                                    clickedChild = c;
+                                    clickedVm = vm;
+                                    break;
                                 }
                             }
+                            else
+                            {
+                                clickedChild = c;
+                                clickedVm = vm;
+                                break;
+                            }
+                        }
+                    }
+                    curr = curr.GetVisualParent();
+                }
+            }
 
-                            // Capture pointer for robust drag/resize tracking
-                            e.Pointer.Capture(this);
-                            e.Handled = true;
-                            return;
+            // 2. Fallback: Search Children in REVERSE Z-order (top-most elements first)
+            if (clickedChild == null)
+            {
+                for (int i = Children.Count - 1; i >= 0; i--)
+                {
+                    var child = Children[i];
+                    if (child == _gridOverlay || child == _selectionOverlay) continue;
+
+                    if (child.DataContext is WidgetViewModelBase vm)
+                    {
+                        if (vm is PipeWidgetViewModel pipeVm)
+                        {
+                            // For pipes, check if point is near any line segment (never use the bounding box!)
+                            var pipeControl = VisualPortHelper.FindPipeControlRecursive(child);
+                            double thickness = pipeControl != null ? pipeControl.Thickness : pipeVm.Thickness;
+                            var gridPoints = pipeVm.GetAbsoluteGridPoints();
+                            double cellSize = CellWidth;
+                            for (int segIdx = 0; segIdx < gridPoints.Count - 1; segIdx++)
+                            {
+                                var p1 = new Point(gridPoints[segIdx].X * cellSize + cellSize / 2, gridPoints[segIdx].Y * cellSize + cellSize / 2);
+                                var p2 = new Point(gridPoints[segIdx + 1].X * cellSize + cellSize / 2, gridPoints[segIdx + 1].Y * cellSize + cellSize / 2);
+
+                                if (IsPointNearSegment(point, p1, p2, thickness / 2 + 8))
+                                {
+                                    clickedChild = child;
+                                    clickedVm = vm;
+                                    break;
+                                }
+                            }
+                            if (clickedChild != null) break;
                         }
                         else
                         {
-                            e.Handled = true;
-                            return;
+                            double col = vm.Col;
+                            double row = vm.Row;
+                            int sizeX = vm.SizeX;
+                            int sizeY = vm.SizeY;
+
+                            var childBounds = new Rect(
+                                col * CellWidth, row * CellHeight,
+                                sizeX * CellWidth, sizeY * CellHeight);
+
+                            if (childBounds.Contains(point))
+                            {
+                                clickedChild = child;
+                                clickedVm = vm;
+                                break;
+                            }
                         }
                     }
+                }
+            }
+
+            if (clickedChild != null && clickedVm != null)
+            {
+                bool wasSelected = SelectedVm == clickedVm;
+                SelectedVm = clickedVm;
+                clickedWidget = true;
+
+                double col = clickedVm.Col;
+                double row = clickedVm.Row;
+                int sizeX = clickedVm.SizeX;
+                int sizeY = clickedVm.SizeY;
+                var childBounds = new Rect(col * CellWidth, row * CellHeight, sizeX * CellWidth, sizeY * CellHeight);
+
+                // Правый клик (ПКМ) — выделяем виджет и открываем контекстное меню прямо под курсором
+                if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+                {
+                    var dragHandle = VisualPortHelper.FindDragHandleRecursive(clickedChild);
+                    if (dragHandle != null && dragHandle.ContextMenu != null)
+                    {
+                        var menu = dragHandle.ContextMenu;
+                        menu.Placement = PlacementMode.Pointer;
+                        menu.PlacementTarget = dragHandle;
+                        menu.DataContext = clickedVm;
+                        clickedChild.Tag = dragHandle.Tag;
+                        menu.Open(dragHandle);
+                    }
+                    e.Handled = true;
+                    return;
+                }
+
+                // Check if click was in the bottom-right corner for resize (20x20 pixels)
+                // ONLY allow resize if the widget was ALREADY selected!
+                var resizeRect = new Rect(childBounds.Right - 20, childBounds.Bottom - 20, 20, 20);
+                if (wasSelected && resizeRect.Contains(point))
+                {
+                    _dragChild = clickedChild;
+                    _dragVm = clickedVm;
+                    _dragStartPoint = point;
+                    _dragOriginalSizeX = sizeX;
+                    _dragOriginalSizeY = sizeY;
+                    _isDragging = false;
+                    _isResizing = true;
+                    
+                    // Capture pointer for robust drag/resize tracking
+                    e.Pointer.Capture(this);
+                    e.Handled = true;
+                    return;
+                }
+                else if (VisualPortHelper.IsDragHandle(e.Source) || wasSelected)
+                {
+                    _dragChild = clickedChild;
+                    _dragVm = clickedVm;
+                    _dragStartPoint = point;
+                    _dragOriginalRow = row;
+                    _dragOriginalCol = col;
+                    _isDragging = false; // Not dragging until threshold is met
+                    _isResizing = false;
+                    
+                    // Collect connected pipes for rubber-banding
+                    _connectedPipePoints.Clear();
+                    bool isValve = string.Equals(clickedVm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
+                    bool isPump = string.Equals(clickedVm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
+                    bool isExchanger = string.Equals(clickedVm.Type, "HeatExchanger", StringComparison.OrdinalIgnoreCase);
+                    bool isReactor = string.Equals(clickedVm.Type, "Reactor", StringComparison.OrdinalIgnoreCase);
+                    if (isValve || isPump || isExchanger || isReactor)
+                    {
+                        var (p1, p2) = VisualPortHelper.GetVisualPortsInGrid(clickedChild, clickedVm, this);
+
+                        foreach (var otherChild in Children)
+                        {
+                            if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
+                            if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
+                            {
+                                var points = pipeVm.GetAbsoluteGridPoints();
+                                for (int i = 0; i < points.Count; i++)
+                                {
+                                    var pt = points[i];
+                                    if (Math.Abs(pt.X - p1.X) < 0.01 && Math.Abs(pt.Y - p1.Y) < 0.01)
+                                    {
+                                        _connectedPipePoints.Add(new ConnectedPipePoint
+                                        {
+                                            PipeVm = pipeVm,
+                                            PointIndex = i,
+                                            IsPort1 = true
+                                        });
+                                    }
+                                    else if (Math.Abs(pt.X - p2.X) < 0.01 && Math.Abs(pt.Y - p2.Y) < 0.01)
+                                    {
+                                        _connectedPipePoints.Add(new ConnectedPipePoint
+                                        {
+                                            PipeVm = pipeVm,
+                                            PointIndex = i,
+                                            IsPort1 = false
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Capture pointer for robust drag/resize tracking
+                    e.Pointer.Capture(this);
+                    e.Handled = true;
+                    return;
+                }
+                else
+                {
+                    e.Handled = true;
+                    return;
                 }
             }
 
@@ -718,29 +800,20 @@ namespace AvaloniaApplication1.Views
                 if (IsDesignMode)
                 {
                     bool overResize = false;
-                    foreach (var child in Children)
+                    if (SelectedVm != null)
                     {
-                        if (child == _gridOverlay || child == _selectionOverlay) continue;
-                        if (child.DataContext is WidgetViewModelBase vm)
-                        {
-                            // ONLY show resize cursor if this widget is the currently selected one!
-                            if (SelectedVm == vm)
-                            {
-                                double col = GetCol(child);
-                                double row = GetRow(child);
-                                int sizeX = GetSizeX(child);
-                                int sizeY = GetSizeY(child);
-                                var childBounds = new Rect(
-                                    col * CellWidth, row * CellHeight,
-                                    sizeX * CellWidth, sizeY * CellHeight);
+                        double col = SelectedVm.Col;
+                        double row = SelectedVm.Row;
+                        int sizeX = SelectedVm.SizeX;
+                        int sizeY = SelectedVm.SizeY;
+                        var childBounds = new Rect(
+                            col * CellWidth, row * CellHeight,
+                            sizeX * CellWidth, sizeY * CellHeight);
 
-                                var resizeRect = new Rect(childBounds.Right - 20, childBounds.Bottom - 20, 20, 20);
-                                if (resizeRect.Contains(point))
-                                {
-                                    overResize = true;
-                                    break;
-                                }
-                            }
+                        var resizeRect = new Rect(childBounds.Right - 20, childBounds.Bottom - 20, 20, 20);
+                        if (resizeRect.Contains(point))
+                        {
+                            overResize = true;
                         }
                     }
 
@@ -836,6 +909,12 @@ namespace AvaloniaApplication1.Views
                 _dragVm.SizeX = newSizeX;
                 _dragVm.SizeY = newSizeY;
 
+                if (_dragChild != null)
+                {
+                    SetSizeX(_dragChild, newSizeX);
+                    SetSizeY(_dragChild, newSizeY);
+                }
+
                 _dragVm.OriginalConfig.Position.SizeX = newSizeX;
                 _dragVm.OriginalConfig.Position.SizeY = newSizeY;
 
@@ -887,6 +966,12 @@ namespace AvaloniaApplication1.Views
                 // Update the VM (which updates the UI via bindings)
                 _dragVm.Row = newRow;
                 _dragVm.Col = newCol;
+
+                if (_dragChild != null)
+                {
+                    SetCol(_dragChild, newCol);
+                    SetRow(_dragChild, newRow);
+                }
 
                 // Sync back to the OriginalConfig for JSON persistence
                 _dragVm.OriginalConfig.Position.Row = newRow;
@@ -975,10 +1060,11 @@ namespace AvaloniaApplication1.Views
                     continue;
                 }
 
-                double col = GetCol(child);
-                double row = GetRow(child);
-                int sizeX = GetSizeX(child);
-                int sizeY = GetSizeY(child);
+                var vm = child.DataContext as WidgetViewModelBase;
+                double col = vm != null ? vm.Col : GetCol(child);
+                double row = vm != null ? vm.Row : GetRow(child);
+                int sizeX = vm != null ? vm.SizeX : GetSizeX(child);
+                int sizeY = vm != null ? vm.SizeY : GetSizeY(child);
 
                 double w = sizeX * CellWidth;
                 double h = sizeY * CellHeight;
@@ -1005,10 +1091,11 @@ namespace AvaloniaApplication1.Views
             {
                 if (child == _gridOverlay || child == _selectionOverlay) continue;
 
-                double col = GetCol(child);
-                double row = GetRow(child);
-                int sizeX = GetSizeX(child);
-                int sizeY = GetSizeY(child);
+                var vm = child.DataContext as WidgetViewModelBase;
+                double col = vm != null ? vm.Col : GetCol(child);
+                double row = vm != null ? vm.Row : GetRow(child);
+                int sizeX = vm != null ? vm.SizeX : GetSizeX(child);
+                int sizeY = vm != null ? vm.SizeY : GetSizeY(child);
 
                 double x = col * CellWidth;
                 double y = row * CellHeight;
@@ -1026,6 +1113,16 @@ namespace AvaloniaApplication1.Views
             base.OnKeyDown(e);
 
             if (!IsDesignMode || SelectedVm == null) return;
+
+            if (e.Key == Avalonia.Input.Key.Delete)
+            {
+                if (DataContext is DashboardViewModel dashboardVm)
+                {
+                    dashboardVm.RemoveWidgetCommand.Execute(SelectedVm);
+                    e.Handled = true;
+                    return;
+                }
+            }
 
             bool isShiftPressed = e.KeyModifiers.HasFlag(Avalonia.Input.KeyModifiers.Shift);
             double stepX = isShiftPressed ? 1.0 : (1.0 / CellWidth);

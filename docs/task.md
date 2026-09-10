@@ -162,3 +162,19 @@
 - [x] Интеграция в фабрику `WidgetFactory.cs`, редактор `WidgetEditorViewModel.cs` и разметку `DashboardView.axaml`
 - [x] Обновление демонстрационной мнемосхемы в `config.json`
 - [x] Успешная сборка (0 ошибок, 0 предупреждений) и запуск приложения
+
+# Tasks: Fix Hit-Testing, Selection & ContextMenu Deletion (Сессия 16 — Выполнено)
+
+- [x] Устранение багов хит-тестинга и ложного удаления предыдущих объектов:
+  - [x] Внедрить точный визуальный хит-тестинг через `e.Source` и восхождение по дереву предков до прямого потомка `DashboardPanel`
+  - [x] Реализовать обратный обход `Children` (Reverse Z-Order) для fallback-проверки вместо прямого (0 -> N)
+  - [x] Исключить использование прямоугольного хит-бокса для труб `Pipe`: проверять попадание только по фактическим сегментам (`IsPointNearSegment`)
+  - [x] Использовать координаты напрямую из ViewModel (`vm.Col`, `vm.Row`, `vm.SizeX`, `vm.SizeY`) в `DashboardPanel`, исключив рассинхрон с attached properties
+  - [x] Принудительно синхронизировать свойства `ColProperty`, `RowProperty`, `SizeXProperty`, `SizeYProperty` на `_dragChild` при завершении перетаскивания и ресайза
+  - [x] Использовать прямое считывание `vm` координат в `MeasureOverride` и `ArrangeOverride`
+- [x] Коррекция позиционирования и параметров контекстного меню:
+  - [x] Настроить открытие меню точно под курсором мыши (`menu.Placement = PlacementMode.Pointer`)
+  - [x] Явно передавать `menu.DataContext = clickedVm` для гарантии верного параметра в `RemoveWidgetCommand`
+  - [x] Добавить защитный fallback `widget ??= Widgets.FirstOrDefault(w => w.IsSelected);` в `RemoveWidget` и `DuplicateWidget` в `DashboardViewModel`
+  - [x] Добавить удаление выбранного виджета по нажатию клавиши `Delete` на клавиатуре в `OnKeyDown`
+- [x] Сборка решения (`0 ошибок, 0 предупреждений CS`) и запуск приложения

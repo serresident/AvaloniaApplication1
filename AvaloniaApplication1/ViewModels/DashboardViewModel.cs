@@ -183,6 +183,7 @@ namespace AvaloniaApplication1.ViewModels
         [RelayCommand]
         private void RemoveWidget(WidgetViewModelBase? widget)
         {
+            widget ??= Widgets.FirstOrDefault(w => w.IsSelected);
             if (widget == null) return;
 
             // Remove from config model
@@ -198,6 +199,7 @@ namespace AvaloniaApplication1.ViewModels
         [RelayCommand]
         private void DuplicateWidget(WidgetViewModelBase? widget)
         {
+            widget ??= Widgets.FirstOrDefault(w => w.IsSelected);
             if (widget == null) return;
 
             var sourceConfig = widget.OriginalConfig;
