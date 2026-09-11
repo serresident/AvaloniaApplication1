@@ -155,7 +155,7 @@ namespace AvaloniaApplication1.ViewModels
             var list = new List<Point>();
             if (string.IsNullOrEmpty(PipePoints)) return list;
             
-            var segments = PipePoints.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            var segments = PipePoints.Split(new[] { ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var seg in segments)
             {
                 var parts = seg.Split(',', StringSplitOptions.RemoveEmptyEntries);

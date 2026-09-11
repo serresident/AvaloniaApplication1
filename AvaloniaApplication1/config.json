@@ -3489,8 +3489,8 @@
       },
       {
         "Type": "Pipe",
-        "Title": "Линия перекачки R101 -> E102",
-        "PipePoints": "0,0 0,6 27,6 27,-6",
+        "Title": "Линия R101 -> YV1",
+        "PipePoints": "0,0;0,6;11,6",
         "ActiveColor": "#00FF00",
         "InactiveColor": "#555555",
         "ShowFlanges": true,
@@ -3505,8 +3505,52 @@
         "Position": {
           "Row": 30,
           "Col": 19,
-          "SizeX": 28,
-          "SizeY": 8
+          "SizeX": 12,
+          "SizeY": 7
+        }
+      },
+      {
+        "Type": "Valve",
+        "Title": "Клапан YV1",
+        "ValveType": "CutOff",
+        "ActuatorType": "Solenoid",
+        "ActiveColor": "#00FF00",
+        "InactiveColor": "#FF0000",
+        "Rotation": 0,
+        "IsVertical": false,
+        "IsOpen": true,
+        "Source": {
+          "ConnId": "plc1",
+          "Address": "00002",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 33,
+          "Col": 30,
+          "SizeX": 6,
+          "SizeY": 6
+        }
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия YV1 -> E102",
+        "PipePoints": "0,12;10,12;10,0",
+        "ActiveColor": "#00FF00",
+        "InactiveColor": "#555555",
+        "ShowFlanges": true,
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Source": {
+          "ConnId": "plc1",
+          "Address": "00001",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 24,
+          "Col": 36,
+          "SizeX": 11,
+          "SizeY": 13
         }
       }
     ]

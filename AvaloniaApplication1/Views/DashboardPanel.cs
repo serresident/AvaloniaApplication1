@@ -125,6 +125,9 @@ namespace AvaloniaApplication1.Views
         private bool _isManagingOverlays;
         private ContextMenu? _activeWidgetMenu;
 
+        public Point? ActiveSnapTarget { get; private set; }
+        private bool _isSnappedToEquipmentPort = false;
+
         public void CloseActiveWidgetMenu()
         {
             if (_activeWidgetMenu != null)
@@ -836,7 +839,7 @@ namespace AvaloniaApplication1.Views
                                 double dy = (dragAbsY - port.Y) * cellSize;
                                 double dist = Math.Sqrt(dx * dx + dy * dy);
 
-                                if (dist <= 20.0) // 20px snap radius (was 10px)
+                                if (dist <= 25.0) // 25px snap radius
                                 {
                                     dragAbsX = port.X;
                                     dragAbsY = port.Y;
@@ -847,7 +850,8 @@ namespace AvaloniaApplication1.Views
                             if (snapped) break;
                         }
 
-                        // Valve/Pump snapped ports check if not snapped to sibling pipe (20px snap radius)
+                        // Valve/Pump snapped ports check if not snapped to sibling pipe (25px snap radius)
+                        bool snappedToEquipment = false;
                         if (!snapped)
                         {
                             foreach (var child in Children)
@@ -865,11 +869,12 @@ namespace AvaloniaApplication1.Views
                                     double dx1 = (dragAbsX - p1.X) * cellSize;
                                     double dy1 = (dragAbsY - p1.Y) * cellSize;
                                     double dist1 = Math.Sqrt(dx1 * dx1 + dy1 * dy1);
-                                    if (dist1 <= 20.0) // 20px snap radius
+                                    if (dist1 <= 25.0) // 25px snap radius
                                     {
                                         dragAbsX = p1.X;
                                         dragAbsY = p1.Y;
                                         snapped = true;
+                                        snappedToEquipment = true;
                                         break;
                                     }
 
@@ -877,15 +882,24 @@ namespace AvaloniaApplication1.Views
                                     double dx2 = (dragAbsX - p2.X) * cellSize;
                                     double dy2 = (dragAbsY - p2.Y) * cellSize;
                                     double dist2 = Math.Sqrt(dx2 * dx2 + dy2 * dy2);
-                                    if (dist2 <= 20.0) // 20px snap radius
+                                    if (dist2 <= 25.0) // 25px snap radius
                                     {
                                         dragAbsX = p2.X;
                                         dragAbsY = p2.Y;
                                         snapped = true;
+                                        snappedToEquipment = true;
                                         break;
                                     }
                                 }
                             }
+                        }
+
+                        _isSnappedToEquipmentPort = snappedToEquipment;
+                        Point? newSnapTarget = snapped ? new Point(dragAbsX * cellSize + cellSize / 2, dragAbsY * cellSize + cellSize / 2) : null;
+                        if (ActiveSnapTarget != newSnapTarget)
+                        {
+                            ActiveSnapTarget = newSnapTarget;
+                            _selectionOverlay?.InvalidateVisual();
                         }
 
                         gridPoints[_draggedPointIndex] = new Point(dragAbsX, dragAbsY);
@@ -997,8 +1011,26 @@ namespace AvaloniaApplication1.Views
                 var pipeVm = _draggedPipeControl.DataContext as PipeWidgetViewModel;
                 if (pipeVm != null)
                 {
+                    if (_isSnappedToEquipmentPort)
+                    {
+                        var gridPoints = pipeVm.GetAbsoluteGridPoints();
+                        if (_draggedPointIndex == 0)
+                        {
+                            pipeVm.StartFitting = "Flange";
+                        }
+                        else if (_draggedPointIndex == gridPoints.Count - 1)
+                        {
+                            pipeVm.EndFitting = "Flange";
+                        }
+                    }
                     pipeVm.IsSuppressingNormalization = false;
                     pipeVm.NormalizePointsAndSize();
+                }
+                _isSnappedToEquipmentPort = false;
+                if (ActiveSnapTarget != null)
+                {
+                    ActiveSnapTarget = null;
+                    _selectionOverlay?.InvalidateVisual();
                 }
                 _draggedPipeControl = null;
                 _draggedPointIndex = -1;
@@ -1144,6 +1176,13 @@ namespace AvaloniaApplication1.Views
             _isDragging = false;
             _isResizing = false;
             _connectedPipePoints.Clear();
+            _isSnappedToEquipmentPort = false;
+
+            if (ActiveSnapTarget != null)
+            {
+                ActiveSnapTarget = null;
+                _selectionOverlay?.InvalidateVisual();
+            }
 
             if (_gridOverlay != null)
             {

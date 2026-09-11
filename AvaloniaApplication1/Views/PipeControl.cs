@@ -213,10 +213,45 @@ namespace AvaloniaApplication1.Views
             else if (EndFitting == "Elbow45") { endElbowDir = endAngle + Math.PI / 4; hasEndElbow = true; }
             else if (EndFitting == "ElbowMinus45") { endElbowDir = endAngle - Math.PI / 4; hasEndElbow = true; }
 
+            // Flange dimensions
+            double flangeThickness = Math.Clamp(thickness * 0.4, 2.0, 8.0);
+            bool hasStartFlange = (StartFitting == "Flange" && ShowFlanges && pixelPoints.Count >= 2);
+            bool hasEndFlange = (EndFitting == "Flange" && ShowFlanges && pixelPoints.Count >= 2);
+
+            // Compute actual start and end positions for 3D segments (offsetting behind the flange plates)
+            Point seg0Start = pixelPoints[0];
+            if (hasStartFlange)
+            {
+                double dx = pixelPoints[1].X - pixelPoints[0].X;
+                double dy = pixelPoints[1].Y - pixelPoints[0].Y;
+                double dist = Math.Sqrt(dx * dx + dy * dy);
+                if (dist > flangeThickness)
+                {
+                    seg0Start = new Point(pixelPoints[0].X + (dx / dist) * flangeThickness,
+                                          pixelPoints[0].Y + (dy / dist) * flangeThickness);
+                }
+            }
+
+            Point segLastEnd = pixelPoints[pixelPoints.Count - 1];
+            if (hasEndFlange)
+            {
+                int last = pixelPoints.Count - 1;
+                double dx = pixelPoints[last].X - pixelPoints[last - 1].X;
+                double dy = pixelPoints[last].Y - pixelPoints[last - 1].Y;
+                double dist = Math.Sqrt(dx * dx + dy * dy);
+                if (dist > flangeThickness)
+                {
+                    segLastEnd = new Point(pixelPoints[last].X - (dx / dist) * flangeThickness,
+                                           pixelPoints[last].Y - (dy / dist) * flangeThickness);
+                }
+            }
+
             // 1. Draw 3D segments
             for (int i = 0; i < pixelPoints.Count - 1; i++)
             {
-                Draw3DSegment(context, pixelPoints[i], pixelPoints[i + 1], baseColor, thickness);
+                Point p1 = (i == 0) ? seg0Start : pixelPoints[i];
+                Point p2 = (i == pixelPoints.Count - 2) ? segLastEnd : pixelPoints[i + 1];
+                Draw3DSegment(context, p1, p2, baseColor, thickness);
             }
 
             // 2. Draw Elbow extensions
@@ -245,18 +280,34 @@ namespace AvaloniaApplication1.Views
 
                 if (i == 0) // Start
                 {
-                    if (StartFitting == "Flange" && ShowFlanges)
+                    if (hasStartFlange)
                     {
-                        double angle = startAngle + Math.PI / 2;
-                        DrawFlangePlate(context, p, angle, flangeBrush, flangeBorderPen, thickness);
+                        double dx = pixelPoints[1].X - pixelPoints[0].X;
+                        double dy = pixelPoints[1].Y - pixelPoints[0].Y;
+                        double dist = Math.Sqrt(dx * dx + dy * dy);
+                        double ux = dist > 0.001 ? dx / dist : 1.0;
+                        double uy = dist > 0.001 ? dy / dist : 0.0;
+
+                        // Outer face is exactly at p, center of plate is offset backwards by half-thickness
+                        Point flangeCenter = new Point(p.X + ux * (flangeThickness / 2.0),
+                                                       p.Y + uy * (flangeThickness / 2.0));
+                        DrawFlangePlate(context, flangeCenter, startAngle, flangeBrush, flangeBorderPen, thickness);
                     }
                 }
                 else if (i == pixelPoints.Count - 1) // End
                 {
-                    if (EndFitting == "Flange" && ShowFlanges)
+                    if (hasEndFlange)
                     {
-                        double angle = endAngle + Math.PI / 2;
-                        DrawFlangePlate(context, p, angle, flangeBrush, flangeBorderPen, thickness);
+                        double dx = pixelPoints[i].X - pixelPoints[i - 1].X;
+                        double dy = pixelPoints[i].Y - pixelPoints[i - 1].Y;
+                        double dist = Math.Sqrt(dx * dx + dy * dy);
+                        double ux = dist > 0.001 ? dx / dist : 1.0;
+                        double uy = dist > 0.001 ? dy / dist : 0.0;
+
+                        // Outer face is exactly at p, center of plate is offset backwards by half-thickness
+                        Point flangeCenter = new Point(p.X - ux * (flangeThickness / 2.0),
+                                                       p.Y - uy * (flangeThickness / 2.0));
+                        DrawFlangePlate(context, flangeCenter, endAngle, flangeBrush, flangeBorderPen, thickness);
                     }
                 }
                 else // Mid corner
@@ -318,18 +369,25 @@ namespace AvaloniaApplication1.Views
             context.DrawGeometry(brush, null, geometry);
         }
 
-        private void DrawFlangePlate(DrawingContext context, Point center, double angleRad, IBrush brush, Pen borderPen, double thickness)
+        private void DrawFlangePlate(DrawingContext context, Point center, double segmentAngleRad, IBrush brush, Pen borderPen, double thickness)
         {
             double w = Math.Clamp(thickness * 0.4, 2.0, 8.0);
             double h = thickness * 2.2;
 
-            var cos = Math.Cos(angleRad);
-            var sin = Math.Sin(angleRad);
+            double cos = Math.Cos(segmentAngleRad);
+            double sin = Math.Sin(segmentAngleRad);
 
-            var p1 = new Point(center.X - w/2 * cos - h/2 * sin, center.Y - w/2 * sin + h/2 * cos);
-            var p2 = new Point(center.X + w/2 * cos - h/2 * sin, center.Y + w/2 * sin + h/2 * cos);
-            var p3 = new Point(center.X + w/2 * cos + h/2 * sin, center.Y + w/2 * sin - h/2 * cos);
-            var p4 = new Point(center.X - w/2 * cos + h/2 * sin, center.Y - w/2 * sin - h/2 * cos);
+            // Vector along pipe axis: (cos, sin)
+            // Vector transverse to pipe axis: (-sin, cos)
+            double ux = cos;
+            double uy = sin;
+            double px = -sin;
+            double py = cos;
+
+            var p1 = new Point(center.X - (w / 2) * ux - (h / 2) * px, center.Y - (w / 2) * uy - (h / 2) * py);
+            var p2 = new Point(center.X + (w / 2) * ux - (h / 2) * px, center.Y + (w / 2) * uy - (h / 2) * py);
+            var p3 = new Point(center.X + (w / 2) * ux + (h / 2) * px, center.Y + (w / 2) * uy + (h / 2) * py);
+            var p4 = new Point(center.X - (w / 2) * ux + (h / 2) * px, center.Y - (w / 2) * uy + (h / 2) * py);
 
             var geometry = new StreamGeometry();
             using (var ctx = geometry.Open())
@@ -652,7 +710,7 @@ namespace AvaloniaApplication1.Views
         private List<Point> ParsePoints(string pointsStr)
         {
             var list = new List<Point>();
-            var segments = pointsStr.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            var segments = pointsStr.Split(new[] { ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var seg in segments)
             {
                 var parts = seg.Split(',', StringSplitOptions.RemoveEmptyEntries);

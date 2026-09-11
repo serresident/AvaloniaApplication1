@@ -278,18 +278,29 @@ namespace AvaloniaApplication1.Views.DashboardPanelHelpers
                 {
                     double w = valveControl.Bounds.Width;
                     double h = valveControl.Bounds.Height;
-                    double flowSize = isFlowVertical ? h : w;
-                    
+
+                    double availableH = h;
+                    bool willShowFeedback = string.Equals(valveControl.ValveType, "Regulating", StringComparison.OrdinalIgnoreCase)
+                                            && valveControl.HasFeedbackSource && valveControl.ShowFeedbackBar;
+                    if (willShowFeedback)
+                    {
+                        availableH -= 18.0;
+                    }
+
+                    double flowSize = isFlowVertical ? availableH : w;
+                    double cx = w / 2.0;
+                    double cy = availableH / 2.0;
+
                     double angle = finalRotation * Math.PI / 180.0;
-                    var lp1 = new Point(w / 2.0 - flowSize / 2.0, h / 2.0);
-                    var lp2 = new Point(w / 2.0 + flowSize / 2.0, h / 2.0);
-                    
-                    var lp1Rot = GridMathHelper.RotatePoint(lp1, new Point(w / 2.0, h / 2.0), angle);
-                    var lp2Rot = GridMathHelper.RotatePoint(lp2, new Point(w / 2.0, h / 2.0), angle);
-                    
+                    var lp1 = new Point(cx - flowSize / 2.0, cy);
+                    var lp2 = new Point(cx + flowSize / 2.0, cy);
+
+                    var lp1Rot = GridMathHelper.RotatePoint(lp1, new Point(cx, cy), angle);
+                    var lp2Rot = GridMathHelper.RotatePoint(lp2, new Point(cx, cy), angle);
+
                     var p1PixelOpt = valveControl.TranslatePoint(lp1Rot, panel);
                     var p2PixelOpt = valveControl.TranslatePoint(lp2Rot, panel);
-                    
+
                     if (p1PixelOpt.HasValue && p2PixelOpt.HasValue)
                     {
                         var p1Grid = new Point(

@@ -224,3 +224,24 @@
   - [x] Выполнен тестовый рендер `MainWindow` и `DashboardView` (3-4 сек)
   - [x] Сгенерированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json`
   - [x] Выполнена чистая сборка `dotnet build AvaloniaApplication1.sln` (0 ошибок, 0 предупреждений)
+
+# Tasks: Pipe-Valve Fast Docking & Flush Flange Geometry (Сессия 20 — Завершено)
+
+- [x] Разработка математической модели плотной стыковки (Вариант 2 — встык без зазоров и нахлестов):
+  - [x] В `PipeControl.cs` скорректировать метод `DrawFlangePlate`: внешняя грань фланца строго по точке порта $P$, толщина уходит назад по вектору трубы
+  - [x] Сместить цилиндры 3D трубы (`seg0Start`, `segLastEnd`) на `flangeThickness` назад, исключив врезание трубы во фланец
+  - [x] Отключить по умолчанию двойные фланцы на клапане в `ValveControl.cs` (`ShowFlangesProperty = false`)
+- [x] Точный расчет координат портов задвижек:
+  - [x] В `VisualPortHelper.cs` учесть шкалу обратной связи `availableH = isRegulating && showFeedbackBar ? h - 18 : h`
+  - [x] Центрировать порты по основанию треугольников задвижки с учетом поворота (`IsVertical`)
+- [x] Магнитные порты с визуальным snap-индикатором и автофланцем:
+  - [x] Увеличить радиус примагничивания в `DashboardPanel.cs` до 25 px
+  - [x] Добавить свойства `ActiveSnapTarget` и флаг `_isSnappedToEquipmentPort`
+  - [x] Реализовать отрисовку неоново-зеленого кольца примагничивания в `SelectionOverlay.cs`
+  - [x] Автоматически устанавливать `StartFitting = "Flange"` / `EndFitting = "Flange"` в `OnPointerReleased` при стыковке
+- [x] Универсальный парсинг координат точек труб:
+  - [x] Поддержка как пробелов, так и точек с запятой в `PipeControl.cs` и `PipeWidgetViewModel.cs`
+- [x] Визуальная верификация и Headless UI тест:
+  - [x] Добавить поддержку рендера мнемосхемы `MimicView` в `AvaloniaApplication1.UIValidation`
+  - [x] Сгенерировать скриншот `artifacts/ui_preview.png` и проверить геометрию стыка клапана `YV1`
+  - [x] Проверить сборку `check-build.ps1` (0 ошибок, 0 предупреждений)

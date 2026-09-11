@@ -50,7 +50,7 @@ namespace AvaloniaApplication1.Views
             AvaloniaProperty.Register<ValveControl, string>(nameof(InactiveColor), "#FF0000");
 
         public static readonly StyledProperty<bool> ShowFlangesProperty =
-            AvaloniaProperty.Register<ValveControl, bool>(nameof(ShowFlanges), true);
+            AvaloniaProperty.Register<ValveControl, bool>(nameof(ShowFlanges), false);
 
         public static readonly StyledProperty<bool> ShowFeedbackBarProperty =
             AvaloniaProperty.Register<ValveControl, bool>(nameof(ShowFeedbackBar), false);

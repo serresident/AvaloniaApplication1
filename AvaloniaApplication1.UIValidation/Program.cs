@@ -101,8 +101,26 @@ public static class Program
 
             var mainVm = sp.GetRequiredService<MainViewModel>();
 
+            for (int i = 0; i < 20 && (mainVm.Dashboard == null || mainVm.Dashboard.Widgets.Count == 0); i++)
+            {
+                Dispatcher.UIThread.RunJobs();
+                Thread.Sleep(50);
+            }
+
             Window window;
-            if (string.Equals(targetView, "DashboardView", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(targetView, "MimicView", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(targetView, "Mimic", StringComparison.OrdinalIgnoreCase))
+            {
+                mainVm.ShowMimicCommand.Execute(null);
+                Dispatcher.UIThread.RunJobs();
+                window = new MainWindow
+                {
+                    DataContext = mainVm,
+                    Width = 1400,
+                    Height = 900
+                };
+            }
+            else if (string.Equals(targetView, "DashboardView", StringComparison.OrdinalIgnoreCase))
             {
                 window = new Window
                 {

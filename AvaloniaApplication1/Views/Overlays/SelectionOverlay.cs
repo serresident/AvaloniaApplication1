@@ -47,7 +47,6 @@ namespace AvaloniaApplication1.Views
 
                     var fillBrush = new SolidColorBrush(Color.FromArgb(30, 0, 122, 255));
                     var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 2.0);
-                    
                     context.DrawRectangle(fillBrush, borderPen, new Rect(x, y, w, h), 4, 4);
 
                     var handleBrush = Brushes.White;
@@ -58,7 +57,15 @@ namespace AvaloniaApplication1.Views
                     context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y + h), 4, 4);
                 }
             }
+
+            if (_panel.IsDesignMode && _panel.ActiveSnapTarget.HasValue)
+            {
+                var snapPt = _panel.ActiveSnapTarget.Value;
+                var snapRingPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 230, 118)), 2.5);
+                var snapFill = new SolidColorBrush(Color.FromArgb(70, 0, 230, 118));
+                context.DrawEllipse(snapFill, snapRingPen, snapPt, 11, 11);
+                context.DrawEllipse(Brushes.White, null, snapPt, 3.5, 3.5);
+            }
         }
     }
-
 }
