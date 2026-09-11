@@ -186,6 +186,8 @@ namespace AvaloniaApplication1.ViewModels
             widget ??= Widgets.FirstOrDefault(w => w.IsSelected);
             if (widget == null) return;
 
+            widget.IsSelected = false;
+
             // Remove from config model
             _dashboardConfig.Widgets.Remove(widget.OriginalConfig);
             
@@ -216,6 +218,8 @@ namespace AvaloniaApplication1.ViewModels
                 var vm = CreateWidgetViewModel(clonedConfig);
                 if (vm != null)
                 {
+                    widget.IsSelected = false;
+                    vm.IsSelected = true;
                     vm.PropertyChanged += OnWidgetPropertyChanged;
                     Widgets.Add(vm);
                     ResolvePipeConnections();

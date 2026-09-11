@@ -304,3 +304,29 @@
     *   Выполнена чистая сборка решения в конфигурации `Release`: **0 ошибок, 0 предупреждений**.
     *   Выполнена чистая сборка решения в конфигурации `Debug`: **0 ошибок, 0 предупреждений**.
 
+---
+
+## 📅 11.09.2026 (Сессия 18 — Перехватчик событий мыши в Tunnel-режиме и надежное нативное ContextMenu удаления)
+
+### 📌 Достижение: Полная ликвидация бага смещения при выборе, перехвата кликов кнопками внутри виджетов и ошибочного удаления контролов
+
+*   **Анализ первопричин дефекта:**
+    1.  *Перехват `PointerPressed` интерактивными контролами (Buttons, Switches):* В `DashboardView.axaml` аппараты вроде задвижек (`Valve`) и насосов (`Pump`) были обернуты в растянутый на весь габарит `Button Command="{Binding OpenControlPopupCommand}"`. До выбора элемента оверлей `DragHandle` скрыт (`IsVisible = false`), поэтому клик попадал прямо в кнопку Avalonia. Кнопка устанавливала `e.Handled = true`, и `DashboardPanel.OnPointerPressed` сразу завершал выполнение (`if (e.Handled) return;`), не выбирая элемент. В результате оставался выбранным предыдущий элемент, и контекстное меню ошибочно удаляло его.
+    2.  *Нестабильность XAML-привязок в контекстном меню:* В 15 DataTemplates дублировались блоки `<Border.ContextMenu>` со сложными цепочками `{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}`. В рантайме Avalonia при динамическом открытии меню `PlacementTarget` или `Tag` часто оставались `null`, из-за чего клик по «Удалить» либо не вызывал никакой команды, либо падал в фоллбэк `Widgets.FirstOrDefault(w => w.IsSelected)`.
+    3.  *Удержание устаревшей ссылки на удаленный виджет:* При удалении виджета свойство `SelectedVm` в `DashboardPanel` не очищалось синхронно, а `widget.IsSelected` оставался `true`.
+*   **Реализованные архитектурные решения:**
+    *   **Перехват в режиме Tunnel (`RoutingStrategies.Tunnel`):**
+        *   В `DashboardPanel` зарегистрирован обработчик `AddHandler(PointerPressedEvent, OnPreviewPointerPressed, RoutingStrategies.Tunnel)`.
+        *   В режиме редактирования (`IsDesignMode == true`) панель получает событие клика **до** того, как оно дойдет до дочерних кнопок (`Button`, `ToggleSwitch`, `Slider`).
+        *   Кнопки больше не поглощают клик и не открывают окна управления при редактировании схемы. Любой виджет мгновенно и надежно выбирается с первого клика.
+    *   **Единое программное контекстное меню (`ShowWidgetContextMenu`):**
+        *   Из `DashboardView.axaml` полностью удалены все 15 дублированных блоков `<Border.ContextMenu>` (файл сокращен на 249 строк избыточного кода).
+        *   В `DashboardPanel.cs` реализован метод `ShowWidgetContextMenu(WidgetViewModelBase targetVm, Control? targetChild)`, создающий нативное меню Avalonia с прямыми C#-делегатами к командам `DashboardViewModel` (`RemoveWidgetCommand`, `DuplicateWidgetCommand`, `EditWidgetCommand`, `BringToFrontCommand` и др.).
+        *   При клике «Удалить» вызывается строго `dashboardVm.RemoveWidgetCommand.Execute(targetVm)`, гарантируя удаление именно того объекта, для которого было открыто меню.
+    *   **Корректный сброс состояния:**
+        *   При удалении виджета сразу сбрасываются `SelectedVm = null` и `widget.IsSelected = false`.
+        *   При выходе из режима редактирования (`!IsDesignMode`) активный выбор и открытые меню автоматически закрываются.
+*   **Верификация:**
+    *   `dotnet build` в конфигурациях Debug и Release: **0 ошибок, 0 предупреждений**.
+    *   Все тесты решения пройдены успешно.
+

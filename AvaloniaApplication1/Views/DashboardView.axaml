@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -47,21 +47,7 @@
                                   </StackPanel>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                  <Border.ContextMenu>
-                                      <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                          <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                      </ContextMenu>
-                                  </Border.ContextMenu>
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -79,21 +65,7 @@
                                   </StackPanel>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                  <Border.ContextMenu>
-                                      <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                          <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                      </ContextMenu>
-                                  </Border.ContextMenu>
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -110,21 +82,7 @@
                                   </Button>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                  <Border.ContextMenu>
-                                      <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                          <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                      </ContextMenu>
-                                  </Border.ContextMenu>
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -144,21 +102,7 @@
                                   </Button>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                  <Border.ContextMenu>
-                                      <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                          <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                      </ContextMenu>
-                                  </Border.ContextMenu>
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                        <!-- Floating Toolbar -->
                                        <Border VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-36,0,0" Height="28" Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="4,2" ZIndex="105" BoxShadow="0 2 8 0 #80000000">
@@ -183,21 +127,7 @@
                                   </StackPanel>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                  <Border.ContextMenu>
-                                      <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                          <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                      </ContextMenu>
-                                  </Border.ContextMenu>
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -222,21 +152,7 @@
                                   </Button>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                  <Border.ContextMenu>
-                                      <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                          <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                      </ContextMenu>
-                                  </Border.ContextMenu>
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -262,21 +178,7 @@
                                   </Grid>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                  <Border.ContextMenu>
-                                      <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                          <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                      </ContextMenu>
-                                  </Border.ContextMenu>
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -300,26 +202,7 @@
                                               CellSize="{Binding $parent[v:DashboardPanel].CellWidth}" />
                                
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="Transparent" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                   <Border.ContextMenu>
-                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                            <Separator />
-                                            <MenuItem Header="Редактировать вершины" Command="{Binding ToggleEditingVerticesCommand}" IsVisible="{Binding !IsEditingVertices}" />
-                                            <MenuItem Header="Завершить редактирование" Command="{Binding ToggleEditingVerticesCommand}" IsVisible="{Binding IsEditingVertices}" />
-                                            <Separator />
-                                            <MenuItem Header="Автотрассировка (под 90°)" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.AutoRoutePipeCommand}" CommandParameter="{Binding}" />
-                                            <Separator /><Separator />
-                                       </ContextMenu>
-                                   </Border.ContextMenu>
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="Transparent" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                    </Grid>
                                </Border>
@@ -369,23 +252,7 @@
                                </Button>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                   <Border.ContextMenu>
-                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Повернуть" Command="{Binding RotateCommand}" />
-                                            <Separator />
-                                            <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                       </ContextMenu>
-                                   </Border.ContextMenu>
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
@@ -415,21 +282,7 @@
                                </Border>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                   <Border.ContextMenu>
-                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                       </ContextMenu>
-                                   </Border.ContextMenu>
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
@@ -463,21 +316,7 @@
                                </Button>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                   <Border.ContextMenu>
-                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                       </ContextMenu>
-                                   </Border.ContextMenu>
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
@@ -507,21 +346,7 @@
                                </Border>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                   <Border.ContextMenu>
-                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                       </ContextMenu>
-                                   </Border.ContextMenu>
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
@@ -555,21 +380,7 @@
                                </Button>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                   <Border.ContextMenu>
-                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                       </ContextMenu>
-                                   </Border.ContextMenu>
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
@@ -598,21 +409,7 @@
                                </Border>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                   <Border.ContextMenu>
-                                       <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                           <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                           <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                           <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                           <Separator />
-                                       </ContextMenu>
-                                   </Border.ContextMenu>
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
@@ -630,21 +427,7 @@
                                   </StackPanel>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False" Tag="{Binding $parent[v:DashboardView].DataContext}">
-                                  <Border.ContextMenu>
-                                      <ContextMenu x:CompileBindings="False" Opened="ContextMenu_Opened">
-                                          <MenuItem Header="На передний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringToFrontCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить вперед" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.BringForwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Переместить назад" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendBackwardCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="На задний план" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.SendToBackCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Свойства" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.EditWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                          <MenuItem Header="Дублировать" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.DuplicateWidgetCommand}" CommandParameter="{Binding}" />
-                                          <MenuItem Header="Удалить" Command="{Binding $parent[ContextMenu].PlacementTarget.Tag.RemoveWidgetCommand}" CommandParameter="{Binding}" />
-                                          <Separator />
-                                      </ContextMenu>
-                                  </Border.ContextMenu>
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>

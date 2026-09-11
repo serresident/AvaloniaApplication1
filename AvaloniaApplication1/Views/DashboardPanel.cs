@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -122,6 +123,24 @@ namespace AvaloniaApplication1.Views
         private GridOverlay? _gridOverlay;
         private SelectionOverlay? _selectionOverlay;
         private bool _isManagingOverlays;
+        private ContextMenu? _activeWidgetMenu;
+
+        public void CloseActiveWidgetMenu()
+        {
+            if (_activeWidgetMenu != null)
+            {
+                _activeWidgetMenu.Close();
+                _activeWidgetMenu = null;
+            }
+        }
+
+        private DashboardViewModel? GetDashboardViewModel()
+        {
+            if (DataContext is DashboardViewModel vm) return vm;
+            var view = this.FindAncestorOfType<DashboardView>();
+            if (view?.DataContext is DashboardViewModel vm2) return vm2;
+            return null;
+        }
 
         static DashboardPanel()
         {
@@ -130,6 +149,11 @@ namespace AvaloniaApplication1.Views
             IsDesignModeProperty.Changed.AddClassHandler<DashboardPanel>((panel, args) =>
             {
                 panel.UpdateGridOverlay();
+                if (!panel.IsDesignMode)
+                {
+                    panel.SelectedVm = null;
+                    panel.CloseActiveWidgetMenu();
+                }
             });
             ColProperty.Changed.AddClassHandler<Control>((control, args) =>
             {
@@ -164,6 +188,7 @@ namespace AvaloniaApplication1.Views
         public DashboardPanel()
         {
             Focusable = true;
+            AddHandler(PointerPressedEvent, OnPreviewPointerPressed, RoutingStrategies.Tunnel);
             foreach (var child in Children)
             {
                 child.DataContextChanged += Child_DataContextChanged;
@@ -350,13 +375,23 @@ namespace AvaloniaApplication1.Views
             }
         }
 
+        private void OnPreviewPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (!IsDesignMode) return;
+            HandleDesignPointerPressed(e);
+        }
+
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
-            PipeControl.CloseActiveMenu();
-
             base.OnPointerPressed(e);
-
             if (e.Handled || !IsDesignMode) return;
+            HandleDesignPointerPressed(e);
+        }
+
+        private void HandleDesignPointerPressed(PointerPressedEventArgs e)
+        {
+            PipeControl.CloseActiveMenu();
+            CloseActiveWidgetMenu();
 
             Focus();
 
@@ -366,7 +401,7 @@ namespace AvaloniaApplication1.Views
             // 1. Check if we clicked on a vertex of any Pipe widget
             foreach (var child in Children)
             {
-                if (child == _gridOverlay) continue;
+                if (child == _gridOverlay || child == _selectionOverlay) continue;
 
                 if (child.DataContext is PipeWidgetViewModel pipeVm)
                 {
@@ -413,7 +448,7 @@ namespace AvaloniaApplication1.Views
             {
                 foreach (var child in Children)
                 {
-                    if (child == _gridOverlay) continue;
+                    if (child == _gridOverlay || child == _selectionOverlay) continue;
 
                     if (child.DataContext is PipeWidgetViewModel pipeVm)
                     {
@@ -457,11 +492,27 @@ namespace AvaloniaApplication1.Views
                     {
                         if (c.DataContext is WidgetViewModelBase vm)
                         {
-                            // If the source visual is a Pipe, only accept if the click actually hit the pipe control
-                            if (vm is PipeWidgetViewModel)
+                            // If the source visual is a Pipe, only accept if the click actually hit the pipe line
+                            if (vm is PipeWidgetViewModel pipeVm)
                             {
-                                var pipeCtrl = VisualPortHelper.FindPipeControlRecursive(c);
-                                if (pipeCtrl != null && (sourceVisual == pipeCtrl || pipeCtrl.IsVisualAncestorOf(sourceVisual)))
+                                var pipeControl = VisualPortHelper.FindPipeControlRecursive(c);
+                                double thickness = pipeControl != null ? pipeControl.Thickness : pipeVm.Thickness;
+                                var gridPoints = pipeVm.GetAbsoluteGridPoints();
+                                double cellSize = CellWidth;
+                                bool nearSegment = false;
+                                for (int segIdx = 0; segIdx < gridPoints.Count - 1; segIdx++)
+                                {
+                                    var p1 = new Point(gridPoints[segIdx].X * cellSize + cellSize / 2, gridPoints[segIdx].Y * cellSize + cellSize / 2);
+                                    var p2 = new Point(gridPoints[segIdx + 1].X * cellSize + cellSize / 2, gridPoints[segIdx + 1].Y * cellSize + cellSize / 2);
+
+                                    if (IsPointNearSegment(point, p1, p2, thickness / 2 + 8))
+                                    {
+                                        nearSegment = true;
+                                        break;
+                                    }
+                                }
+
+                                if (nearSegment)
                                 {
                                     clickedChild = c;
                                     clickedVm = vm;
@@ -492,7 +543,6 @@ namespace AvaloniaApplication1.Views
                     {
                         if (vm is PipeWidgetViewModel pipeVm)
                         {
-                            // For pipes, check if point is near any line segment (never use the bounding box!)
                             var pipeControl = VisualPortHelper.FindPipeControlRecursive(child);
                             double thickness = pipeControl != null ? pipeControl.Thickness : pipeVm.Thickness;
                             var gridPoints = pipeVm.GetAbsoluteGridPoints();
@@ -545,19 +595,10 @@ namespace AvaloniaApplication1.Views
                 int sizeY = clickedVm.SizeY;
                 var childBounds = new Rect(col * CellWidth, row * CellHeight, sizeX * CellWidth, sizeY * CellHeight);
 
-                // Правый клик (ПКМ) — выделяем виджет и открываем контекстное меню прямо под курсором
+                // Правый клик (ПКМ) — открываем надежное контекстное меню точно для выбранного виджета
                 if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
                 {
-                    var dragHandle = VisualPortHelper.FindDragHandleRecursive(clickedChild);
-                    if (dragHandle != null && dragHandle.ContextMenu != null)
-                    {
-                        var menu = dragHandle.ContextMenu;
-                        menu.Placement = PlacementMode.Pointer;
-                        menu.PlacementTarget = dragHandle;
-                        menu.DataContext = clickedVm;
-                        clickedChild.Tag = dragHandle.Tag;
-                        menu.Open(dragHandle);
-                    }
+                    ShowWidgetContextMenu(clickedVm, clickedChild);
                     e.Handled = true;
                     return;
                 }
@@ -575,19 +616,18 @@ namespace AvaloniaApplication1.Views
                     _isDragging = false;
                     _isResizing = true;
                     
-                    // Capture pointer for robust drag/resize tracking
                     e.Pointer.Capture(this);
                     e.Handled = true;
                     return;
                 }
-                else if (VisualPortHelper.IsDragHandle(e.Source) || wasSelected)
+                else
                 {
                     _dragChild = clickedChild;
                     _dragVm = clickedVm;
                     _dragStartPoint = point;
                     _dragOriginalRow = row;
                     _dragOriginalCol = col;
-                    _isDragging = false; // Not dragging until threshold is met
+                    _isDragging = false;
                     _isResizing = false;
                     
                     // Collect connected pipes for rubber-banding
@@ -632,13 +672,7 @@ namespace AvaloniaApplication1.Views
                         }
                     }
 
-                    // Capture pointer for robust drag/resize tracking
                     e.Pointer.Capture(this);
-                    e.Handled = true;
-                    return;
-                }
-                else
-                {
                     e.Handled = true;
                     return;
                 }
@@ -648,6 +682,84 @@ namespace AvaloniaApplication1.Views
             {
                 SelectedVm = null;
             }
+        }
+
+        private void ShowWidgetContextMenu(WidgetViewModelBase targetVm, Control? targetChild)
+        {
+            var dashboardVm = GetDashboardViewModel();
+            if (dashboardVm == null) return;
+
+            CloseActiveWidgetMenu();
+
+            var menu = new ContextMenu();
+            _activeWidgetMenu = menu;
+            menu.Closed += (s, ev) =>
+            {
+                if (_activeWidgetMenu == menu) _activeWidgetMenu = null;
+            };
+
+            var bringToFrontItem = new MenuItem { Header = "На передний план" };
+            bringToFrontItem.Click += (s, ev) => dashboardVm.BringToFrontCommand.Execute(targetVm);
+            menu.Items.Add(bringToFrontItem);
+
+            var bringForwardItem = new MenuItem { Header = "Переместить вперед" };
+            bringForwardItem.Click += (s, ev) => dashboardVm.BringForwardCommand.Execute(targetVm);
+            menu.Items.Add(bringForwardItem);
+
+            var sendBackwardItem = new MenuItem { Header = "Переместить назад" };
+            sendBackwardItem.Click += (s, ev) => dashboardVm.SendBackwardCommand.Execute(targetVm);
+            menu.Items.Add(sendBackwardItem);
+
+            var sendToBackItem = new MenuItem { Header = "На задний план" };
+            sendToBackItem.Click += (s, ev) => dashboardVm.SendToBackCommand.Execute(targetVm);
+            menu.Items.Add(sendToBackItem);
+
+            menu.Items.Add(new Separator());
+
+            if (targetVm is ValveWidgetViewModel valveVm)
+            {
+                var rotateItem = new MenuItem { Header = "Повернуть" };
+                rotateItem.Click += (s, ev) => valveVm.RotateCommand.Execute(null);
+                menu.Items.Add(rotateItem);
+                menu.Items.Add(new Separator());
+            }
+
+            var editItem = new MenuItem { Header = "Свойства" };
+            editItem.Click += (s, ev) => dashboardVm.EditWidgetCommand.Execute(targetVm);
+            menu.Items.Add(editItem);
+
+            menu.Items.Add(new Separator());
+
+            var dupItem = new MenuItem { Header = "Дублировать" };
+            dupItem.Click += (s, ev) => dashboardVm.DuplicateWidgetCommand.Execute(targetVm);
+            menu.Items.Add(dupItem);
+
+            var removeItem = new MenuItem { Header = "Удалить" };
+            removeItem.Click += (s, ev) =>
+            {
+                SelectedVm = null;
+                dashboardVm.RemoveWidgetCommand.Execute(targetVm);
+            };
+            menu.Items.Add(removeItem);
+
+            if (targetVm is PipeWidgetViewModel pipeVm)
+            {
+                menu.Items.Add(new Separator());
+
+                var editVerticesItem = new MenuItem
+                {
+                    Header = pipeVm.IsEditingVertices ? "Завершить редактирование" : "Редактировать вершины"
+                };
+                editVerticesItem.Click += (s, ev) => pipeVm.ToggleEditingVerticesCommand.Execute(null);
+                menu.Items.Add(editVerticesItem);
+
+                var autoRouteItem = new MenuItem { Header = "Автотрассировка (под 90°)" };
+                autoRouteItem.Click += (s, ev) => dashboardVm.AutoRoutePipeCommand.Execute(pipeVm);
+                menu.Items.Add(autoRouteItem);
+            }
+
+            menu.Placement = PlacementMode.Pointer;
+            menu.Open(this);
         }
 
         protected override void OnPointerMoved(PointerEventArgs e)
@@ -1116,9 +1228,12 @@ namespace AvaloniaApplication1.Views
 
             if (e.Key == Avalonia.Input.Key.Delete)
             {
-                if (DataContext is DashboardViewModel dashboardVm)
+                var dashboardVm = GetDashboardViewModel();
+                if (dashboardVm != null)
                 {
-                    dashboardVm.RemoveWidgetCommand.Execute(SelectedVm);
+                    var toRemove = SelectedVm;
+                    SelectedVm = null;
+                    dashboardVm.RemoveWidgetCommand.Execute(toRemove);
                     e.Handled = true;
                     return;
                 }
