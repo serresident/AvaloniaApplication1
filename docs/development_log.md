@@ -330,3 +330,34 @@
     *   `dotnet build` в конфигурациях Debug и Release: **0 ошибок, 0 предупреждений**.
     *   Все тесты решения пройдены успешно.
 
+---
+
+## 📅 11.09.2026 (Сессия 19 — Аудит правил, стандарты Avalonia 11+, Headless UI Runner и Visual Protocol)
+
+### 📌 Достижение: Внедрение кодекса разработки Avalonia 11+, автономного Headless-раннера UI и протокола визуальной верификации
+
+*   **Аудит и консолидация правил разработки:**
+    *   Проведен глубокий аудит существующих инструкций (`docs/agent.md`, `.agents/rules/agent.md`, `AGENTS.md`, `GEMINI.md`, `docs/preprompt.md`).
+    *   Все правила сохранены без потерь контекста (архитектура MDI, SCADA мнемосхема 10x10, ISA-виджеты, Tunnel routing, аппаратные драйверы Modbus/MQTT).
+    *   Добавлены стандарты разработки под Avalonia 11+ и C# 12:
+        *   Специфика свойств Avalonia (`StyledProperty<T>`, `DirectProperty<TOwner, TValue>`, `AffectsRender`, `AffectsMeasure`).
+        *   Avalonia XAML vs WPF: запрет `DependencyProperty.Register`, `<Style.Triggers>` и `MultiDataTrigger`; использование селекторов псевдоклассов `^:pointerover`, `^:pressed`, `^:disabled`.
+        *   Compiled Bindings: обязательное указание `x:DataType`, запрет отключения `CompileBindings="False"`, типизация контекстов данных.
+        *   Рендеринг и перформанс: нулевые аллокации в `Render(DrawingContext)` (кэширование `Pen`, `Brush`, `Geometry`), отсутствие блокировок UI потока, передача неизменяемых структур данных.
+        *   Современный MVVM: использование `[ObservableProperty]`, `[RelayCommand]` из `CommunityToolkit.Mvvm`, запрет самодельного boilerplate-кода.
+    *   Созданы и актуализированы единые файлы: `.antigravity/rules.md`, `AGENT_RULES.md`, `.editorconfig`, `AGENTS.md`, `GEMINI.md`, `docs/agent.md`, `.agents/rules/agent.md`.
+*   **Реализация Headless UI Runner (`AvaloniaApplication1.UIValidation`):**
+    *   Развернут отдельный CLI-проект `AvaloniaApplication1.UIValidation` на базе `Avalonia.Headless` + `Avalonia.Skia`.
+    *   Внедрена безопасная изоляция от сетевых сокетов: при запуске в headless-режиме приложение не открывает блокирующие TCP-сокеты брокера MQTT (`stp10:1883`) и Modbus PLC (`plc1`), используя моки сервисов данных при сохранении реальных виджетов, стилей и шаблонов дашборда.
+    *   Решена проблема зависания `dotnet test` (вызванная перехватом локальных сокетов VSTest прокси-переменными окружения) путем прямого автономного запуска CLI (`dotnet run --project AvaloniaApplication1.UIValidation`).
+    *   Реализована выгрузка визуального состояния интерфейса: скриншот в формате PNG (`artifacts/ui_preview.png`) и структурное дерево элементов в JSON (`artifacts/ui_tree.json`).
+*   **Скрипты автоматизации и проверки:**
+    *   Созданы кроссплатформенные скрипты запуска:
+        *   `scripts/render_ui.sh` и `scripts/render_ui.ps1` (генерация скриншота и JSON-дерева за 3-4 секунды).
+        *   `scripts/check-build.sh` и `scripts/check-build.ps1` (чистая сборка с расширенной диагностикой XAMLIL AvaloniaShowTrace).
+*   **Верификация:**
+    *   Рендеринг `MainWindow` выполнен штатно за 3.8 сек без зависаний.
+    *   Сформированы артефакты `artifacts/ui_preview.png` (38.7 КБ) и `artifacts/ui_tree.json` (354.7 КБ).
+    *   Сборка решения `dotnet build AvaloniaApplication1.sln`: **0 предупреждений, 0 ошибок**.
+
+

@@ -201,3 +201,26 @@
   - [x] Корректно сбрасывать `SelectedVm = null` и `widget.IsSelected = false` при удалении виджета
   - [x] Автоматически закрывать контекстные меню при смене режима редактирования
 - [x] Проверить сборку Debug/Release (0 ошибок, 0 предупреждений)
+
+# Tasks: Avalonia 11+ Standards Audit, Headless UI Runner & Protocol Integration (Сессия 19 — Завершено)
+
+- [x] Этап 1. Поиск и сбор ранее реализованных инструкций:
+  - [x] Проведен аудит `AGENTS.md`, `GEMINI.md`, `docs/agent.md`, `.agents/rules/agent.md`, `docs/preprompt.md`
+  - [x] Зафиксированы все уникальные особенности архитектуры SCADA мнемосхемы, технологических аппаратов, реактивного ядра DataCoreService и протоколов
+- [x] Этап 2. Сопоставление с новыми стандартами разработки Avalonia 11+:
+  - [x] Интеграция стандартов .NET 8 / C# 12 / Avalonia 11+ (12.0.4) и MVVM на базе `CommunityToolkit.Mvvm`
+  - [x] Строгий запрет синтаксиса WPF (`DependencyProperty.Register`, `<Style.Triggers>`)
+  - [x] Фиксация StyledProperty/DirectProperty и селекторов псевдоклассов `^:pointerover`, `^:pressed`, `^:disabled`
+  - [x] Обязательные Compiled Bindings (`x:DataType`, `x:CompileBindings="True"`, решение AVLNxxxx типизацией)
+  - [x] Многопоточность и нулевые аллокации в `Render(DrawingContext)` с вызовом `AffectsRender`
+- [x] Этап 3. Инкрементальное обновление и сохранение:
+  - [x] Сформирован объединенный кодекс правил в `.antigravity/rules.md`
+  - [x] Продублирован кодекс в корневой `AGENT_RULES.md`
+  - [x] Актуализированы `AGENTS.md`, `GEMINI.md`, `docs/agent.md` и `.agents/rules/agent.md`
+  - [x] Создан корневой `.editorconfig` для стандартов C# и XAML
+  - [x] Развернут headless UI-раннер `AvaloniaApplication1.UIValidation` с устранением сетевых блокировок
+  - [x] Созданы скрипты `scripts/render_ui.sh`, `scripts/render_ui.ps1`, `scripts/check-build.sh`, `scripts/check-build.ps1`
+- [x] Этап 4. Проверка и верификация:
+  - [x] Выполнен тестовый рендер `MainWindow` и `DashboardView` (3-4 сек)
+  - [x] Сгенерированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json`
+  - [x] Выполнена чистая сборка `dotnet build AvaloniaApplication1.sln` (0 ошибок, 0 предупреждений)

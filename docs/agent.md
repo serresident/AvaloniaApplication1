@@ -1212,3 +1212,48 @@ event для высокочастотной телеметрии
 Предпочитать создание небольшого специализированного компонента с четко определенной ролью.
 
 **Главная цель проекта — создание масштабируемого, тестируемого, безопасного по памяти и производительного кроссплатформенного приложения на C# / .NET / Avalonia.**
+
+---
+
+# 26. СТАНДАРТЫ РАЗРАБОТКИ НА AVALONIA 11+ И СОВРЕМЕННОМ C#
+
+## 26.1 Стек и MVVM
+* Стек: .NET 8, C# 12, Avalonia UI 11+ (12.0.4).
+* Категорически запрещен синтаксис WPF, UWP или старой Avalonia 0.10.
+* MVVM базируется на `CommunityToolkit.Mvvm`:
+  * Модели представления наследуются от `ObservableObject` / `ViewModelBase`.
+  * Свойства объявляются через source generators: `[ObservableProperty] private string _title;`.
+  * Команды объявляются через `[RelayCommand]`.
+
+## 26.2 Строгие ограничения XAML и Avalonia Property System
+* Запрещен синтаксис WPF: `DependencyProperty.Register`, `<Style.Triggers>`, `Trigger`.
+* Свойства контролов объявляются строго через `StyledProperty<T>.Register<TOwner, T>()` или `DirectProperty<TOwner, T>`.
+* Псевдоклассы стилей Avalonia 11+: `^:pointerover`, `^:pressed`, `^:disabled`, `^:selected`.
+
+## 26.3 Compiled Bindings и XAMLIL
+* Обязательный `x:DataType` на корневых контейнерах и в `DataTemplate`.
+* Флаг `x:CompileBindings="True"`.
+* Ошибки компилятора XAMLIL (`AVLNxxxx`) исправлять строгой типизацией, конвертерами и приведением типов, а НЕ отключением проверки биндингов.
+
+## 26.4 Производительность кастомного рендеринга
+* В `Render(DrawingContext)` кастомных контролов: строго нулевые аллокации в цикле отрисовки. Кисти, перья, форматированный текст и геометрии кэшируются в полях класса.
+* Инвалидация перерисовки объявляется через `AffectsRender<TControl>(Property1, Property2)`.
+* Очистка ресурсов при `DetachedFromVisualTree` или `Dispose()`.
+
+---
+
+# 27. VISUAL FEEDBACK & UI DEBUGGING PROTOCOL (AVALONIA UI)
+
+## 27.1 Доступный инструментарий
+* Скрипт рендеринга артефактов:
+  * Windows: `powershell -ExecutionPolicy Bypass -File scripts/render_ui.ps1 [ViewName]`
+  * Linux/macOS: `./scripts/render_ui.sh [ViewName]`
+* Скриншот экрана: `./artifacts/ui_preview.png`
+* Дерево элементов: `./artifacts/ui_tree.json` (типы контролов, Name, Bounds, Margin, Padding, IsVisible)
+
+## 27.2 Цикл TDD для UI
+1. **Baseline**: генерация снимка до правок.
+2. **Внесение изменений**: правки `.axaml`, стилей или кода. Проверка сборки `scripts/check-build.ps1` (Exit code 0).
+3. **Vision Inspection**: генерация свежего `ui_preview.png` и анализ обрезки текста, выравнивания Grid, ZIndex, пропорций Path и контраста.
+4. **Локализация по `ui_tree.json`**: поиск проблемного узла по координатам Bounds и устранение ограничений компоновки.
+5. **Итеративное исправление**: повторение до идеального визуального результата.

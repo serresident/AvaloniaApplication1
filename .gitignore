@@ -1,2 +1,5 @@
-AvaloniaApplication1/obj/*
-AvaloniaApplication1/bin/*
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+

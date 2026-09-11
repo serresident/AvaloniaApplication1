@@ -25,10 +25,9 @@ namespace AvaloniaApplication1
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
 
-            var mainVm = Services.GetRequiredService<MainViewModel>();
-
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                var mainVm = Services.GetRequiredService<MainViewModel>();
                 desktop.MainWindow = new MainWindow
                 {
                     DataContext = mainVm

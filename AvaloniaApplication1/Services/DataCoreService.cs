@@ -124,6 +124,12 @@ namespace AvaloniaApplication1.Services
             // Синхронная версия — безопасна только из non-async контекста (финализатор, тесты)
             _cts?.Cancel();
             _disposables.Dispose();
+            foreach (var driver in _drivers.Values)
+            {
+                driver.Dispose();
+            }
+            _drivers.Clear();
+            _currentValuesCache.Clear();
             _unifiedTagStream.Dispose();
         }
 
