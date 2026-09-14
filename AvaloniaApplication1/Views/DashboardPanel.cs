@@ -1069,7 +1069,25 @@ namespace AvaloniaApplication1.Views
             {
                 var point = e.GetPosition(this);
 
-                GetSnappedPosition(_dragChild, point, out double newCol, out double newRow);
+                GetSnappedPosition(_dragChild, point, out double newCol, out double newRow, out var snappedPipeConn);
+
+                if (snappedPipeConn.HasValue)
+                {
+                    if (snappedPipeConn.Value.isStart)
+                    {
+                        snappedPipeConn.Value.pipeVm.StartFitting = "Flange";
+                    }
+                    else
+                    {
+                        snappedPipeConn.Value.pipeVm.EndFitting = "Flange";
+                    }
+                }
+
+                if (ActiveSnapTarget != null)
+                {
+                    ActiveSnapTarget = null;
+                    _selectionOverlay?.InvalidateVisual();
+                }
 
                 // Update connected pipes for rubber-banding
                 if (_connectedPipePoints.Count > 0)
@@ -1322,9 +1340,112 @@ namespace AvaloniaApplication1.Views
             return GridMathHelper.IsPointNearSegment(p, s1, s2, maxDistance);
         }
 
+        private void GetSnappedPosition(Control child, Point pointer, out double snappedCol, out double snappedRow, out (PipeWidgetViewModel pipeVm, bool isStart)? connectedPipe)
+        {
+            connectedPipe = null;
+            double deltaX = pointer.X - _dragStartPoint.X;
+            double deltaY = pointer.Y - _dragStartPoint.Y;
+
+            double tentativeCol = Math.Max(0, _dragOriginalCol + deltaX / CellWidth);
+            double tentativeRow = Math.Max(0, _dragOriginalRow + deltaY / CellHeight);
+
+            var vm = child.DataContext as WidgetViewModelBase;
+            bool isSnapCandidate = vm != null && (
+                string.Equals(vm.Type, "Valve", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(vm.Type, "Pump", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(vm.Type, "HeatExchanger", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(vm.Type, "Reactor", StringComparison.OrdinalIgnoreCase));
+
+            if (isSnapCandidate && vm != null)
+            {
+                var (p1Grid, p2Grid) = VisualPortHelper.GetVisualPortsInGrid(child, vm, this);
+                double relX1 = p1Grid.X - vm.Col;
+                double relY1 = p1Grid.Y - vm.Row;
+                double relX2 = p2Grid.X - vm.Col;
+                double relY2 = p2Grid.Y - vm.Row;
+
+                var candidatePort1 = new Point(tentativeCol + relX1, tentativeRow + relY1);
+                var candidatePort2 = new Point(tentativeCol + relX2, tentativeRow + relY2);
+
+                double bestDist = 25.0; // 25px snap capture radius
+                double bestCol = Math.Round(tentativeCol);
+                double bestRow = Math.Round(tentativeRow);
+                Point? bestSnapTarget = null;
+                PipeWidgetViewModel? bestPipe = null;
+                bool bestIsStart = false;
+
+                foreach (var otherChild in Children)
+                {
+                    if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
+                    if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
+                    {
+                        // Skip pipes that are already connected and moving with this widget
+                        if (_connectedPipePoints.Any(c => c.PipeVm == pipeVm)) continue;
+
+                        var pts = pipeVm.GetAbsoluteGridPoints();
+                        if (pts.Count < 2) continue;
+
+                        var pipeEndpoints = new[] { (pts[0], true), (pts[pts.Count - 1], false) };
+                        foreach (var (pipePt, isStart) in pipeEndpoints)
+                        {
+                            // Check distance to candidatePort1
+                            double dx1 = (candidatePort1.X - pipePt.X) * CellWidth;
+                            double dy1 = (candidatePort1.Y - pipePt.Y) * CellHeight;
+                            double dist1 = Math.Sqrt(dx1 * dx1 + dy1 * dy1);
+                            if (dist1 <= bestDist)
+                            {
+                                bestDist = dist1;
+                                bestCol = pipePt.X - relX1;
+                                bestRow = pipePt.Y - relY1;
+                                bestSnapTarget = new Point(pipePt.X * CellWidth + CellWidth / 2.0, pipePt.Y * CellHeight + CellHeight / 2.0);
+                                bestPipe = pipeVm;
+                                bestIsStart = isStart;
+                            }
+
+                            // Check distance to candidatePort2
+                            double dx2 = (candidatePort2.X - pipePt.X) * CellWidth;
+                            double dy2 = (candidatePort2.Y - pipePt.Y) * CellHeight;
+                            double dist2 = Math.Sqrt(dx2 * dx2 + dy2 * dy2);
+                            if (dist2 <= bestDist)
+                            {
+                                bestDist = dist2;
+                                bestCol = pipePt.X - relX2;
+                                bestRow = pipePt.Y - relY2;
+                                bestSnapTarget = new Point(pipePt.X * CellWidth + CellWidth / 2.0, pipePt.Y * CellHeight + CellHeight / 2.0);
+                                bestPipe = pipeVm;
+                                bestIsStart = isStart;
+                            }
+                        }
+                    }
+                }
+
+                if (bestSnapTarget.HasValue)
+                {
+                    snappedCol = bestCol;
+                    snappedRow = bestRow;
+                    ActiveSnapTarget = bestSnapTarget;
+                    _selectionOverlay?.InvalidateVisual();
+                    if (bestPipe != null)
+                    {
+                        connectedPipe = (bestPipe, bestIsStart);
+                    }
+                    return;
+                }
+            }
+
+            if (ActiveSnapTarget != null)
+            {
+                ActiveSnapTarget = null;
+                _selectionOverlay?.InvalidateVisual();
+            }
+
+            snappedCol = Math.Max(0, Math.Round(tentativeCol));
+            snappedRow = Math.Max(0, Math.Round(tentativeRow));
+        }
+
         private void GetSnappedPosition(Control child, Point pointer, out double snappedCol, out double snappedRow)
         {
-            GridMathHelper.GetSnappedPosition(pointer, CellWidth, CellHeight, out snappedCol, out snappedRow);
+            GetSnappedPosition(child, pointer, out snappedCol, out snappedRow, out _);
         }
     }
 }
