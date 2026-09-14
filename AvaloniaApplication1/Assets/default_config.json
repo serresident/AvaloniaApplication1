@@ -1,24 +1,16 @@
 {
   "Project": {
-    "Name": "GPA Gas Pumping Station HMI",
+    "Name": "Аппарат 511 - Отделение азосочетания (Цех 15)",
     "Version": "1.0.0"
   },
   "Connections": [
     {
-      "Id": "plc1",
+      "Id": "plc_511",
       "Type": "ModbusTCP",
       "Host": "127.0.0.1",
       "Port": 502,
-      "PollIntervalMs": 500,
-      "ByteOrder": "ABCD"
-    },
-    {
-      "Id": "mqtt1",
-      "Type": "MQTT",
-      "Host": "stp10",
-      "Port": 1883,
-      "PollIntervalMs": 1000,
-      "ByteOrder": "ABCD"
+      "PollIntervalMs": 200,
+      "ByteOrder": "CDAB"
     }
   ],
   "BridgeRules": [],
@@ -26,906 +18,220 @@
     "CellSize": 160,
     "Widgets": [
       {
-        "Format": "{0:F1} kW",
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "ValueDisplay",
-        "Title": "ZAS Actual Power",
-        "Source": {
-          "ConnId": "mqtt1",
-          "Address": "gMqt/ZAS/ZAS_Actual_Power",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 0,
-          "Col": 0,
-          "SizeX": 1,
-          "SizeY": 1
-        }
-      },
-      {
-        "Format": "{0:F1} kW",
-        "MinValue": 0,
-        "MaxValue": 1000,
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "SetValue",
-        "Title": "ZAS Power Setpoint",
-        "Source": {
-          "ConnId": "mqtt1",
-          "Address": "gMqt/ZAS/ZAS_Setpoint_Power",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 0,
-          "Col": 1,
-          "SizeX": 1,
-          "SizeY": 1
-        }
-      },
-      {
-        "Format": "{0}",
-        "MinValue": 0,
-        "MaxValue": 500,
         "Type": "RealTimeTrend",
-        "Title": "ZAS Power History",
+        "Title": "Температура R-511",
         "Source": {
-          "ConnId": "mqtt1",
-          "Address": "gMqt/ZAS/ZAS_Actual_Power",
+          "ConnId": "plc_511",
+          "Address": "30017",
           "DataType": "Float32"
         },
         "Position": {
-          "Row": 1,
+          "Row": 0,
           "Col": 0,
           "SizeX": 2,
           "SizeY": 2
-        }
+        },
+        "MinValue": 0,
+        "MaxValue": 100,
+        "Format": "{0:F1} °C"
       },
       {
-        "Children": [
-          {
-            "Format": "{0:F0} kW",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Power",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA1/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} kWh",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Energy",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA1/PPU_Gen_counter_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} \u00B0C",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Exhaust Temp T404",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA1/T404",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F0} h",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Operating Hours",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA1/Hours",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#00FF00",
-            "FalseColor": "#440000",
-            "Type": "PilotLight",
-            "Title": "Status MWM",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA1/Status_MWM",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#FFCC00",
-            "FalseColor": "#443300",
-            "Type": "PilotLight",
-            "Title": "Word55 Warning",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA1/HAS_IN_Word55_0",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0}",
-            "MinValue": 0,
-            "MaxValue": 2000,
-            "Type": "RealTimeTrend",
-            "Title": "GPA 1 Power Trend",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA1/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 2,
-              "Col": 0,
-              "SizeX": 3,
-              "SizeY": 2
-            }
-          }
-        ],
-        "Type": "ContainerButton",
-        "Title": "GPA 1 Unit",
+        "Type": "RealTimeTrend",
+        "Title": "pH среды R-511",
         "Source": {
-          "ConnId": "",
-          "Address": "",
-          "DataType": ""
+          "ConnId": "plc_511",
+          "Address": "30015",
+          "DataType": "Float32"
         },
         "Position": {
           "Row": 0,
           "Col": 2,
-          "SizeX": 1,
-          "SizeY": 1
-        }
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "MinValue": 7,
+        "MaxValue": 13,
+        "Format": "{0:F2} pH"
       },
       {
-        "Children": [
-          {
-            "Format": "{0:F0} kW",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Power",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA2/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} kWh",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Energy",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA2/PPU_Gen_counter_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} \u00B0C",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Exhaust Temp T404",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA2/T404",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F0} h",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Operating Hours",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA2/Hours",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#00FF00",
-            "FalseColor": "#440000",
-            "Type": "PilotLight",
-            "Title": "Status MWM",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA2/Status_MWM",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#FFCC00",
-            "FalseColor": "#443300",
-            "Type": "PilotLight",
-            "Title": "Word55 Warning",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA2/HAS_IN_Word55_0",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0}",
-            "MinValue": 0,
-            "MaxValue": 2000,
-            "Type": "RealTimeTrend",
-            "Title": "GPA 2 Power Trend",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA2/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 2,
-              "Col": 0,
-              "SizeX": 3,
-              "SizeY": 2
-            }
-          }
-        ],
-        "Type": "ContainerButton",
-        "Title": "GPA 2 Unit",
+        "Type": "RealTimeTrend",
+        "Title": "Расход диазосоединения",
         "Source": {
-          "ConnId": "",
-          "Address": "",
-          "DataType": ""
+          "ConnId": "plc_511",
+          "Address": "30035",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 2,
+          "Col": 0,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "MinValue": 0,
+        "MaxValue": 25,
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "RealTimeTrend",
+        "Title": "Расход соды 14%",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30023",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 2,
+          "Col": 2,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "MinValue": 0,
+        "MaxValue": 10,
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "SetValue",
+        "Title": "Уставка Т нагрева",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40121",
+          "DataType": "Float32"
         },
         "Position": {
           "Row": 0,
-          "Col": 3,
+          "Col": 4,
           "SizeX": 1,
           "SizeY": 1
-        }
+        },
+        "MinValue": 0,
+        "MaxValue": 100,
+        "Format": "{0:F1} °C"
       },
       {
-        "Children": [
-          {
-            "Format": "{0:F0} kW",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Power",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA3/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} kWh",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Energy",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA3/PPU_Gen_counter_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} \u00B0C",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Exhaust Temp T404",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA3/T404",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F0} h",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Operating Hours",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA3/Hours",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#00FF00",
-            "FalseColor": "#440000",
-            "Type": "PilotLight",
-            "Title": "Status MWM",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA3/Status_MWM",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#FFCC00",
-            "FalseColor": "#443300",
-            "Type": "PilotLight",
-            "Title": "Word55 Warning",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA3/HAS_IN_Word55_0",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0}",
-            "MinValue": 0,
-            "MaxValue": 2000,
-            "Type": "RealTimeTrend",
-            "Title": "GPA 3 Power Trend",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA3/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 2,
-              "Col": 0,
-              "SizeX": 3,
-              "SizeY": 2
-            }
-          }
-        ],
-        "Type": "ContainerButton",
-        "Title": "GPA 3 Unit",
+        "Type": "SetValue",
+        "Title": "Уставка дозы воды",
         "Source": {
-          "ConnId": "",
-          "Address": "",
-          "DataType": ""
+          "ConnId": "plc_511",
+          "Address": "40119",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 0,
+          "Col": 5,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "MinValue": 0,
+        "MaxValue": 20,
+        "Format": "{0:F1} м³"
+      },
+      {
+        "Type": "SetValue",
+        "Title": "Уставка диазо",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40123",
+          "DataType": "Float32"
         },
         "Position": {
           "Row": 1,
-          "Col": 2,
+          "Col": 4,
           "SizeX": 1,
           "SizeY": 1
-        }
+        },
+        "MinValue": 0,
+        "MaxValue": 25,
+        "Format": "{0:F1} м³/ч"
       },
       {
-        "Children": [
-          {
-            "Format": "{0:F0} kW",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Power",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA4/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} kWh",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Energy",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA4/PPU_Gen_counter_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} \u00B0C",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Exhaust Temp T404",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA4/T404",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F0} h",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Operating Hours",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA4/Hours",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#00FF00",
-            "FalseColor": "#440000",
-            "Type": "PilotLight",
-            "Title": "Status MWM",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA4/Status_MWM",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#FFCC00",
-            "FalseColor": "#443300",
-            "Type": "PilotLight",
-            "Title": "Word55 Warning",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA4/HAS_IN_Word55_0",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0}",
-            "MinValue": 0,
-            "MaxValue": 2000,
-            "Type": "RealTimeTrend",
-            "Title": "GPA 4 Power Trend",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA4/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 2,
-              "Col": 0,
-              "SizeX": 3,
-              "SizeY": 2
-            }
-          }
-        ],
-        "Type": "ContainerButton",
-        "Title": "GPA 4 Unit",
+        "Type": "SetValue",
+        "Title": "Целевой pH",
         "Source": {
-          "ConnId": "",
-          "Address": "",
-          "DataType": ""
+          "ConnId": "plc_511",
+          "Address": "40153",
+          "DataType": "Float32"
         },
         "Position": {
           "Row": 1,
-          "Col": 3,
+          "Col": 5,
           "SizeX": 1,
           "SizeY": 1
-        }
+        },
+        "MinValue": 7,
+        "MaxValue": 12,
+        "Format": "{0:F2} pH"
       },
       {
-        "Children": [
-          {
-            "Format": "{0:F0} kW",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Power",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA5/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} kWh",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Energy",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA5/PPU_Gen_counter_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} \u00B0C",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Exhaust Temp T404",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA5/T404",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F0} h",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Operating Hours",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA5/Hours",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#00FF00",
-            "FalseColor": "#440000",
-            "Type": "PilotLight",
-            "Title": "Status MWM",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA5/Status_MWM",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#FFCC00",
-            "FalseColor": "#443300",
-            "Type": "PilotLight",
-            "Title": "Word55 Warning",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA5/HAS_IN_Word55_0",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0}",
-            "MinValue": 0,
-            "MaxValue": 2000,
-            "Type": "RealTimeTrend",
-            "Title": "GPA 5 Power Trend",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA5/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 2,
-              "Col": 0,
-              "SizeX": 3,
-              "SizeY": 2
-            }
-          }
-        ],
-        "Type": "ContainerButton",
-        "Title": "GPA 5 Unit",
+        "Type": "SetValue",
+        "Title": "ПИД пара: Kp",
         "Source": {
-          "ConnId": "",
-          "Address": "",
-          "DataType": ""
+          "ConnId": "plc_511",
+          "Address": "40133",
+          "DataType": "Float32"
         },
         "Position": {
           "Row": 2,
-          "Col": 2,
+          "Col": 4,
           "SizeX": 1,
           "SizeY": 1
-        }
+        },
+        "MinValue": 0,
+        "MaxValue": 50,
+        "Format": "{0:F1}"
       },
       {
-        "Children": [
-          {
-            "Format": "{0:F0} kW",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Power",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA6/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} kWh",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Gen Active Energy",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA6/PPU_Gen_counter_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F1} \u00B0C",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Exhaust Temp T404",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA6/T404",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 0,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0:F0} h",
-            "ValueColor": "",
-            "ValueFontSize": 0,
-            "Type": "ValueDisplay",
-            "Title": "Operating Hours",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA6/Hours",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 1,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#00FF00",
-            "FalseColor": "#440000",
-            "Type": "PilotLight",
-            "Title": "Status MWM",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA6/Status_MWM",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 0,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "TrueColor": "#FFCC00",
-            "FalseColor": "#443300",
-            "Type": "PilotLight",
-            "Title": "Word55 Warning",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA6/HAS_IN_Word55_0",
-              "DataType": "Bool"
-            },
-            "Position": {
-              "Row": 1,
-              "Col": 2,
-              "SizeX": 1,
-              "SizeY": 1
-            }
-          },
-          {
-            "Format": "{0}",
-            "MinValue": 0,
-            "MaxValue": 2000,
-            "Type": "RealTimeTrend",
-            "Title": "GPA 6 Power Trend",
-            "Source": {
-              "ConnId": "mqtt1",
-              "Address": "gMqt/GPA6/PPU_Gen_active_power",
-              "DataType": "Float32"
-            },
-            "Position": {
-              "Row": 2,
-              "Col": 0,
-              "SizeX": 3,
-              "SizeY": 2
-            }
-          }
-        ],
-        "Type": "ContainerButton",
-        "Title": "GPA 6 Unit",
+        "Type": "SetValue",
+        "Title": "ПИД пара: Tn",
         "Source": {
-          "ConnId": "",
-          "Address": "",
-          "DataType": ""
+          "ConnId": "plc_511",
+          "Address": "40135",
+          "DataType": "Float32"
         },
         "Position": {
           "Row": 2,
-          "Col": 3,
+          "Col": 5,
           "SizeX": 1,
           "SizeY": 1
-        }
+        },
+        "MinValue": 0,
+        "MaxValue": 100,
+        "Format": "{0:F1} с"
+      },
+      {
+        "Type": "SetValue",
+        "Title": "pH Мин",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40149",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 3,
+          "Col": 4,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "MinValue": 7,
+        "MaxValue": 12,
+        "Format": "{0:F2} pH"
+      },
+      {
+        "Type": "SetValue",
+        "Title": "pH Макс",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40151",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 3,
+          "Col": 5,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "MinValue": 7,
+        "MaxValue": 14,
+        "Format": "{0:F2} pH"
       }
     ]
   },
@@ -933,701 +239,626 @@
     "CellSize": 10,
     "Widgets": [
       {
-        "ActiveColor": "#00FF00",
-        "InactiveColor": "#FF0000",
-        "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0,
-        "Type": "Pump",
-        "Title": "\u041D\u0430\u0441\u043E\u0441 \u0432\u043E\u0434\u044B NS1",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00001",
-          "DataType": "Bool"
-        },
+        "Type": "Reactor",
+        "Title": "Аппарат 511",
         "Position": {
-          "Row": 4.5,
-          "Col": 9.5,
-          "SizeX": 6,
-          "SizeY": 6
-        }
+          "Row": 22,
+          "Col": 56,
+          "SizeX": 20,
+          "SizeY": 26
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30019",
+          "DataType": "Float32"
+        },
+        "TempSource": {
+          "ConnId": "plc_511",
+          "Address": "30017",
+          "DataType": "Float32"
+        },
+        "HasJacket": true,
+        "Format": "{0:F0} кг",
+        "MinValue": 0,
+        "MaxValue": 5000,
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#455A64"
       },
       {
-        "ValveType": "CutOff",
-        "ActiveColor": "#00FF00",
-        "InactiveColor": "#FF0000",
-        "FeedbackSource": {
-          "ConnId": "plc1",
-          "Address": "10002",
-          "DataType": "Bool"
+        "Type": "Pipe",
+        "Title": "Линия Воды к YV1",
+        "Position": {
+          "Row": 6.5,
+          "Col": 14.5,
+          "SizeX": 25,
+          "SizeY": 1
         },
-        "IsVertical": false,
-        "ActuatorType": "Solenoid",
-        "Rotation": 0,
-        "AlarmDisabled": false,
-        "Tolerance": 10,
-        "ModeSource": null,
+        "PipePoints": "0,0;24,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
         "Type": "Valve",
-        "Title": "\u041A\u043B\u0430\u043F\u0430\u043D \u0432\u043E\u0434\u044B YV1",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00002",
-          "DataType": "Bool"
-        },
+        "Title": "YV1 (Вода)",
         "Position": {
-          "Row": 4.5,
-          "Col": 23.5,
+          "Row": 4,
+          "Col": 39,
           "SizeX": 6,
           "SizeY": 6
-        }
-      },
-      {
-        "PipePoints": "0,1;5,1",
-        "ActiveColor": "#00AAFF",
-        "InactiveColor": "#005588",
-        "ShowFlanges": true,
-        "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u0432\u043E\u0434\u044B 1",
+        },
+        "ValveType": "CutOff",
+        "ActuatorType": "Solenoid",
         "Source": {
-          "ConnId": "plc1",
-          "Address": "00001",
+          "ConnId": "plc_511",
+          "Address": "00005",
           "DataType": "Bool"
         },
-        "Position": {
-          "Row": 6,
-          "Col": 4,
-          "SizeX": 6,
-          "SizeY": 2
-        }
-      },
-      {
-        "PipePoints": "0,1;8,1",
-        "ActiveColor": "#00AAFF",
-        "InactiveColor": "#005588",
-        "ShowFlanges": true,
-        "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u0432\u043E\u0434\u044B 2",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00001",
+        "ModeSource": {
+          "ConnId": "plc_511",
+          "Address": "00004",
           "DataType": "Bool"
         },
-        "Position": {
-          "Row": 6,
-          "Col": 15,
-          "SizeX": 9,
-          "SizeY": 2
-        }
-      },
-      {
-        "PipePoints": "0,1;17,1;17,15",
-        "ActiveColor": "#00AAFF",
-        "InactiveColor": "#005588",
-        "ShowFlanges": true,
-        "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u0432\u043E\u0434\u044B \u0432 \u0431\u0430\u043A",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00001",
+        "FeedbackSource": {
+          "ConnId": "plc_511",
+          "Address": "10500",
           "DataType": "Bool"
         },
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Воды от YV1 в R511",
         "Position": {
-          "Row": 6,
-          "Col": 29,
+          "Row": 6.5,
+          "Col": 45.5,
           "SizeX": 21,
           "SizeY": 16
-        }
-      },
-      {
-        "Format": "{0:F1} \u043B",
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "ValueDisplay",
-        "Title": "\u0414\u043E\u0437\u0430\u0442\u043E\u0440 \u0432\u043E\u0434\u044B",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "30035",
-          "DataType": "Float32"
         },
-        "Position": {
-          "Row": 12,
-          "Col": 10,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "Format": "{0} \u043B",
-        "MinValue": 0,
-        "MaxValue": 1000,
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "SetValue",
-        "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0432\u043E\u0434\u044B",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "40005",
-          "DataType": "Int16"
-        },
-        "Position": {
-          "Row": 12,
-          "Col": 19,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "ButtonMode": "Pulse",
-        "Type": "CommandButton",
-        "Title": "\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C \u0434\u043E\u0437\u0443",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00010",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 12,
-          "Col": 28,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "ActiveColor": "#00FF00",
-        "InactiveColor": "#FF0000",
-        "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0,
-        "Type": "Pump",
-        "Title": "\u041F\u0438\u0442\u0430\u0442\u0435\u043B\u044C A QS1",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00003",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 24.5,
-          "Col": 9.5,
-          "SizeX": 6,
-          "SizeY": 6
-        }
-      },
-      {
-        "PipePoints": "0,1;30,1",
-        "ActiveColor": "#E5C158",
-        "InactiveColor": "#7F6B2F",
-        "ShowFlanges": true,
+        "PipePoints": "0,0;20,0;20,15",
         "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u043F\u043E\u0434\u0430\u0447\u0438 A",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00003",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 26,
-          "Col": 15,
-          "SizeX": 31,
-          "SizeY": 2
-        }
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
       },
       {
-        "Format": "{0:F1} \u043A\u0433",
-        "ValueColor": "",
-        "ValueFontSize": 0,
         "Type": "ValueDisplay",
-        "Title": "\u0412\u0435\u0441 A \u0432 \u0441\u043C\u0435\u0441\u0438\u0442\u0435\u043B\u0438",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "30031",
-          "DataType": "Float32"
-        },
+        "Title": "Расход воды",
         "Position": {
-          "Row": 31,
-          "Col": 10,
-          "SizeX": 8,
+          "Row": 1,
+          "Col": 14,
+          "SizeX": 11,
           "SizeY": 4
-        }
-      },
-      {
-        "Format": "{0} \u043A\u0433",
-        "MinValue": 0,
-        "MaxValue": 500,
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "SetValue",
-        "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0432\u0435\u0441\u0430 A",
+        },
         "Source": {
-          "ConnId": "plc1",
-          "Address": "40006",
-          "DataType": "Int16"
-        },
-        "Position": {
-          "Row": 31,
-          "Col": 19,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "ActiveColor": "#00FF00",
-        "InactiveColor": "#FF0000",
-        "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0,
-        "Type": "Pump",
-        "Title": "\u041F\u0438\u0442\u0430\u0442\u0435\u043B\u044C B QS2",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00004",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 38.5,
-          "Col": 9.5,
-          "SizeX": 6,
-          "SizeY": 6
-        }
-      },
-      {
-        "PipePoints": "0,1;30,1",
-        "ActiveColor": "#BC7FEB",
-        "InactiveColor": "#613880",
-        "ShowFlanges": true,
-        "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u043F\u043E\u0434\u0430\u0447\u0438 B",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00004",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 40,
-          "Col": 15,
-          "SizeX": 31,
-          "SizeY": 2
-        }
-      },
-      {
-        "Format": "{0:F1} \u043A\u0433",
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "ValueDisplay",
-        "Title": "\u0412\u0435\u0441 B \u0432 \u0441\u043C\u0435\u0441\u0438\u0442\u0435\u043B\u0438",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "30033",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 45,
-          "Col": 10,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "Format": "{0} \u043A\u0433",
-        "MinValue": 0,
-        "MaxValue": 500,
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "SetValue",
-        "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0432\u0435\u0441\u0430 B",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "40007",
-          "DataType": "Int16"
-        },
-        "Position": {
-          "Row": 45,
-          "Col": 19,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "Format": "{0:F1} \u043A\u0433",
-        "MinValue": 0,
-        "MaxValue": 1000,
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "Tank",
-        "Title": "\u0420\u0435\u0430\u043A\u0442\u043E\u0440 \u0441\u043C\u0435\u0441\u0438\u0442\u0435\u043B\u044C",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "30029",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 20,
-          "Col": 46,
-          "SizeX": 16,
-          "SizeY": 24
-        }
-      },
-      {
-        "Format": "{0:F2} \u0431\u0430\u0440",
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "ValueDisplay",
-        "Title": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0440\u0435\u0430\u043A\u0442\u043E\u0440\u0430",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "30025",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 15,
-          "Col": 46,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "Format": "{0:F1} \u00B0C",
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "ValueDisplay",
-        "Title": "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u0441\u043C\u0435\u0441\u0438",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "30023",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 15,
-          "Col": 54,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "ButtonMode": "Toggle",
-        "Type": "CommandButton",
-        "Title": "\u041D\u0430\u0433\u0440\u0435\u0432 \u0410\u0412\u0422\u041E",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00011",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 4,
-          "Col": 68,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "ButtonMode": "Toggle",
-        "Type": "CommandButton",
-        "Title": "\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u0422\u042D\u041D",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00006",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 4,
-          "Col": 77,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "Format": "{0:F1} \u00B0C",
-        "MinValue": 0,
-        "MaxValue": 100,
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "SetValue",
-        "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0442\u0435\u043C\u043F-\u0440\u044B",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "40033",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 9,
-          "Col": 68,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "Format": "{0:F1} %",
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "ValueDisplay",
-        "Title": "\u041C\u043E\u0449\u043D\u043E\u0441\u0442\u044C \u0422\u042D\u041D\u0430",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "40025",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 9,
-          "Col": 77,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "ActiveColor": "#00FF00",
-        "InactiveColor": "#FF0000",
-        "ControlWindowWidth": 0,
-        "ControlWindowHeight": 0,
-        "Type": "Pump",
-        "Title": "\u041D\u0430\u0441\u043E\u0441 \u043E\u0445\u043B\u0430\u0436\u0434\u0435\u043D\u0438\u044F",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00007",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 15.5,
-          "Col": 67.5,
-          "SizeX": 6,
-          "SizeY": 6
-        }
-      },
-      {
-        "ValveType": "Regulating",
-        "ActiveColor": "#00FF00",
-        "InactiveColor": "#FF0000",
-        "FeedbackSource": {
-          "ConnId": "plc1",
-          "Address": "40027",
-          "DataType": "Float32"
-        },
-        "IsVertical": false,
-        "ActuatorType": "Diaphragm",
-        "Rotation": 0,
-        "AlarmDisabled": false,
-        "Tolerance": 10,
-        "ModeSource": null,
-        "Type": "Valve",
-        "Title": "\u041A\u043B\u0430\u043F\u0430\u043D \u043E\u0445\u043B.",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "40027",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 15.5,
-          "Col": 77.5,
-          "SizeX": 6,
-          "SizeY": 6
-        }
-      },
-      {
-        "PipePoints": "0,1;5,1",
-        "ActiveColor": "#00AAFF",
-        "InactiveColor": "#005588",
-        "ShowFlanges": true,
-        "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u043E\u0445\u043B. 1",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00007",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 17,
-          "Col": 62,
-          "SizeX": 6,
-          "SizeY": 2
-        }
-      },
-      {
-        "PipePoints": "0,1;4,1",
-        "ActiveColor": "#00AAFF",
-        "InactiveColor": "#005588",
-        "ShowFlanges": true,
-        "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u043E\u0445\u043B. 2",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00007",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 17,
-          "Col": 73,
-          "SizeX": 5,
-          "SizeY": 2
-        }
-      },
-      {
-        "PipePoints": "0,1;6,1",
-        "ActiveColor": "#00AAFF",
-        "InactiveColor": "#005588",
-        "ShowFlanges": true,
-        "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u043E\u0445\u043B. 3",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00007",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 17,
-          "Col": 83,
-          "SizeX": 7,
-          "SizeY": 2
-        }
-      },
-      {
-        "ValveType": "CutOff",
-        "ActiveColor": "#00FF00",
-        "InactiveColor": "#FF0000",
-        "FeedbackSource": {
-          "ConnId": "plc1",
-          "Address": "10005",
-          "DataType": "Bool"
-        },
-        "IsVertical": false,
-        "ActuatorType": "Solenoid",
-        "Rotation": 0,
-        "AlarmDisabled": false,
-        "Tolerance": 10,
-        "ModeSource": null,
-        "Type": "Valve",
-        "Title": "\u0421\u0434\u0443\u0432 \u0434\u0430\u0432\u043B\u0435\u043D\u0438\u044F",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00005",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 22.5,
-          "Col": 67.5,
-          "SizeX": 6,
-          "SizeY": 6
-        }
-      },
-      {
-        "PipePoints": "0,1;5,1",
-        "ActiveColor": "#00AAFF",
-        "InactiveColor": "#005588",
-        "ShowFlanges": true,
-        "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u0441\u0434\u0443\u0432\u0430",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00005",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 24,
-          "Col": 62,
-          "SizeX": 6,
-          "SizeY": 2
-        }
-      },
-      {
-        "Format": "{0:F2} \u0431\u0430\u0440",
-        "MinValue": 1,
-        "MaxValue": 6,
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "SetValue",
-        "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0434\u0430\u0432\u043B.",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "40029",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 29,
-          "Col": 68,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "Format": "{0:F1} %",
-        "MinValue": 0,
-        "MaxValue": 100,
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "SetValue",
-        "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0441\u0434\u0443\u0432\u0430 %",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "40021",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 29,
-          "Col": 77,
-          "SizeX": 8,
-          "SizeY": 4
-        }
-      },
-      {
-        "PipePoints": "0,1;0,9;13,9",
-        "ActiveColor": "#00FF99",
-        "InactiveColor": "#007755",
-        "ShowFlanges": true,
-        "Thickness": 12,
-        "StartFitting": "None",
-        "EndFitting": "None",
-        "Type": "Pipe",
-        "Title": "\u041B\u0438\u043D\u0438\u044F \u0441\u043B\u0438\u0432\u0430",
-        "Source": {
-          "ConnId": "plc1",
-          "Address": "00001",
-          "DataType": "Bool"
-        },
-        "Position": {
-          "Row": 44,
-          "Col": 54,
-          "SizeX": 14,
-          "SizeY": 10
-        }
-      },
-      {
-        "Format": "{0:F1} \u043B/\u043C\u0438\u043D",
-        "ValueColor": "",
-        "ValueFontSize": 0,
-        "Type": "ValueDisplay",
-        "Title": "\u0421\u043A\u043E\u0440\u043E\u0441\u0442\u044C \u0441\u043B\u0438\u0432\u0430",
-        "Source": {
-          "ConnId": "plc1",
+          "ConnId": "plc_511",
           "Address": "30027",
           "DataType": "Float32"
         },
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Налито воды",
         "Position": {
-          "Row": 45,
-          "Col": 68,
-          "SizeX": 8,
+          "Row": 1,
+          "Col": 26,
+          "SizeX": 11,
           "SizeY": 4
-        }
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30031",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F2} м³"
+      },
+      {
+        "Type": "SetValue",
+        "Title": "Уставка дозы",
+        "Position": {
+          "Row": 9,
+          "Col": 14,
+          "SizeX": 11,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40119",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} м³",
+        "MinValue": 0,
+        "MaxValue": 20
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Пуск дозы",
+        "Position": {
+          "Row": 9,
+          "Col": 26,
+          "SizeX": 11,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00007",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Диазо к FCV1",
+        "Position": {
+          "Row": 24.5,
+          "Col": 10.5,
+          "SizeX": 20,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;19,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Valve",
+        "Title": "FCV1 (Диазо)",
+        "Position": {
+          "Row": 22,
+          "Col": 30,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "ValveType": "Regulating",
+        "ActuatorType": "Pneumatic",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40107",
+          "DataType": "Float32"
+        },
+        "ModeSource": {
+          "ConnId": "plc_511",
+          "Address": "00001",
+          "DataType": "Bool"
+        },
+        "FeedbackSource": {
+          "ConnId": "plc_511",
+          "Address": "30009",
+          "DataType": "Float32"
+        },
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Диазо от FCV1 в R511",
+        "Position": {
+          "Row": 24.5,
+          "Col": 36.5,
+          "SizeX": 20,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;19,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Расход диазо",
+        "Position": {
+          "Row": 17,
+          "Col": 9,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30035",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Объем диазо",
+        "Position": {
+          "Row": 17,
+          "Col": 20,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30037",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F2} м³"
+      },
+      {
+        "Type": "SetValue",
+        "Title": "Уставка расхода",
+        "Position": {
+          "Row": 17,
+          "Col": 31,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40123",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} м³/ч",
+        "MinValue": 0,
+        "MaxValue": 25
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Соды к FCV2",
+        "Position": {
+          "Row": 38.5,
+          "Col": 10.5,
+          "SizeX": 20,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;19,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Valve",
+        "Title": "FCV2 (Сода)",
+        "Position": {
+          "Row": 36,
+          "Col": 30,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "ValveType": "Regulating",
+        "ActuatorType": "Pneumatic",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40109",
+          "DataType": "Float32"
+        },
+        "ModeSource": {
+          "ConnId": "plc_511",
+          "Address": "00002",
+          "DataType": "Bool"
+        },
+        "FeedbackSource": {
+          "ConnId": "plc_511",
+          "Address": "30011",
+          "DataType": "Float32"
+        },
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Соды от FCV2 в R511",
+        "Position": {
+          "Row": 38.5,
+          "Col": 36.5,
+          "SizeX": 20,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;19,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Расход соды",
+        "Position": {
+          "Row": 41,
+          "Col": 9,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30023",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Объем соды",
+        "Position": {
+          "Row": 41,
+          "Col": 19.5,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30025",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F2} м³"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Пара к TCV1",
+        "Position": {
+          "Row": 56.5,
+          "Col": 24.5,
+          "SizeX": 17,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;16,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Valve",
+        "Title": "TCV1 (Пар)",
+        "Position": {
+          "Row": 54,
+          "Col": 41,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "ValveType": "Regulating",
+        "ActuatorType": "Pneumatic",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40111",
+          "DataType": "Float32"
+        },
+        "ModeSource": {
+          "ConnId": "plc_511",
+          "Address": "00003",
+          "DataType": "Bool"
+        },
+        "FeedbackSource": {
+          "ConnId": "plc_511",
+          "Address": "30013",
+          "DataType": "Float32"
+        },
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Пара от TCV1 в рубашку R511",
+        "Position": {
+          "Row": 47.5,
+          "Col": 47.5,
+          "SizeX": 20,
+          "SizeY": 10
+        },
+        "PipePoints": "0,9;18,9;18,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "SetValue",
+        "Title": "Уставка Т",
+        "Position": {
+          "Row": 62,
+          "Col": 28,
+          "SizeX": 11,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40121",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} °C",
+        "MinValue": 0,
+        "MaxValue": 100
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Пуск нагрева",
+        "Position": {
+          "Row": 62,
+          "Col": 40,
+          "SizeX": 11,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00008",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Удержание",
+        "Position": {
+          "Row": 62,
+          "Col": 52,
+          "SizeX": 13,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00013",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Температура R-511",
+        "Position": {
+          "Row": 8,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30017",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} °C"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "pH среды R-511",
+        "Position": {
+          "Row": 8,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30015",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F2} pH"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Весы WE-1",
+        "Position": {
+          "Row": 14,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30019",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} кг"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Весы WE-2",
+        "Position": {
+          "Row": 14,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30021",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} кг"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Пуск стадии",
+        "Position": {
+          "Row": 22,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00009",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Пауза стадии",
+        "Position": {
+          "Row": 22,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00012",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "PilotLight",
+        "Title": "Идет сочетание",
+        "Position": {
+          "Row": 29,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00010",
+          "DataType": "Bool"
+        },
+        "TrueColor": "#00E676",
+        "FalseColor": "#37474F"
+      },
+      {
+        "Type": "PilotLight",
+        "Title": "Стадия готова",
+        "Position": {
+          "Row": 29,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00011",
+          "DataType": "Bool"
+        },
+        "TrueColor": "#00E676",
+        "FalseColor": "#37474F"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Осталось времени",
+        "Position": {
+          "Row": 36,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30043",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F0} сек"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Этап автомата",
+        "Position": {
+          "Row": 36,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30045",
+          "DataType": "Float32"
+        },
+        "Format": "Шаг {0:F0}"
       }
     ]
   }
