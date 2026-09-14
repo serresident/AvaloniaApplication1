@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -217,38 +217,31 @@
                                        Background="Transparent" BorderThickness="0" Padding="0"
                                        ClipToBounds="False">
                                    <Border Background="Transparent" BorderThickness="0" Margin="0" ClipToBounds="False">
-                                       <DockPanel Tag="{Binding Rotation}" ClipToBounds="False">
-                                            <!-- Title and Value -->
-                                            <StackPanel Tag="{Binding Rotation}" DockPanel.Dock="Bottom" HorizontalAlignment="Center" Margin="0,0,0,5">
-                                                <StackPanel.Styles>
-                                                    <Style Selector="StackPanel[Tag=180]">
-                                                        <Setter Property="DockPanel.Dock" Value="Top" />
-                                                    </Style>
-                                                </StackPanel.Styles>
-                                                <TextBlock Text="{Binding Title}" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" />
-                                                <TextBlock Text="{Binding DisplayValue}" FontSize="12" FontWeight="Bold" Foreground="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" HorizontalAlignment="Center" />
-                                            </StackPanel>
+                                       <Grid ClipToBounds="False">
+                                           <!-- Valve Graphic filling the widget bounds -->
+                                           <v:ValveControl 
+                                               ValveType="{Binding ValveType}"
+                                               IsOpen="{Binding IsOpen}"
+                                               Setpoint="{Binding Setpoint}"
+                                               Feedback="{Binding Feedback}"
+                                               HasFeedbackSource="{Binding HasFeedbackSource}"
+                                               IsVertical="{Binding IsVertical}"
+                                               ActuatorType="{Binding ActuatorType}"
+                                               ActiveColor="{Binding ActiveColor}"
+                                               InactiveColor="{Binding InactiveColor}"
+                                               Rotation="{Binding Rotation}"
+                                               IsAlarmFlashing="{Binding IsAlarmFlashing}"
+                                               IsAlarmFlashState="{Binding IsAlarmFlashState}"
+                                               ShowStaticAlarmIcon="{Binding ShowStaticAlarmIcon}"
+                                               ShowFeedbackBar="True" />
 
-                                            <!-- Valve Graphic -->
-                                            <Grid ClipToBounds="False">
-                                                <v:ValveControl 
-                                                    ValveType="{Binding ValveType}"
-                                                    IsOpen="{Binding IsOpen}"
-                                                    Setpoint="{Binding Setpoint}"
-                                                    Feedback="{Binding Feedback}"
-                                                    HasFeedbackSource="{Binding HasFeedbackSource}"
-                                                    IsVertical="{Binding IsVertical}"
-                                                    ActuatorType="{Binding ActuatorType}"
-                                                    ActiveColor="{Binding ActiveColor}"
-                                                    InactiveColor="{Binding InactiveColor}"
-                                                    Rotation="{Binding Rotation}"
-                                                    IsAlarmFlashing="{Binding IsAlarmFlashing}"
-                                                    IsAlarmFlashState="{Binding IsAlarmFlashState}"
-                                                    ShowStaticAlarmIcon="{Binding ShowStaticAlarmIcon}"
-                                                    ShowFeedbackBar="True" />
-                                            </Grid>
-                                        </DockPanel>
-                                    </Border>
+                                           <!-- Title and Value overlaid at bottom of widget -->
+                                           <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-24" IsHitTestVisible="False">
+                                               <TextBlock Text="{Binding Title}" FontSize="11" Foreground="Gray" HorizontalAlignment="Center" />
+                                               <TextBlock Text="{Binding DisplayValue}" FontSize="11" FontWeight="Bold" Foreground="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" HorizontalAlignment="Center" />
+                                           </StackPanel>
+                                       </Grid>
+                                   </Border>
                                </Button>
 
                                <!-- Design Overlay -->

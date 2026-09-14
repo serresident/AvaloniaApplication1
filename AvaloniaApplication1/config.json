@@ -3503,8 +3503,8 @@
           "DataType": "Bool"
         },
         "Position": {
-          "Row": 30,
-          "Col": 19,
+          "Row": 29.5,
+          "Col": 18.5,
           "SizeX": 12,
           "SizeY": 7
         }
@@ -3547,8 +3547,8 @@
           "DataType": "Bool"
         },
         "Position": {
-          "Row": 24,
-          "Col": 36,
+          "Row": 23.5,
+          "Col": 35.5,
           "SizeX": 11,
           "SizeY": 13
         }

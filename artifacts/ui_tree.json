@@ -1738,10 +1738,10 @@
                                                                               "Type": "ContentPresenter",
                                                                               "Name": null,
                                                                               "Bounds": {
-                                                                                "X": 190,
-                                                                                "Y": 300,
-                                                                                "Width": 110,
-                                                                                "Height": 60
+                                                                                "X": 180,
+                                                                                "Y": 290,
+                                                                                "Width": 120,
+                                                                                "Height": 70
                                                                               },
                                                                               "Margin": {
                                                                                 "Left": 0,
@@ -1763,8 +1763,8 @@
                                                                                   "Bounds": {
                                                                                     "X": 0,
                                                                                     "Y": 0,
-                                                                                    "Width": 110,
-                                                                                    "Height": 60
+                                                                                    "Width": 120,
+                                                                                    "Height": 70
                                                                                   },
                                                                                   "Margin": {
                                                                                     "Left": 0,
@@ -1781,8 +1781,8 @@
                                                                                       "Bounds": {
                                                                                         "X": 0,
                                                                                         "Y": 0,
-                                                                                        "Width": 110,
-                                                                                        "Height": 60
+                                                                                        "Width": 120,
+                                                                                        "Height": 70
                                                                                       },
                                                                                       "Margin": {
                                                                                         "Left": 0,
@@ -1953,7 +1953,7 @@
                                                                                               "IsVisible": true,
                                                                                               "Children": [
                                                                                                 {
-                                                                                                  "Type": "DockPanel",
+                                                                                                  "Type": "Grid",
                                                                                                   "Name": null,
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
@@ -1971,19 +1971,38 @@
                                                                                                   "IsVisible": true,
                                                                                                   "Children": [
                                                                                                     {
-                                                                                                      "Type": "StackPanel",
+                                                                                                      "Type": "ValveControl",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
                                                                                                         "X": 0,
-                                                                                                        "Y": 25,
+                                                                                                        "Y": 0,
                                                                                                         "Width": 60,
-                                                                                                        "Height": 30
+                                                                                                        "Height": 60
                                                                                                       },
                                                                                                       "Margin": {
                                                                                                         "Left": 0,
                                                                                                         "Top": 0,
                                                                                                         "Right": 0,
-                                                                                                        "Bottom": 5
+                                                                                                        "Bottom": 0
+                                                                                                      },
+                                                                                                      "Padding": null,
+                                                                                                      "IsVisible": true,
+                                                                                                      "Children": []
+                                                                                                    },
+                                                                                                    {
+                                                                                                      "Type": "StackPanel",
+                                                                                                      "Name": null,
+                                                                                                      "Bounds": {
+                                                                                                        "X": 0,
+                                                                                                        "Y": 56,
+                                                                                                        "Width": 60,
+                                                                                                        "Height": 28
+                                                                                                      },
+                                                                                                      "Margin": {
+                                                                                                        "Left": 0,
+                                                                                                        "Top": 0,
+                                                                                                        "Right": 0,
+                                                                                                        "Bottom": -24
                                                                                                       },
                                                                                                       "Padding": null,
                                                                                                       "IsVisible": true,
@@ -1995,7 +2014,7 @@
                                                                                                             "X": 0,
                                                                                                             "Y": 0,
                                                                                                             "Width": 60,
-                                                                                                            "Height": 15
+                                                                                                            "Height": 14
                                                                                                           },
                                                                                                           "Margin": {
                                                                                                             "Left": 0,
@@ -2017,9 +2036,9 @@
                                                                                                           "Name": null,
                                                                                                           "Bounds": {
                                                                                                             "X": 22,
-                                                                                                            "Y": 15,
-                                                                                                            "Width": 17,
-                                                                                                            "Height": 15
+                                                                                                            "Y": 14,
+                                                                                                            "Width": 16,
+                                                                                                            "Height": 14
                                                                                                           },
                                                                                                           "Margin": {
                                                                                                             "Left": 0,
@@ -2033,45 +2052,6 @@
                                                                                                             "Right": 0,
                                                                                                             "Bottom": 0
                                                                                                           },
-                                                                                                          "IsVisible": true,
-                                                                                                          "Children": []
-                                                                                                        }
-                                                                                                      ]
-                                                                                                    },
-                                                                                                    {
-                                                                                                      "Type": "Grid",
-                                                                                                      "Name": null,
-                                                                                                      "Bounds": {
-                                                                                                        "X": 0,
-                                                                                                        "Y": 0,
-                                                                                                        "Width": 60,
-                                                                                                        "Height": 25
-                                                                                                      },
-                                                                                                      "Margin": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
-                                                                                                      },
-                                                                                                      "Padding": null,
-                                                                                                      "IsVisible": true,
-                                                                                                      "Children": [
-                                                                                                        {
-                                                                                                          "Type": "ValveControl",
-                                                                                                          "Name": null,
-                                                                                                          "Bounds": {
-                                                                                                            "X": 0,
-                                                                                                            "Y": 0,
-                                                                                                            "Width": 60,
-                                                                                                            "Height": 25
-                                                                                                          },
-                                                                                                          "Margin": {
-                                                                                                            "Left": 0,
-                                                                                                            "Top": 0,
-                                                                                                            "Right": 0,
-                                                                                                            "Bottom": 0
-                                                                                                          },
-                                                                                                          "Padding": null,
                                                                                                           "IsVisible": true,
                                                                                                           "Children": []
                                                                                                         }
@@ -2162,10 +2142,10 @@
                                                                               "Type": "ContentPresenter",
                                                                               "Name": null,
                                                                               "Bounds": {
-                                                                                "X": 360,
-                                                                                "Y": 240,
-                                                                                "Width": 100,
-                                                                                "Height": 120
+                                                                                "X": 350,
+                                                                                "Y": 230,
+                                                                                "Width": 110,
+                                                                                "Height": 130
                                                                               },
                                                                               "Margin": {
                                                                                 "Left": 0,
@@ -2187,8 +2167,8 @@
                                                                                   "Bounds": {
                                                                                     "X": 0,
                                                                                     "Y": 0,
-                                                                                    "Width": 100,
-                                                                                    "Height": 120
+                                                                                    "Width": 110,
+                                                                                    "Height": 130
                                                                                   },
                                                                                   "Margin": {
                                                                                     "Left": 0,
@@ -2205,8 +2185,8 @@
                                                                                       "Bounds": {
                                                                                         "X": 0,
                                                                                         "Y": 0,
-                                                                                        "Width": 100,
-                                                                                        "Height": 120
+                                                                                        "Width": 110,
+                                                                                        "Height": 130
                                                                                       },
                                                                                       "Margin": {
                                                                                         "Left": 0,

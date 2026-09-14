@@ -257,10 +257,10 @@ namespace AvaloniaApplication1.Views.DashboardPanelHelpers
             if (finalRotation == 0 && isVertical) finalRotation = 90;
             bool isFlowVertical = (finalRotation == 90 || finalRotation == 270);
 
-            double fallbackRelX1 = isFlowVertical ? (sizeX / 2.0) : 0.0;
-            double fallbackRelY1 = isFlowVertical ? 0.0 : (sizeY / 2.0);
-            double fallbackRelX2 = isFlowVertical ? (sizeX / 2.0) : sizeX;
-            double fallbackRelY2 = isFlowVertical ? sizeY : (sizeY / 2.0);
+            double fallbackRelX1 = isFlowVertical ? (sizeX - 1) / 2.0 : -0.5;
+            double fallbackRelY1 = isFlowVertical ? -0.5 : (sizeY - 1) / 2.0;
+            double fallbackRelX2 = isFlowVertical ? (sizeX - 1) / 2.0 : sizeX - 0.5;
+            double fallbackRelY2 = isFlowVertical ? sizeY - 0.5 : (sizeY - 1) / 2.0;
 
             var fallbackP1 = new Point(col + fallbackRelX1, row + fallbackRelY1);
             var fallbackP2 = new Point(col + fallbackRelX2, row + fallbackRelY2);
@@ -332,17 +332,17 @@ namespace AvaloniaApplication1.Views.DashboardPanelHelpers
             else if (string.Equals(vm.Type, "HeatExchanger", StringComparison.OrdinalIgnoreCase))
             {
                 // Port 1: Верхний левый патрубок (Hot In)
-                var p1Grid = new Point(col + sizeX * 0.22, row);
+                var p1Grid = new Point(col + (sizeX - 1) * 0.25, row - 0.5);
                 // Port 2: Нижний правый патрубок (Hot Out)
-                var p2Grid = new Point(col + sizeX * 0.78, row + sizeY);
+                var p2Grid = new Point(col + (sizeX - 1) * 0.75, row + sizeY - 0.5);
                 return (p1Grid, p2Grid);
             }
             else if (string.Equals(vm.Type, "Reactor", StringComparison.OrdinalIgnoreCase))
             {
                 // Port 1: Верхний загрузочный штуцер
-                var p1Grid = new Point(col + sizeX * 0.2, row);
+                var p1Grid = new Point(col + (sizeX - 1) * 0.2, row - 0.5);
                 // Port 2: Нижний сливной штуцер
-                var p2Grid = new Point(col + sizeX * 0.5, row + sizeY);
+                var p2Grid = new Point(col + (sizeX - 1) / 2.0, row + sizeY - 0.5);
                 return (p1Grid, p2Grid);
             }
 
