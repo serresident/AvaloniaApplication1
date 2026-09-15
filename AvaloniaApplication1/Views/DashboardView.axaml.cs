@@ -265,6 +265,27 @@ namespace AvaloniaApplication1.Views
             {
                 window.Deactivated += Window_Deactivated;
             }
+            LinkOverlays();
+        }
+
+        public void LinkOverlays()
+        {
+            var panel = this.FindDescendantOfType<DashboardPanel>();
+            var gridOverlay = this.FindControl<GridOverlay>("DashboardGridOverlay");
+            var selectionOverlay = this.FindControl<SelectionOverlay>("DashboardSelectionOverlay");
+            if (panel != null)
+            {
+                if (gridOverlay != null)
+                {
+                    panel.GridOverlay = gridOverlay;
+                    gridOverlay.Panel = panel;
+                }
+                if (selectionOverlay != null)
+                {
+                    panel.SelectionOverlay = selectionOverlay;
+                    selectionOverlay.Panel = panel;
+                }
+            }
         }
 
         protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)

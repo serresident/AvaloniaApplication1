@@ -357,6 +357,66 @@ public static class Program
         }
         openWindow.CloseCommand.Execute(null);
 
+        // 9. Test Widget Deletion without view switching (Bugfix validation)
+        var testDashboardConfig = new DashboardConfig();
+        var testDashboardVm = new DashboardViewModel(testDashboardConfig, new MockDataCoreService(), mainVm.ProjectContext, new HmiConfiguration(), null, widgetFactory);
+        
+        var testView = new DashboardView { DataContext = testDashboardVm };
+        var testWindow = new Window { Content = testView, Width = 800, Height = 600 };
+        testWindow.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var testPanel = testView.FindDescendantOfType<DashboardPanel>();
+        if (testPanel == null)
+            throw new Exception("DashboardPanel was not found in DashboardView visual tree.");
+
+        if (testPanel.Children.Count != 0)
+            throw new Exception($"DashboardPanel.Children should be empty initially, but was {testPanel.Children.Count}.");
+
+        // Add 3 widgets
+        testDashboardVm.AddQuickWidgetAt("Valve", 2, 2);
+        testDashboardVm.AddQuickWidgetAt("Pump", 6, 6);
+        testDashboardVm.AddQuickWidgetAt("Tank", 10, 10);
+        Dispatcher.UIThread.RunJobs();
+
+        if (testDashboardVm.Widgets.Count != 3)
+            throw new Exception("Widgets count should be 3.");
+        if (testPanel.Children.Count != 3)
+            throw new Exception($"DashboardPanel.Children.Count ({testPanel.Children.Count}) does not match Widgets.Count (3).");
+
+        // Delete the middle widget (index 1: Pump)
+        var pumpWidget = testDashboardVm.Widgets[1];
+        testDashboardVm.RemoveWidgetCommand.Execute(pumpWidget);
+        Dispatcher.UIThread.RunJobs();
+
+        if (testDashboardVm.Widgets.Count != 2)
+            throw new Exception("Widgets count should be 2 after removing middle widget.");
+        if (testPanel.Children.Count != 2)
+            throw new Exception($"DashboardPanel.Children.Count ({testPanel.Children.Count}) did not immediately update to 2!");
+
+        // Delete first widget (index 0: Valve)
+        var valveWidget = testDashboardVm.Widgets[0];
+        testDashboardVm.RemoveWidgetCommand.Execute(valveWidget);
+        Dispatcher.UIThread.RunJobs();
+
+        if (testDashboardVm.Widgets.Count != 1)
+            throw new Exception("Widgets count should be 1 after removing first widget.");
+        if (testPanel.Children.Count != 1)
+            throw new Exception($"DashboardPanel.Children.Count ({testPanel.Children.Count}) did not immediately update to 1!");
+
+        // Delete last remaining widget (Tank)
+        var tankWidget = testDashboardVm.Widgets[0];
+        testDashboardVm.RemoveWidgetCommand.Execute(tankWidget);
+        Dispatcher.UIThread.RunJobs();
+
+        if (testDashboardVm.Widgets.Count != 0)
+            throw new Exception("Widgets count should be 0.");
+        if (testPanel.Children.Count != 0)
+            throw new Exception($"DashboardPanel.Children.Count ({testPanel.Children.Count}) should be 0, phantom widgets detected!");
+
+        testWindow.Close();
+        Dispatcher.UIThread.RunJobs();
+
         Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS PASSED SUCCESSFULLY!");
     }
 

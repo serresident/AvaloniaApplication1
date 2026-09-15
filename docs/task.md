@@ -357,3 +357,19 @@
     - Наследование и двухсторонняя синхронизация `CellSize`/`ZoomScale` окна-контейнера `ContainerButton`
   - [x] Сборка `scripts/check-build.ps1`: 0 ошибок, 0 предупреждений
   - [x] Рендеринг `scripts/render_ui.ps1 MimicView` и `DashboardView` успешно пройден, артефакты сформированы
+
+# Tasks: Widget Instant Deletion & Overlays Decoupling (Сессия 26 — Завершено)
+
+- [x] Устранение дефекта «фантомного» удаления виджетов (зависание элементов на канве без переключения вкладок):
+  - [x] Анализ жизненного цикла `ItemsControl.ItemsPanel` (`DashboardPanel.Children`) и локализация дефекта: служебные оверлеи `_gridOverlay` и `_selectionOverlay` вставлялись напрямую в `Children` (`Insert(0, _gridOverlay)` и `Add(_selectionOverlay)`), сбивая 1:1 соответствие между `Widgets` и `Children` и приводя к удалению оверлея вместо виджета
+  - [x] Архитектурная изоляция оверлеев: вынос `GridOverlay` и `SelectionOverlay` из `DashboardPanel.Children` в трехуровневый `<Grid>` в `DashboardView.axaml` (`GridOverlay` снизу, `ItemsControl` по центру, `SelectionOverlay` сверху)
+  - [x] Рефакторинг `DashboardPanel.cs`: полное удаление манипуляций с `Children`, удаление `EnsureOverlaysState()`, обеспечение чистоты коллекции `Children` (только контейнеры виджетов)
+  - [x] Рефакторинг `GridOverlay.cs` и `SelectionOverlay.cs`: поддержка автономного конструктора без параметров, автоматический поиск родителя `DashboardView`/`DashboardPanel` и явный метод связывания `LinkOverlays()`
+  - [x] Связывание в `DashboardView.axaml.cs`: вызов `panel.LinkOverlays(DashboardGridOverlay, DashboardSelectionOverlay)`
+  - [x] Исправление порядка выполнения команды удаления в `DashboardPanel.cs`: фиксация удаляемого экземпляра в локальной переменной, вызов `RemoveWidgetCommand.Execute(toRemove)` до сброса `SelectedVm = null`
+- [x] Автоматическое тестирование:
+  - [x] Добавлен тест №9 в `AvaloniaApplication1.UIValidation/Program.cs`: создание 3 виджетов, поочередное удаление с проверкой мгновенного уменьшения `DashboardPanel.Children.Count` (с 3 до 2, 1, 0) без переключения вкладок
+- [x] Верификация:
+  - [x] Все 9 тестов `AvaloniaApplication1.UIValidation` пройдены успешно (100%)
+  - [x] `scripts/check-build.ps1`: 0 ошибок, 0 предупреждений
+  - [x] `scripts/render_ui.ps1 DashboardView`: успешный рендер, артефакты `ui_preview.png` и `ui_tree.json` сгенерированы

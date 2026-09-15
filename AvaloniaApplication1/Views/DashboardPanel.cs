@@ -120,10 +120,35 @@ namespace AvaloniaApplication1.Views
         }
         private List<ConnectedPipePoint> _connectedPipePoints = new();
 
-        // Grid overlay control
+        // Overlay references (hosted outside Children to keep Children 1:1 with Widgets)
         private GridOverlay? _gridOverlay;
+        public GridOverlay? GridOverlay
+        {
+            get => _gridOverlay;
+            set
+            {
+                if (_gridOverlay != value)
+                {
+                    _gridOverlay = value;
+                    _gridOverlay?.InvalidateVisual();
+                }
+            }
+        }
+
         private SelectionOverlay? _selectionOverlay;
-        private bool _isManagingOverlays;
+        public SelectionOverlay? SelectionOverlay
+        {
+            get => _selectionOverlay;
+            set
+            {
+                if (_selectionOverlay != value)
+                {
+                    _selectionOverlay = value;
+                    _selectionOverlay?.InvalidateVisual();
+                }
+            }
+        }
+
         private ContextMenu? _activeWidgetMenu;
 
         public Point? ActiveSnapTarget { get; private set; }
@@ -176,7 +201,9 @@ namespace AvaloniaApplication1.Views
             });
             IsDesignModeProperty.Changed.AddClassHandler<DashboardPanel>((panel, args) =>
             {
-                panel.UpdateGridOverlay();
+                panel._gridOverlay?.InvalidateVisual();
+                panel._selectionOverlay?.InvalidateVisual();
+                panel.InvalidateVisual();
                 if (!panel.IsDesignMode)
                 {
                     panel.SelectedVm = null;
@@ -224,7 +251,6 @@ namespace AvaloniaApplication1.Views
 
             Children.CollectionChanged += (s, e) =>
             {
-                if (_isManagingOverlays) return;
                 if (e.OldItems != null)
                 {
                     foreach (Control child in e.OldItems)
@@ -264,10 +290,10 @@ namespace AvaloniaApplication1.Views
                         SelectedVm = null;
                     }
                 }
-                Avalonia.Threading.Dispatcher.UIThread.Post(() => EnsureOverlaysState());
                 InvalidateMeasure();
                 InvalidateArrange();
                 InvalidateVisual();
+                _selectionOverlay?.InvalidateVisual();
             };
         }
 
@@ -304,102 +330,41 @@ namespace AvaloniaApplication1.Views
                 InvalidateMeasure();
                 InvalidateArrange();
                 InvalidateVisual();
-            }
-        }
-
-        private void UpdateGridOverlay()
-        {
-            if (IsDesignMode)
-            {
-                EnsureOverlaysState();
-            }
-            else
-            {
-                if (_isManagingOverlays) return;
-                _isManagingOverlays = true;
-                try
-                {
-                    if (_gridOverlay != null)
-                    {
-                        Children.Remove(_gridOverlay);
-                        _gridOverlay = null;
-                    }
-                    if (_selectionOverlay != null)
-                    {
-                        Children.Remove(_selectionOverlay);
-                        _selectionOverlay = null;
-                    }
-                }
-                finally
-                {
-                    _isManagingOverlays = false;
-                }
+                _selectionOverlay?.InvalidateVisual();
             }
         }
 
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
-            UpdateGridOverlay();
+            ResolveOverlays();
         }
 
-        private void EnsureOverlaysState()
+        public void ResolveOverlays()
         {
-            if (!IsDesignMode) return;
-            if (_isManagingOverlays) return;
-            
-            _isManagingOverlays = true;
-            try
+            var view = this.FindAncestorOfType<DashboardView>();
+            if (view != null)
             {
-                // Ensure grid overlay is at index 0
-                if (_gridOverlay != null)
+                if (_gridOverlay == null)
                 {
-                    int gridIdx = Children.IndexOf(_gridOverlay);
-                    if (gridIdx != 0)
+                    var gridOverlay = view.FindControl<GridOverlay>("DashboardGridOverlay");
+                    if (gridOverlay != null)
                     {
-                        if (gridIdx > 0)
-                        {
-                            Children.RemoveAt(gridIdx);
-                        }
-                        Children.Insert(0, _gridOverlay);
+                        _gridOverlay = gridOverlay;
+                        gridOverlay.Panel = this;
+                        _gridOverlay.InvalidateVisual();
                     }
                 }
-                else
+                if (_selectionOverlay == null)
                 {
-                    _gridOverlay = new GridOverlay
+                    var selectionOverlay = view.FindControl<SelectionOverlay>("DashboardSelectionOverlay");
+                    if (selectionOverlay != null)
                     {
-                        CellWidth = CellWidth,
-                        CellHeight = CellHeight,
-                        IsHitTestVisible = false
-                    };
-                    Children.Insert(0, _gridOverlay);
-                }
-
-                // Ensure selection overlay is at the end
-                if (_selectionOverlay != null)
-                {
-                    int selIdx = Children.IndexOf(_selectionOverlay);
-                    if (selIdx != Children.Count - 1)
-                    {
-                        if (selIdx >= 0)
-                        {
-                            Children.RemoveAt(selIdx);
-                        }
-                        Children.Add(_selectionOverlay);
+                        _selectionOverlay = selectionOverlay;
+                        selectionOverlay.Panel = this;
+                        _selectionOverlay.InvalidateVisual();
                     }
                 }
-                else
-                {
-                    _selectionOverlay = new SelectionOverlay(this)
-                    {
-                        IsHitTestVisible = false
-                    };
-                    Children.Add(_selectionOverlay);
-                }
-            }
-            finally
-            {
-                _isManagingOverlays = false;
             }
         }
 
@@ -429,8 +394,6 @@ namespace AvaloniaApplication1.Views
             // 1. Check if we clicked on a vertex of any Pipe widget
             foreach (var child in Children)
             {
-                if (child == _gridOverlay || child == _selectionOverlay) continue;
-
                 if (child.DataContext is PipeWidgetViewModel pipeVm)
                 {
                     if (!pipeVm.IsEditingVertices) continue;
@@ -476,8 +439,6 @@ namespace AvaloniaApplication1.Views
             {
                 foreach (var child in Children)
                 {
-                    if (child == _gridOverlay || child == _selectionOverlay) continue;
-
                     if (child.DataContext is PipeWidgetViewModel pipeVm)
                     {
                         if (!pipeVm.IsEditingVertices) continue;
@@ -516,7 +477,7 @@ namespace AvaloniaApplication1.Views
                 var curr = sourceVisual;
                 while (curr != null && curr != this)
                 {
-                    if (curr.GetVisualParent() == this && curr is Control c && c != _gridOverlay && c != _selectionOverlay)
+                    if (curr.GetVisualParent() == this && curr is Control c)
                     {
                         if (c.DataContext is WidgetViewModelBase vm)
                         {
@@ -565,7 +526,6 @@ namespace AvaloniaApplication1.Views
                 for (int i = Children.Count - 1; i >= 0; i--)
                 {
                     var child = Children[i];
-                    if (child == _gridOverlay || child == _selectionOverlay) continue;
 
                     if (child.DataContext is WidgetViewModelBase vm)
                     {
@@ -670,7 +630,6 @@ namespace AvaloniaApplication1.Views
 
                         foreach (var otherChild in Children)
                         {
-                            if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
                             if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
                             {
                                 var points = pipeVm.GetAbsoluteGridPoints();
@@ -888,8 +847,11 @@ namespace AvaloniaApplication1.Views
             var removeItem = new MenuItem { Header = "Удалить" };
             removeItem.Click += (s, ev) =>
             {
+                var toRemove = targetVm;
+                dashboardVm.RemoveWidgetCommand.Execute(toRemove);
                 SelectedVm = null;
-                dashboardVm.RemoveWidgetCommand.Execute(targetVm);
+                InvalidateVisual();
+                _selectionOverlay?.InvalidateVisual();
             };
             menu.Items.Add(removeItem);
 
@@ -1004,7 +966,6 @@ namespace AvaloniaApplication1.Views
                         {
                             foreach (var child in Children)
                             {
-                                if (child == _gridOverlay || child == _selectionOverlay) continue;
                                 if (child.DataContext is WidgetViewModelBase widgetVm && 
                                     (string.Equals(widgetVm.Type, "Valve", StringComparison.OrdinalIgnoreCase) ||
                                      string.Equals(widgetVm.Type, "Pump", StringComparison.OrdinalIgnoreCase) ||
@@ -1371,12 +1332,6 @@ namespace AvaloniaApplication1.Views
 
             foreach (var child in Children)
             {
-                if (child == _gridOverlay || child == _selectionOverlay)
-                {
-                    // Overlay fills entire panel — measured later
-                    continue;
-                }
-
                 var vm = child.DataContext as WidgetViewModelBase;
                 double col = vm != null ? vm.Col : GetCol(child);
                 double row = vm != null ? vm.Row : GetRow(child);
@@ -1391,23 +1346,13 @@ namespace AvaloniaApplication1.Views
                 maxHeight = Math.Max(maxHeight, (row + sizeY) * CellHeight);
             }
 
-            // Now measure the overlays to fill everything
-            _gridOverlay?.Measure(new Size(maxWidth, maxHeight));
-            _selectionOverlay?.Measure(new Size(maxWidth, maxHeight));
-
             return new Size(maxWidth, maxHeight);
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            // Arrange overlays to fill entire panel
-            _gridOverlay?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
-            _selectionOverlay?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
-
             foreach (var child in Children)
             {
-                if (child == _gridOverlay || child == _selectionOverlay) continue;
-
                 var vm = child.DataContext as WidgetViewModelBase;
                 double col = vm != null ? vm.Col : GetCol(child);
                 double row = vm != null ? vm.Row : GetRow(child);
@@ -1459,8 +1404,10 @@ namespace AvaloniaApplication1.Views
                 if (dashboardVm != null)
                 {
                     var toRemove = SelectedVm;
-                    SelectedVm = null;
                     dashboardVm.RemoveWidgetCommand.Execute(toRemove);
+                    SelectedVm = null;
+                    InvalidateVisual();
+                    _selectionOverlay?.InvalidateVisual();
                     e.Handled = true;
                     return;
                 }
@@ -1546,7 +1493,6 @@ namespace AvaloniaApplication1.Views
 
                 foreach (var otherChild in Children)
                 {
-                    if (otherChild == _gridOverlay || otherChild == _selectionOverlay) continue;
                     if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
                     {
                         // Skip pipes that are already connected and moving with this widget

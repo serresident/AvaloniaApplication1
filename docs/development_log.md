@@ -579,3 +579,38 @@
   8. Синхронизация `CellSize` и `ZoomScale` между окном `ContainerButton` и конфигурацией: УСПЕШНО.
 * **Сборка (`scripts/check-build.ps1`):** **0 ошибок, 0 предупреждений**.
 * **Headless UI Рендеринг (`scripts/render_ui.ps1 MimicView` и `DashboardView`):** Все артефакты `ui_preview.png` и `ui_tree.json` успешно сформированы.
+
+## 2026-09-15 — Сессия 26: Устранение «фантомного» удаления виджетов и декаплинг оверлеев
+
+### 🎯 Цель сессии
+Устранить дефект, при котором после удаления виджета через контекстное меню («Удалить») или по клавише `Delete` элемент иногда оставался визуально отображаться на экране (фантом), исчезая только после переключения активных вкладок «Дашборд» и «Мнемосхема». Обеспечить мгновенное, детерминированное удаление визуального контейнера виджета с холста.
+
+### 🔍 Анализ коренной причины (Root Cause Analysis)
+1. **Засорение `ItemsControl.ItemsPanel.Children`:**
+   В Avalonia `DashboardPanel` является панелью элементов (`ItemsPanel`) для `ItemsControl` со связкой `ItemsSource="{Binding Widgets}"`. Avalonia связывает индекс элемента в коллекции `ItemsSource` (`Widgets[i]`) с индексом визуального контейнера `Children[i]`.
+   Однако в старой реализации `GridOverlay` вставлялся как `Children.Insert(0, _gridOverlay)`, а `SelectionOverlay` как `Children.Add(_selectionOverlay)`.
+   Когда пользователь удалял виджет с индексом `0` (`Widgets.RemoveAt(0)`), `ItemsControl` удалял из `Children` элемент с индексом `0` — то есть **сам служебный `_gridOverlay`**! При этом реальный контейнер удаленного виджета оставался на холсте как «фантом». Метод `EnsureOverlaysState()` при последующем цикле вставлял новый `_gridOverlay` в начало, создавая постоянное рассогласование индексов.
+2. **Преждевременный сброс выделения (`SelectedVm = null`):**
+   В обработчике контекстного меню свойство `SelectedVm` сбрасывалось до вызова `RemoveWidgetCommand.Execute(...)`. Из-за этого свойство `widget.IsSelected` становилось `false`, и фоллбэк команды удаления `widget ??= Widgets.FirstOrDefault(w => w.IsSelected)` возвращал `null`, не выполняя удаление.
+
+### 🛠️ Выполненные инженерные решения
+1. **Архитектурный вынос оверлеев из `DashboardPanel.Children` (`DashboardView.axaml`):**
+   * Внутри `ZoomControl` развернут трехуровневый `<Grid>`:
+     - **Слой 1 (фон):** `<v:GridOverlay x:Name="DashboardGridOverlay" Margin="10" IsHitTestVisible="False" />`
+     - **Слой 2 (контент):** `<ItemsControl ItemsSource="{Binding Widgets}" x:Name="WidgetsItemsControl"> ... </ItemsControl>`
+     - **Слой 3 (передний план):** `<v:SelectionOverlay x:Name="DashboardSelectionOverlay" Margin="10" IsHitTestVisible="False" ClipToBounds="False" />`
+   * Панель `DashboardPanel` теперь содержит **исключительно** визуальные контейнеры виджетов. Никаких вставок оверлеев в `Children`, никаких вызовов `EnsureOverlaysState()`.
+2. **Декаплинг `GridOverlay.cs` и `SelectionOverlay.cs`:**
+   * Добавлены конструкторы по умолчанию `public GridOverlay()` и `public SelectionOverlay()`.
+   * Реализован автоматический резолв целевой `DashboardPanel` через визуальное дерево при `OnAttachedToVisualTree` и метод явного связывания `panel.LinkOverlays(gridOverlay, selectionOverlay)`.
+   * В `DashboardView.axaml.cs` в `OnApplyTemplate` и `InitializeComponent` выполняется надежное связывание через `LinkOverlays`.
+3. **Коррекция команды удаления в `DashboardPanel.cs`:**
+   * В `ShowWidgetContextMenu`: удаляемый экземпляр виджета кэшируется в локальной переменной `var toRemove = hitWidget`, после чего вызывается `dashboardVm.RemoveWidgetCommand.Execute(toRemove)`, и только затем очищается `SelectedVm = null; InvalidateVisual();`.
+   * Аналогично скорректирован обработчик `OnKeyDown` для клавиши `Delete`.
+4. **Тест №9 в `AvaloniaApplication1.UIValidation/Program.cs`:**
+   * Добавлен автоматический тест: добавление 3 виджетов в `DashboardViewModel.Widgets` и панель `DashboardPanel`, затем поочередное удаление (среднего, первого, последнего) с верификацией строгого равенства `DashboardPanel.Children.Count` ожидаемым значениям (2, 1, 0) без переключения вкладок.
+
+### 🧪 Верификация и результаты
+* **9 автоматических валидационных проверок в `AvaloniaApplication1.UIValidation/Program.cs`:** Все 9 тестов пройдены успешно (100%).
+* **Сборка (`scripts/check-build.ps1`):** **0 ошибок, 0 предупреждений**.
+* **Headless UI Рендеринг (`scripts/render_ui.ps1 DashboardView`):** Рендеринг холста и оверлеев прошел штатно, артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json` успешно созданы.
