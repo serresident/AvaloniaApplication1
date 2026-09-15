@@ -474,7 +474,34 @@ namespace AvaloniaApplication1.Views
             {
                 parent = parent.Parent;
             }
-            return parent as DashboardPanel;
+            if (parent is DashboardPanel p) return p;
+            return Avalonia.VisualTree.VisualExtensions.FindAncestorOfType<DashboardPanel>(this);
+        }
+
+        private void NotifyPanelAfterPointsChanged()
+        {
+            var panel = FindDashboardPanel();
+            if (panel != null)
+            {
+                if (DataContext is PipeWidgetViewModel pipeVm)
+                {
+                    var child = panel.FindChildForVm(pipeVm);
+                    if (child != null)
+                    {
+                        DashboardPanel.SetCol(child, pipeVm.Col);
+                        DashboardPanel.SetRow(child, pipeVm.Row);
+                        DashboardPanel.SetSizeX(child, pipeVm.SizeX);
+                        DashboardPanel.SetSizeY(child, pipeVm.SizeY);
+                        child.InvalidateMeasure();
+                        child.InvalidateArrange();
+                        child.InvalidateVisual();
+                    }
+                }
+                panel.InvalidateMeasure();
+                panel.InvalidateArrange();
+                panel.InvalidateVisual();
+                panel.SelectionOverlay?.InvalidateVisual();
+            }
         }
 
         private List<PipeControl> FindAllSiblingPipes()
@@ -654,6 +681,7 @@ namespace AvaloniaApplication1.Views
             {
                 gridPoints.Insert(segmentIndex + 1, new Point(gridX, gridY));
                 Points = string.Join(";", gridPoints.Select(p => string.Format(CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                NotifyPanelAfterPointsChanged();
             }
         }
 
@@ -674,6 +702,7 @@ namespace AvaloniaApplication1.Views
                 var newPoint = new Point(first.X + dir.X, first.Y + dir.Y);
                 gridPoints.Insert(0, newPoint);
                 Points = string.Join(";", gridPoints.Select(p => string.Format(CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                NotifyPanelAfterPointsChanged();
             }
         }
 
@@ -694,6 +723,7 @@ namespace AvaloniaApplication1.Views
                 var newPoint = new Point(last.X + dir.X, last.Y + dir.Y);
                 gridPoints.Add(newPoint);
                 Points = string.Join(";", gridPoints.Select(p => string.Format(CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                NotifyPanelAfterPointsChanged();
             }
         }
 
@@ -704,6 +734,7 @@ namespace AvaloniaApplication1.Views
             {
                 gridPoints.RemoveAt(index);
                 Points = string.Join(";", gridPoints.Select(p => string.Format(CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                NotifyPanelAfterPointsChanged();
             }
         }
 

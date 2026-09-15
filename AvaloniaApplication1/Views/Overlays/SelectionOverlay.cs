@@ -68,10 +68,39 @@ namespace AvaloniaApplication1.Views
                     }
                 }
 
-                double col = selectedControl != null ? DashboardPanel.GetCol(selectedControl) : _panel.SelectedVm.Col;
-                double row = selectedControl != null ? DashboardPanel.GetRow(selectedControl) : _panel.SelectedVm.Row;
-                int sizeX = selectedControl != null ? DashboardPanel.GetSizeX(selectedControl) : _panel.SelectedVm.SizeX;
-                int sizeY = selectedControl != null ? DashboardPanel.GetSizeY(selectedControl) : _panel.SelectedVm.SizeY;
+                double col, row;
+                double sizeX, sizeY;
+
+                if (_panel.SelectedVm is PipeWidgetViewModel pipeVm)
+                {
+                    var points = pipeVm.GetAbsoluteGridPoints();
+                    if (points.Count >= 2)
+                    {
+                        double minX = points.Min(p => p.X);
+                        double maxX = points.Max(p => p.X);
+                        double minY = points.Min(p => p.Y);
+                        double maxY = points.Max(p => p.Y);
+
+                        col = Math.Floor(minX);
+                        row = Math.Floor(minY);
+                        sizeX = Math.Max(1.0, Math.Ceiling(maxX - col));
+                        sizeY = Math.Max(1.0, Math.Ceiling(maxY - row));
+                    }
+                    else
+                    {
+                        col = pipeVm.Col;
+                        row = pipeVm.Row;
+                        sizeX = pipeVm.SizeX;
+                        sizeY = pipeVm.SizeY;
+                    }
+                }
+                else
+                {
+                    col = _panel.SelectedVm.Col;
+                    row = _panel.SelectedVm.Row;
+                    sizeX = _panel.SelectedVm.SizeX;
+                    sizeY = _panel.SelectedVm.SizeY;
+                }
 
                 double x = col * _panel.CellWidth;
                 double y = row * _panel.CellHeight;

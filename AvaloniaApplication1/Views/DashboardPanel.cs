@@ -240,6 +240,108 @@ namespace AvaloniaApplication1.Views
             });
         }
 
+        private readonly Dictionary<Control, WidgetViewModelBase> _boundChildVms = new();
+
+        public Control? FindChildForVm(WidgetViewModelBase vm)
+        {
+            foreach (var kvp in _boundChildVms)
+            {
+                if (kvp.Value == vm)
+                    return kvp.Key;
+            }
+            foreach (var child in Children)
+            {
+                if (child.DataContext == vm)
+                    return child;
+            }
+            return null;
+        }
+
+        private void SubscribeChildVm(Control child)
+        {
+            UnsubscribeChildVm(child);
+            if (child.DataContext is WidgetViewModelBase vm)
+            {
+                _boundChildVms[child] = vm;
+                vm.PropertyChanged += OnWidgetVmPropertyChanged;
+
+                // Sync initial attached properties from VM
+                SetCol(child, vm.Col);
+                SetRow(child, vm.Row);
+                SetSizeX(child, vm.SizeX);
+                SetSizeY(child, vm.SizeY);
+            }
+        }
+
+        private void UnsubscribeChildVm(Control child)
+        {
+            if (_boundChildVms.TryGetValue(child, out var vm))
+            {
+                vm.PropertyChanged -= OnWidgetVmPropertyChanged;
+                _boundChildVms.Remove(child);
+            }
+        }
+
+        private void OnWidgetVmPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (sender is WidgetViewModelBase vm)
+            {
+                Control? targetChild = FindChildForVm(vm);
+
+                if (e.PropertyName == nameof(WidgetViewModelBase.Col) ||
+                    e.PropertyName == nameof(WidgetViewModelBase.Row) ||
+                    e.PropertyName == nameof(WidgetViewModelBase.SizeX) ||
+                    e.PropertyName == nameof(WidgetViewModelBase.SizeY))
+                {
+                    if (targetChild != null)
+                    {
+                        SetCol(targetChild, vm.Col);
+                        SetRow(targetChild, vm.Row);
+                        SetSizeX(targetChild, vm.SizeX);
+                        SetSizeY(targetChild, vm.SizeY);
+                        targetChild.InvalidateMeasure();
+                        targetChild.InvalidateArrange();
+                        targetChild.InvalidateVisual();
+                    }
+
+                    InvalidateMeasure();
+                    InvalidateArrange();
+                    InvalidateVisual();
+                    _selectionOverlay?.InvalidateVisual();
+                }
+                else if (e.PropertyName == nameof(PipeWidgetViewModel.PipePoints))
+                {
+                    if (targetChild != null)
+                    {
+                        targetChild.InvalidateMeasure();
+                        targetChild.InvalidateArrange();
+                        targetChild.InvalidateVisual();
+                    }
+
+                    InvalidateMeasure();
+                    InvalidateArrange();
+                    InvalidateVisual();
+                    _selectionOverlay?.InvalidateVisual();
+                }
+                else if (e.PropertyName == nameof(WidgetViewModelBase.IsSelected))
+                {
+                    if (vm.IsSelected)
+                    {
+                        if (SelectedVm != vm)
+                        {
+                            SelectedVm = vm;
+                        }
+                    }
+                    else if (SelectedVm == vm)
+                    {
+                        SelectedVm = null;
+                    }
+                    InvalidateVisual();
+                    _selectionOverlay?.InvalidateVisual();
+                }
+            }
+        }
+
         public DashboardPanel()
         {
             Focusable = true;
@@ -247,6 +349,7 @@ namespace AvaloniaApplication1.Views
             foreach (var child in Children)
             {
                 child.DataContextChanged += Child_DataContextChanged;
+                SubscribeChildVm(child);
             }
 
             Children.CollectionChanged += (s, e) =>
@@ -256,6 +359,7 @@ namespace AvaloniaApplication1.Views
                     foreach (Control child in e.OldItems)
                     {
                         child.DataContextChanged -= Child_DataContextChanged;
+                        UnsubscribeChildVm(child);
                     }
                 }
                 if (e.NewItems != null)
@@ -263,6 +367,7 @@ namespace AvaloniaApplication1.Views
                     foreach (Control child in e.NewItems)
                     {
                         child.DataContextChanged += Child_DataContextChanged;
+                        SubscribeChildVm(child);
                         var vm = child.DataContext as WidgetViewModelBase;
                         if (vm != null && vm.IsSelected)
                         {
@@ -301,6 +406,8 @@ namespace AvaloniaApplication1.Views
         {
             if (sender is Control child)
             {
+                SubscribeChildVm(child);
+
                 var vm = child.DataContext as WidgetViewModelBase;
                 if (vm != null && vm.IsSelected)
                 {
@@ -592,9 +699,10 @@ namespace AvaloniaApplication1.Views
                 }
 
                 // Check if click was in the bottom-right corner for resize (20x20 pixels)
-                // ONLY allow resize if the widget was ALREADY selected!
+                // ONLY allow resize if the widget was ALREADY selected and not in pipe vertex edit mode!
+                bool isEditingPipe = clickedVm is PipeWidgetViewModel pvm && pvm.IsEditingVertices;
                 var resizeRect = new Rect(childBounds.Right - 20, childBounds.Bottom - 20, 20, 20);
-                if (wasSelected && resizeRect.Contains(point))
+                if (wasSelected && !isEditingPipe && resizeRect.Contains(point))
                 {
                     _dragChild = clickedChild;
                     _dragVm = clickedVm;
@@ -1023,6 +1131,8 @@ namespace AvaloniaApplication1.Views
                         {
                             pipeVm.PipePoints = newPointsStr;
                         }
+
+                        _selectionOverlay?.InvalidateVisual();
                     }
                 }
                 e.Handled = true;
@@ -1134,6 +1244,23 @@ namespace AvaloniaApplication1.Views
                     }
                     pipeVm.IsSuppressingNormalization = false;
                     pipeVm.NormalizePointsAndSize();
+
+                    var child = FindChildForVm(pipeVm);
+                    if (child != null)
+                    {
+                        SetCol(child, pipeVm.Col);
+                        SetRow(child, pipeVm.Row);
+                        SetSizeX(child, pipeVm.SizeX);
+                        SetSizeY(child, pipeVm.SizeY);
+                        child.InvalidateMeasure();
+                        child.InvalidateArrange();
+                        child.InvalidateVisual();
+                    }
+
+                    InvalidateMeasure();
+                    InvalidateArrange();
+                    InvalidateVisual();
+                    _selectionOverlay?.InvalidateVisual();
                 }
                 _isSnappedToEquipmentPort = false;
                 if (ActiveSnapTarget != null)
@@ -1228,6 +1355,18 @@ namespace AvaloniaApplication1.Views
                                 if (conn.PipeVm.PipePoints != newPointsStr)
                                 {
                                     conn.PipeVm.PipePoints = newPointsStr;
+                                }
+
+                                var pipeChild = FindChildForVm(conn.PipeVm);
+                                if (pipeChild != null)
+                                {
+                                    SetCol(pipeChild, conn.PipeVm.Col);
+                                    SetRow(pipeChild, conn.PipeVm.Row);
+                                    SetSizeX(pipeChild, conn.PipeVm.SizeX);
+                                    SetSizeY(pipeChild, conn.PipeVm.SizeY);
+                                    pipeChild.InvalidateMeasure();
+                                    pipeChild.InvalidateArrange();
+                                    pipeChild.InvalidateVisual();
                                 }
                             }
                         }

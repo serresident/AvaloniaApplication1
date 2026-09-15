@@ -373,3 +373,20 @@
   - [x] Все 9 тестов `AvaloniaApplication1.UIValidation` пройдены успешно (100%)
   - [x] `scripts/check-build.ps1`: 0 ошибок, 0 предупреждений
   - [x] `scripts/render_ui.ps1 DashboardView`: успешный рендер, артефакты `ui_preview.png` и `ui_tree.json` сгенерированы
+
+# Tasks: Dynamic Pipe Selection Frame & Child Container Synchronization (Сессия 27 — Завершено)
+
+- [x] Устранение десинхронизации трубы и рамки выделения при модификации вершин:
+  - [x] Локализована коренная причина (RCA): локальные значения `SetCol/SetRow` на `ContentPresenter` переопределяли Style binding, а отсутствие подписки `DashboardPanel` на `vm.PropertyChanged` приводило к тому, что контейнер оставался на старых координатах после `NormalizePointsAndSize()`, сдвигая трубу относительно канвы
+  - [x] Внедрена реактивная синхронизация в `DashboardPanel.cs`: централизованные методы `SubscribeChildVm`, `UnsubscribeChildVm`, `FindChildForVm` и обработчик `OnWidgetVmPropertyChanged` для немедленной актуализации `SetCol`, `SetRow`, `SetSizeX`, `SetSizeY` на `ContentPresenter` при любых изменениях VM
+  - [x] Реализована динамическая перерисовка рамки выделения в `SelectionOverlay.cs`: расчет габаритов рамки для `PipeWidgetViewModel` напрямую по реальным координатам `pipeVm.GetAbsoluteGridPoints()`
+  - [x] Добавлена инвалидация рамки выделения `_selectionOverlay?.InvalidateVisual()` на каждый тик перемещения вершины в `OnPointerMoved` и при отпускании в `OnPointerReleased`
+  - [x] Добавлен метод `NotifyPanelAfterPointsChanged()` в `PipeControl.cs` для контекстных действий добавления/удаления вершин
+  - [x] Заблокирован ложный захват ресайза за правый нижний угол трубы в режиме редактирования вершин `IsEditingVertices`
+- [x] Автоматическое тестирование:
+  - [x] Добавлен тест №10 в `AvaloniaApplication1.UIValidation/Program.cs`: создание трубы (10, 10), добавление вершины со смещением (-3, -2), автоматическая нормализация в (7, 8) и мгновенная синхронизация `GetCol`/`GetRow` контейнера в панели без переключения экранов
+  - [x] Добавлена регистрация `IChildWindowService` в DI `Program.cs`
+- [x] Верификация:
+  - [x] Все 10 автоматических тестов `AvaloniaApplication1.UIValidation` пройдены успешно (100% PASS)
+  - [x] Сборка `scripts/check-build.ps1`: **0 ошибок, 0 предупреждений**
+  - [x] Рендеринг `scripts/render_ui.ps1 MimicView` и `DashboardView`: успешный рендер, артефакты `ui_preview.png` и `ui_tree.json` сгенерированы и проверены через Vision Inspection

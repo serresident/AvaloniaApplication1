@@ -614,3 +614,67 @@
 * **9 автоматических валидационных проверок в `AvaloniaApplication1.UIValidation/Program.cs`:** Все 9 тестов пройдены успешно (100%).
 * **Сборка (`scripts/check-build.ps1`):** **0 ошибок, 0 предупреждений**.
 * **Headless UI Рендеринг (`scripts/render_ui.ps1 DashboardView`):** Рендеринг холста и оверлеев прошел штатно, артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json` успешно созданы.
+
+## 2026-09-15 — Сессия 27: Динамическое следование рамки выделения трубы и реактивная синхронизация контейнера
+
+### 🎯 Цель сессии
+Устранить дефект, при котором после модификации или добавления вершин трубы она визуально смещалась относительно синей рамки выделения (рамка оставалась внизу в виде плоского прямоугольника, а труба уходила вверх). При переключении вкладок «Дашборд» <-> «Мнемосхема» труба возвращалась на правильное место. Обеспечить непрерывное динамическое следование рамки выделения за вершинами трубы в реальном времени и мгновенную синхронизацию контейнера виджета без необходимости смены экранов.
+
+### 🔍 Анализ коренной причины (Root Cause Analysis)
+1. **Приоритет свойств в Avalonia (`BindingPriority.LocalValue` vs `BindingPriority.Style`):**
+   При обычном перемещении виджета метод `DashboardPanel.OnPointerReleased` устанавливал `SetCol(_dragChild, newCol)` и `SetRow(_dragChild, newRow)` напрямую на визуальный контейнер (`ContentPresenter`). В Avalonia прямое присвоение создает `LocalValue`, которое имеет наивысший приоритет и блокирует обновление координат из стиля контейнера (`DashboardView.axaml`).
+2. **Отсутствие реакции панели на пересчет координат ViewModel:**
+   Когда пользователь добавлял, удалял или перемещал вершину трубы, метод `PipeWidgetViewModel.NormalizePointsAndSize()` пересчитывал `newCol`, `newRow`, `newSizeX`, `newSizeY` и обновлял относительные координаты `PipePoints`. Однако панель `DashboardPanel` **не была подписана на `vm.PropertyChanged`**. В результате контейнер `ContentPresenter` оставался на устаревших координатах `(oldCol, oldRow)`.
+3. **Физический сдвиг трубы внутри устаревшего контейнера:**
+   Контрол `PipeControl` перерисовывал новые относительные координаты `newPipePoints` внутри старого контейнера, физически сдвигая трубу на холсте на величину разницы `(newCol - oldCol, newRow - oldRow)`.
+4. **Застревание `SelectionOverlay`:**
+   Оверлей выделения вычислял позицию рамки через `GetCol(selectedControl)`, получая устаревшее локальное значение `oldCol, oldRow`.
+5. **Эффект переключения вкладок:**
+   При смене вкладки `ItemsControl` пересоздавал контейнеры `ContentPresenter` с нуля, читая актуальные `vm.Col` и `vm.Row`, из-за чего труба и рамка внезапно «прыгали» на истинную позицию.
+
+### 🛠️ Выполненные инженерные решения
+1. **Реактивная синхронизация в `DashboardPanel.cs`:**
+   * Добавлены методы жизненного цикла дочерних элементов: `SubscribeChildVm(Control child)` и `UnsubscribeChildVm(Control child)`, вызываемые при добавлении/удалении контролов из `Children`.
+   * Добавлен централизованный обработчик `OnWidgetVmPropertyChanged`: при изменении `Col`, `Row`, `SizeX`, `SizeY` или `PipePoints` у любой `WidgetViewModelBase` немедленно обновляются присоединенные свойства контейнера:
+     ```csharp
+     SetCol(child, vm.Col);
+     SetRow(child, vm.Row);
+     SetSizeX(child, vm.SizeX);
+     SetSizeY(child, vm.SizeY);
+     ```
+     и вызываются `InvalidateMeasure()`, `InvalidateArrange()`, `InvalidateVisual()` и `_selectionOverlay?.InvalidateVisual()`.
+   * Реализован публичный метод `FindChildForVm(WidgetViewModelBase vm)` для надежного поиска контейнера в коллекции `Children`.
+   * В `DashboardPanel.OnPointerMoved` при интерактивном перетаскивании вершины трубы добавлен вызов `_selectionOverlay?.InvalidateVisual()` на каждый тик мыши.
+   * В `DashboardPanel.OnPointerReleased` при отпускании вершины трубы добавлен вызов синхронизации `FindChildForVm(pipeVm)` и инвалидации лейаута.
+   * В `DashboardPanel.OnPointerReleased` для rubber-banding подключенных труб при перетаскивании задвижек/насосов добавлена синхронизация контейнеров труб.
+   * В `DashboardPanel.OnPreviewPointerPressed` заблокирован ложный захват ресайза правого нижнего угла для трубы в режиме `IsEditingVertices`.
+2. **Динамический расчет рамки выделения в `SelectionOverlay.cs`:**
+   * Для `PipeWidgetViewModel` рамка вычисляется напрямую из реальных абсолютных координат вершин `pipeVm.GetAbsoluteGridPoints()`:
+     ```csharp
+     double minX = absPoints.Min(p => p.X);
+     double maxX = absPoints.Max(p => p.X);
+     double minY = absPoints.Min(p => p.Y);
+     double maxY = absPoints.Max(p => p.Y);
+     col = Math.Floor(minX);
+     row = Math.Floor(minY);
+     sizeX = Math.Max(1.0, Math.Ceiling(maxX - col));
+     sizeY = Math.Max(1.0, Math.Ceiling(maxY - row));
+     ```
+     Это строго соответствует формуле `NormalizePointsAndSize` и обеспечивает безупречное следование рамки за всеми сегментами трубы и во время драга, и после нормализации.
+3. **Оповещение панели в `PipeControl.cs`:**
+   * Добавлен вспомогательный метод `NotifyPanelAfterPointsChanged()`, вызываемый при контекстных действиях: `AddPointOnSegment`, `AddPointAtStart`, `AddPointAtEnd`, `RemovePointAt`.
+4. **Тест №10 в `AvaloniaApplication1.UIValidation/Program.cs`:**
+   * Добавлен автоматический тест:
+     - Создание `PipeWidgetViewModel` на позиции (10, 10) размером (10, 1).
+     - Добавление вершины с отрицательным смещением `(-3, -2)`.
+     - Автоматическая нормализация в VM: `Col` переходит в 7, `Row` в 8.
+     - Проверка мгновенной синхронизации `DashboardPanel.GetCol(pipeChild) == 7` и `GetRow(pipeChild) == 8` без смены экранов.
+     - Проверка инвариантности абсолютных координат остальных точек трубы.
+   * Зарегистрирован `IChildWindowService` в DI тестового раннера.
+
+### 🧪 Верификация и результаты
+* **10 автоматических валидационных проверок в `AvaloniaApplication1.UIValidation/Program.cs`:** Все 10 тестов успешно пройдены (100% PASS).
+* **Сборка (`scripts/check-build.ps1`):** **0 ошибок, 0 предупреждений**.
+* **Headless UI Рендеринг (`scripts/render_ui.ps1 MimicView` и `DashboardView`):**
+  - `artifacts/ui_preview.png` и `artifacts/ui_tree.json` успешно сгенерированы.
+  - Проведен мультимодальный анализ скриншотов: отсутствие клиппинга, наложений, идеальная стыковка труб и клапанов.

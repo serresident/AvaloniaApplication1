@@ -100,6 +100,7 @@ public static class Program
             services.AddSingleton<IWidgetFactory, WidgetFactory>();
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<MainViewModel>();
+            services.AddSingleton<IChildWindowService>(sp => sp.GetRequiredService<MainViewModel>());
             using var sp = services.BuildServiceProvider();
 
             var mainVm = sp.GetRequiredService<MainViewModel>();
@@ -196,7 +197,17 @@ public static class Program
             File.WriteAllText(jsonPath, json);
             Console.WriteLine($"[UIValidation] Visual tree dump saved: {jsonPath} ({new FileInfo(jsonPath).Length} bytes)");
 
-            RunAutomatedValidations(mainVm, sp);
+            try
+            {
+                RunAutomatedValidations(mainVm, sp);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"[UIValidation] VALIDATION ERROR: {ex}");
+                Console.ResetColor();
+                Environment.Exit(1);
+            }
 
             Console.WriteLine("[UIValidation] SUCCESS: Artifacts generated successfully.");
             Environment.Exit(0);
@@ -414,6 +425,48 @@ public static class Program
         if (testPanel.Children.Count != 0)
             throw new Exception($"DashboardPanel.Children.Count ({testPanel.Children.Count}) should be 0, phantom widgets detected!");
 
+        // 10. Test Pipe Vertex Modification & Dynamic Frame/Container Synchronization
+        Console.WriteLine("[Validation] Running Test 10: Pipe Vertex Modification & Container Synchronization...");
+        var pipeConfig = new PipeConfig
+        {
+            Type = "Pipe",
+            Title = "Test Pipe",
+            Position = new WidgetPosition { Col = 10, Row = 10, SizeX = 10, SizeY = 1 },
+            PipePoints = "0,0; 10,0"
+        };
+        var pipeVm = new PipeWidgetViewModel(pipeConfig, new MockDataCoreService(), mainVm.ProjectContext);
+        testDashboardVm.Widgets.Add(pipeVm);
+        Dispatcher.UIThread.RunJobs();
+
+        var pipeChild = testPanel.FindChildForVm(pipeVm);
+        if (pipeChild == null)
+            throw new Exception("Test pipe child container was not found in DashboardPanel.");
+
+        if (DashboardPanel.GetCol(pipeChild) != 10 || DashboardPanel.GetRow(pipeChild) != 10)
+            throw new Exception($"Initial pipe attached properties Col={DashboardPanel.GetCol(pipeChild)}, Row={DashboardPanel.GetRow(pipeChild)} did not match VM 10, 10.");
+
+        // Simulate adding a vertex above and to the left (relative -3, -2) which triggers normalization
+        // This shifts newCol to 10 - 3 = 7, and newRow to 10 - 2 = 8
+        pipeVm.PipePoints = "-3,-2; 0,0; 10,0";
+        Dispatcher.UIThread.RunJobs();
+
+        // Check that VM normalized coordinates: newCol = 7, newRow = 8
+        if (pipeVm.Col != 7 || pipeVm.Row != 8)
+            throw new Exception($"PipeViewModel Col={pipeVm.Col}, Row={pipeVm.Row} should have normalized to 7, 8.");
+
+        // Check that DashboardPanel child container immediately synchronized without switching views!
+        if (DashboardPanel.GetCol(pipeChild) != 7 || DashboardPanel.GetRow(pipeChild) != 8)
+            throw new Exception($"DashboardPanel child container Col={DashboardPanel.GetCol(pipeChild)}, Row={DashboardPanel.GetRow(pipeChild)} was not synchronized to 7, 8!");
+
+        // Check that relative points inside PipePoints start from 0
+        var absPoints = pipeVm.GetAbsoluteGridPoints();
+        if (absPoints[0].X != 7 || absPoints[0].Y != 8)
+            throw new Exception($"Absolute points after normalization do not match: {absPoints[0]} vs (7, 8)");
+        if (absPoints[1].X != 10 || absPoints[1].Y != 10)
+            throw new Exception($"Original point (10,10) shifted: now at {absPoints[1]}");
+
+        // Clean up
+        testDashboardVm.Widgets.Remove(pipeVm);
         testWindow.Close();
         Dispatcher.UIThread.RunJobs();
 
