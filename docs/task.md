@@ -390,3 +390,27 @@
   - [x] Все 10 автоматических тестов `AvaloniaApplication1.UIValidation` пройдены успешно (100% PASS)
   - [x] Сборка `scripts/check-build.ps1`: **0 ошибок, 0 предупреждений**
   - [x] Рендеринг `scripts/render_ui.ps1 MimicView` и `DashboardView`: успешный рендер, артефакты `ui_preview.png` и `ui_tree.json` сгенерированы и проверены через Vision Inspection
+# Tasks: ColorPickerBox + FormatEditorBox Integration (Сессия 28 — Завершено)
+
+- [x] Создан ColorPickerBox UserControl (Views/Controls/ColorPickerBox.axaml + .cs):
+  - [x] 36 цветовых ячеек (6x6 UniformGrid) с палитрой HMI/SCADA
+  - [x] RGB-слайдеры с NumericUpDown для точного ввода каждого канала (0-255)
+  - [x] Спектральный слайдер Hue (0-360 градусов) с радужным LinearGradientBrush
+  - [x] Hex TextBox для прямого ввода цвета с двунаправленной синхронизацией
+  - [x] SelectedColorHex StyledProperty (TwoWay) — точка интеграции с VM
+  - [x] HSV/RGB математика без внешних зависимостей; флаг isInternalUpdate для предотвращения петли
+- [x] Создан FormatEditorBox UserControl (Views/Controls/FormatEditorBox.axaml + .cs):
+  - [x] MenuFlyout с 11 категориями (~50 пресетов): Температура, Давление, Расход, Уровень, Масса, Химия, Электрика, Обороты, Объем, Время, Числа
+  - [x] 5 кнопок быстрой точности: 0 / .0 / .00 / .000 / Авто (F0/F1/F2/F3/{0})
+  - [x] Умная замена точности через Regex с сохранением единицы измерения
+  - [x] Format StyledProperty (TwoWay) — точка интеграции с VM
+- [x] Интегрированы оба контрола в WidgetEditorWindow.axaml:
+  - [x] Добавлен xmlns:controls для namespace Controls
+  - [x] Format -> FormatEditorBox (раздел Value Display Settings)
+  - [x] ValueColor -> ColorPickerBox (Value Display Settings)
+  - [x] TrueColor / FalseColor -> ColorPickerBox (PilotLight Settings)
+  - [x] ActiveColor / InactiveColor -> ColorPickerBox (Mimic Color Settings)
+- [x] Верификация:
+  - [x] Сборка: 0 ошибок, 0 предупреждений
+  - [x] Все 10 тестов UIValidation PASS
+  - [x] Коммит 34e8ea7, запушен в origin/main
