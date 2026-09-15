@@ -7,7 +7,8 @@
         mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="700"
         x:Class="AvaloniaApplication1.Views.WidgetEditorWindow"
         x:DataType="vm:WidgetEditorViewModel"
-        Title="Widget Editor"
+        Title="Свойства контрола"
+        Icon="{x:Null}"
         Width="440" Height="600"
         MinWidth="400" MinHeight="500"
         WindowStartupLocation="CenterOwner"
@@ -122,13 +123,52 @@
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowCommandButtonSettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Command Button Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
-                        <TextBlock Text="Button Mode" Foreground="#AAAAAA" FontSize="11" />
-                        <ComboBox ItemsSource="{Binding AvailableButtonModes}" 
+                        <TextBlock Text="Настройки кнопки управления" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Text="Режим кнопки" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableButtonModes}"
                                   SelectedItem="{Binding SelectedButtonMode}"
                                   HorizontalAlignment="Stretch" />
+
+                        <!-- Mode description -->
+                        <Border Background="#1A1A1A" CornerRadius="4" Padding="8,4">
+                            <TextBlock Foreground="#888888" FontSize="10" TextWrapping="Wrap">
+                                Toggle — обычный тумблер (ВКЛ/ВЫКЛ). Momentary — импульс пока нажата. Latching — кнопка с фиксацией (Пуск/Стоп). ToggleSwitch — визуальный переключатель.
+                            </TextBlock>
+                        </Border>
+
+                        <Separator Background="#3E3E42" Height="1" Margin="0,4" />
+
+                        <!-- Labels -->
+                        <TextBlock Text="Надпись ВКЛ / Активно" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Надпись активного состояния" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding LabelOn}" PlaceholderText="ВКЛ / ПУСК" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Надпись неактивного состояния" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding LabelOff}" PlaceholderText="ВЫКЛ / СТОП" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Separator Background="#3E3E42" Height="1" Margin="0,4" />
+
+                        <!-- Colors -->
+                        <TextBlock Text="Цвета состояний" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Цвет ВКЛ / Активно" Foreground="#AAAAAA" FontSize="11" />
+                                <controls:ColorPickerBox SelectedColorHex="{Binding ColorOn}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Цвет ВЫКЛ / Неактивно" Foreground="#AAAAAA" FontSize="11" />
+                                <controls:ColorPickerBox SelectedColorHex="{Binding ColorOff}" />
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
+
 
                 <!-- Slider Settings -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"

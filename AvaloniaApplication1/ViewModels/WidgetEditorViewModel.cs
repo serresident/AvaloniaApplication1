@@ -61,6 +61,18 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string _selectedButtonMode = ButtonModes.All[0];
 
+        [ObservableProperty]
+        private string _labelOn = "ВКЛ";
+
+        [ObservableProperty]
+        private string _labelOff = "ВЫКЛ";
+
+        [ObservableProperty]
+        private string _colorOn = "#00AA44";
+
+        [ObservableProperty]
+        private string _colorOff = "#AA2200";
+
         // --- Widget-specific: Slider ---
         [ObservableProperty]
         private double _minValue = 0;
@@ -203,7 +215,7 @@ namespace AvaloniaApplication1.ViewModels
 
                 if (existingConfig is ValueDisplayConfig vd) { Format = vd.Format; ValueColor = vd.ValueColor; ValueFontSize = vd.ValueFontSize; }
                 if (existingConfig is PilotLightConfig pl) { TrueColor = pl.TrueColor; FalseColor = pl.FalseColor; }
-                if (existingConfig is CommandButtonConfig cb) { SelectedButtonMode = cb.ButtonMode; }
+                if (existingConfig is CommandButtonConfig cb) { SelectedButtonMode = cb.ButtonMode; LabelOn = cb.LabelOn; LabelOff = cb.LabelOff; ColorOn = cb.ColorOn; ColorOff = cb.ColorOff; }
                 if (existingConfig is SliderConfig sl) { MinValue = sl.MinValue; MaxValue = sl.MaxValue; }
                 if (existingConfig is SetValueConfig sv) { Format = sv.Format; MinValue = sv.MinValue; MaxValue = sv.MaxValue; ValueColor = sv.ValueColor; ValueFontSize = sv.ValueFontSize; }
                 if (existingConfig is RealTimeTrendConfig rt) { Format = rt.Format; MinValue = rt.MinValue; MaxValue = rt.MaxValue; }
@@ -345,7 +357,7 @@ namespace AvaloniaApplication1.ViewModels
             {
                 "ValueDisplay" => new ValueDisplayConfig { Format = Format, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
                 "PilotLight" => new PilotLightConfig { TrueColor = TrueColor, FalseColor = FalseColor },
-                "CommandButton" => new CommandButtonConfig { ButtonMode = SelectedButtonMode },
+                "CommandButton" => new CommandButtonConfig { ButtonMode = SelectedButtonMode, LabelOn = LabelOn, LabelOff = LabelOff, ColorOn = ColorOn, ColorOff = ColorOff },
                 "Slider" => new SliderConfig { MinValue = MinValue, MaxValue = MaxValue },
                 "SetValue" => new SetValueConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
                 "RealTimeTrend" => new RealTimeTrendConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue },

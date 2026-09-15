@@ -22,6 +22,6 @@ namespace AvaloniaApplication1.Models.Config
 
     public static class ButtonModes
     {
-        public static readonly string[] All = { "Toggle", "Momentary", "SetValue" };
+        public static readonly string[] All = { "Toggle", "Momentary", "Latching", "ToggleSwitch", "SetValue" };
     }
 }

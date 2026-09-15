@@ -3,51 +3,54 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:AvaloniaApplication1.Views.Controls"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="36"
+             mc:Ignorable="d" d:DesignWidth="320" d:DesignHeight="36"
              x:Class="AvaloniaApplication1.Views.Controls.ColorPickerBox"
-             x:DataType="local:ColorPickerBox">
+             x:CompileBindings="False">
 
     <Grid ColumnDefinitions="32,*,Auto" VerticalAlignment="Center">
-        <!-- Color Preview Swatch Button -->
+
+        <!-- Color Preview Swatch Button — opens Flyout -->
         <Button x:Name="SwatchButton"
-                Grid.Column="0" 
-                Width="28" Height="28" 
+                Grid.Column="0"
+                Width="28" Height="28"
                 Padding="0" Margin="0,0,4,0"
                 CornerRadius="4"
                 BorderBrush="#555555" BorderThickness="1.5"
-                Background="{Binding SelectedBrush, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}"
+                Background="{Binding SelectedBrush}"
                 ToolTip.Tip="Нажмите для открытия палитры цветов">
             <Button.Flyout>
                 <Flyout Placement="BottomEdgeAlignedLeft">
-                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Padding="14" Width="330">
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1"
+                            CornerRadius="8" Padding="12" Width="340">
                         <StackPanel Spacing="10">
 
-                            <!-- Flyout Header: Current selection preview & Hex -->
+                            <!-- Header: preview + hex -->
                             <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
                                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                    <Border Width="34" Height="26" CornerRadius="4" 
+                                    <Border Width="34" Height="26" CornerRadius="4"
                                             BorderBrush="#666666" BorderThickness="1.5"
-                                            Background="{Binding SelectedBrush, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}" />
-                                    <TextBlock Text="{Binding SelectedColorHex, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}" 
-                                               Foreground="White" FontSize="14" FontWeight="Bold" FontFamily="Consolas, monospace" VerticalAlignment="Center" />
+                                            Background="{Binding SelectedBrush}" />
+                                    <TextBlock Text="{Binding SelectedColorHex}"
+                                               Foreground="White" FontSize="14" FontWeight="Bold"
+                                               FontFamily="Consolas,monospace" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <Button Grid.Column="2" Content="✕" Click="CloseFlyout_Click" 
+                                <Button Grid.Column="2" Content="✕" Click="CloseFlyout_Click"
                                         Background="Transparent" Foreground="#888888" Padding="6,2" FontSize="12" />
                             </Grid>
 
                             <Separator Background="#3E3E42" Height="1" Margin="0,2" />
 
-                            <!-- Section 1: Standard HMI / SCADA Palette Swatches (6x6 = 36 colors) -->
+                            <!-- HMI/SCADA Palette Swatches -->
                             <StackPanel Spacing="4">
                                 <TextBlock Text="Базовые цвета HMI / SCADA:" Foreground="#AAAAAA" FontSize="11" FontWeight="SemiBold" />
-                                <ItemsControl ItemsSource="{Binding Swatches, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}">
+                                <ItemsControl x:Name="SwatchesItemsControl">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <UniformGrid Columns="6" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate DataType="local:ColorSwatchItem">
+                                        <DataTemplate>
                                             <Button Width="44" Height="26" Margin="2" Padding="0"
                                                     CornerRadius="4" BorderThickness="1" BorderBrush="#444444"
                                                     Background="{Binding Brush}"
@@ -61,15 +64,15 @@
 
                             <Separator Background="#3E3E42" Height="1" Margin="0,4" />
 
-                            <!-- Section 2: Visual Adjustments (Hue spectrum + RGB Sliders) -->
+                            <!-- Hue Spectrum + RGB Sliders -->
                             <StackPanel Spacing="8">
                                 <TextBlock Text="Настройка оттенка (Спектр и RGB):" Foreground="#AAAAAA" FontSize="11" FontWeight="SemiBold" />
 
-                                <!-- Hue Slider with Rainbow Gradient -->
-                                <Grid ColumnDefinitions="24,*,40" VerticalAlignment="Center">
+                                <!-- Hue -->
+                                <Grid ColumnDefinitions="28,*,44">
                                     <TextBlock Grid.Column="0" Text="Тон" Foreground="#DDDDDD" FontSize="11" VerticalAlignment="Center" />
-                                    <Slider Grid.Column="1" Minimum="0" Maximum="360" 
-                                            Value="{Binding Hue, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}" 
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="360"
+                                            Value="{Binding Hue}"
                                             Margin="4,0" VerticalAlignment="Center">
                                         <Slider.Background>
                                             <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
@@ -83,44 +86,48 @@
                                             </LinearGradientBrush>
                                         </Slider.Background>
                                     </Slider>
-                                    <TextBlock Grid.Column="2" 
-                                               Text="{Binding Hue, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}, StringFormat='{}{0:0}°'}" 
-                                               Foreground="#AAAAAA" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding HueText}"
+                                               Foreground="#AAAAAA" FontSize="11"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
                                 </Grid>
 
-                                <!-- Red Slider -->
-                                <Grid ColumnDefinitions="24,*,40" VerticalAlignment="Center">
+                                <!-- Red -->
+                                <Grid ColumnDefinitions="28,*,44">
                                     <TextBlock Grid.Column="0" Text="R" Foreground="#FF5252" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
-                                    <Slider Grid.Column="1" Minimum="0" Maximum="255" 
-                                            Value="{Binding Red, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}" 
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="255"
+                                            Value="{Binding RedDouble}"
                                             Margin="4,0" VerticalAlignment="Center" />
-                                    <NumericUpDown Grid.Column="2" 
-                                                   Value="{Binding Red, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}" 
-                                                   Minimum="0" Maximum="255" FormatString="0" ShowButtonSpinner="False" 
+                                    <NumericUpDown Grid.Column="2"
+                                                   Value="{Binding RedDouble}"
+                                                   Minimum="0" Maximum="255"
+                                                   FormatString="0" ShowButtonSpinner="False"
                                                    Padding="4,2" FontSize="11" HorizontalAlignment="Stretch" />
                                 </Grid>
 
-                                <!-- Green Slider -->
-                                <Grid ColumnDefinitions="24,*,40" VerticalAlignment="Center">
+                                <!-- Green -->
+                                <Grid ColumnDefinitions="28,*,44">
                                     <TextBlock Grid.Column="0" Text="G" Foreground="#00E676" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
-                                    <Slider Grid.Column="1" Minimum="0" Maximum="255" 
-                                            Value="{Binding Green, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}" 
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="255"
+                                            Value="{Binding GreenDouble}"
                                             Margin="4,0" VerticalAlignment="Center" />
-                                    <NumericUpDown Grid.Column="2" 
-                                                   Value="{Binding Green, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}" 
-                                                   Minimum="0" Maximum="255" FormatString="0" ShowButtonSpinner="False" 
+                                    <NumericUpDown Grid.Column="2"
+                                                   Value="{Binding GreenDouble}"
+                                                   Minimum="0" Maximum="255"
+                                                   FormatString="0" ShowButtonSpinner="False"
                                                    Padding="4,2" FontSize="11" HorizontalAlignment="Stretch" />
                                 </Grid>
 
-                                <!-- Blue Slider -->
-                                <Grid ColumnDefinitions="24,*,40" VerticalAlignment="Center">
+                                <!-- Blue -->
+                                <Grid ColumnDefinitions="28,*,44">
                                     <TextBlock Grid.Column="0" Text="B" Foreground="#448AFF" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
-                                    <Slider Grid.Column="1" Minimum="0" Maximum="255" 
-                                            Value="{Binding Blue, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}" 
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="255"
+                                            Value="{Binding BlueDouble}"
                                             Margin="4,0" VerticalAlignment="Center" />
-                                    <NumericUpDown Grid.Column="2" 
-                                                   Value="{Binding Blue, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}}" 
-                                                   Minimum="0" Maximum="255" FormatString="0" ShowButtonSpinner="False" 
+                                    <NumericUpDown Grid.Column="2"
+                                                   Value="{Binding BlueDouble}"
+                                                   Minimum="0" Maximum="255"
+                                                   FormatString="0" ShowButtonSpinner="False"
                                                    Padding="4,2" FontSize="11" HorizontalAlignment="Stretch" />
                                 </Grid>
                             </StackPanel>
@@ -132,15 +139,16 @@
         </Button>
 
         <!-- Hex TextBox for direct editing -->
-        <TextBox Grid.Column="1" 
-                 Text="{Binding SelectedColorHex, RelativeSource={RelativeSource AncestorType=local:ColorPickerBox}, Mode=TwoWay}"
+        <TextBox Grid.Column="1"
+                 Text="{Binding SelectedColorHex, Mode=TwoWay}"
                  PlaceholderText="#00FF00"
-                 FontFamily="Consolas, monospace"
-                 VerticalAlignment="Center" />
+                 FontFamily="Consolas,monospace"
+                 VerticalAlignment="Center"
+                 LostFocus="HexBox_LostFocus" />
 
-        <!-- Quick Palette Button -->
-        <Button Grid.Column="2" 
-                Content="🎨" 
+        <!-- Open Flyout button -->
+        <Button Grid.Column="2"
+                Content="🎨"
                 Click="PaletteButton_Click"
                 Padding="8,5" Margin="4,0,0,0"
                 Background="#3E3E42" Foreground="White" CornerRadius="4"

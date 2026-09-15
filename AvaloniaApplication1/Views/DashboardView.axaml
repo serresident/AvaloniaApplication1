@@ -79,14 +79,41 @@
                       <DataTemplate DataType="{x:Type vm:CommandButtonViewModel}">
                           <Grid ClipToBounds="False">
                               <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
-                                  <Button Command="{Binding ExecuteCommandCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="8" Background="#4A4A4D">
-                                      <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" TextWrapping="Wrap" TextAlignment="Center" />
+                                  <Button Command="{Binding ExecuteCommandCommand}"
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                          CornerRadius="7" Background="{Binding CurrentBackground}">
+                                      <Grid>
+                                          <!-- Main Label -->
+                                          <TextBlock Text="{Binding CurrentLabel}"
+                                                     FontSize="16" FontWeight="Bold"
+                                                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                     Foreground="White" TextWrapping="Wrap" TextAlignment="Center"
+                                                     Margin="8,4" />
+                                          <!-- ToggleSwitch mode: left OFF / right ON labels -->
+                                          <StackPanel Orientation="Horizontal"
+                                                      IsVisible="{Binding IsToggleSwitchMode}"
+                                                      VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                                      Margin="0,0,0,4" Spacing="8">
+                                              <TextBlock Text="{Binding TypedConfig.LabelOff}"
+                                                         Foreground="#CCCCCC" FontSize="11" />
+                                              <TextBlock Text="⟵" Foreground="#888888" FontSize="11"
+                                                         IsVisible="{Binding !IsActive}" />
+                                              <TextBlock Text="⟶" Foreground="White" FontSize="11"
+                                                         IsVisible="{Binding IsActive}" />
+                                              <TextBlock Text="{Binding TypedConfig.LabelOn}"
+                                                         Foreground="White" FontSize="11" />
+                                          </StackPanel>
+                                      </Grid>
                                   </Button>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle"
+                                      Background="#33000000" BorderBrush="#007ACC" BorderThickness="2"
+                                      CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
-                                      <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                                      <TextBlock Text="◢" Foreground="#007ACC" FontSize="14"
+                                                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                 Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
                               </Border>
                           </Grid>

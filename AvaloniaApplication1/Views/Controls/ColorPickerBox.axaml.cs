@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -11,50 +13,31 @@ namespace AvaloniaApplication1.Views.Controls
 {
     public class ColorSwatchItem
     {
-        public string Hex { get; set; } = string.Empty;
+        public string Hex  { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public IBrush Brush { get; set; } = Brushes.Transparent;
 
         public ColorSwatchItem(string hex, string name)
         {
-            Hex = hex;
+            Hex  = hex;
             Name = $"{name} ({hex})";
             if (Color.TryParse(hex, out var c))
-            {
                 Brush = new SolidColorBrush(c);
-            }
         }
     }
 
-    public partial class ColorPickerBox : UserControl
+    /// <summary>
+    /// Color picker UserControl.
+    /// The single external binding point is <see cref="SelectedColorHexProperty"/> (StyledProperty, TwoWay).
+    /// Everything else binds through DataContext=this (INotifyPropertyChanged).
+    /// </summary>
+    public partial class ColorPickerBox : UserControl, INotifyPropertyChanged
     {
+        // ══════════════════ External StyledProperty ══════════════════
         public static readonly StyledProperty<string> SelectedColorHexProperty =
             AvaloniaProperty.Register<ColorPickerBox, string>(
-                nameof(SelectedColorHex),
-                "#00FF00",
+                nameof(SelectedColorHex), "#00FF00",
                 defaultBindingMode: BindingMode.TwoWay);
-
-        public static readonly StyledProperty<Color> SelectedColorProperty =
-            AvaloniaProperty.Register<ColorPickerBox, Color>(
-                nameof(SelectedColor),
-                Color.FromRgb(0, 255, 0));
-
-        public static readonly StyledProperty<IBrush> SelectedBrushProperty =
-            AvaloniaProperty.Register<ColorPickerBox, IBrush>(
-                nameof(SelectedBrush),
-                new SolidColorBrush(Color.FromRgb(0, 255, 0)));
-
-        public static readonly StyledProperty<byte> RedProperty =
-            AvaloniaProperty.Register<ColorPickerBox, byte>(nameof(Red), 0);
-
-        public static readonly StyledProperty<byte> GreenProperty =
-            AvaloniaProperty.Register<ColorPickerBox, byte>(nameof(Green), 255);
-
-        public static readonly StyledProperty<byte> BlueProperty =
-            AvaloniaProperty.Register<ColorPickerBox, byte>(nameof(Blue), 0);
-
-        public static readonly StyledProperty<double> HueProperty =
-            AvaloniaProperty.Register<ColorPickerBox, double>(nameof(Hue), 120.0);
 
         public string SelectedColorHex
         {
@@ -62,279 +45,227 @@ namespace AvaloniaApplication1.Views.Controls
             set => SetValue(SelectedColorHexProperty, value);
         }
 
-        public Color SelectedColor
-        {
-            get => GetValue(SelectedColorProperty);
-            set => SetValue(SelectedColorProperty, value);
-        }
+        // ══════════════════ INotifyPropertyChanged (for DataContext=this bindings) ══════════════════
+        public new event PropertyChangedEventHandler? PropertyChanged;
+        private void Notify([CallerMemberName] string? name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
+        // ── Visual brush shown on swatch button ──
+        private IBrush _selectedBrush = new SolidColorBrush(Color.FromRgb(0, 255, 0));
         public IBrush SelectedBrush
         {
-            get => GetValue(SelectedBrushProperty);
-            set => SetValue(SelectedBrushProperty, value);
+            get => _selectedBrush;
+            private set { _selectedBrush = value; Notify(); }
         }
 
-        public byte Red
+        // ── Sliders / spinners use double (Avalonia Slider.Value = double) ──
+        private double _red   = 0;
+        private double _green = 255;
+        private double _blue  = 0;
+        private double _hue   = 120;
+
+        public double RedDouble
         {
-            get => GetValue(RedProperty);
-            set => SetValue(RedProperty, value);
+            get => _red;
+            set { _red = value; Notify(); if (!_busy) OnRgbChanged(); }
         }
-
-        public byte Green
+        public double GreenDouble
         {
-            get => GetValue(GreenProperty);
-            set => SetValue(GreenProperty, value);
+            get => _green;
+            set { _green = value; Notify(); if (!_busy) OnRgbChanged(); }
         }
-
-        public byte Blue
+        public double BlueDouble
         {
-            get => GetValue(BlueProperty);
-            set => SetValue(BlueProperty, value);
+            get => _blue;
+            set { _blue = value; Notify(); if (!_busy) OnRgbChanged(); }
         }
-
         public double Hue
         {
-            get => GetValue(HueProperty);
-            set => SetValue(HueProperty, value);
+            get => _hue;
+            set { _hue = value; Notify(); Notify(nameof(HueText)); if (!_busy) OnHueChanged(); }
         }
+        public string HueText => $"{_hue:0}°";
 
-        public List<ColorSwatchItem> Swatches { get; } = new()
+        // ══════════════════ Swatches ══════════════════
+        public static readonly IReadOnlyList<ColorSwatchItem> Swatches = new List<ColorSwatchItem>
         {
-            // Green (Норма / Работа)
-            new ColorSwatchItem("#00FF00", "Ярко-зеленый"),
-            new ColorSwatchItem("#00E676", "Неоново-зеленый"),
-            new ColorSwatchItem("#2ECC71", "Изумрудный"),
-            new ColorSwatchItem("#76FF03", "Салатовый"),
-            new ColorSwatchItem("#AEEA00", "Лайм"),
-            new ColorSwatchItem("#64DD17", "Светло-зеленый"),
-
-            // Red (Авария / Останов / Закрыто)
-            new ColorSwatchItem("#FF0000", "Ярко-красный"),
-            new ColorSwatchItem("#E74C3C", "Коралловый"),
-            new ColorSwatchItem("#FF5252", "Алый"),
-            new ColorSwatchItem("#D50000", "Рубиновый"),
-            new ColorSwatchItem("#880000", "Бордовый"),
-            new ColorSwatchItem("#440000", "Темно-красный"),
-
-            // Yellow / Orange (Предупреждение / Внимание)
-            new ColorSwatchItem("#FFFF00", "Желтый"),
-            new ColorSwatchItem("#FFD700", "Золотой"),
-            new ColorSwatchItem("#FFC107", "Янтарный"),
-            new ColorSwatchItem("#FFA000", "Охра"),
-            new ColorSwatchItem("#FF6D00", "Оранжевый"),
-            new ColorSwatchItem("#FF9800", "Светло-оранжевый"),
-
-            // Blue / Cyan (Процесс / Вода / Инфо)
-            new ColorSwatchItem("#00AAFF", "Небесно-голубой"),
-            new ColorSwatchItem("#007ACC", "Синий"),
-            new ColorSwatchItem("#0050EF", "Индиго"),
-            new ColorSwatchItem("#00FFFF", "Cyan"),
-            new ColorSwatchItem("#00FFCC", "Бирюзовый"),
-            new ColorSwatchItem("#29B6F6", "Голубой"),
-
-            // Purple / Magenta (Спец / Химия)
-            new ColorSwatchItem("#9C27B0", "Фиолетовый"),
-            new ColorSwatchItem("#BA68C8", "Сиреневый"),
-            new ColorSwatchItem("#E040FB", "Маджента"),
-            new ColorSwatchItem("#D80073", "Пурпурный"),
-            new ColorSwatchItem("#E91E63", "Розовый"),
-            new ColorSwatchItem("#FF4081", "Неоново-розовый"),
-
-            // Monochrome (Металл / Корпуса / Фон)
-            new ColorSwatchItem("#FFFFFF", "Белый"),
-            new ColorSwatchItem("#CCCCCC", "Светло-серый"),
-            new ColorSwatchItem("#888888", "Серый"),
-            new ColorSwatchItem("#555555", "Темно-серый"),
-            new ColorSwatchItem("#222222", "Антрацит"),
-            new ColorSwatchItem("#000000", "Черный")
+            // Green — Норма / Работа
+            new("#00FF00","Ярко-зеленый"), new("#00E676","Неоново-зеленый"), new("#2ECC71","Изумрудный"),
+            new("#76FF03","Салатовый"),    new("#AEEA00","Лайм"),            new("#64DD17","Светло-зеленый"),
+            // Red — Авария / Останов
+            new("#FF0000","Ярко-красный"), new("#E74C3C","Коралловый"), new("#FF5252","Алый"),
+            new("#D50000","Рубиновый"),    new("#880000","Бордовый"),   new("#440000","Темно-красный"),
+            // Yellow/Orange — Предупреждение
+            new("#FFFF00","Желтый"),  new("#FFD700","Золотой"),         new("#FFC107","Янтарный"),
+            new("#FFA000","Охра"),    new("#FF6D00","Оранжевый"),       new("#FF9800","Светло-оранжевый"),
+            // Blue/Cyan — Процесс / Вода
+            new("#00AAFF","Небесно-голубой"), new("#007ACC","Синий"),  new("#0050EF","Индиго"),
+            new("#00FFFF","Cyan"),            new("#00FFCC","Бирюзовый"), new("#29B6F6","Голубой"),
+            // Purple/Magenta — Химия / Спец
+            new("#9C27B0","Фиолетовый"), new("#BA68C8","Сиреневый"),  new("#E040FB","Маджента"),
+            new("#D80073","Пурпурный"),  new("#E91E63","Розовый"),    new("#FF4081","Неоново-розовый"),
+            // Monochrome
+            new("#FFFFFF","Белый"),     new("#CCCCCC","Светло-серый"), new("#888888","Серый"),
+            new("#555555","Темно-серый"),new("#222222","Антрацит"),    new("#000000","Черный"),
         };
 
-        private bool _isInternalUpdate;
+        private bool _busy;
 
+        // ══════════════════ Constructor ══════════════════
         public ColorPickerBox()
         {
+            DataContext = this;          // <── must come before Load!
             InitializeComponent();
 
-            SelectedColorHexProperty.Changed.AddClassHandler<ColorPickerBox>((x, e) => x.OnSelectedColorHexChanged(e));
-            RedProperty.Changed.AddClassHandler<ColorPickerBox>((x, e) => x.OnRgbComponentChanged());
-            GreenProperty.Changed.AddClassHandler<ColorPickerBox>((x, e) => x.OnRgbComponentChanged());
-            BlueProperty.Changed.AddClassHandler<ColorPickerBox>((x, e) => x.OnRgbComponentChanged());
-            HueProperty.Changed.AddClassHandler<ColorPickerBox>((x, e) => x.OnHueChanged());
+            // Populate swatches imperatively
+            if (this.FindControl<ItemsControl>("SwatchesItemsControl") is { } ic)
+                ic.ItemsSource = Swatches;
 
-            UpdateFromHex(SelectedColorHex);
-        }
-
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
-
-        private void OnSelectedColorHexChanged(AvaloniaPropertyChangedEventArgs e)
-        {
-            if (_isInternalUpdate) return;
-            if (e.NewValue is string hex)
+            // React to external SelectedColorHex changes (VM → control)
+            SelectedColorHexProperty.Changed.AddClassHandler<ColorPickerBox>((x, e) =>
             {
-                UpdateFromHex(hex);
-            }
+                if (!x._busy && e.NewValue is string hex)
+                    x.SyncFromHex(hex);
+            });
+
+            SyncFromHex(SelectedColorHex);
         }
 
-        private void UpdateFromHex(string? hex)
-        {
-            if (TryParseHex(hex, out var c))
-            {
-                _isInternalUpdate = true;
-                try
-                {
-                    SelectedColor = c;
-                    SelectedBrush = new SolidColorBrush(c);
-                    Red = c.R;
-                    Green = c.G;
-                    Blue = c.B;
-                    var (h, _, _) = RgbToHsv(c.R, c.G, c.B);
-                    Hue = Math.Round(h);
-                }
-                finally
-                {
-                    _isInternalUpdate = false;
-                }
-            }
-        }
+        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        private void OnRgbComponentChanged()
-        {
-            if (_isInternalUpdate) return;
+        // ══════════════════ Sync helpers ══════════════════
 
-            _isInternalUpdate = true;
+        private void SyncFromHex(string? hex)
+        {
+            if (!TryParseHex(hex, out var c)) return;
+            _busy = true;
             try
             {
-                var color = Color.FromRgb(Red, Green, Blue);
-                SelectedColor = color;
-                SelectedBrush = new SolidColorBrush(color);
-                SelectedColorHex = $"#{Red:X2}{Green:X2}{Blue:X2}";
+                SelectedBrush = new SolidColorBrush(c);
+                _red   = c.R; Notify(nameof(RedDouble));
+                _green = c.G; Notify(nameof(GreenDouble));
+                _blue  = c.B; Notify(nameof(BlueDouble));
+                var (h, _, _) = RgbToHsv(c.R, c.G, c.B);
+                _hue = Math.Round(h); Notify(nameof(Hue)); Notify(nameof(HueText));
+            }
+            finally { _busy = false; }
+        }
 
-                var (h, _, _) = RgbToHsv(Red, Green, Blue);
-                Hue = Math.Round(h);
-            }
-            finally
+        private void OnRgbChanged()
+        {
+            _busy = true;
+            try
             {
-                _isInternalUpdate = false;
+                byte r = ClipToByte(_red), g = ClipToByte(_green), b = ClipToByte(_blue);
+                var color = Color.FromRgb(r, g, b);
+                SelectedBrush = new SolidColorBrush(color);
+                var hex = $"#{r:X2}{g:X2}{b:X2}";
+                SetValue(SelectedColorHexProperty, hex);   // propagate to VM
+                Notify(nameof(SelectedColorHex));
+                var (h, _, _) = RgbToHsv(r, g, b);
+                _hue = Math.Round(h); Notify(nameof(Hue)); Notify(nameof(HueText));
             }
+            finally { _busy = false; }
         }
 
         private void OnHueChanged()
         {
-            if (_isInternalUpdate) return;
-
-            _isInternalUpdate = true;
+            _busy = true;
             try
             {
-                // Convert current Hue to RGB using current saturation & value if non-zero, or default S=1, V=1
-                var (_, currentS, currentV) = RgbToHsv(Red, Green, Blue);
-                if (currentS < 0.1 && currentV < 0.1)
-                {
-                    currentS = 1.0;
-                    currentV = 1.0;
-                }
-                else if (currentS < 0.1)
-                {
-                    currentS = 1.0;
-                }
-
-                var (r, g, b) = HsvToRgb(Hue, currentS, currentV);
-                Red = r;
-                Green = g;
-                Blue = b;
-
+                byte r0 = ClipToByte(_red), g0 = ClipToByte(_green), b0 = ClipToByte(_blue);
+                var (_, s, v) = RgbToHsv(r0, g0, b0);
+                if (s < 0.1 && v < 0.1) { s = 1; v = 1; }
+                else if (s < 0.1) s = 1;
+                var (r, g, b) = HsvToRgb(_hue, s, v);
+                _red = r; _green = g; _blue = b;
+                Notify(nameof(RedDouble)); Notify(nameof(GreenDouble)); Notify(nameof(BlueDouble));
                 var color = Color.FromRgb(r, g, b);
-                SelectedColor = color;
                 SelectedBrush = new SolidColorBrush(color);
-                SelectedColorHex = $"#{r:X2}{g:X2}{b:X2}";
+                var hex = $"#{r:X2}{g:X2}{b:X2}";
+                SetValue(SelectedColorHexProperty, hex);
+                Notify(nameof(SelectedColorHex));
             }
-            finally
-            {
-                _isInternalUpdate = false;
-            }
+            finally { _busy = false; }
         }
+
+        private static byte ClipToByte(double v) => (byte)Math.Clamp(Math.Round(v), 0, 255);
+
+        // ══════════════════ Event handlers ══════════════════
 
         private void Swatch_Click(object? sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is string hex)
+            if (sender is Button { Tag: string hex })
             {
-                SelectedColorHex = hex;
-                UpdateFromHex(hex);
+                SetValue(SelectedColorHexProperty, hex);
+                SyncFromHex(hex);
+                Notify(nameof(SelectedColorHex));
             }
         }
 
         private void PaletteButton_Click(object? sender, RoutedEventArgs e)
         {
-            var swatchBtn = this.FindControl<Button>("SwatchButton");
-            if (swatchBtn?.Flyout != null)
-            {
-                swatchBtn.Flyout.ShowAt(swatchBtn);
-            }
+            var btn = this.FindControl<Button>("SwatchButton");
+            btn?.Flyout?.ShowAt(btn);
         }
 
         private void CloseFlyout_Click(object? sender, RoutedEventArgs e)
+            => this.FindControl<Button>("SwatchButton")?.Flyout?.Hide();
+
+        private void HexBox_LostFocus(object? sender, RoutedEventArgs e)
         {
-            var swatchBtn = this.FindControl<Button>("SwatchButton");
-            swatchBtn?.Flyout?.Hide();
+            if (sender is TextBox tb)
+            {
+                var hex = tb.Text ?? string.Empty;
+                if (TryParseHex(hex, out _))
+                {
+                    if (!hex.StartsWith('#')) hex = '#' + hex;
+                    SetValue(SelectedColorHexProperty, hex);
+                    SyncFromHex(hex);
+                    Notify(nameof(SelectedColorHex));
+                }
+            }
         }
+
+        // ══════════════════ Color math ══════════════════
 
         public static bool TryParseHex(string? hex, out Color color)
         {
             color = Colors.Transparent;
             if (string.IsNullOrWhiteSpace(hex)) return false;
-            var clean = hex.Trim();
-            if (!clean.StartsWith("#")) clean = "#" + clean;
-            return Color.TryParse(clean, out color);
+            var s = hex.Trim();
+            if (!s.StartsWith('#')) s = '#' + s;
+            return Color.TryParse(s, out color);
         }
 
         public static (double h, double s, double v) RgbToHsv(byte r, byte g, byte b)
         {
-            double rNorm = r / 255.0;
-            double gNorm = g / 255.0;
-            double bNorm = b / 255.0;
-
-            double max = Math.Max(rNorm, Math.Max(gNorm, bNorm));
-            double min = Math.Min(rNorm, Math.Min(gNorm, bNorm));
+            double rN = r / 255.0, gN = g / 255.0, bN = b / 255.0;
+            double max = Math.Max(rN, Math.Max(gN, bN));
+            double min = Math.Min(rN, Math.Min(gN, bN));
             double delta = max - min;
-
             double h = 0;
             if (delta > 0.0001)
             {
-                if (Math.Abs(max - rNorm) < 0.0001)
-                    h = 60 * (((gNorm - bNorm) / delta) % 6);
-                else if (Math.Abs(max - gNorm) < 0.0001)
-                    h = 60 * (((bNorm - rNorm) / delta) + 2);
-                else
-                    h = 60 * (((rNorm - gNorm) / delta) + 4);
-
+                if (Math.Abs(max - rN) < 0.0001)      h = 60 * (((gN - bN) / delta) % 6);
+                else if (Math.Abs(max - gN) < 0.0001) h = 60 * (((bN - rN) / delta) + 2);
+                else                                   h = 60 * (((rN - gN) / delta) + 4);
                 if (h < 0) h += 360;
             }
-
-            double s = max > 0.0001 ? delta / max : 0;
-            double v = max;
-
-            return (h, s, v);
+            return (h, max > 0.0001 ? delta / max : 0, max);
         }
 
         public static (byte r, byte g, byte b) HsvToRgb(double h, double s, double v)
         {
-            double c = v * s;
-            double x = c * (1 - Math.Abs((h / 60) % 2 - 1));
-            double m = v - c;
-
-            double rPrime = 0, gPrime = 0, bPrime = 0;
-            if (h < 60) { rPrime = c; gPrime = x; bPrime = 0; }
-            else if (h < 120) { rPrime = x; gPrime = c; bPrime = 0; }
-            else if (h < 180) { rPrime = 0; gPrime = c; bPrime = x; }
-            else if (h < 240) { rPrime = 0; gPrime = x; bPrime = c; }
-            else if (h < 300) { rPrime = x; gPrime = 0; bPrime = c; }
-            else { rPrime = c; gPrime = 0; bPrime = x; }
-
-            return ((byte)Math.Clamp(Math.Round((rPrime + m) * 255), 0, 255),
-                    (byte)Math.Clamp(Math.Round((gPrime + m) * 255), 0, 255),
-                    (byte)Math.Clamp(Math.Round((bPrime + m) * 255), 0, 255));
+            double c = v * s, x = c * (1 - Math.Abs((h / 60) % 2 - 1)), m = v - c;
+            double rP = 0, gP = 0, bP = 0;
+            if      (h < 60)  { rP = c; gP = x; }
+            else if (h < 120) { rP = x; gP = c; }
+            else if (h < 180) { gP = c; bP = x; }
+            else if (h < 240) { gP = x; bP = c; }
+            else if (h < 300) { rP = x; bP = c; }
+            else              { rP = c; bP = x; }
+            return (ClipToByte((rP + m) * 255), ClipToByte((gP + m) * 255), ClipToByte((bP + m) * 255));
         }
     }
 }

@@ -83,8 +83,14 @@ namespace AvaloniaApplication1.Models.Config
 
     public class CommandButtonConfig : WidgetConfig
     {
-        // Toggle | Momentary | SetValue
-        public string ButtonMode { get; set; } = "Toggle";
+        // Toggle | Momentary | Latching | ToggleSwitch
+        public string ButtonMode    { get; set; } = "Toggle";
+        // Labels
+        public string LabelOn       { get; set; } = "ВКЛ";
+        public string LabelOff      { get; set; } = "ВЫКЛ";
+        // Colors
+        public string ColorOn       { get; set; } = "#00AA44";
+        public string ColorOff      { get; set; } = "#AA2200";
     }
 
     public class SliderConfig : WidgetConfig
