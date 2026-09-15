@@ -279,17 +279,9 @@ namespace AvaloniaApplication1.Views.DashboardPanelHelpers
                     double w = valveControl.Bounds.Width;
                     double h = valveControl.Bounds.Height;
 
-                    double availableH = h;
-                    bool willShowFeedback = string.Equals(valveControl.ValveType, "Regulating", StringComparison.OrdinalIgnoreCase)
-                                            && valveControl.HasFeedbackSource && valveControl.ShowFeedbackBar;
-                    if (willShowFeedback)
-                    {
-                        availableH -= 18.0;
-                    }
-
-                    double flowSize = isFlowVertical ? availableH : w;
+                    double flowSize = isFlowVertical ? h : w;
                     double cx = w / 2.0;
-                    double cy = availableH / 2.0;
+                    double cy = h / 2.0;
 
                     double angle = finalRotation * Math.PI / 180.0;
                     var lp1 = new Point(cx - flowSize / 2.0, cy);

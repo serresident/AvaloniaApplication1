@@ -14,7 +14,10 @@ using AvaloniaApplication1;
 using AvaloniaApplication1.Models;
 using AvaloniaApplication1.Views;
 using AvaloniaApplication1.Services;
+using System.Linq;
+using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.ViewModels;
+using AvaloniaApplication1.Views.DashboardPanelHelpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AvaloniaApplication1.UIValidation;
@@ -193,6 +196,8 @@ public static class Program
             File.WriteAllText(jsonPath, json);
             Console.WriteLine($"[UIValidation] Visual tree dump saved: {jsonPath} ({new FileInfo(jsonPath).Length} bytes)");
 
+            RunAutomatedValidations(mainVm, sp);
+
             Console.WriteLine("[UIValidation] SUCCESS: Artifacts generated successfully.");
             Environment.Exit(0);
         }, CancellationToken.None);
@@ -200,6 +205,89 @@ public static class Program
         // Failsafe timeout
         Thread.Sleep(6000);
         Environment.Exit(0);
+    }
+
+    private static void RunAutomatedValidations(MainViewModel mainVm, IServiceProvider sp)
+    {
+        Console.WriteLine("[UIValidation] Running automated validations...");
+
+        // 1. Test WidgetClipboard for ValveConfig
+        var valveConfig = new ValveConfig
+        {
+            Type = "Valve",
+            Title = "Test Valve",
+            ValveType = "CutOff",
+            Position = new WidgetPosition { Col = 5, Row = 8, SizeX = 6, SizeY = 6 }
+        };
+        WidgetClipboard.Copy(valveConfig);
+        if (!WidgetClipboard.HasWidget)
+            throw new Exception("WidgetClipboard.HasWidget should be true after copy.");
+
+        var pastedValve = WidgetClipboard.PasteClone() as ValveConfig;
+        if (pastedValve == null || pastedValve.Title != "Test Valve" || pastedValve.ValveType != "CutOff")
+            throw new Exception("Pasted ValveConfig does not match copied config.");
+
+        // 2. Test WidgetClipboard for ContainerButtonConfig with Children
+        var containerConfig = new ContainerButtonConfig
+        {
+            Type = "ContainerButton",
+            Title = "Main Container",
+            Position = new WidgetPosition { Col = 1, Row = 1, SizeX = 4, SizeY = 4 },
+            Children = new List<WidgetConfig>
+            {
+                new ValveConfig { Type = "Valve", Title = "Child Valve", ValveType = "Regulating" },
+                new PumpConfig { Type = "Pump", Title = "Child Pump" }
+            }
+        };
+        WidgetClipboard.Copy(containerConfig);
+        var pastedContainer = WidgetClipboard.PasteClone() as ContainerButtonConfig;
+        if (pastedContainer == null || pastedContainer.Children.Count != 2 || pastedContainer.Children[0].Title != "Child Valve")
+            throw new Exception("Pasted ContainerButtonConfig failed to restore children.");
+
+        // 3. Test ContainerButtonViewModel.PasteWidgetIntoContainer
+        WidgetClipboard.Copy(new ValveConfig { Type = "Valve", Title = "Inserted Valve", ValveType = "CutOff" });
+        var containerVm = new ContainerButtonViewModel(pastedContainer, new MockDataCoreService(), mainVm.ProjectContext);
+        containerVm.PasteWidgetIntoContainer();
+        if (containerVm.TypedConfig.Children.Count != 3 || containerVm.TypedConfig.Children.Last().Title != "Inserted Valve")
+            throw new Exception("ContainerButtonViewModel.PasteWidgetIntoContainer did not add widget to Children.");
+
+        // 4. Test Valve Port Snapping Invariance: CutOff vs Regulating
+        var cutoffConfig = new ValveConfig
+        {
+            Type = "Valve",
+            ValveType = "CutOff",
+            Position = new WidgetPosition { Col = 10, Row = 10, SizeX = 6, SizeY = 6 }
+        };
+        var regulatingConfig = new ValveConfig
+        {
+            Type = "Valve",
+            ValveType = "Regulating",
+            FeedbackSource = new DataSourceConfig { ConnId = "plc", Address = "100" },
+            Position = new WidgetPosition { Col = 10, Row = 10, SizeX = 6, SizeY = 6 }
+        };
+        var panel = new DashboardPanel { CellWidth = 20, CellHeight = 20 };
+        var cutoffVm = new ValveWidgetViewModel(cutoffConfig, new MockDataCoreService(), mainVm.ProjectContext);
+        var regVm = new ValveWidgetViewModel(regulatingConfig, new MockDataCoreService(), mainVm.ProjectContext);
+
+        var (cutoffP1, cutoffP2) = VisualPortHelper.GetVisualPortsInGrid(new Control(), cutoffVm, panel);
+        var (regP1, regP2) = VisualPortHelper.GetVisualPortsInGrid(new Control(), regVm, panel);
+
+        if (Math.Abs(cutoffP1.X - regP1.X) > 0.001 || Math.Abs(cutoffP1.Y - regP1.Y) > 0.001 ||
+            Math.Abs(cutoffP2.X - regP2.X) > 0.001 || Math.Abs(cutoffP2.Y - regP2.Y) > 0.001)
+        {
+            throw new Exception($"Valve port discrepancy detected between CutOff ({cutoffP1}, {cutoffP2}) and Regulating ({regP1}, {regP2})!");
+        }
+
+        // 5. Test DashboardViewModel.PasteWidgetAt
+        var dConfig = new DashboardConfig();
+        var widgetFactory = sp.GetRequiredService<IWidgetFactory>();
+        var dVm = new DashboardViewModel(dConfig, new MockDataCoreService(), mainVm.ProjectContext, new HmiConfiguration(), null, widgetFactory);
+        WidgetClipboard.Copy(new ValveConfig { Type = "Valve", Title = "Dashboard Valve", ValveType = "CutOff" });
+        dVm.PasteWidgetAt(15, 20);
+        if (dVm.Widgets.Count != 1 || dVm.Widgets[0].Col != 15 || dVm.Widgets[0].Row != 20)
+            throw new Exception("DashboardViewModel.PasteWidgetAt failed to position widget correctly.");
+
+        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS PASSED SUCCESSFULLY!");
     }
 
     private static VisualTreeNode DumpVisualTree(Visual visual)

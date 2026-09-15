@@ -199,6 +199,72 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         [RelayCommand]
+        public void CopyWidget(WidgetViewModelBase? widget)
+        {
+            widget ??= Widgets.FirstOrDefault(w => w.IsSelected);
+            if (widget == null) return;
+            WidgetClipboard.Copy(widget.OriginalConfig);
+        }
+
+        [RelayCommand]
+        public void PasteWidget(object? parameter = null)
+        {
+            var clonedConfig = WidgetClipboard.PasteClone();
+            if (clonedConfig == null) return;
+
+            if (parameter is Avalonia.Point pt)
+            {
+                clonedConfig.Position.Col = Math.Max(0, Math.Floor(pt.X));
+                clonedConfig.Position.Row = Math.Max(0, Math.Floor(pt.Y));
+            }
+            else
+            {
+                var selected = Widgets.FirstOrDefault(w => w.IsSelected);
+                if (selected != null)
+                {
+                    clonedConfig.Position.Col = selected.Col + 2;
+                    clonedConfig.Position.Row = selected.Row + 2;
+                }
+                else
+                {
+                    clonedConfig.Position.Col += 2;
+                    clonedConfig.Position.Row += 2;
+                }
+            }
+
+            AddWidgetFromConfig(clonedConfig);
+        }
+
+        public void PasteWidgetAt(double col, double row)
+        {
+            var clonedConfig = WidgetClipboard.PasteClone();
+            if (clonedConfig == null) return;
+
+            clonedConfig.Position.Col = col;
+            clonedConfig.Position.Row = row;
+
+            AddWidgetFromConfig(clonedConfig);
+        }
+
+        public void AddWidgetFromConfig(WidgetConfig config)
+        {
+            if (!_dashboardConfig.Widgets.Contains(config))
+            {
+                _dashboardConfig.Widgets.Add(config);
+            }
+
+            var vm = CreateWidgetViewModel(config);
+            if (vm != null)
+            {
+                foreach (var w in Widgets) w.IsSelected = false;
+                vm.IsSelected = true;
+                vm.PropertyChanged += OnWidgetPropertyChanged;
+                Widgets.Add(vm);
+                ResolvePipeConnections();
+            }
+        }
+
+        [RelayCommand]
         private void DuplicateWidget(WidgetViewModelBase? widget)
         {
             widget ??= Widgets.FirstOrDefault(w => w.IsSelected);
@@ -212,18 +278,7 @@ namespace AvaloniaApplication1.ViewModels
             {
                 clonedConfig.Position.Row += 2;
                 clonedConfig.Position.Col += 2;
-
-                _dashboardConfig.Widgets.Add(clonedConfig);
-
-                var vm = CreateWidgetViewModel(clonedConfig);
-                if (vm != null)
-                {
-                    widget.IsSelected = false;
-                    vm.IsSelected = true;
-                    vm.PropertyChanged += OnWidgetPropertyChanged;
-                    Widgets.Add(vm);
-                    ResolvePipeConnections();
-                }
+                AddWidgetFromConfig(clonedConfig);
             }
         }
 

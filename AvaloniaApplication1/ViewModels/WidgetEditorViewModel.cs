@@ -165,6 +165,7 @@ namespace AvaloniaApplication1.ViewModels
         private bool _showIndustrialSettings;
 
         private bool _isEditing;
+        private readonly WidgetConfig? _existingConfig;
 
         // --- Result ---
         public bool IsConfirmed { get; private set; }
@@ -172,6 +173,7 @@ namespace AvaloniaApplication1.ViewModels
 
         public WidgetEditorViewModel(WidgetConfig? existingConfig, List<ConnectionConfig> connections)
         {
+            _existingConfig = existingConfig;
             AvailableConnections = connections.Select(c => c.Id).ToList();
 
             if (existingConfig != null)
@@ -342,7 +344,10 @@ namespace AvaloniaApplication1.ViewModels
                 "HeatExchanger" => new HeatExchangerConfig { ExchangerType = "ShellAndTube", Format = Format, ActiveColor = ActiveColor, InactiveColor = InactiveColor, ShowFlanges = ShowFlanges },
                 "Reactor" => new ReactorConfig { MinValue = MinValue, MaxValue = MaxValue, Format = Format, HasJacket = true, ActiveColor = ActiveColor, InactiveColor = InactiveColor },
                 "LevelSensor" => new LevelSensorConfig { SensorType = "Radar", TagNumber = Title, Unit = "%", Format = Format, MinValue = MinValue, MaxValue = MaxValue, AlarmHigh = 90, AlarmLow = 10, ValueColor = ValueColor },
-                "ContainerButton" => new ContainerButtonConfig(),
+                "ContainerButton" => new ContainerButtonConfig 
+                { 
+                    Children = (_existingConfig as ContainerButtonConfig)?.Children ?? new() 
+                },
                 _ => new WidgetConfigBase()
             };
 

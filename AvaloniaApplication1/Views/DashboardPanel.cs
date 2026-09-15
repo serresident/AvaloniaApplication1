@@ -9,6 +9,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using AvaloniaApplication1.Services;
 using AvaloniaApplication1.ViewModels;
 using AvaloniaApplication1.Views.DashboardPanelHelpers;
 
@@ -684,7 +685,44 @@ namespace AvaloniaApplication1.Views
             if (!clickedWidget)
             {
                 SelectedVm = null;
+                if (IsDesignMode && e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+                {
+                    ShowCanvasContextMenu(point);
+                    e.Handled = true;
+                    return;
+                }
             }
+        }
+
+        private void ShowCanvasContextMenu(Point clickPoint)
+        {
+            var dashboardVm = GetDashboardViewModel();
+            if (dashboardVm == null) return;
+
+            CloseActiveWidgetMenu();
+
+            var menu = new ContextMenu();
+            _activeWidgetMenu = menu;
+            menu.Closed += (s, ev) =>
+            {
+                if (_activeWidgetMenu == menu) _activeWidgetMenu = null;
+            };
+
+            var pasteItem = new MenuItem 
+            { 
+                Header = "Вставить", 
+                IsEnabled = WidgetClipboard.HasWidget 
+            };
+            pasteItem.Click += (s, ev) =>
+            {
+                double col = Math.Max(0, Math.Floor(clickPoint.X / CellWidth));
+                double row = Math.Max(0, Math.Floor(clickPoint.Y / CellHeight));
+                dashboardVm.PasteWidgetAt(col, row);
+            };
+            menu.Items.Add(pasteItem);
+
+            menu.Placement = PlacementMode.Pointer;
+            menu.Open(this);
         }
 
         private void ShowWidgetContextMenu(WidgetViewModelBase targetVm, Control? targetChild)
@@ -727,11 +765,40 @@ namespace AvaloniaApplication1.Views
                 menu.Items.Add(new Separator());
             }
 
+            if (targetVm is ContainerButtonViewModel containerVm)
+            {
+                var openContainerItem = new MenuItem { Header = "Открыть контейнер" };
+                openContainerItem.Click += async (s, ev) => await containerVm.OpenContainerCommand.ExecuteAsync(null);
+                menu.Items.Add(openContainerItem);
+
+                var pasteIntoContainerItem = new MenuItem 
+                { 
+                    Header = "Вставить внутрь контейнера",
+                    IsEnabled = WidgetClipboard.HasWidget
+                };
+                pasteIntoContainerItem.Click += (s, ev) => containerVm.PasteWidgetIntoContainer();
+                menu.Items.Add(pasteIntoContainerItem);
+
+                menu.Items.Add(new Separator());
+            }
+
             var editItem = new MenuItem { Header = "Свойства" };
             editItem.Click += (s, ev) => dashboardVm.EditWidgetCommand.Execute(targetVm);
             menu.Items.Add(editItem);
 
             menu.Items.Add(new Separator());
+
+            var copyItem = new MenuItem { Header = "Копировать" };
+            copyItem.Click += (s, ev) => dashboardVm.CopyWidgetCommand.Execute(targetVm);
+            menu.Items.Add(copyItem);
+
+            var pasteItem = new MenuItem 
+            { 
+                Header = "Вставить", 
+                IsEnabled = WidgetClipboard.HasWidget 
+            };
+            pasteItem.Click += (s, ev) => dashboardVm.PasteWidgetCommand.Execute(null);
+            menu.Items.Add(pasteItem);
 
             var dupItem = new MenuItem { Header = "Дублировать" };
             dupItem.Click += (s, ev) => dashboardVm.DuplicateWidgetCommand.Execute(targetVm);
@@ -1281,7 +1348,29 @@ namespace AvaloniaApplication1.Views
         {
             base.OnKeyDown(e);
 
-            if (!IsDesignMode || SelectedVm == null) return;
+            if (!IsDesignMode) return;
+
+            if (e.KeyModifiers.HasFlag(Avalonia.Input.KeyModifiers.Control))
+            {
+                var dashboardVm = GetDashboardViewModel();
+                if (dashboardVm != null)
+                {
+                    if (e.Key == Avalonia.Input.Key.C && SelectedVm != null)
+                    {
+                        dashboardVm.CopyWidgetCommand.Execute(SelectedVm);
+                        e.Handled = true;
+                        return;
+                    }
+                    if (e.Key == Avalonia.Input.Key.V && WidgetClipboard.HasWidget)
+                    {
+                        dashboardVm.PasteWidgetCommand.Execute(null);
+                        e.Handled = true;
+                        return;
+                    }
+                }
+            }
+
+            if (SelectedVm == null) return;
 
             if (e.Key == Avalonia.Input.Key.Delete)
             {

@@ -25,8 +25,6 @@ namespace AvaloniaApplication1.ViewModels
         [RelayCommand]
         private async Task OpenContainerAsync()
         {
-            if (ProjectContext.IsDesignMode) return;
-
             if (_controlWindow != null)
             {
                 _controlWindow.CloseAction?.Invoke();
@@ -63,6 +61,38 @@ namespace AvaloniaApplication1.ViewModels
             else if (DialogService != null)
             {
                 await DialogService.ShowContainerDashboardAsync(Title, dashboardConfig);
+            }
+        }
+
+        [RelayCommand]
+        public void PasteWidgetIntoContainer()
+        {
+            var clonedConfig = WidgetClipboard.PasteClone();
+            if (clonedConfig == null) return;
+
+            if (TypedConfig.Children == null)
+            {
+                TypedConfig.Children = new List<WidgetConfig>();
+            }
+
+            // Position at beginning or below existing widgets
+            double maxRow = TypedConfig.Children.Count > 0
+                ? TypedConfig.Children.Max(c => c.Position.Row + c.Position.SizeY)
+                : 0;
+            clonedConfig.Position.Col = 0;
+            clonedConfig.Position.Row = maxRow > 0 ? maxRow + 1 : 0;
+
+            if (_controlWindow?.Content is DashboardViewModel innerDashboardVm)
+            {
+                innerDashboardVm.AddWidgetFromConfig(clonedConfig);
+            }
+            else
+            {
+                TypedConfig.Children.Add(clonedConfig);
+                if (!_childrenConfig.Contains(clonedConfig))
+                {
+                    _childrenConfig.Add(clonedConfig);
+                }
             }
         }
     }
