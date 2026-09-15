@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        xmlns:controls="clr-namespace:AvaloniaApplication1.Views.Controls"
         mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="700"
         x:Class="AvaloniaApplication1.Views.WidgetEditorWindow"
         x:DataType="vm:WidgetEditorViewModel"
@@ -84,12 +85,12 @@
                     <StackPanel Spacing="8">
                         <TextBlock Text="Value Display Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         <TextBlock Text="Display Format" Foreground="#AAAAAA" FontSize="11" />
-                        <TextBox Text="{Binding Format}" PlaceholderText="{}{0:F2} °C" />
+                        <controls:FormatEditorBox Format="{Binding Format}" />
 
                         <Grid ColumnDefinitions="*,10,*">
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Text Color (hex)" Foreground="#AAAAAA" FontSize="11" />
-                                <TextBox Text="{Binding ValueColor}" PlaceholderText="#00FF00" />
+                                <TextBlock Text="Text Color" Foreground="#AAAAAA" FontSize="11" />
+                                <controls:ColorPickerBox SelectedColorHex="{Binding ValueColor}" />
                             </StackPanel>
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="Font Size" Foreground="#AAAAAA" FontSize="11" />
@@ -106,12 +107,12 @@
                         <TextBlock Text="Pilot Light Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         <Grid ColumnDefinitions="*,10,*">
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="True Color (hex)" Foreground="#AAAAAA" FontSize="11" />
-                                <TextBox Text="{Binding TrueColor}" PlaceholderText="#00FF00" />
+                                <TextBlock Text="True Color" Foreground="#AAAAAA" FontSize="11" />
+                                <controls:ColorPickerBox SelectedColorHex="{Binding TrueColor}" />
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="False Color (hex)" Foreground="#AAAAAA" FontSize="11" />
-                                <TextBox Text="{Binding FalseColor}" PlaceholderText="#440000" />
+                                <TextBlock Text="False Color" Foreground="#AAAAAA" FontSize="11" />
+                                <controls:ColorPickerBox SelectedColorHex="{Binding FalseColor}" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -243,12 +244,12 @@
                         <TextBlock Text="Mimic Color Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         <Grid ColumnDefinitions="*,10,*">
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Active Color (hex)" Foreground="#AAAAAA" FontSize="11" />
-                                <TextBox Text="{Binding ActiveColor}" PlaceholderText="#00FF00" />
+                                <TextBlock Text="Active Color" Foreground="#AAAAAA" FontSize="11" />
+                                <controls:ColorPickerBox SelectedColorHex="{Binding ActiveColor}" />
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="Inactive Color (hex)" Foreground="#AAAAAA" FontSize="11" />
-                                <TextBox Text="{Binding InactiveColor}" PlaceholderText="#FF0000" />
+                                <TextBlock Text="Inactive Color" Foreground="#AAAAAA" FontSize="11" />
+                                <controls:ColorPickerBox SelectedColorHex="{Binding InactiveColor}" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>

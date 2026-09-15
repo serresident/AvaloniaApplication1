@@ -1,0 +1,167 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:AvaloniaApplication1.Views.Controls"
+             mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="70"
+             x:Class="AvaloniaApplication1.Views.Controls.FormatEditorBox"
+             x:DataType="local:FormatEditorBox">
+
+    <StackPanel Spacing="6">
+        <!-- Row 1: Format Input & Presets Menu Button -->
+        <Grid ColumnDefinitions="*,8,Auto">
+            <TextBox Grid.Column="0" 
+                     x:Name="FormatTextBox"
+                     Text="{Binding Format, RelativeSource={RelativeSource AncestorType=local:FormatEditorBox}, Mode=TwoWay}" 
+                     PlaceholderText="{}{0:F1} °C" 
+                     FontFamily="Consolas, monospace"
+                     VerticalAlignment="Center" />
+
+            <Button Grid.Column="2" 
+                    Content="📋 Шаблоны ▼" 
+                    Padding="10,6" 
+                    Background="#3E3E42" Foreground="#00AAFF" 
+                    FontWeight="SemiBold" FontSize="12" CornerRadius="4"
+                    ToolTip.Tip="Выбрать готовый шаблон физической величины">
+                <Button.Flyout>
+                    <MenuFlyout Placement="BottomEdgeAlignedRight">
+                        <!-- 1. Температура -->
+                        <MenuItem Header="🌡️  Температура">
+                            <MenuItem Header="{}{0:F1} °C   (Цельсий, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} °C" />
+                            <MenuItem Header="{}{0:F0} °C   (Цельсий, целое)" Click="PresetItem_Click" Tag="{}{0:F0} °C" />
+                            <MenuItem Header="{}{0:F2} °C   (Цельсий, 2 знака)" Click="PresetItem_Click" Tag="{}{0:F2} °C" />
+                            <MenuItem Header="{}{0:F1} °F   (Фаренгейт)" Click="PresetItem_Click" Tag="{}{0:F1} °F" />
+                            <MenuItem Header="{}{0:F1} K    (Кельвин)" Click="PresetItem_Click" Tag="{}{0:F1} K" />
+                        </MenuItem>
+
+                        <!-- 2. Давление -->
+                        <MenuItem Header="⏱️  Давление">
+                            <MenuItem Header="{}{0:F1} bar      (Бар, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} bar" />
+                            <MenuItem Header="{}{0:F2} bar      (Бар, 2 знака)" Click="PresetItem_Click" Tag="{}{0:F2} bar" />
+                            <MenuItem Header="{}{0:F2} MPa      (Мегапаскали)" Click="PresetItem_Click" Tag="{}{0:F2} MPa" />
+                            <MenuItem Header="{}{0:F1} kPa      (Килопаскали)" Click="PresetItem_Click" Tag="{}{0:F1} kPa" />
+                            <MenuItem Header="{}{0:F0} kPa      (Килопаскали, целое)" Click="PresetItem_Click" Tag="{}{0:F0} kPa" />
+                            <MenuItem Header="{}{0:F1} кгс/см²  (Техн. атмосфера)" Click="PresetItem_Click" Tag="{}{0:F1} кгс/см²" />
+                            <MenuItem Header="{}{0:F1} psi      (Фунт / кв. дюйм)" Click="PresetItem_Click" Tag="{}{0:F1} psi" />
+                            <MenuItem Header="{}{0:F0} мм рт.ст." Click="PresetItem_Click" Tag="{}{0:F0} мм рт.ст." />
+                        </MenuItem>
+
+                        <!-- 3. Расход и поток -->
+                        <MenuItem Header="🌊  Расход и поток">
+                            <MenuItem Header="{}{0:F1} м³/ч    (Кубометры/час, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} м³/ч" />
+                            <MenuItem Header="{}{0:F2} м³/ч    (Кубометры/час, 2 знака)" Click="PresetItem_Click" Tag="{}{0:F2} м³/ч" />
+                            <MenuItem Header="{}{0:F0} л/мин   (Литры/мин, целое)" Click="PresetItem_Click" Tag="{}{0:F0} л/мин" />
+                            <MenuItem Header="{}{0:F1} л/мин   (Литры/мин, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} л/мин" />
+                            <MenuItem Header="{}{0:F1} л/с     (Литры/сек)" Click="PresetItem_Click" Tag="{}{0:F1} л/с" />
+                            <MenuItem Header="{}{0:F2} т/ч     (Тонны/час)" Click="PresetItem_Click" Tag="{}{0:F2} т/ч" />
+                            <MenuItem Header="{}{0:F1} kg/h    (Килограммы/час)" Click="PresetItem_Click" Tag="{}{0:F1} kg/h" />
+                        </MenuItem>
+
+                        <!-- 4. Уровень и процент -->
+                        <MenuItem Header="📊  Уровень и положение">
+                            <MenuItem Header="{}{0:F1} %    (Проценты, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} %" />
+                            <MenuItem Header="{}{0:F0} %    (Проценты, целое)" Click="PresetItem_Click" Tag="{}{0:F0} %" />
+                            <MenuItem Header="{}{0:F2} %    (Проценты, 2 знака)" Click="PresetItem_Click" Tag="{}{0:F2} %" />
+                            <MenuItem Header="{}{0:F0} мм   (Миллиметры)" Click="PresetItem_Click" Tag="{}{0:F0} мм" />
+                            <MenuItem Header="{}{0:F2} м    (Метры)" Click="PresetItem_Click" Tag="{}{0:F2} м" />
+                        </MenuItem>
+
+                        <!-- 5. Масса и вес -->
+                        <MenuItem Header="⚖️  Масса и вес">
+                            <MenuItem Header="{}{0:F1} кг   (Килограммы, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} кг" />
+                            <MenuItem Header="{}{0:F2} кг   (Килограммы, 2 знака)" Click="PresetItem_Click" Tag="{}{0:F2} кг" />
+                            <MenuItem Header="{}{0:F0} кг   (Килограммы, целое)" Click="PresetItem_Click" Tag="{}{0:F0} кг" />
+                            <MenuItem Header="{}{0:F2} т    (Тонны, 2 знака)" Click="PresetItem_Click" Tag="{}{0:F2} т" />
+                            <MenuItem Header="{}{0:F3} т    (Тонны, 3 знака)" Click="PresetItem_Click" Tag="{}{0:F3} т" />
+                            <MenuItem Header="{}{0:F1} г    (Граммы)" Click="PresetItem_Click" Tag="{}{0:F1} г" />
+                        </MenuItem>
+
+                        <!-- 6. Химия и качество -->
+                        <MenuItem Header="🧪  Химия и аналитика">
+                            <MenuItem Header="{}{0:F2} pH        (Водородный показатель, 2 знака)" Click="PresetItem_Click" Tag="{}{0:F2} pH" />
+                            <MenuItem Header="{}{0:F1} pH        (Водородный показатель, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} pH" />
+                            <MenuItem Header="{}{0:F1} мкСм/см   (Удельная электропроводность)" Click="PresetItem_Click" Tag="{}{0:F1} мкСм/см" />
+                            <MenuItem Header="{}{0:F0} ppm       (Концентрация)" Click="PresetItem_Click" Tag="{}{0:F0} ppm" />
+                            <MenuItem Header="{}{0:F1} мг/л      (Миллиграммы/литр)" Click="PresetItem_Click" Tag="{}{0:F1} мг/л" />
+                        </MenuItem>
+
+                        <!-- 7. Электрика и мощность -->
+                        <MenuItem Header="⚡  Электрика и мощность">
+                            <MenuItem Header="{}{0:F1} В      (Напряжение, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} В" />
+                            <MenuItem Header="{}{0:F0} В      (Напряжение, целое)" Click="PresetItem_Click" Tag="{}{0:F0} В" />
+                            <MenuItem Header="{}{0:F2} А      (Ток, 2 знака)" Click="PresetItem_Click" Tag="{}{0:F2} А" />
+                            <MenuItem Header="{}{0:F1} А      (Ток, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} А" />
+                            <MenuItem Header="{}{0:F1} кВт    (Активная мощность)" Click="PresetItem_Click" Tag="{}{0:F1} кВт" />
+                            <MenuItem Header="{}{0:F2} МВт    (Мегаватты)" Click="PresetItem_Click" Tag="{}{0:F2} МВт" />
+                            <MenuItem Header="{}{0:F1} Гц     (Частота)" Click="PresetItem_Click" Tag="{}{0:F1} Гц" />
+                            <MenuItem Header="{}{0:F2} cos φ  (Коэффициент мощности)" Click="PresetItem_Click" Tag="{}{0:F2} cos φ" />
+                        </MenuItem>
+
+                        <!-- 8. Частота вращения и скорость -->
+                        <MenuItem Header="🔄  Обороты и скорость">
+                            <MenuItem Header="{}{0:F0} об/мин  (Обороты/мин, целое)" Click="PresetItem_Click" Tag="{}{0:F0} об/мин" />
+                            <MenuItem Header="{}{0:F1} об/мин  (Обороты/мин, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} об/мин" />
+                            <MenuItem Header="{}{0:F1} м/с     (Скорость потока)" Click="PresetItem_Click" Tag="{}{0:F1} м/с" />
+                            <MenuItem Header="{}{0:F1} км/ч    (Скорость)" Click="PresetItem_Click" Tag="{}{0:F1} км/ч" />
+                        </MenuItem>
+
+                        <!-- 9. Объем -->
+                        <MenuItem Header="📦  Объем">
+                            <MenuItem Header="{}{0:F1} м³   (Кубометры, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} м³" />
+                            <MenuItem Header="{}{0:F2} м³   (Кубометры, 2 знака)" Click="PresetItem_Click" Tag="{}{0:F2} м³" />
+                            <MenuItem Header="{}{0:F0} л    (Литры, целое)" Click="PresetItem_Click" Tag="{}{0:F0} л" />
+                            <MenuItem Header="{}{0:F1} л    (Литры, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} л" />
+                        </MenuItem>
+
+                        <!-- 10. Время -->
+                        <MenuItem Header="⏳  Время">
+                            <MenuItem Header="{}{0:F0} с    (Секунды, целое)" Click="PresetItem_Click" Tag="{}{0:F0} с" />
+                            <MenuItem Header="{}{0:F1} с    (Секунды, 1 знак)" Click="PresetItem_Click" Tag="{}{0:F1} с" />
+                            <MenuItem Header="{}{0:F0} мин  (Минуты)" Click="PresetItem_Click" Tag="{}{0:F0} мин" />
+                            <MenuItem Header="{}{0:F1} ч    (Часы)" Click="PresetItem_Click" Tag="{}{0:F1} ч" />
+                        </MenuItem>
+
+                        <Separator Background="#3E3E42" Height="1" Margin="0,2" />
+
+                        <!-- 11. Числовые форматы -->
+                        <MenuItem Header="🔢  Числовой формат (без единиц)">
+                            <MenuItem Header="{}{0:F0}   (Целое число)" Click="PresetItem_Click" Tag="{}{0:F0}" />
+                            <MenuItem Header="{}{0:F1}   (1 знак после запятой)" Click="PresetItem_Click" Tag="{}{0:F1}" />
+                            <MenuItem Header="{}{0:F2}   (2 знака после запятой)" Click="PresetItem_Click" Tag="{}{0:F2}" />
+                            <MenuItem Header="{}{0:F3}   (3 знака после запятой)" Click="PresetItem_Click" Tag="{}{0:F3}" />
+                            <MenuItem Header="{}{0}      (Исходное значение)" Click="PresetItem_Click" Tag="{}{0}" />
+                        </MenuItem>
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+        </Grid>
+
+        <!-- Row 2: Precision quick-switcher buttons (Smart format switcher) -->
+        <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
+            <TextBlock Grid.Column="0" Text="Знаков:" Foreground="#888888" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <UniformGrid Grid.Column="1" Columns="5">
+                <Button Content="0" Click="PrecisionButton_Click" Tag="F0"
+                        Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
+                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        ToolTip.Tip="Целое число ({0:F0})" />
+                <Button Content=".0" Click="PrecisionButton_Click" Tag="F1"
+                        Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
+                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        ToolTip.Tip="1 знак после запятой ({0:F1})" />
+                <Button Content=".00" Click="PrecisionButton_Click" Tag="F2"
+                        Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
+                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        ToolTip.Tip="2 знака после запятой ({0:F2})" />
+                <Button Content=".000" Click="PrecisionButton_Click" Tag="F3"
+                        Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
+                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        ToolTip.Tip="3 знака после запятой ({0:F3})" />
+                <Button Content="Авто" Click="PrecisionButton_Click" Tag=""
+                        Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
+                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        ToolTip.Tip="Без форматирования ({0})" />
+            </UniformGrid>
+        </Grid>
+    </StackPanel>
+
+</UserControl>
