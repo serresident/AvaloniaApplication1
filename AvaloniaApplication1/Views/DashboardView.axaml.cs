@@ -27,6 +27,7 @@ namespace AvaloniaApplication1.Views
             AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
             AddHandler(KeyUpEvent, OnKeyUp, RoutingStrategies.Tunnel);
             AddHandler(PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel);
+            AddHandler(PointerPressedEvent, OnBubblePointerPressed, RoutingStrategies.Bubble);
             AddHandler(PointerMovedEvent, OnPointerMoved, RoutingStrategies.Tunnel);
             AddHandler(PointerReleasedEvent, OnPointerReleased, RoutingStrategies.Tunnel);
             AddHandler(PointerCaptureLostEvent, OnPointerCaptureLost, RoutingStrategies.Tunnel);
@@ -119,6 +120,22 @@ namespace AvaloniaApplication1.Views
 
                 _panTimer?.Start();
                 e.Handled = true;
+            }
+        }
+
+        private void OnBubblePointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (e.Handled) return;
+
+            if (IsDesignModeActive() && e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+            {
+                var panel = this.FindDescendantOfType<DashboardPanel>();
+                if (panel != null)
+                {
+                    var posInPanel = e.GetPosition(panel);
+                    panel.ShowCanvasContextMenu(posInPanel);
+                    e.Handled = true;
+                }
             }
         }
 

@@ -287,6 +287,76 @@ public static class Program
         if (dVm.Widgets.Count != 1 || dVm.Widgets[0].Col != 15 || dVm.Widgets[0].Row != 20)
             throw new Exception("DashboardViewModel.PasteWidgetAt failed to position widget correctly.");
 
+        // 6. Test DashboardPropertiesViewModel
+        var propVm = new DashboardPropertiesViewModel(40, 1.0);
+        propVm.SetCellSizePresetCommand.Execute(20);
+        propVm.SetZoomPresetCommand.Execute(150);
+        if (propVm.CellSize != 20 || propVm.ZoomPercent != 150 || Math.Abs(propVm.ZoomScale - 1.5) > 0.001)
+            throw new Exception("DashboardPropertiesViewModel preset commands failed.");
+        propVm.ResetDefaultsCommand.Execute(null);
+        if (propVm.CellSize != 40 || propVm.ZoomPercent != 100 || Math.Abs(propVm.ZoomScale - 1.0) > 0.001)
+            throw new Exception("DashboardPropertiesViewModel ResetDefaults failed.");
+
+        // 7. Test DashboardViewModel.UpdateGridAndScale & AddQuickWidgetAt
+        double reportedCellSize = 0;
+        double reportedZoom = 0;
+        dVm.OnGridOrScaleChanged += (cs, zs) =>
+        {
+            reportedCellSize = cs;
+            reportedZoom = zs;
+        };
+        dVm.UpdateGridAndScale(80, 1.25);
+        if (dVm.CellWidth != 80 || dVm.CellHeight != 80 || Math.Abs(dVm.ZoomScale - 1.25) > 0.001 ||
+            dConfig.CellSize != 80 || Math.Abs(dConfig.ZoomScale - 1.25) > 0.001 ||
+            reportedCellSize != 80 || Math.Abs(reportedZoom - 1.25) > 0.001)
+        {
+            throw new Exception("DashboardViewModel.UpdateGridAndScale failed to update properties or fire event.");
+        }
+
+        dVm.AddQuickWidgetAt("Valve", 12, 18);
+        var addedValve = dVm.Widgets.LastOrDefault();
+        if (addedValve == null || addedValve.Col != 12 || addedValve.Row != 18 || addedValve.Type != "Valve")
+            throw new Exception("DashboardViewModel.AddQuickWidgetAt failed to create Valve at (12, 18).");
+
+        dVm.AddQuickWidgetAt("Pump", 25, 30);
+        var addedPump = dVm.Widgets.LastOrDefault();
+        if (addedPump == null || addedPump.Col != 25 || addedPump.Row != 30 || addedPump.Type != "Pump")
+            throw new Exception("DashboardViewModel.AddQuickWidgetAt failed to create Pump at (25, 30).");
+
+        // 8. Test ContainerButtonConfig and Container synchronization
+        var containerWithGrid = new ContainerButtonConfig
+        {
+            Type = "ContainerButton",
+            Title = "Nested Window",
+            CellSize = 20,
+            ZoomScale = 1.5,
+            Children = new List<WidgetConfig>()
+        };
+        var childWindowService = sp.GetRequiredService<IChildWindowService>();
+        var containerBtnVm = new ContainerButtonViewModel(containerWithGrid, new MockDataCoreService(), mainVm.ProjectContext)
+        {
+            ChildWindowService = childWindowService
+        };
+        containerBtnVm.OpenContainerCommand.Execute(null);
+        if (mainVm.ActiveChildWindows.Count == 0)
+            throw new Exception("Failed to open child window for ContainerButtonViewModel.");
+
+        var openWindow = mainVm.ActiveChildWindows.Last();
+        if (openWindow.Content is DashboardViewModel nestedDashboardVm)
+        {
+            if (nestedDashboardVm.CellWidth != 20 || Math.Abs(nestedDashboardVm.ZoomScale - 1.5) > 0.001)
+                throw new Exception("Nested DashboardViewModel did not inherit CellSize/ZoomScale from ContainerButtonConfig.");
+
+            nestedDashboardVm.UpdateGridAndScale(10, 0.75);
+            if (containerWithGrid.CellSize != 10 || Math.Abs(containerWithGrid.ZoomScale - 0.75) > 0.001)
+                throw new Exception("ContainerButtonConfig was not synchronized when nested DashboardViewModel grid/scale changed.");
+        }
+        else
+        {
+            throw new Exception("Child window content is not DashboardViewModel.");
+        }
+        openWindow.CloseCommand.Execute(null);
+
         Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS PASSED SUCCESSFULLY!");
     }
 

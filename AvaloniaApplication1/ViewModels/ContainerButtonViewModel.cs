@@ -32,13 +32,27 @@ namespace AvaloniaApplication1.ViewModels
                 return;
             }
 
-            var dashboardConfig = new DashboardConfig { Widgets = _childrenConfig };
+            var dashboardConfig = new DashboardConfig 
+            { 
+                CellSize = TypedConfig.CellSize > 0 ? TypedConfig.CellSize : 40,
+                ZoomScale = TypedConfig.ZoomScale > 0 ? TypedConfig.ZoomScale : 1.0,
+                Widgets = _childrenConfig 
+            };
 
             if (ChildWindowService != null)
             {
                 _controlWindow = ChildWindowService.OpenChildWindow(Title, (object)dashboardConfig);
                 if (_controlWindow != null)
                 {
+                    if (_controlWindow.Content is DashboardViewModel innerDashboardVm)
+                    {
+                        innerDashboardVm.OnGridOrScaleChanged += (cellSize, zoomScale) =>
+                        {
+                            TypedConfig.CellSize = (int)System.Math.Round(cellSize);
+                            TypedConfig.ZoomScale = zoomScale;
+                        };
+                    }
+
                     if (_lastPopupX.HasValue && _lastPopupY.HasValue)
                     {
                         _controlWindow.X = _lastPopupX.Value;
@@ -61,6 +75,8 @@ namespace AvaloniaApplication1.ViewModels
             else if (DialogService != null)
             {
                 await DialogService.ShowContainerDashboardAsync(Title, dashboardConfig);
+                TypedConfig.CellSize = dashboardConfig.CellSize;
+                TypedConfig.ZoomScale = dashboardConfig.ZoomScale;
             }
         }
 

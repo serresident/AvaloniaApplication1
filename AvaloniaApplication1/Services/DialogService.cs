@@ -132,11 +132,12 @@ namespace AvaloniaApplication1.Services
 
         // ===== Design Mode Dialogs =====
 
-        public async Task<WidgetConfig?> ShowWidgetEditorAsync(WidgetConfig? existingConfig, List<ConnectionConfig> connections)
+        public async Task<WidgetConfig?> ShowWidgetEditorAsync(WidgetConfig? existingConfig, List<ConnectionConfig> connections, WidgetPosition? initialPosition = null)
         {
-            if (MainWindow == null) return null;
+            var targetWindow = MainWindow;
+            if (targetWindow == null) return null;
 
-            var vm = new WidgetEditorViewModel(existingConfig, connections);
+            var vm = new WidgetEditorViewModel(existingConfig, connections, initialPosition);
             var window = new WidgetEditorWindow
             {
                 DataContext = vm
@@ -144,9 +145,27 @@ namespace AvaloniaApplication1.Services
 
             vm.CloseAction = () => window.Close();
 
-            await window.ShowDialog(MainWindow);
+            await window.ShowDialog(targetWindow);
 
             return vm.IsConfirmed ? vm.ToWidgetConfig() : null;
+        }
+
+        public async Task<(double CellSize, double ZoomScale)?> ShowDashboardPropertiesAsync(double currentCellSize, double currentZoomScale)
+        {
+            var targetWindow = MainWindow;
+            if (targetWindow == null) return null;
+
+            var vm = new DashboardPropertiesViewModel(currentCellSize, currentZoomScale);
+            var window = new DashboardPropertiesWindow
+            {
+                DataContext = vm
+            };
+
+            vm.CloseAction = () => window.Close();
+
+            await window.ShowDialog(targetWindow);
+
+            return vm.IsConfirmed ? (vm.CellSize, vm.ZoomScale) : null;
         }
 
         public async Task<ConnectionConfig?> ShowConnectionEditorAsync(ConnectionConfig? existingConfig)

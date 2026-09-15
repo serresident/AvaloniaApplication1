@@ -254,6 +254,24 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Container Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowContainerSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Container Window Settings" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Размер сетки контейнера (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ContainerCellSize}" Minimum="10" Maximum="500" Increment="5" FormatString="0 px" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Масштаб контейнера (%)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ContainerZoomPercent}" Minimum="20" Maximum="300" Increment="5" FormatString="0 '%'" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
             </StackPanel>
         </ScrollViewer>
 

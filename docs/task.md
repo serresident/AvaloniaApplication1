@@ -325,3 +325,35 @@
     - Вставка на канву по заданным координатам `(col, row)`
   - [x] Сборка `scripts/check-build.ps1`: 0 ошибок, 0 предупреждений
   - [x] Рендеринг `scripts/render_ui.ps1 MimicView` и `DashboardView` успешно пройден
+
+# Tasks: Canvas Context Menu, Add Element & Grid/Scale Properties (Сессия 25 — Завершено)
+
+- [x] Надежный вызов контекстного меню рабочей области в режиме редактирования (Design Mode):
+  - [x] Снятие мертвых зон: обработчик `OnBubblePointerPressed` в `DashboardView.axaml.cs` для перехвата правого клика по пустым полям и отступам
+  - [x] Расширение минимальной области `MeasureOverride` в `DashboardPanel.cs` в режиме редактирования (50x40 ячеек)
+  - [x] Публичный метод `ShowCanvasContextMenu(Point clickPoint)` в `DashboardPanel.cs`
+- [x] Добавление элементов через контекстное меню канвы:
+  - [x] Пункт «➕ Добавить элемент...» с вызовом диалога `ShowWidgetEditorAsync` и предзаполненными координатами `(col, row)`
+  - [x] Подменю «⚡ Быстро добавить» для мгновенной вставки любого аппарата в 1 клик (Задвижка, Насос, Труба, Бак, Теплообменник, Реактор, Датчик уровня, Контейнер, Значение, Уставка, Тренд, Кнопка, Лампа, Ползунок)
+  - [x] Методы `AddWidgetAtAsync(col, row)` и `AddQuickWidgetAt(type, col, row)` в `DashboardViewModel.cs`
+- [x] Диалог настройки свойств рабочей области («Свойства»):
+  - [x] Создание диалога `Views/DashboardPropertiesWindow.axaml` и вьюмодели `ViewModels/DashboardPropertiesViewModel.cs`
+  - [x] Настройка размера ячейки сетки (Cell Size): пресеты (10, 20, 40, 80, 160 px) и точный `NumericUpDown` (10–500 px)
+  - [x] Настройка масштаба (Zoom Scale): пресеты (50%, 75%, 100%, 125%, 150%, 200%), бегунок `Slider` и `NumericUpDown` (20%–300%)
+  - [x] Кнопка «🔄 По умолчанию» (40 px / 100%), «Отмена» и «Применить»
+  - [x] Реактивное обновление `CellWidth`, `CellHeight`, `ZoomScale` в `DashboardViewModel.cs`
+  - [x] Обработчики смены размера сетки в `DashboardPanel.cs` с динамической перерисовкой `_gridOverlay`
+- [x] Полная поддержка для окон контейнеров `ContainerButton`:
+  - [x] Свойства `CellSize` и `ZoomScale` в `ContainerButtonConfig` (`HmiConfiguration.cs`)
+  - [x] Синхронизация масштаба и сетки между внутренним `DashboardViewModel` и `ContainerButtonConfig` в `ContainerButtonViewModel.cs`
+  - [x] Настройки сетки и масштаба контейнера в форме `WidgetEditorWindow.axaml` (`ShowContainerSettings`)
+- [x] Верификация и тестирование:
+  - [x] 8 автоматических тестов в `AvaloniaApplication1.UIValidation/Program.cs`:
+    - Копирование/вставка простых и вложенных виджетов
+    - Вставка внутрь ContainerButton и инвариантность портов клапанов
+    - Тестирование пресетов и сброса `DashboardPropertiesViewModel`
+    - Тестирование `UpdateGridAndScale`, реактивности и событий `OnGridOrScaleChanged`
+    - Быстрое добавление элементов `AddQuickWidgetAt` точно по координатам ячейки
+    - Наследование и двухсторонняя синхронизация `CellSize`/`ZoomScale` окна-контейнера `ContainerButton`
+  - [x] Сборка `scripts/check-build.ps1`: 0 ошибок, 0 предупреждений
+  - [x] Рендеринг `scripts/render_ui.ps1 MimicView` и `DashboardView` успешно пройден, артефакты сформированы

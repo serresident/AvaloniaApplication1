@@ -1,0 +1,109 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="460" d:DesignHeight="480"
+        x:Class="AvaloniaApplication1.Views.DashboardPropertiesWindow"
+        x:DataType="vm:DashboardPropertiesViewModel"
+        x:CompileBindings="True"
+        Title="Свойства рабочей области"
+        Width="460" Height="480"
+        MinWidth="420" MinHeight="450"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E"
+        CanResize="False">
+
+    <Grid RowDefinitions="*,Auto">
+        <!-- Content area -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="20">
+            <StackPanel Spacing="16">
+
+                <!-- Header -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Свойства рабочей области" Foreground="White" FontSize="18" FontWeight="Bold" />
+                    <TextBlock Text="Настройка шага сетки и масштаба отображения элементов" Foreground="#888888" FontSize="12" />
+                </StackPanel>
+
+                <!-- Grid Size Section -->
+                <Border Background="#2D2D30" CornerRadius="8" Padding="14" BorderBrush="#3E3E42" BorderThickness="1">
+                    <StackPanel Spacing="10">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock Text="📐" FontSize="16" />
+                            <TextBlock Text="Размер ячейки сетки (Cell Size)" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- Presets -->
+                        <TextBlock Text="Быстрый выбор:" Foreground="#AAAAAA" FontSize="11" />
+                        <UniformGrid Columns="5" Margin="0,2">
+                            <Button Content="10 px" Command="{Binding SetCellSizePresetCommand}" CommandParameter="10" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                            <Button Content="20 px" Command="{Binding SetCellSizePresetCommand}" CommandParameter="20" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                            <Button Content="40 px" Command="{Binding SetCellSizePresetCommand}" CommandParameter="40" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                            <Button Content="80 px" Command="{Binding SetCellSizePresetCommand}" CommandParameter="80" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                            <Button Content="160 px" Command="{Binding SetCellSizePresetCommand}" CommandParameter="160" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                        </UniformGrid>
+
+                        <!-- Numeric UpDown -->
+                        <Grid ColumnDefinitions="*,120" Margin="0,4,0,0">
+                            <TextBlock Text="Точный размер ячейки:" Foreground="#CCCCCC" FontSize="12" VerticalAlignment="Center" />
+                            <NumericUpDown Grid.Column="1" Value="{Binding CellSize}" Minimum="10" Maximum="500" Increment="5" FormatString="0 px" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Zoom Scale Section -->
+                <Border Background="#2D2D30" CornerRadius="8" Padding="14" BorderBrush="#3E3E42" BorderThickness="1">
+                    <StackPanel Spacing="10">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock Text="🔍" FontSize="16" />
+                            <TextBlock Text="Масштаб отображения (Zoom Scale)" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- Presets -->
+                        <TextBlock Text="Быстрый выбор:" Foreground="#AAAAAA" FontSize="11" />
+                        <UniformGrid Columns="6" Margin="0,2">
+                            <Button Content="50%" Command="{Binding SetZoomPresetCommand}" CommandParameter="50" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                            <Button Content="75%" Command="{Binding SetZoomPresetCommand}" CommandParameter="75" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                            <Button Content="100%" Command="{Binding SetZoomPresetCommand}" CommandParameter="100" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                            <Button Content="125%" Command="{Binding SetZoomPresetCommand}" CommandParameter="125" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                            <Button Content="150%" Command="{Binding SetZoomPresetCommand}" CommandParameter="150" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                            <Button Content="200%" Command="{Binding SetZoomPresetCommand}" CommandParameter="200" Margin="2" Padding="0,6" HorizontalContentAlignment="Center" Background="#3E3E42" Foreground="White" CornerRadius="4" />
+                        </UniformGrid>
+
+                        <!-- Slider & Numeric UpDown -->
+                        <Grid ColumnDefinitions="*,12,120" Margin="0,4,0,0">
+                            <Slider Grid.Column="0" Value="{Binding ZoomPercent}" Minimum="20" Maximum="300" TickFrequency="25" IsSnapToTickEnabled="False" VerticalAlignment="Center" />
+                            <NumericUpDown Grid.Column="2" Value="{Binding ZoomPercent}" Minimum="20" Maximum="300" Increment="5" FormatString="0 '%'" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Bottom action bar -->
+        <Border Grid.Row="1" Background="#252526" BorderBrush="#3E3E42" BorderThickness="0,1,0,0" Padding="20,14">
+            <Grid ColumnDefinitions="Auto,*,Auto,12,Auto">
+                <Button Grid.Column="0" 
+                        Content="🔄 По умолчанию" 
+                        Command="{Binding ResetDefaultsCommand}"
+                        Background="#3E3E42" Foreground="#CCCCCC" CornerRadius="6" 
+                        Padding="12,8" FontSize="13" />
+
+                <Button Grid.Column="2" 
+                        Content="Отмена" 
+                        IsCancel="True"
+                        Command="{Binding CancelCommand}"
+                        Background="#3E3E42" Foreground="White" CornerRadius="6" 
+                        Padding="16,8" FontSize="13" />
+
+                <Button Grid.Column="4" 
+                        Content="Применить" 
+                        IsDefault="True"
+                        Command="{Binding SaveCommand}"
+                        Background="#007ACC" Foreground="White" CornerRadius="6" 
+                        Padding="18,8" FontSize="13" FontWeight="SemiBold" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

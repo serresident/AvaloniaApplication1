@@ -10,7 +10,8 @@ namespace AvaloniaApplication1.Services
         Task ShowContainerDashboardAsync(string title, DashboardConfig config);
 
         // Design Mode dialogs
-        Task<WidgetConfig?> ShowWidgetEditorAsync(WidgetConfig? existingConfig, List<ConnectionConfig> connections);
+        Task<WidgetConfig?> ShowWidgetEditorAsync(WidgetConfig? existingConfig, List<ConnectionConfig> connections, WidgetPosition? initialPosition = null);
+        Task<(double CellSize, double ZoomScale)?> ShowDashboardPropertiesAsync(double currentCellSize, double currentZoomScale);
         Task<ConnectionConfig?> ShowConnectionEditorAsync(ConnectionConfig? existingConfig);
         Task ShowConnectionManagerAsync(HmiConfiguration config);
     }

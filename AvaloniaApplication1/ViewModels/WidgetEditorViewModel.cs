@@ -164,6 +164,16 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _showIndustrialSettings;
 
+        // --- Widget-specific: ContainerButton ---
+        [ObservableProperty]
+        private int _containerCellSize = 40;
+
+        [ObservableProperty]
+        private double _containerZoomPercent = 100;
+
+        [ObservableProperty]
+        private bool _showContainerSettings;
+
         private bool _isEditing;
         private readonly WidgetConfig? _existingConfig;
 
@@ -171,7 +181,7 @@ namespace AvaloniaApplication1.ViewModels
         public bool IsConfirmed { get; private set; }
         public Action? CloseAction { get; set; }
 
-        public WidgetEditorViewModel(WidgetConfig? existingConfig, List<ConnectionConfig> connections)
+        public WidgetEditorViewModel(WidgetConfig? existingConfig, List<ConnectionConfig> connections, WidgetPosition? initialPosition = null)
         {
             _existingConfig = existingConfig;
             AvailableConnections = connections.Select(c => c.Id).ToList();
@@ -204,11 +214,23 @@ namespace AvaloniaApplication1.ViewModels
                 if (existingConfig is HeatExchangerConfig he) { Format = he.Format; ActiveColor = he.ActiveColor; InactiveColor = he.InactiveColor; ShowFlanges = he.ShowFlanges; }
                 if (existingConfig is ReactorConfig re) { Format = re.Format; MinValue = re.MinValue; MaxValue = re.MaxValue; ActiveColor = re.ActiveColor; InactiveColor = re.InactiveColor; }
                 if (existingConfig is LevelSensorConfig ls) { Format = ls.Format; MinValue = ls.MinValue; MaxValue = ls.MaxValue; ValueColor = ls.ValueColor; }
+                if (existingConfig is ContainerButtonConfig ctn)
+                {
+                    ContainerCellSize = ctn.CellSize > 0 ? ctn.CellSize : 40;
+                    ContainerZoomPercent = Math.Round((ctn.ZoomScale > 0 ? ctn.ZoomScale : 1.0) * 100.0);
+                }
             }
             else
             {
                 _isEditing = false;
                 SetDefaultSizes(SelectedWidgetType);
+                if (initialPosition != null)
+                {
+                    Row = initialPosition.Row;
+                    Col = initialPosition.Col;
+                    if (initialPosition.SizeX > 0) SizeX = initialPosition.SizeX;
+                    if (initialPosition.SizeY > 0) SizeY = initialPosition.SizeY;
+                }
             }
 
             UpdateVisibility();
@@ -300,6 +322,7 @@ namespace AvaloniaApplication1.ViewModels
             ShowValveSettings = SelectedWidgetType == "Valve";
             ShowIndustrialSettings = SelectedWidgetType == "Pipe" || SelectedWidgetType == "Valve" || SelectedWidgetType == "Pump" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor";
             ShowRegulatingSettings = SelectedWidgetType == "Valve";
+            ShowContainerSettings = SelectedWidgetType == "ContainerButton";
         }
 
         [RelayCommand]
@@ -346,7 +369,9 @@ namespace AvaloniaApplication1.ViewModels
                 "LevelSensor" => new LevelSensorConfig { SensorType = "Radar", TagNumber = Title, Unit = "%", Format = Format, MinValue = MinValue, MaxValue = MaxValue, AlarmHigh = 90, AlarmLow = 10, ValueColor = ValueColor },
                 "ContainerButton" => new ContainerButtonConfig 
                 { 
-                    Children = (_existingConfig as ContainerButtonConfig)?.Children ?? new() 
+                    Children = (_existingConfig as ContainerButtonConfig)?.Children ?? new(),
+                    CellSize = ContainerCellSize > 0 ? ContainerCellSize : 40,
+                    ZoomScale = Math.Round(ContainerZoomPercent / 100.0, 2)
                 },
                 _ => new WidgetConfigBase()
             };

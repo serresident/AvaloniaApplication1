@@ -150,6 +150,30 @@ namespace AvaloniaApplication1.Views
         {
             AffectsMeasure<DashboardPanel>(CellWidthProperty, CellHeightProperty, ColProperty, RowProperty, SizeXProperty, SizeYProperty);
             AffectsArrange<DashboardPanel>(CellWidthProperty, CellHeightProperty, ColProperty, RowProperty, SizeXProperty, SizeYProperty);
+            CellWidthProperty.Changed.AddClassHandler<DashboardPanel>((panel, args) =>
+            {
+                if (panel._gridOverlay != null)
+                {
+                    panel._gridOverlay.CellWidth = panel.CellWidth;
+                    panel._gridOverlay.InvalidateVisual();
+                }
+                panel._selectionOverlay?.InvalidateVisual();
+                panel.InvalidateMeasure();
+                panel.InvalidateArrange();
+                panel.InvalidateVisual();
+            });
+            CellHeightProperty.Changed.AddClassHandler<DashboardPanel>((panel, args) =>
+            {
+                if (panel._gridOverlay != null)
+                {
+                    panel._gridOverlay.CellHeight = panel.CellHeight;
+                    panel._gridOverlay.InvalidateVisual();
+                }
+                panel._selectionOverlay?.InvalidateVisual();
+                panel.InvalidateMeasure();
+                panel.InvalidateArrange();
+                panel.InvalidateVisual();
+            });
             IsDesignModeProperty.Changed.AddClassHandler<DashboardPanel>((panel, args) =>
             {
                 panel.UpdateGridOverlay();
@@ -694,7 +718,7 @@ namespace AvaloniaApplication1.Views
             }
         }
 
-        private void ShowCanvasContextMenu(Point clickPoint)
+        public void ShowCanvasContextMenu(Point clickPoint)
         {
             var dashboardVm = GetDashboardViewModel();
             if (dashboardVm == null) return;
@@ -708,18 +732,75 @@ namespace AvaloniaApplication1.Views
                 if (_activeWidgetMenu == menu) _activeWidgetMenu = null;
             };
 
+            double col = Math.Max(0, Math.Floor(clickPoint.X / CellWidth));
+            double row = Math.Max(0, Math.Floor(clickPoint.Y / CellHeight));
+
+            // 1. Добавить элемент...
+            var addEditorItem = new MenuItem 
+            { 
+                Header = "➕  Добавить элемент..." 
+            };
+            addEditorItem.Click += async (s, ev) =>
+            {
+                await dashboardVm.AddWidgetAtAsync(col, row);
+            };
+            menu.Items.Add(addEditorItem);
+
+            // 2. Быстро добавить >
+            var quickMenu = new MenuItem 
+            { 
+                Header = "⚡  Быстро добавить" 
+            };
+
+            void AddQuickItem(string header, string type)
+            {
+                var item = new MenuItem { Header = header };
+                item.Click += (s, ev) => dashboardVm.AddQuickWidgetAt(type, col, row);
+                quickMenu.Items.Add(item);
+            }
+
+            AddQuickItem("🚰  Задвижка / Клапан", "Valve");
+            AddQuickItem("⚙️  Насос", "Pump");
+            AddQuickItem("═  Трубопровод", "Pipe");
+            AddQuickItem("🛢️  Бак / Емкость", "Tank");
+            AddQuickItem("🔄  Теплообменник", "HeatExchanger");
+            AddQuickItem("🧪  Реактор с мешалкой", "Reactor");
+            AddQuickItem("📊  Датчик уровня", "LevelSensor");
+            quickMenu.Items.Add(new Separator());
+            AddQuickItem("📁  Окно-контейнер", "ContainerButton");
+            AddQuickItem("🔢  Индикатор значения", "ValueDisplay");
+            AddQuickItem("🎛️  Задатчик уставки", "SetValue");
+            AddQuickItem("📈  График тренда", "RealTimeTrend");
+            AddQuickItem("🔘  Кнопка управления", "CommandButton");
+            AddQuickItem("💡  Сигнальная лампа", "PilotLight");
+            AddQuickItem("🎚️  Ползунок", "Slider");
+
+            menu.Items.Add(quickMenu);
+
+            // 3. Вставить
             var pasteItem = new MenuItem 
             { 
-                Header = "Вставить", 
+                Header = "📋  Вставить", 
                 IsEnabled = WidgetClipboard.HasWidget 
             };
             pasteItem.Click += (s, ev) =>
             {
-                double col = Math.Max(0, Math.Floor(clickPoint.X / CellWidth));
-                double row = Math.Max(0, Math.Floor(clickPoint.Y / CellHeight));
                 dashboardVm.PasteWidgetAt(col, row);
             };
             menu.Items.Add(pasteItem);
+
+            menu.Items.Add(new Separator());
+
+            // 4. Свойства...
+            var propertiesItem = new MenuItem 
+            { 
+                Header = "⚙️  Свойства..." 
+            };
+            propertiesItem.Click += async (s, ev) =>
+            {
+                await dashboardVm.OpenPropertiesCommand.ExecuteAsync(null);
+            };
+            menu.Items.Add(propertiesItem);
 
             menu.Placement = PlacementMode.Pointer;
             menu.Open(this);
@@ -1281,11 +1362,11 @@ namespace AvaloniaApplication1.Views
             double maxWidth = 0;
             double maxHeight = 0;
 
-            // Always reserve at least a 6x6 grid in design mode for drop targets
+            // Always reserve a comfortable grid in design mode for drop targets and canvas interactions
             if (IsDesignMode)
             {
-                maxWidth = Math.Max(maxWidth, 6 * CellWidth);
-                maxHeight = Math.Max(maxHeight, 6 * CellHeight);
+                maxWidth = Math.Max(maxWidth, 50 * CellWidth);
+                maxHeight = Math.Max(maxHeight, 40 * CellHeight);
             }
 
             foreach (var child in Children)

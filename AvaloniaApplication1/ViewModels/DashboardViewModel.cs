@@ -21,15 +21,32 @@ namespace AvaloniaApplication1.ViewModels
         
         public ObservableCollection<WidgetViewModelBase> Widgets { get; } = new();
 
-        public double CellWidth { get; }
-        public double CellHeight { get; }
+        [ObservableProperty]
+        private double _cellWidth = 40;
+
+        [ObservableProperty]
+        private double _cellHeight = 40;
 
         [ObservableProperty]
         private double _zoomScale = 1.0;
 
+        public event Action<double, double>? OnGridOrScaleChanged;
+
         public void AdjustZoom(double delta)
         {
-            ZoomScale = Math.Clamp(ZoomScale + delta, 0.5, 3.0);
+            ZoomScale = Math.Clamp(ZoomScale + delta, 0.2, 3.0);
+            _dashboardConfig.ZoomScale = ZoomScale;
+            OnGridOrScaleChanged?.Invoke(CellWidth, ZoomScale);
+        }
+
+        public void UpdateGridAndScale(double cellSize, double zoomScale)
+        {
+            CellWidth = cellSize;
+            CellHeight = cellSize;
+            ZoomScale = zoomScale;
+            _dashboardConfig.CellSize = (int)Math.Round(cellSize);
+            _dashboardConfig.ZoomScale = zoomScale;
+            OnGridOrScaleChanged?.Invoke(cellSize, zoomScale);
         }
 
         public DashboardViewModel(
@@ -47,8 +64,9 @@ namespace AvaloniaApplication1.ViewModels
             _dashboardConfig = dashboardConfig;
             ProjectContext = projectContext;
 
-            CellWidth = dashboardConfig.CellSize == 0 ? 160 : dashboardConfig.CellSize;
-            CellHeight = dashboardConfig.CellSize == 0 ? 160 : dashboardConfig.CellSize;
+            CellWidth = dashboardConfig.CellSize <= 0 ? 40 : dashboardConfig.CellSize;
+            CellHeight = dashboardConfig.CellSize <= 0 ? 40 : dashboardConfig.CellSize;
+            ZoomScale = dashboardConfig.ZoomScale <= 0 ? 1.0 : dashboardConfig.ZoomScale;
 
             LoadWidgets(dashboardConfig);
             ResolvePipeConnections();
@@ -159,25 +177,151 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         [RelayCommand]
-        private async Task AddWidgetAsync()
+        public async Task OpenPropertiesAsync()
+        {
+            if (_dialogService == null) return;
+            var result = await _dialogService.ShowDashboardPropertiesAsync(CellWidth, ZoomScale);
+            if (result != null)
+            {
+                UpdateGridAndScale(result.Value.CellSize, result.Value.ZoomScale);
+            }
+        }
+
+        [RelayCommand]
+        public async Task AddWidgetAsync()
+        {
+            var selected = Widgets.FirstOrDefault(w => w.IsSelected);
+            double col = selected != null ? selected.Col + 2 : 0;
+            double row = selected != null ? selected.Row + 2 : 0;
+            await AddWidgetAtAsync(col, row);
+        }
+
+        public async Task AddWidgetAtAsync(double col, double row)
         {
             if (_dialogService == null) return;
 
-            var result = await _dialogService.ShowWidgetEditorAsync(null, _config.Connections);
+            var initialPos = new WidgetPosition { Col = col, Row = row, SizeX = 4, SizeY = 4 };
+            var result = await _dialogService.ShowWidgetEditorAsync(null, _config.Connections, initialPos);
             if (result != null)
             {
-                // Add to config model
-                _dashboardConfig.Widgets.Add(result);
-                
-                // Create and add VM
-                var vm = CreateWidgetViewModel(result);
-                if (vm != null)
-                {
-                    vm.PropertyChanged += OnWidgetPropertyChanged;
-                    Widgets.Add(vm);
-                    ResolvePipeConnections();
-                }
+                AddWidgetFromConfig(result);
             }
+        }
+
+        public void AddQuickWidgetAt(string type, double col, double row)
+        {
+            WidgetConfig config = type switch
+            {
+                "Valve" => new ValveConfig
+                {
+                    Title = "Клапан",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 4, SizeY = 4 },
+                    ValveType = "CutOff",
+                    ActiveColor = "#00FF00",
+                    InactiveColor = "#FF0000"
+                },
+                "Pump" => new PumpConfig
+                {
+                    Title = "Насос",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 6, SizeY = 6 },
+                    ActiveColor = "#00FF00",
+                    InactiveColor = "#FF0000"
+                },
+                "Pipe" => new PipeConfig
+                {
+                    Title = "Трубопровод",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 10, SizeY = 2 },
+                    PipePoints = "0,0;10,0",
+                    Thickness = 12,
+                    ShowFlanges = true,
+                    ActiveColor = "#00FF00",
+                    InactiveColor = "#AAAAAA"
+                },
+                "Tank" => new TankConfig
+                {
+                    Title = "Бак",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 8, SizeY = 12 },
+                    MinValue = 0,
+                    MaxValue = 100
+                },
+                "HeatExchanger" => new HeatExchangerConfig
+                {
+                    Title = "Теплообменник",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 8, SizeY = 8 },
+                    ExchangerType = "ShellAndTube"
+                },
+                "Reactor" => new ReactorConfig
+                {
+                    Title = "Реактор",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 10, SizeY = 14 },
+                    HasJacket = true,
+                    MinValue = 0,
+                    MaxValue = 100
+                },
+                "LevelSensor" => new LevelSensorConfig
+                {
+                    Title = "LT",
+                    TagNumber = "LT-01",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 4, SizeY = 6 },
+                    SensorType = "Radar",
+                    MinValue = 0,
+                    MaxValue = 100
+                },
+                "ContainerButton" => new ContainerButtonConfig
+                {
+                    Title = "Контейнер",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 6, SizeY = 3 },
+                    CellSize = (int)CellWidth,
+                    ZoomScale = 1.0,
+                    Children = new System.Collections.Generic.List<WidgetConfig>()
+                },
+                "ValueDisplay" => new ValueDisplayConfig
+                {
+                    Title = "Параметр",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 6, SizeY = 3 },
+                    Format = "{0:F1}"
+                },
+                "SetValue" => new SetValueConfig
+                {
+                    Title = "Уставка",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 6, SizeY = 3 },
+                    MinValue = 0,
+                    MaxValue = 100,
+                    Format = "{0:F1}"
+                },
+                "RealTimeTrend" => new RealTimeTrendConfig
+                {
+                    Title = "Тренд",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 12, SizeY = 8 },
+                    MinValue = 0,
+                    MaxValue = 100
+                },
+                "CommandButton" => new CommandButtonConfig
+                {
+                    Title = "Команда",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 6, SizeY = 3 },
+                    ButtonMode = "Toggle"
+                },
+                "PilotLight" => new PilotLightConfig
+                {
+                    Title = "Индикатор",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 4, SizeY = 4 }
+                },
+                "Slider" => new SliderConfig
+                {
+                    Title = "Ползунок",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 8, SizeY = 3 },
+                    MinValue = 0,
+                    MaxValue = 100
+                },
+                _ => new ValueDisplayConfig
+                {
+                    Title = "Элемент",
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 4, SizeY = 4 }
+                }
+            };
+            config.Type = type;
+            AddWidgetFromConfig(config);
         }
 
         [RelayCommand]

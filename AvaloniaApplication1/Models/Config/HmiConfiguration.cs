@@ -45,6 +45,7 @@ namespace AvaloniaApplication1.Models.Config
     public class DashboardConfig
     {
         public int CellSize { get; set; } = 160;
+        public double ZoomScale { get; set; } = 1.0;
         public List<WidgetConfig> Widgets { get; set; } = new();
     }
 
@@ -75,6 +76,8 @@ namespace AvaloniaApplication1.Models.Config
 
     public class ContainerButtonConfig : WidgetConfig
     {
+        public int CellSize { get; set; } = 40;
+        public double ZoomScale { get; set; } = 1.0;
         public List<WidgetConfig> Children { get; set; } = new();
     }
 
