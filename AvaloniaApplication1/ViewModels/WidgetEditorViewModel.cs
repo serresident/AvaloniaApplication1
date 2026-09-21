@@ -116,12 +116,18 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string _selectedEndFitting = "None";
 
-        // --- Widget-specific: Regulating Valve Feedback ---
+        // --- Widget-specific: Regulating Valve Feedback & Dual Limit Switches ---
         [ObservableProperty]
         private string? _feedbackConnectionId;
 
         [ObservableProperty]
         private string _feedbackAddress = string.Empty;
+
+        [ObservableProperty]
+        private string? _closedFeedbackConnectionId;
+
+        [ObservableProperty]
+        private string _closedFeedbackAddress = string.Empty;
 
         [ObservableProperty]
         private double _controlWindowWidth = 320;
@@ -220,7 +226,21 @@ namespace AvaloniaApplication1.ViewModels
                 if (existingConfig is SetValueConfig sv) { Format = sv.Format; MinValue = sv.MinValue; MaxValue = sv.MaxValue; ValueColor = sv.ValueColor; ValueFontSize = sv.ValueFontSize; }
                 if (existingConfig is RealTimeTrendConfig rt) { Format = rt.Format; MinValue = rt.MinValue; MaxValue = rt.MaxValue; }
                 if (existingConfig is PipeConfig pc) { PipePoints = pc.PipePoints; ActiveColor = pc.ActiveColor; InactiveColor = pc.InactiveColor; ShowFlanges = pc.ShowFlanges; Thickness = pc.Thickness; SelectedStartFitting = pc.StartFitting; SelectedEndFitting = pc.EndFitting; }
-                if (existingConfig is ValveConfig vc) { SelectedValveType = vc.ValveType; ActiveColor = vc.ActiveColor; InactiveColor = vc.InactiveColor; FeedbackConnectionId = vc.FeedbackSource?.ConnId; FeedbackAddress = vc.FeedbackSource?.Address ?? string.Empty; IsVertical = vc.IsVertical; SelectedActuatorType = vc.ActuatorType; SelectedRotation = vc.Rotation; Tolerance = vc.Tolerance; ModeConnectionId = vc.ModeSource?.ConnId; ModeAddress = vc.ModeSource?.Address ?? string.Empty; }
+                if (existingConfig is ValveConfig vc) { 
+                    SelectedValveType = vc.ValveType; 
+                    ActiveColor = vc.ActiveColor; 
+                    InactiveColor = vc.InactiveColor; 
+                    FeedbackConnectionId = vc.FeedbackSource?.ConnId; 
+                    FeedbackAddress = vc.FeedbackSource?.Address ?? string.Empty; 
+                    ClosedFeedbackConnectionId = vc.ClosedFeedbackSource?.ConnId;
+                    ClosedFeedbackAddress = vc.ClosedFeedbackSource?.Address ?? string.Empty;
+                    IsVertical = vc.IsVertical; 
+                    SelectedActuatorType = vc.ActuatorType; 
+                    SelectedRotation = vc.Rotation; 
+                    Tolerance = vc.Tolerance; 
+                    ModeConnectionId = vc.ModeSource?.ConnId; 
+                    ModeAddress = vc.ModeSource?.Address ?? string.Empty; 
+                }
                 if (existingConfig is TankConfig tc) { Format = tc.Format; MinValue = tc.MinValue; MaxValue = tc.MaxValue; ValueColor = tc.ValueColor; ValueFontSize = tc.ValueFontSize; }
                 if (existingConfig is PumpConfig pu) { ActiveColor = pu.ActiveColor; InactiveColor = pu.InactiveColor; ControlWindowWidth = pu.ControlWindowWidth; ControlWindowHeight = pu.ControlWindowHeight; }
                 if (existingConfig is HeatExchangerConfig he) { Format = he.Format; ActiveColor = he.ActiveColor; InactiveColor = he.InactiveColor; ShowFlanges = he.ShowFlanges; }
@@ -366,13 +386,14 @@ namespace AvaloniaApplication1.ViewModels
                     ValveType = SelectedValveType, 
                     ActiveColor = ActiveColor, 
                     InactiveColor = InactiveColor, 
-                    FeedbackSource = !string.IsNullOrEmpty(FeedbackAddress) ? new DataSourceConfig { ConnId = SelectedConnectionId ?? string.Empty, Address = FeedbackAddress, DataType = SelectedDataType } : null,
+                    FeedbackSource = !string.IsNullOrEmpty(FeedbackAddress) ? new DataSourceConfig { ConnId = FeedbackConnectionId ?? SelectedConnectionId ?? string.Empty, Address = FeedbackAddress, DataType = SelectedDataType } : null,
+                    ClosedFeedbackSource = !string.IsNullOrEmpty(ClosedFeedbackAddress) ? new DataSourceConfig { ConnId = ClosedFeedbackConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ClosedFeedbackAddress, DataType = "Bool" } : null,
                     IsVertical = IsVertical,
                     ActuatorType = SelectedActuatorType,
                     Rotation = SelectedRotation,
                     AlarmDisabled = false,
                     Tolerance = Tolerance == 0 ? 10.0 : Tolerance,
-                    ModeSource = !string.IsNullOrEmpty(ModeAddress) ? new DataSourceConfig { ConnId = SelectedConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" } : null
+                    ModeSource = !string.IsNullOrEmpty(ModeAddress) ? new DataSourceConfig { ConnId = ModeConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" } : null
                 },
                 "Tank" => new TankConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
                 "Pump" => new PumpConfig { ActiveColor = ActiveColor, InactiveColor = InactiveColor, ControlWindowWidth = ControlWindowWidth, ControlWindowHeight = ControlWindowHeight },

@@ -251,6 +251,8 @@
                                            <v:ValveControl 
                                                ValveType="{Binding ValveType}"
                                                IsOpen="{Binding IsOpen}"
+                                               IsMoving="{Binding IsMoving}"
+                                               IsSensorFault="{Binding IsSensorFault}"
                                                Setpoint="{Binding Setpoint}"
                                                Feedback="{Binding Feedback}"
                                                HasFeedbackSource="{Binding HasFeedbackSource}"

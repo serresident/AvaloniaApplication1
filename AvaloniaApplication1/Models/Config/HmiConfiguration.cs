@@ -132,6 +132,7 @@ namespace AvaloniaApplication1.Models.Config
         public string ActiveColor { get; set; } = string.Empty;
         public string InactiveColor { get; set; } = string.Empty;
         public DataSourceConfig? FeedbackSource { get; set; }
+        public DataSourceConfig? ClosedFeedbackSource { get; set; }
         public bool IsVertical { get; set; } = false;
         public string ActuatorType { get; set; } = "Solenoid";
         public int Rotation { get; set; } = 0;

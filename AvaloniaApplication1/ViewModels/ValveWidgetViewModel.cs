@@ -51,6 +51,21 @@ namespace AvaloniaApplication1.ViewModels
         private bool _hasFeedbackSource;
 
         [ObservableProperty]
+        private bool _hasClosedFeedbackSource;
+
+        [ObservableProperty]
+        private bool _isOpenLimitSwitch;
+
+        [ObservableProperty]
+        private bool _isClosedLimitSwitch;
+
+        [ObservableProperty]
+        private bool _isMoving;
+
+        [ObservableProperty]
+        private bool _isSensorFault;
+
+        [ObservableProperty]
         private bool _isVertical;
 
         [ObservableProperty]
@@ -111,6 +126,7 @@ namespace AvaloniaApplication1.ViewModels
             : base(config, dataService, projectContext)
         {
             HasFeedbackSource = !string.IsNullOrEmpty(config.FeedbackSource?.Address);
+            HasClosedFeedbackSource = !string.IsNullOrEmpty(config.ClosedFeedbackSource?.Address);
             IsVertical = config.IsVertical;
             ActuatorType = string.IsNullOrEmpty(config.ActuatorType) ? "Solenoid" : config.ActuatorType;
 
@@ -141,9 +157,16 @@ namespace AvaloniaApplication1.ViewModels
             {
                 DataService.TagUpdates
                     .Where(t => t.ConnId == fbSource.ConnId && t.Address == fbSource.Address)
-                    .Sample(TimeSpan.FromMilliseconds(100))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => UpdateFeedback())
+                    .Subscribe(_ => Dispatcher.UIThread.Post(UpdateFeedback))
+                    .DisposeWith(Disposables);
+            }
+
+            var closedFbSource = TypedConfig.ClosedFeedbackSource;
+            if (closedFbSource != null && !string.IsNullOrEmpty(closedFbSource.ConnId) && !string.IsNullOrEmpty(closedFbSource.Address))
+            {
+                DataService.TagUpdates
+                    .Where(t => t.ConnId == closedFbSource.ConnId && t.Address == closedFbSource.Address)
+                    .Subscribe(_ => Dispatcher.UIThread.Post(UpdateFeedback))
                     .DisposeWith(Disposables);
             }
 
@@ -152,9 +175,7 @@ namespace AvaloniaApplication1.ViewModels
             {
                 DataService.TagUpdates
                     .Where(t => t.ConnId == modeSrc.ConnId && t.Address == modeSrc.Address)
-                    .Sample(TimeSpan.FromMilliseconds(100))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => UpdateModeState())
+                    .Subscribe(_ => Dispatcher.UIThread.Post(UpdateModeState))
                     .DisposeWith(Disposables);
             }
 
@@ -179,30 +200,45 @@ namespace AvaloniaApplication1.ViewModels
             {
                 if (!IsRegulating)
                 {
-                    IsOpen = TagValueConverter.ToBool(val);
+                    bool cmdOpen = TagValueConverter.ToBool(val);
+                    Setpoint = cmdOpen ? 100 : 0;
                     
-                    DisplayValue = IsOpen ? "ОТКРЫТ" : "ЗАКРЫТ";
-                    CurrentColor = IsOpen ? ActiveColor : InactiveColor;
-                    Setpoint = IsOpen ? 100 : 0;
+                    if (!HasFeedbackSource && !HasClosedFeedbackSource)
+                    {
+                        IsOpen = cmdOpen;
+                        DisplayValue = IsOpen ? "ОТКРЫТ" : "ЗАКРЫТ";
+                        CurrentColor = IsOpen ? ActiveColor : InactiveColor;
+                        IsMoving = false;
+                        IsSensorFault = false;
+                    }
                 }
                 else // Regulating
                 {
                     double dVal = TagValueConverter.ToDouble(val);
                     CurrentValue = dVal;
                     Setpoint = Math.Clamp(dVal, 0, 100);
-                    DisplayValue = $"{CurrentValue:F1} %";
-                    CurrentColor = CurrentValue > 0 ? ActiveColor : InactiveColor;
+                    if (!HasFeedbackSource)
+                    {
+                        DisplayValue = $"{CurrentValue:F1} %";
+                        CurrentColor = CurrentValue > 0 ? ActiveColor : InactiveColor;
+                    }
                 }
             }
             else
             {
-                DisplayValue = "---";
-                CurrentColor = InactiveColor;
                 Setpoint = 0;
+                if (!HasFeedbackSource && !HasClosedFeedbackSource)
+                {
+                    DisplayValue = "---";
+                    CurrentColor = InactiveColor;
+                    IsOpen = false;
+                    IsMoving = false;
+                    IsSensorFault = false;
+                }
             }
 
             // If no separate feedback source, feedback mirrors setpoint
-            if (!HasFeedbackSource)
+            if (!HasFeedbackSource && !HasClosedFeedbackSource)
             {
                 Feedback = Setpoint;
             }
@@ -216,21 +252,92 @@ namespace AvaloniaApplication1.ViewModels
 
         private void UpdateFeedback()
         {
-            var fbSource = TypedConfig.FeedbackSource;
-            if (fbSource == null || string.IsNullOrEmpty(fbSource.Address)) return;
-
-            var fbVal = DataService.GetCurrentValue(fbSource.ConnId, fbSource.Address);
-            if (fbVal != null)
+            if (HasClosedFeedbackSource)
             {
-                if (IsRegulating)
+                var fbSource = TypedConfig.FeedbackSource;
+                var closedFbSource = TypedConfig.ClosedFeedbackSource;
+
+                object? fbVal = (fbSource != null && !string.IsNullOrEmpty(fbSource.Address))
+                    ? DataService.GetCurrentValue(fbSource.ConnId, fbSource.Address)
+                    : null;
+
+                object? closedVal = (closedFbSource != null && !string.IsNullOrEmpty(closedFbSource.Address))
+                    ? DataService.GetCurrentValue(closedFbSource.ConnId, closedFbSource.Address)
+                    : null;
+
+                bool sqh = fbVal != null && TagValueConverter.ToBool(fbVal);
+                bool sql = closedVal != null && TagValueConverter.ToBool(closedVal);
+
+                IsOpenLimitSwitch = sqh;
+                IsClosedLimitSwitch = sql;
+
+                if (sqh && !sql)
                 {
-                    double dFb = TagValueConverter.ToDouble(fbVal);
-                    Feedback = Math.Clamp(dFb, 0, 100);
+                    // Fully Open
+                    IsOpen = true;
+                    IsMoving = false;
+                    IsSensorFault = false;
+                    DisplayValue = "ОТКРЫТ";
+                    CurrentColor = ActiveColor;
+                    Feedback = 100;
                 }
-                else // CutOff
+                else if (!sqh && sql)
                 {
-                    IsOpen = TagValueConverter.ToBool(fbVal);
-                    Feedback = IsOpen ? 100 : 0;
+                    // Fully Closed
+                    IsOpen = false;
+                    IsMoving = false;
+                    IsSensorFault = false;
+                    DisplayValue = "ЗАКРЫТ";
+                    CurrentColor = InactiveColor;
+                    Feedback = 0;
+                }
+                else if (!sqh && !sql)
+                {
+                    // Moving / Intermediate
+                    IsOpen = false;
+                    IsMoving = true;
+                    IsSensorFault = false;
+                    DisplayValue = "В ПУТИ";
+                    CurrentColor = "#FFB300"; // Amber / Yellow
+                    Feedback = 50;
+                }
+                else // sqh && sql
+                {
+                    // Sensor fault / Inconsistent
+                    IsOpen = false;
+                    IsMoving = false;
+                    IsSensorFault = true;
+                    DisplayValue = "АВАРИЯ ДАТЧИКОВ";
+                    CurrentColor = "#FF1744"; // Flashing red
+                    Feedback = 0;
+                }
+            }
+            else if (HasFeedbackSource)
+            {
+                var fbSource = TypedConfig.FeedbackSource;
+                if (fbSource == null || string.IsNullOrEmpty(fbSource.Address)) return;
+
+                var fbVal = DataService.GetCurrentValue(fbSource.ConnId, fbSource.Address);
+                if (fbVal != null)
+                {
+                    if (IsRegulating)
+                    {
+                        double dFb = TagValueConverter.ToDouble(fbVal);
+                        Feedback = Math.Clamp(dFb, 0, 100);
+                        DisplayValue = $"{Feedback:F1} %";
+                        CurrentColor = Feedback > 0 ? ActiveColor : InactiveColor;
+                    }
+                    else // CutOff (Single feedback switch)
+                    {
+                        IsOpen = TagValueConverter.ToBool(fbVal);
+                        IsOpenLimitSwitch = IsOpen;
+                        IsClosedLimitSwitch = !IsOpen;
+                        IsMoving = false;
+                        IsSensorFault = false;
+                        Feedback = IsOpen ? 100 : 0;
+                        DisplayValue = IsOpen ? "ОТКРЫТ" : "ЗАКРЫТ";
+                        CurrentColor = IsOpen ? ActiveColor : InactiveColor;
+                    }
                 }
             }
 
@@ -282,7 +389,7 @@ namespace AvaloniaApplication1.ViewModels
 
         private void EvaluateAlarm()
         {
-            if (!HasFeedbackSource)
+            if (!HasFeedbackSource && !HasClosedFeedbackSource)
             {
                 IsAlarmActive = false;
                 IsAlarmFlashing = false;
@@ -296,7 +403,17 @@ namespace AvaloniaApplication1.ViewModels
             }
             else
             {
-                IsAlarmActive = (Setpoint > 0) != IsOpen;
+                if (HasClosedFeedbackSource)
+                {
+                    // Sensor fault is always an alarm condition.
+                    // Also if commanded OPEN (Setpoint > 0) but closed limit switch is ON (IsClosedLimitSwitch),
+                    // or commanded CLOSE (Setpoint == 0) but open limit switch is ON (IsOpenLimitSwitch).
+                    IsAlarmActive = IsSensorFault || (Setpoint > 0 && IsClosedLimitSwitch) || (Setpoint == 0 && IsOpenLimitSwitch);
+                }
+                else
+                {
+                    IsAlarmActive = (Setpoint > 0) != IsOpen;
+                }
             }
 
             IsAlarmFlashing = IsAlarmActive && !AlarmDisabled;
@@ -309,7 +426,7 @@ namespace AvaloniaApplication1.ViewModels
                 if (!AlarmDisabled)
                 {
                     string ctrlStr = IsRegulating ? $"{Setpoint:F0}%" : (Setpoint > 0 ? "ОТКРЫТ" : "ЗАКРЫТ");
-                    string fbStr = IsRegulating ? $"{Feedback:F0}%" : (IsOpen ? "ОТКРЫТ" : "ЗАКРЫТ");
+                    string fbStr = IsRegulating ? $"{Feedback:F0}%" : DisplayValue;
                     
                     AlarmService?.ShowAlarm($"Ошибка рассогласования [{Title}]", $"управление = {ctrlStr}, обратная связь = {fbStr}");
                 }

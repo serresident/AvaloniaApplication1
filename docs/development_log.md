@@ -839,4 +839,54 @@
     *   Сборка решения: **0 ошибок, 0 предупреждений**.
     *   Визуальный снимок `artifacts/ui_preview.png` подтверждает идеальное размещение всех технологических элементов.
 
-
+---
+
+## 📅 21.09.2026 (Сессия 33 — Поддержка двух концевиков обратной связи отсечных клапанов SQH/SQL и 4-позиционная логика состояний)
+
+### 📌 Достижение: Полная поддержка двух концевиков положения (SQH/SQL) для отсечной арматуры, 4-позиционная логика состояний, визуализация в ValveControl, расширение попапа управления и интеграция с ПЛК Wiren Board 8
+
+*   **Архитектура двух концевиков положения (Cut-Off Valves Feedback):**
+    *   В модель `ValveConfig.cs` добавлено свойство `ClosedFeedbackSource` (наряду с `FeedbackSource`), позволяющее задавать независимые адреса концевиков:
+        *   `FeedbackSource` $\rightarrow$ концевик «Открыт» (**SQH** / ZSO, DI)
+        *   `ClosedFeedbackSource` $\rightarrow$ концевик «Закрыт» (**SQL** / ZSC, DI)
+    *   В `ValveWidgetViewModel.cs` реализована 4-позиционная дискретная логика состояний:
+        1.  **ОТКРЫТ** (`SQH = 1, SQL = 0`): `IsOpen = true`, `IsMoving = false`, `IsSensorFault = false`, цвет `#00E676` (зеленый), статус «ОТКРЫТ».
+        2.  **ЗАКРЫТ** (`SQH = 0, SQL = 1`): `IsOpen = false`, `IsMoving = false`, `IsSensorFault = false`, цвет `#D50000` (красный), статус «ЗАКРЫТ».
+        3.  **В ПУТИ / ПРОМЕЖУТОЧНОЕ** (`SQH = 0, SQL = 0`): `IsOpen = false`, `IsMoving = true`, `IsSensorFault = false`, цвет `#FFB300` (янтарно-желтый), статус «В ПУТИ».
+        4.  **АВАРИЯ ДАТЧИКОВ / НЕДОСТОВЕРНОСТЬ** (`SQH = 1, SQL = 1`): `IsOpen = false`, `IsMoving = false`, `IsSensorFault = true`, цвет `#FF1744` (мигающий красный), статус «АВАРИЯ ДАТЧИКОВ», автоматическая активация флага тревоги `IsAlarmActive = true`.
+    *   Реализован контроль рассогласования команд управления и концевиков: при уставке > 0 и активном концевике закрытия, либо уставке 0 и активном концевике открытия фиксируется ошибка рассогласования.
+    *   Все подписки на теги переведены на маршалинг через `Dispatcher.UIThread.Post(...)` для мгновенной реакции UI.
+
+*   **Отрисовка в `ValveControl.cs` и XAML-привязки:**
+    *   В `ValveControl.cs` добавлены `StyledProperty<bool> IsMovingProperty` и `StyledProperty<bool> IsSensorFaultProperty`, зарегистрированные в `AffectsRender`.
+    *   В методе `Render(DrawingContext)`:
+        *   При `IsSensorFault` корпус клапана заливается аварийным цветом `#FF1744`.
+        *   При `IsMoving` корпус заливается цветом `#FFB300` (желтый транзит).
+        *   Красный индикатор закрытого состояния отображается только при достоверном закрытом положении (`!IsOpen && !IsMoving && !IsSensorFault`).
+    *   В `DashboardView.axaml` добавлены привязки `IsMoving="{Binding IsMoving}"` и `IsSensorFault="{Binding IsSensorFault}"`.
+
+*   **Инженерный редактор `WidgetEditorWindow`:**
+    *   В `WidgetEditorViewModel.cs` и разметку `WidgetEditorWindow.axaml` добавлены поля для настройки концевика закрытия: выбор соединения (`ClosedFeedbackConnectionId`) и адреса Modbus/MQTT (`ClosedFeedbackAddress`).
+    *   Настройки полностью сохраняются и загружаются в конфигурационные файлы JSON.
+
+*   **Попап управления `ValveControlPopupView` и `ValveControlPopupViewModel`:**
+    *   Во вьюмодель проброшены свойства `HasClosedFeedbackSource`, `IsOpenLimitSwitch`, `IsClosedLimitSwitch`, `IsMoving`, `IsSensorFault`.
+    *   В разметку попапа встроены эргономичные светодиодные индикаторы концевиков SQH (Открыт) и SQL (Закрыт) с отображением уровней логических сигналов (ВКЛ (1) / ВЫКЛ (0)), статуса хода «В ПУТИ» и предупреждения об аварии датчиков.
+
+*   **Интеграция с реальной картой памяти ПЛК Wiren Board 8 (`config_mma_park.json`):**
+    *   Для всех отсечных клапанов парка хранения ММА настроены реальные дискретные входы из `cex21_park_mma/src/Mem/IN.hpp`:
+        *   `LV 22`: SQH = `10016`, SQL = `10017`
+        *   `LV 23`: SQH = `10018`, SQL = `10019`
+        *   `LV 24`: SQH = `10020`, SQL = `10021`
+        *   `LV 25`: SQH = `10022`, SQL = `10023`
+        *   `Отсечной кран налива`: SQH = `10024`, SQL = `10025`
+    *   Файл синхронизирован в корне проекта, `C:\Users\adm\Desktop\Парк хранения ММА4 емкости\` и `C:\Users\adm\projects\AvaloniaApplication1\AvaloniaApplication1\`.
+
+*   **Автоматическое тестирование и верификация:**
+    *   В `AvaloniaApplication1.UIValidation/Program.cs` добавлен тест №12:
+        *   Проверка всех 4 состояний концевиков (SQH=1,SQL=0 $\rightarrow$ OPEN; SQH=0,SQL=1 $\rightarrow$ CLOSED; SQH=0,SQL=0 $\rightarrow$ MOVING; SQH=1,SQL=1 $\rightarrow$ SENSOR FAULT).
+        *   Проверка активации аварии при конфликте концевиков.
+        *   Проверка синхронизации состояний с `ValveControlPopupViewModel`.
+    *   Успешное выполнение всех 12 тестов UIValidation (**12/12 PASSED**, 100% SUCCESS).
+    *   Headless-рендеринг `MimicView` и `ValveControlPopupView` подтвердил корректную визуализацию состояний и попапа управления.
+    *   Сборка решения: **0 ошибок, 0 предупреждений**.

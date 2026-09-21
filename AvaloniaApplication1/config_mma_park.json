@@ -1,4 +1,4 @@
-﻿{
+{
     "Project":  {
                     "Name":  "Парк хранения ММА (4 емкости) - Цех 21 ВС-108",
                     "Version":  "1.0.0"
@@ -378,6 +378,11 @@
                                                              "Address":  "10016",
                                                              "DataType":  "Bool"
                                                          },
+                                      "ClosedFeedbackSource":  {
+                                                                   "ConnId":  "wb_mma_park",
+                                                                   "Address":  "10017",
+                                                                   "DataType":  "Bool"
+                                                               },
                                       "ActiveColor":  "#00E676",
                                       "InactiveColor":  "#D50000"
                                   },
@@ -433,6 +438,11 @@
                                                              "Address":  "10018",
                                                              "DataType":  "Bool"
                                                          },
+                                      "ClosedFeedbackSource":  {
+                                                                   "ConnId":  "wb_mma_park",
+                                                                   "Address":  "10019",
+                                                                   "DataType":  "Bool"
+                                                               },
                                       "ActiveColor":  "#00E676",
                                       "InactiveColor":  "#D50000"
                                   },
@@ -488,6 +498,11 @@
                                                              "Address":  "10020",
                                                              "DataType":  "Bool"
                                                          },
+                                      "ClosedFeedbackSource":  {
+                                                                   "ConnId":  "wb_mma_park",
+                                                                   "Address":  "10021",
+                                                                   "DataType":  "Bool"
+                                                               },
                                       "ActiveColor":  "#00E676",
                                       "InactiveColor":  "#D50000"
                                   },
@@ -543,6 +558,11 @@
                                                              "Address":  "10022",
                                                              "DataType":  "Bool"
                                                          },
+                                      "ClosedFeedbackSource":  {
+                                                                   "ConnId":  "wb_mma_park",
+                                                                   "Address":  "10023",
+                                                                   "DataType":  "Bool"
+                                                               },
                                       "ActiveColor":  "#00E676",
                                       "InactiveColor":  "#D50000"
                                   },
@@ -1243,6 +1263,11 @@
                                                              "Address":  "10024",
                                                              "DataType":  "Bool"
                                                          },
+                                      "ClosedFeedbackSource":  {
+                                                                   "ConnId":  "wb_mma_park",
+                                                                   "Address":  "10025",
+                                                                   "DataType":  "Bool"
+                                                               },
                                       "ActiveColor":  "#00E676",
                                       "InactiveColor":  "#D50000"
                                   },

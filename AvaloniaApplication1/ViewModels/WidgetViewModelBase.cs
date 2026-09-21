@@ -1,6 +1,7 @@
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Avalonia.Threading;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -72,9 +73,7 @@ namespace AvaloniaApplication1.ViewModels
 
                 DataService.TagUpdates
                     .Where(tag => tag.ConnId == Source.ConnId && tag.Address == Source.Address)
-                    .Sample(TimeSpan.FromMilliseconds(100)) // Throttle updates to ~10Hz max per widget
-                    .ObserveOn(RxApp.MainThreadScheduler) // Safely marshal to UI thread
-                    .Subscribe(tag => OnTagValueUpdated(tag.Value))
+                    .Subscribe(tag => Dispatcher.UIThread.Post(() => OnTagValueUpdated(tag.Value)))
                     .DisposeWith(Disposables); // Manage memory
             }
         }

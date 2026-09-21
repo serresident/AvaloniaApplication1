@@ -178,27 +178,76 @@
                             <TextBlock Text="Обратная связь:" Foreground="#888" FontSize="11" />
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <TextBlock Text="{Binding ValveViewModel.Feedback, StringFormat=\{0:F1\}%}" FontSize="15" FontWeight="Bold" Foreground="{Binding ValveViewModel.CurrentColor, Converter={StaticResource HexToBrush}}" IsVisible="{Binding IsRegulating}" />
-                                <TextBlock FontSize="15" FontWeight="Bold" IsVisible="{Binding !IsRegulating}">
-                                    <TextBlock.Foreground>
-                                        <Binding Path="ValveViewModel.IsOpen">
-                                            <Binding.Converter>
-                                                <c:BoolToBrushConverter TrueBrush="#00FF00" FalseBrush="#FF0000" />
-                                            </Binding.Converter>
-                                        </Binding>
-                                    </TextBlock.Foreground>
-                                    <TextBlock.Text>
-                                        <Binding Path="ValveViewModel.IsOpen">
-                                            <Binding.Converter>
-                                                <c:BoolToStringConverter TrueString="ОТКРЫТ (Open)" FalseString="ЗАКРЫТ (Closed)" />
-                                            </Binding.Converter>
-                                        </Binding>
-                                    </TextBlock.Text>
-                                </TextBlock>
+                                <TextBlock Text="{Binding ValveViewModel.DisplayValue}" FontSize="15" FontWeight="Bold" Foreground="{Binding ValveViewModel.CurrentColor, Converter={StaticResource HexToBrush}}" IsVisible="{Binding !IsRegulating}" />
                             </StackPanel>
+
+                            <!-- Dual Limit Switches Indicators (Visible when cut-off and dual switches present) -->
+                            <StackPanel Spacing="3" Margin="0,4,0,0" IsVisible="{Binding HasClosedFeedbackSource}">
+                                <!-- SQH Limit Switch (Open) -->
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <Ellipse Width="8" Height="8" VerticalAlignment="Center">
+                                        <Ellipse.Fill>
+                                            <Binding Path="IsOpenLimitSwitch">
+                                                <Binding.Converter>
+                                                    <c:BoolToBrushConverter TrueBrush="#00E676" FalseBrush="#455A64" />
+                                                </Binding.Converter>
+                                            </Binding>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Text="SQH (Открыт):" FontSize="11" Foreground="#B0BEC5" VerticalAlignment="Center" />
+                                    <TextBlock FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center">
+                                        <TextBlock.Foreground>
+                                            <Binding Path="IsOpenLimitSwitch">
+                                                <Binding.Converter>
+                                                    <c:BoolToBrushConverter TrueBrush="#00E676" FalseBrush="#78909C" />
+                                                </Binding.Converter>
+                                            </Binding>
+                                        </TextBlock.Foreground>
+                                        <TextBlock.Text>
+                                            <Binding Path="IsOpenLimitSwitch">
+                                                <Binding.Converter>
+                                                    <c:BoolToStringConverter TrueString="ВКЛ (1)" FalseString="ВЫКЛ (0)" />
+                                                </Binding.Converter>
+                                            </Binding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <!-- SQL Limit Switch (Closed) -->
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <Ellipse Width="8" Height="8" VerticalAlignment="Center">
+                                        <Ellipse.Fill>
+                                            <Binding Path="IsClosedLimitSwitch">
+                                                <Binding.Converter>
+                                                    <c:BoolToBrushConverter TrueBrush="#00B0FF" FalseBrush="#455A64" />
+                                                </Binding.Converter>
+                                            </Binding>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Text="SQL (Закрыт):" FontSize="11" Foreground="#B0BEC5" VerticalAlignment="Center" />
+                                    <TextBlock FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center">
+                                        <TextBlock.Foreground>
+                                            <Binding Path="IsClosedLimitSwitch">
+                                                <Binding.Converter>
+                                                    <c:BoolToBrushConverter TrueBrush="#00B0FF" FalseBrush="#78909C" />
+                                                </Binding.Converter>
+                                            </Binding>
+                                        </TextBlock.Foreground>
+                                        <TextBlock.Text>
+                                            <Binding Path="IsClosedLimitSwitch">
+                                                <Binding.Converter>
+                                                    <c:BoolToStringConverter TrueString="ВКЛ (1)" FalseString="ВЫКЛ (0)" />
+                                                </Binding.Converter>
+                                            </Binding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+
                             <!-- Premium Feedback Progress Bar -->
                             <ProgressBar Minimum="0" Maximum="100" 
                                          Value="{Binding ValveViewModel.Feedback}" 
-                                         Height="10" 
+                                         Height="8" 
                                          Margin="0,4,0,0"
                                          Foreground="{Binding ValveViewModel.CurrentColor, Converter={StaticResource HexToBrush}}" 
                                          Background="#1E1E1E" 

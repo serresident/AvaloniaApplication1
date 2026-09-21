@@ -25,12 +25,25 @@ namespace AvaloniaApplication1.UIValidation;
 public class MockDataCoreService : IDataCoreService
 {
     private readonly Subject<TagData> _subject = new();
+    private readonly Dictionary<string, object> _values = new();
+
     public Task StartAsync() => Task.CompletedTask;
     public Task StopAsync() => Task.CompletedTask;
-    public void PublishTag(TagData tag) => _subject.OnNext(tag);
+    public void PublishTag(TagData tag) 
+    {
+        _values[$"{tag.ConnId}:{tag.Address}"] = tag.Value;
+        _subject.OnNext(tag);
+    }
     public IObservable<TagData> TagUpdates => _subject;
-    public void WriteCommand(string connId, string address, object value) { }
-    public object? GetCurrentValue(string connId, string address) => null;
+    public void WriteCommand(string connId, string address, object value) 
+    {
+        _values[$"{connId}:{address}"] = value;
+        PublishTag(new TagData(connId, address, value));
+    }
+    public object? GetCurrentValue(string connId, string address) 
+    {
+        return _values.TryGetValue($"{connId}:{address}", out var v) ? v : null;
+    }
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
@@ -187,12 +200,32 @@ public static class Program
             }
             else if (string.Equals(targetView, "ValveControlPopupView", StringComparison.OrdinalIgnoreCase))
             {
+                var valveCfg = new ValveConfig
+                {
+                    Type = "Valve",
+                    Title = "LV 22 (Прием)",
+                    ValveType = "CutOff",
+                    ActiveColor = "#00E676",
+                    InactiveColor = "#D50000",
+                    Source = new DataSourceConfig { ConnId = "wb", Address = "00012", DataType = "Bool" },
+                    FeedbackSource = new DataSourceConfig { ConnId = "wb", Address = "10016", DataType = "Bool" },
+                    ClosedFeedbackSource = new DataSourceConfig { ConnId = "wb", Address = "10017", DataType = "Bool" },
+                    Position = new WidgetPosition { Col = 5, Row = 5, SizeX = 6, SizeY = 6 }
+                };
+                var projContext = sp.GetRequiredService<IProjectContextService>();
+                var dataService = sp.GetRequiredService<IDataCoreService>();
+                var valveVm = new ValveWidgetViewModel(valveCfg, dataService, projContext);
+                var popupVm = new ValveControlPopupViewModel(valveVm, () => { });
+
                 window = new Window
                 {
                     Title = "ValveControlPopupView Preview",
-                    Width = 500,
-                    Height = 500,
-                    Content = new ValveControlPopupView()
+                    Width = 550,
+                    Height = 620,
+                    Content = new ValveControlPopupView
+                    {
+                        DataContext = popupVm
+                    }
                 };
             }
             else
@@ -537,7 +570,67 @@ public static class Program
         if (dashVm.Widgets.Count != mmaConfig.Dashboard.Widgets.Count)
             throw new Exception($"DashboardViewModel widgets count {dashVm.Widgets.Count} != config widgets count {mmaConfig.Dashboard.Widgets.Count}.");
 
-        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS PASSED SUCCESSFULLY!");
+        // 12. Test Dual Limit Switch Valve Feedback (4 States & Alarm Mismatch)
+        Console.WriteLine("[Validation] Running Test 12: Dual Limit Switch Valve Feedback & Fault Logic...");
+        var dualValveConfig = new ValveConfig
+        {
+            Type = "Valve",
+            Title = "LV 22 (Прием)",
+            ValveType = "CutOff",
+            ActiveColor = "#00E676",
+            InactiveColor = "#D50000",
+            Source = new DataSourceConfig { ConnId = "wb", Address = "00012", DataType = "Bool" },
+            FeedbackSource = new DataSourceConfig { ConnId = "wb", Address = "10016", DataType = "Bool" }, // SQH
+            ClosedFeedbackSource = new DataSourceConfig { ConnId = "wb", Address = "10017", DataType = "Bool" }, // SQL
+            Position = new WidgetPosition { Col = 5, Row = 5, SizeX = 6, SizeY = 6 }
+        };
+
+        var mockData = new MockDataCoreService();
+        var dualValveVm = new ValveWidgetViewModel(dualValveConfig, mockData, projContext);
+
+        if (!dualValveVm.HasClosedFeedbackSource || !dualValveVm.HasFeedbackSource)
+            throw new Exception("dualValveVm failed to identify dual feedback sources.");
+
+        // State 1: SQH=1, SQL=0 -> OPEN
+        mockData.PublishTag(new TagData("wb", "00012", true));
+        mockData.PublishTag(new TagData("wb", "10016", true));
+        mockData.PublishTag(new TagData("wb", "10017", false));
+        Dispatcher.UIThread.RunJobs();
+
+        if (!dualValveVm.IsOpen || dualValveVm.IsMoving || dualValveVm.IsSensorFault || dualValveVm.DisplayValue != "ОТКРЫТ" || dualValveVm.Feedback != 100)
+            throw new Exception($"Dual limit switch state 1 (OPEN) failed: IsOpen={dualValveVm.IsOpen}, DisplayValue='{dualValveVm.DisplayValue}', Feedback={dualValveVm.Feedback}");
+
+        // State 2: SQH=0, SQL=1 -> CLOSED
+        mockData.PublishTag(new TagData("wb", "00012", false));
+        mockData.PublishTag(new TagData("wb", "10016", false));
+        mockData.PublishTag(new TagData("wb", "10017", true));
+        Dispatcher.UIThread.RunJobs();
+
+        if (dualValveVm.IsOpen || dualValveVm.IsMoving || dualValveVm.IsSensorFault || dualValveVm.DisplayValue != "ЗАКРЫТ" || dualValveVm.Feedback != 0)
+            throw new Exception($"Dual limit switch state 2 (CLOSED) failed: IsOpen={dualValveVm.IsOpen}, DisplayValue='{dualValveVm.DisplayValue}', Feedback={dualValveVm.Feedback}");
+
+        // State 3: SQH=0, SQL=0 -> MOVING / TRANSIT
+        mockData.PublishTag(new TagData("wb", "10016", false));
+        mockData.PublishTag(new TagData("wb", "10017", false));
+        Dispatcher.UIThread.RunJobs();
+
+        if (dualValveVm.IsOpen || !dualValveVm.IsMoving || dualValveVm.IsSensorFault || dualValveVm.DisplayValue != "В ПУТИ" || dualValveVm.CurrentColor != "#FFB300")
+            throw new Exception($"Dual limit switch state 3 (MOVING) failed: IsMoving={dualValveVm.IsMoving}, DisplayValue='{dualValveVm.DisplayValue}', Color='{dualValveVm.CurrentColor}'");
+
+        // State 4: SQH=1, SQL=1 -> SENSOR FAULT / ALARM
+        mockData.PublishTag(new TagData("wb", "10016", true));
+        mockData.PublishTag(new TagData("wb", "10017", true));
+        Dispatcher.UIThread.RunJobs();
+
+        if (dualValveVm.IsOpen || dualValveVm.IsMoving || !dualValveVm.IsSensorFault || dualValveVm.DisplayValue != "АВАРИЯ ДАТЧИКОВ" || !dualValveVm.IsAlarmActive)
+            throw new Exception($"Dual limit switch state 4 (SENSOR FAULT) failed: IsSensorFault={dualValveVm.IsSensorFault}, IsAlarmActive={dualValveVm.IsAlarmActive}");
+
+        // Test ValveControlPopupViewModel binding with dual limit switches
+        var popupVm = new ValveControlPopupViewModel(dualValveVm, () => { });
+        if (!popupVm.HasClosedFeedbackSource || !popupVm.IsOpenLimitSwitch || !popupVm.IsClosedLimitSwitch || !popupVm.IsSensorFault)
+            throw new Exception("ValveControlPopupViewModel did not correctly reflect dual limit switch state.");
+
+        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (12/12) PASSED SUCCESSFULLY!");
     }
 
     private static VisualTreeNode DumpVisualTree(Visual visual)

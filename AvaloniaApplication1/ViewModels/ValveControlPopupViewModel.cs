@@ -28,6 +28,12 @@ namespace AvaloniaApplication1.ViewModels
 
         public bool IsRegulating => string.Equals(ValveViewModel.ValveType, "Regulating", StringComparison.OrdinalIgnoreCase);
 
+        public bool HasClosedFeedbackSource => ValveViewModel.HasClosedFeedbackSource;
+        public bool IsOpenLimitSwitch => ValveViewModel.IsOpenLimitSwitch;
+        public bool IsClosedLimitSwitch => ValveViewModel.IsClosedLimitSwitch;
+        public bool IsMoving => ValveViewModel.IsMoving;
+        public bool IsSensorFault => ValveViewModel.IsSensorFault;
+
         public string SliderTooltipText => "Переместите ползунок или используйте колесо мыши для изменения уставки от 0 до 100. Шаг = 1. Для точного ввода используйте цифровую клавиатуру.";
 
         public string OpenButtonText => IsRegulating ? "ОТКРЫТЬ (100%)" : "ОТКРЫТЬ";
@@ -93,6 +99,17 @@ namespace AvaloniaApplication1.ViewModels
                      e.PropertyName == nameof(ValveWidgetViewModel.AlarmDisabled))
             {
                 OnPropertyChanged(nameof(AlarmStateText));
+            }
+            else if (e.PropertyName == nameof(ValveWidgetViewModel.IsOpenLimitSwitch) ||
+                     e.PropertyName == nameof(ValveWidgetViewModel.IsClosedLimitSwitch) ||
+                     e.PropertyName == nameof(ValveWidgetViewModel.IsMoving) ||
+                     e.PropertyName == nameof(ValveWidgetViewModel.IsSensorFault) ||
+                     e.PropertyName == nameof(ValveWidgetViewModel.IsOpen))
+            {
+                OnPropertyChanged(nameof(IsOpenLimitSwitch));
+                OnPropertyChanged(nameof(IsClosedLimitSwitch));
+                OnPropertyChanged(nameof(IsMoving));
+                OnPropertyChanged(nameof(IsSensorFault));
             }
         }
 

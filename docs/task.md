@@ -493,5 +493,32 @@
   - [x] Визуальная инспекция скриншота `artifacts/ui_preview.png`: идеальное расположение всех 4 емкостей, насосов, клапанов и трубопроводов
   - [x] Сборка решения: 0 ошибок, 0 предупреждений
 
+# Tasks: Dual Limit Switch Valve Feedback (SQH/SQL) & 4-State Fault Logic (Сессия 33 — Выполнено)
+
+- [x] Модель конфигурации и архитектура данных:
+  - [x] Добавить свойство `ClosedFeedbackSource` в `ValveConfig.cs`
+  - [x] Поддержать `ClosedFeedbackConnectionId` и `ClosedFeedbackAddress` в `WidgetEditorViewModel.cs` и `WidgetEditorWindow.axaml`
+  - [x] Внедрить 4-позиционную дискретную логику в `ValveWidgetViewModel.cs`:
+    - [x] `SQH=1, SQL=0` $\rightarrow$ Открыт (`#00E676`)
+    - [x] `SQH=0, SQL=1` $\rightarrow$ Закрыт (`#D50000`)
+    - [x] `SQH=0, SQL=0` $\rightarrow$ В пути / транзит (`#FFB300`)
+    - [x] `SQH=1, SQL=1` $\rightarrow$ Авария концевиков / недостоверность (`#FF1744`, автоматическая активация тревоги)
+  - [x] Реализовать контроль рассогласования команды управления и концевиков
+  - [x] Перевести обработку тегов на безопасный маршалинг `Dispatcher.UIThread.Post(...)`
+- [x] Визуализация и элементы управления:
+  - [x] Добавить свойства `IsMoving` и `IsSensorFault` в `ValveControl.cs` с регистрацией в `AffectsRender`
+  - [x] Отрисовка янтарного цвета `#FFB300` при ходе клапана и аварийного `#FF1744` при конфликте датчиков
+  - [x] Добавить привязки в `DashboardView.axaml`
+  - [x] Расширить окно попапа управления `ValveControlPopupView.axaml` и `ValveControlPopupViewModel.cs` визуальными LED-индикаторами концевиков SQH и SQL
+- [x] Интеграция с ПЛК Wiren Board 8:
+  - [x] Внести реальные дискретные входы (DI 10016-10025) для LV 22..25 и отсечного крана налива в `config_mma_park.json`
+  - [x] Синхронизировать файл конфигурации в `C:\Users\adm\Desktop\Парк хранения ММА4 емкости\` и Visual Studio
+- [x] Тестирование и верификация:
+  - [x] Разработать тест №12 в `AvaloniaApplication1.UIValidation/Program.cs` для верификации всех 4 состояний и попапа
+  - [x] Успешный прогон всех 12 тестов UIValidation (12/12 PASS, 100%)
+  - [x] Headless-рендеринг `MimicView` и `ValveControlPopupView`
+  - [x] Сборка решения: 0 ошибок, 0 предупреждений
+
+
 
 

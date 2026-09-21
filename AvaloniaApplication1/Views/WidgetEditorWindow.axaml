@@ -236,20 +236,27 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Regulating Valve Feedback Settings -->
+                <!-- Valve Feedback & Limit Switches Settings -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowRegulatingSettings}">
                     <StackPanel Spacing="8">
                         <TextBlock Text="Feedback &amp; Mode Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         
-                        <TextBlock Text="Feedback Connection" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Концевик «Открыт» / Feedback (SQH / Положение)" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
                                   SelectedItem="{Binding FeedbackConnectionId}"
                                   HorizontalAlignment="Stretch"
                                   PlaceholderText="Same as main or select..." />
 
-                        <TextBlock Text="Feedback Address" Foreground="#AAAAAA" FontSize="11" />
-                        <TextBox Text="{Binding FeedbackAddress}" PlaceholderText="e.g. 40002 or sensor/position" />
+                        <TextBox Text="{Binding FeedbackAddress}" PlaceholderText="e.g. 10016 or 40002" />
+
+                        <TextBlock Text="Концевик «Закрыт» (SQL / Closed Feedback)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <ComboBox ItemsSource="{Binding AvailableConnections}" 
+                                  SelectedItem="{Binding ClosedFeedbackConnectionId}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Same as main or select..." />
+
+                        <TextBox Text="{Binding ClosedFeedbackAddress}" PlaceholderText="e.g. 10017" />
 
                         <TextBlock Text="Mismatch Tolerance (%)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
                         <NumericUpDown Value="{Binding Tolerance}" Minimum="0" Maximum="100" FormatString="0.0" />

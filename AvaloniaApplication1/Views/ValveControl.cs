@@ -67,6 +67,12 @@ namespace AvaloniaApplication1.Views
         public static readonly StyledProperty<bool> ShowStaticAlarmIconProperty =
             AvaloniaProperty.Register<ValveControl, bool>(nameof(ShowStaticAlarmIcon), false);
 
+        public static readonly StyledProperty<bool> IsMovingProperty =
+            AvaloniaProperty.Register<ValveControl, bool>(nameof(IsMoving), false);
+
+        public static readonly StyledProperty<bool> IsSensorFaultProperty =
+            AvaloniaProperty.Register<ValveControl, bool>(nameof(IsSensorFault), false);
+
         public static readonly StyledProperty<double> ThicknessProperty =
             AvaloniaProperty.Register<ValveControl, double>(nameof(Thickness), 12.0, coerce: CoerceThickness);
 
@@ -84,6 +90,18 @@ namespace AvaloniaApplication1.Views
         {
             get => GetValue(IsOpenProperty);
             set => SetValue(IsOpenProperty, value);
+        }
+
+        public bool IsMoving
+        {
+            get => GetValue(IsMovingProperty);
+            set => SetValue(IsMovingProperty, value);
+        }
+
+        public bool IsSensorFault
+        {
+            get => GetValue(IsSensorFaultProperty);
+            set => SetValue(IsSensorFaultProperty, value);
         }
 
         public double Setpoint
@@ -183,6 +201,8 @@ namespace AvaloniaApplication1.Views
             AffectsRender<ValveControl>(
                 ValveTypeProperty,
                 IsOpenProperty,
+                IsMovingProperty,
+                IsSensorFaultProperty,
                 SetpointProperty,
                 FeedbackProperty,
                 HasFeedbackSourceProperty,
@@ -272,8 +292,19 @@ namespace AvaloniaApplication1.Views
             }
             else // CutOff / onoff
             {
-                // Butterflies depend on feedback (IsOpen): Open = Active, Closed = Grey
-                bodyColor = IsOpen ? activeCol : greyCol;
+                if (IsSensorFault)
+                {
+                    bodyColor = Color.FromRgb(255, 23, 68); // #FF1744 Fault Red
+                }
+                else if (IsMoving)
+                {
+                    bodyColor = Color.FromRgb(255, 179, 0); // #FFB300 Transit Yellow
+                }
+                else
+                {
+                    // Butterflies depend on feedback (IsOpen): Open = Active, Closed = Grey
+                    bodyColor = IsOpen ? activeCol : greyCol;
+                }
 
                 // Actuator rectangle depends on Setpoint (command): Open (Setpoint > 0) = Active, Closed = Inactive
                 actuatorColor = (Setpoint > 0) ? activeCol : inactiveCol;
@@ -300,8 +331,8 @@ namespace AvaloniaApplication1.Views
                 DrawFlanges(context, cx, cy, flowSize, crossSize);
             }
 
-            // 5. Draw Red Triangle in center if cutoff valve is CLOSED
-            if (!string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase) && !IsOpen)
+            // 5. Draw Red Triangle in center if cutoff valve is CLOSED (and not moving, not in sensor fault)
+            if (!string.Equals(ValveType, "Regulating", StringComparison.OrdinalIgnoreCase) && !IsOpen && !IsMoving && !IsSensorFault)
             {
                 double triSize = Math.Max(6.0, flowSize * 0.2);
                 var triGeom = new StreamGeometry();
