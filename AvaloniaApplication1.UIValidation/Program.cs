@@ -470,6 +470,41 @@ public static class Program
         testWindow.Close();
         Dispatcher.UIThread.RunJobs();
 
+        // 11. Test MMA Park HMI Configuration Loading & Structure Validation
+        Console.WriteLine("[Validation] Running Test 11: MMA Park Configuration Loading & Validation...");
+        var mmaConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config_mma_park.json");
+        if (!File.Exists(mmaConfigPath))
+        {
+            var fallback = Path.Combine(Directory.GetCurrentDirectory(), "AvaloniaApplication1", "config_mma_park.json");
+            if (File.Exists(fallback)) mmaConfigPath = fallback;
+            else fallback = Path.Combine(Directory.GetCurrentDirectory(), "config_mma_park.json");
+            if (File.Exists(fallback)) mmaConfigPath = fallback;
+        }
+
+        var json = File.ReadAllText(mmaConfigPath);
+        var mmaConfig = JsonSerializer.Deserialize<HmiConfiguration>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        if (mmaConfig == null || !mmaConfig.Project.Name.Contains("ММА"))
+            throw new Exception($"MMA config Project Name '{mmaConfig?.Project?.Name}' does not contain 'ММА'.");
+        if (mmaConfig.Connections.Count == 0 || mmaConfig.Connections[0].Host != "10.10.10.234")
+            throw new Exception("MMA config does not contain Wiren Board 8 connection (10.10.10.234).");
+        if (mmaConfig.Mimic.Widgets.Count < 30)
+            throw new Exception($"MMA config Mimic widget count {mmaConfig.Mimic.Widgets.Count} is less than 30.");
+        if (mmaConfig.Dashboard.Widgets.Count < 5)
+            throw new Exception($"MMA config Dashboard widget count {mmaConfig.Dashboard.Widgets.Count} is less than 5.");
+
+        var dataCore = sp.GetRequiredService<IDataCoreService>();
+        var projContext = sp.GetRequiredService<IProjectContextService>();
+        var dlgService = sp.GetRequiredService<IDialogService>();
+        var wf = sp.GetRequiredService<IWidgetFactory>();
+
+        using var mimicVm = new DashboardViewModel(mmaConfig.Mimic, dataCore, projContext, mmaConfig, dlgService, wf);
+        if (mimicVm.Widgets.Count != mmaConfig.Mimic.Widgets.Count)
+            throw new Exception($"MimicViewModel widgets count {mimicVm.Widgets.Count} != config widgets count {mmaConfig.Mimic.Widgets.Count}.");
+
+        using var dashVm = new DashboardViewModel(mmaConfig.Dashboard, dataCore, projContext, mmaConfig, dlgService, wf);
+        if (dashVm.Widgets.Count != mmaConfig.Dashboard.Widgets.Count)
+            throw new Exception($"DashboardViewModel widgets count {dashVm.Widgets.Count} != config widgets count {mmaConfig.Dashboard.Widgets.Count}.");
+
         Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS PASSED SUCCESSFULLY!");
     }
 
