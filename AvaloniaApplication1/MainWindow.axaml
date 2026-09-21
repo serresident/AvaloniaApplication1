@@ -9,7 +9,7 @@
         x:Class="AvaloniaApplication1.MainWindow"
         x:DataType="vm:MainViewModel"
         x:CompileBindings="True"
-        Title="Avalonia HMI Dashboard"
+        Title="{Binding WindowTitle}"
         Background="#1E1E1E">
 
     <Window.Resources>
@@ -20,6 +20,9 @@
 
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+E" Command="{Binding ToggleDesignModeCommand}" />
+        <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenProjectCommand}" />
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveConfigCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveConfigAsCommand}" />
     </Window.KeyBindings>
 
     <Grid RowDefinitions="Auto,*">
@@ -37,15 +40,44 @@
                             Background="{Binding IsMimicActive, Converter={StaticResource MimicTabColor}}"
                             Foreground="White" CornerRadius="4" Padding="15,6" BorderThickness="0" />
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <!-- Active Project Name Badge -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,4"
+                            VerticalAlignment="Center"
+                            ToolTip.Tip="Текущий активный файл конфигурации проекта"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}">
+                        <TextBlock Text="{Binding CurrentProjectName, StringFormat='📁 {0}'}" 
+                                   Foreground="#9CDCFE" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </Border>
+
+                    <!-- Open Project Button -->
+                    <Button Command="{Binding OpenProjectCommand}"
+                            Content="📂 Загрузить..."
+                            Background="#0E639C"
+                            Foreground="White" CornerRadius="4" Padding="10,5"
+                            ToolTip.Tip="Загрузить проект из файла JSON (Ctrl+O)"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+
+                    <!-- Save Project Button -->
+                    <Button Command="{Binding SaveConfigCommand}"
+                            Content="💾 Сохранить"
+                            Background="#008A00"
+                            Foreground="White" CornerRadius="4" Padding="10,5"
+                            ToolTip.Tip="Сохранить текущий проект (Ctrl+S)"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+
+                    <!-- Save Project As Button -->
+                    <Button Command="{Binding SaveConfigAsCommand}"
+                            Content="💾 Сохранить как..."
+                            Background="#107C41"
+                            Foreground="White" CornerRadius="4" Padding="10,5"
+                            ToolTip.Tip="Сохранить проект под новым именем (Ctrl+Shift+S)"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+
+                    <!-- Connections Button -->
                     <Button Command="{Binding OpenConnectionManagerCommand}"
                             Content="📡 Connections"
                             Background="#6A1B9A"
-                            Foreground="White" CornerRadius="4" Padding="10,5"
-                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
-                    <Button Command="{Binding SaveConfigCommand}"
-                            Content="Save Config"
-                            Background="#008A00"
                             Foreground="White" CornerRadius="4" Padding="10,5"
                             IsVisible="{Binding ProjectContext.IsDesignMode}"/>
                     <Button Command="{Binding ToggleSimulationCommand}"

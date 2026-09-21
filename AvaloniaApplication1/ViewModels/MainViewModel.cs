@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using Avalonia.Threading;
@@ -26,6 +27,12 @@ namespace AvaloniaApplication1.ViewModels
         private HmiConfiguration? _currentConfig;
 
         public IProjectContextService ProjectContext { get; }
+
+        [ObservableProperty]
+        private string _currentProjectName = "config.json";
+
+        [ObservableProperty]
+        private string _windowTitle = "Avalonia HMI Dashboard - [config.json]";
 
         [ObservableProperty]
         private DashboardViewModel? _dashboard;
@@ -142,11 +149,63 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         [RelayCommand]
+        private async Task OpenProjectAsync()
+        {
+            var filePath = await _dialogService.ShowOpenProjectDialogAsync();
+            if (string.IsNullOrWhiteSpace(filePath)) return;
+
+            try
+            {
+                if (IsSimulationRunning)
+                {
+                    await ToggleSimulationAsync();
+                }
+
+                await LoadConfigAsync(filePath);
+                ShowToast($"Загружен проект: {Path.GetFileName(filePath)}");
+            }
+            catch (Exception ex)
+            {
+                ShowToast($"Ошибка загрузки проекта: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
         private async Task SaveConfigAsync()
         {
             if (_currentConfig != null)
             {
-                await _configurationService.SaveConfigurationAsync(_currentConfig);
+                try
+                {
+                    await _configurationService.SaveConfigurationAsync(_currentConfig);
+                    ShowToast($"Проект сохранен: {CurrentProjectName}");
+                }
+                catch (Exception ex)
+                {
+                    ShowToast($"Ошибка сохранения: {ex.Message}");
+                }
+            }
+        }
+
+        [RelayCommand]
+        private async Task SaveConfigAsAsync()
+        {
+            if (_currentConfig == null) return;
+
+            var currentFileName = Path.GetFileName(_configurationService.CurrentFilePath);
+            var filePath = await _dialogService.ShowSaveProjectAsDialogAsync(currentFileName);
+            if (string.IsNullOrWhiteSpace(filePath)) return;
+
+            try
+            {
+                await _configurationService.SaveConfigurationAsync(_currentConfig, filePath);
+                CurrentProjectName = Path.GetFileName(filePath);
+                WindowTitle = $"Avalonia HMI Dashboard - [{CurrentProjectName}]";
+                ShowToast($"Проект сохранен как: {CurrentProjectName}");
+            }
+            catch (Exception ex)
+            {
+                ShowToast($"Ошибка сохранения: {ex.Message}");
             }
         }
 
@@ -204,9 +263,21 @@ namespace AvaloniaApplication1.ViewModels
             return childWindow;
         }
 
-        private async Task LoadConfigAsync()
+        private async Task LoadConfigAsync(string? filePath = null)
         {
-            _currentConfig = await _configurationService.LoadConfigurationAsync();
+            // Stop current telemetry drivers and dispose existing dashboards/windows
+            await _dataCoreService.StopAsync();
+
+            _mainDashboard?.Dispose();
+            _mimicDashboard?.Dispose();
+            foreach (var cw in ActiveChildWindows)
+                cw.Dispose();
+            ActiveChildWindows.Clear();
+
+            _currentConfig = await _configurationService.LoadConfigurationAsync(filePath);
+
+            CurrentProjectName = Path.GetFileName(_configurationService.CurrentFilePath);
+            WindowTitle = $"Avalonia HMI Dashboard - [{CurrentProjectName}]";
 
             if (_currentConfig.Mimic == null)
             {
@@ -237,8 +308,7 @@ namespace AvaloniaApplication1.ViewModels
             // Start background polling for Modbus/MQTT drivers
             _dataCoreService.StartAsync().FireAndForget(context: "MainViewModel.LoadConfig");
 
-            Dashboard = _mainDashboard;
-            IsMimicActive = false;
+            Dashboard = IsMimicActive ? _mimicDashboard : _mainDashboard;
         }
 
         public void Dispose()

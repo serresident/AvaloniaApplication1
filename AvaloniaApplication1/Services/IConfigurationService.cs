@@ -5,7 +5,8 @@ namespace AvaloniaApplication1.Services
 {
     public interface IConfigurationService
     {
-        Task<HmiConfiguration> LoadConfigurationAsync();
-        Task SaveConfigurationAsync(HmiConfiguration config);
+        string CurrentFilePath { get; set; }
+        Task<HmiConfiguration> LoadConfigurationAsync(string? filePath = null);
+        Task SaveConfigurationAsync(HmiConfiguration config, string? filePath = null);
     }
 }

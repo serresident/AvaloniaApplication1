@@ -106,7 +106,6 @@
   - [x] `MainViewModel.cs`: вызывать `childWindow.Dispose()` в обработчике закрытия окна `CloseAction`
   - [x] `MainViewModel.cs`: утилизировать все активные окна в `Dispose()`
 - [x] Проверить сборку проекта и устранить предупреждения
-
 # Tasks: Code Review Stage 2 — Compiler Warnings, Render Allocations & DashboardPanel Decomposition (Сессия 13 — Выполнено)
 
 - [x] Устранение предупреждений компилятора (CS8602, CS8604, NU1603):
@@ -414,3 +413,25 @@
   - [x] Сборка: 0 ошибок, 0 предупреждений
   - [x] Все 10 тестов UIValidation PASS
   - [x] Коммит 34e8ea7, запушен в origin/main
+
+# Tasks: Project Management in Design Mode (Сессия 29 — Выполнено)
+
+- [x] Расширение сервиса конфигурации `IConfigurationService`:
+  - [x] Добавить свойство `CurrentFilePath`
+  - [x] Поддержка произвольных путей в `LoadConfigurationAsync` и `SaveConfigurationAsync`
+- [x] Интеграция системных диалогов открытия/сохранения в `IDialogService` и `DialogService`:
+  - [x] Метод `ShowOpenProjectDialogAsync()` через `StorageProvider.OpenFilePickerAsync`
+  - [x] Метод `ShowSaveProjectAsDialogAsync()` через `StorageProvider.SaveFilePickerAsync`
+  - [x] Фильтрация по типам файлов `*.json` («Файлы проекта HMI»)
+- [x] Реализация проектных команд и свойств в `MainViewModel`:
+  - [x] Свойства `CurrentProjectName` и `WindowTitle`
+  - [x] Команда `OpenProjectCommand` с корректной остановкой/перезапуском рантайма `DataCoreService` и утилизацией дашбордов
+  - [x] Команда `SaveConfigAsCommand`
+  - [x] Обновление `SaveConfigCommand` с выводом Toast-уведомления
+- [x] Размещение элементов управления в `MainWindow.axaml`:
+  - [x] Бейдж активного файла проекта `📁 <имя>`
+  - [x] Кнопки `📂 Загрузить...`, `💾 Сохранить`, `💾 Сохранить как...`
+  - [x] Горячие клавиши `Ctrl+O`, `Ctrl+S`, `Ctrl+Shift+S`
+  - [x] Привязка заголовка окна к `WindowTitle`
+- [x] Устранение всех предупреждений компилятора CS8602 и CS8604
+- [x] Проверка успешной сборки проекта

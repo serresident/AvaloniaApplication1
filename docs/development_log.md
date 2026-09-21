@@ -183,7 +183,6 @@
     *   `MainViewModel.Dispose()`: обеспечена полная очистка и утилизация всех активных окон `ActiveChildWindows`.
 *   **Сборка и верификация:** 
     *   Проект успешно собирается (`dotnet build --no-restore` завершен с `0 ошибок`).
-
 ---
 
 ## 📅 09.09.2026 (Сессия 13 — Устранение предупреждений компилятора, оптимизация Render и декомпозиция DashboardPanel)
@@ -678,3 +677,56 @@
 * **Headless UI Рендеринг (`scripts/render_ui.ps1 MimicView` и `DashboardView`):**
   - `artifacts/ui_preview.png` и `artifacts/ui_tree.json` успешно сгенерированы.
   - Проведен мультимодальный анализ скриншотов: отсутствие клиппинга, наложений, идеальная стыковка труб и клапанов.
+
+---
+
+## 📅 15.09.2026 (Сессия 28 — Контролы выбора цвета и формата: ColorPickerBox + FormatEditorBox, режимы кнопок Latching/ToggleSwitch)
+
+### 📌 Достижение: Внедрение переиспользуемых UserControl для редактирования цвета и формата, расширение типов CommandButton
+*   **ColorPickerBox (`Views/Controls/ColorPickerBox.axaml` + `.cs`):**
+    *   36 цветовых ячеек (6x6 UniformGrid) с промышленной палитрой HMI/SCADA.
+    *   RGB-слайдеры с `NumericUpDown` для покомпонентного ввода каналов (0–255).
+    *   Спектральный слайдер оттенка (Hue 0–360°) с радужным градиентом.
+    *   `TextBox` прямого ввода Hex-значений с валидацией и двухсторонней синхронизацией.
+    *   Архитектура: `DataContext = this`, `x:CompileBindings="False"`, `INotifyPropertyChanged`, StyledProperty `SelectedColorHex` (TwoWay).
+*   **FormatEditorBox (`Views/Controls/FormatEditorBox.axaml` + `.cs`):**
+    *   `MenuFlyout` с 11 технологическими категориями (~50 пресетов): Температура, Давление, Расход, Уровень, Масса, Химия, Электрика, Обороты, Объем, Время, Числа.
+    *   5 кнопок быстрой точности (0 / .0 / .00 / .000 / Авто) с сохранением суффикса единицы измерения.
+    *   StyledProperty `Format` (TwoWay).
+*   **CommandButton (режимы Latching и ToggleSwitch):**
+    *   Добавлены режимы с фиксацией и тумблером: `LabelOn`, `LabelOff`, `ColorOn`, `ColorOff`.
+*   **Интеграция в `WidgetEditorWindow.axaml`:**
+    *   Редактирование формата и цвета значений (`FormatEditorBox`, `ColorPickerBox`).
+    *   Выбор цветов состояний ламп и аппаратов (`TrueColor`, `FalseColor`, `ActiveColor`, `InactiveColor`).
+*   **Сборка и тесты:** 0 ошибок, 0 предупреждений, 10 тестов UIValidation успешно пройдены.
+
+---
+
+## 📅 21.09.2026 (Сессия 29 — Механизм проектов: Загрузка выбранного конфига и «Сохранить как...»)
+
+### 📌 Достижение: Полноценное управление проектами/конфигурациями HMI в Design Mode
+*   **Сервис конфигурации (`IConfigurationService`, `ConfigurationService`):**
+    *   Добавлено свойство `CurrentFilePath` для отслеживания пути к текущему активному файлу проекта (по умолчанию `config.json`).
+    *   Методы `LoadConfigurationAsync(string? filePath = null)` и `SaveConfigurationAsync(HmiConfiguration config, string? filePath = null)` расширены поддержкой произвольных путей с автосозданием родительских папок и обновлением `CurrentFilePath`.
+*   **Сервис диалогов (`IDialogService`, `DialogService`):**
+    *   Интегрирован кроссплатформенный `StorageProvider` из Avalonia (`TopLevel.GetTopLevel(MainWindow)?.StorageProvider`).
+    *   Реализованы методы `ShowOpenProjectDialogAsync()` и `ShowSaveProjectAsDialogAsync(string? defaultFileName = null)` с фильтрами `*.json` («Файлы проекта HMI») и `*.*` («Все файлы»).
+    *   Устранены предупреждения компилятора CS8602 в `DialogService.cs`.
+*   **Главная ViewModel (`MainViewModel`):**
+    *   Внедрены свойства `CurrentProjectName` и `WindowTitle` с динамическим отображением имени открытого проекта в заголовке окна: `Avalonia HMI Dashboard - [<Имя проекта>]`.
+    *   Внедрена команда `OpenProjectCommand`: вызывает системный диалог выбора файла, корректно останавливает драйверы связи (`_dataCoreService.StopAsync()`), утилизирует старые дашборды и MDI-окна, перезагружает конфигурацию, пересоздает дашборды и запускает драйверы связи для новых тегов с выводом Toast-уведомления.
+    *   Внедрена команда `SaveConfigAsCommand`: открывает системный диалог «Сохранить как...», сохраняет конфигурацию по новому пути, обновляет имя проекта и выводит Toast.
+    *   Команда `SaveConfigCommand` обновлена выводом информативного Toast-уведомления.
+    *   Устранено предупреждение компилятора CS8604 в `OpenChildWindow`.
+*   **Пользовательский интерфейс (`MainWindow.axaml`):**
+    *   В панель инструментов режима редактирования (Design Mode) добавлены:
+        *   Стилизованный бейдж с именем текущего файла проекта: `📁 <ИмяПроекта>`.
+        *   Кнопка `📂 Загрузить...` (`OpenProjectCommand`).
+        *   Кнопка `💾 Сохранить` (`SaveConfigCommand`).
+        *   Кнопка `💾 Сохранить как...` (`SaveConfigAsCommand`).
+    *   Добавлены глобальные горячие клавиши: `Ctrl+O` (Open Project), `Ctrl+S` (Save Project), `Ctrl+Shift+S` (Save Project As).
+    *   Свойство `Title` окна привязано к `WindowTitle`.
+*   **Конфигурация проекта (`AvaloniaApplication1.csproj`):**
+    *   Добавлена настройка `<UseAppHost>false</UseAppHost>`, предотвращающая сбои блокировки Win32 PE-файлов драйвером Google Drive при инкрементальной компиляции.
+*   **Сборка и верификация:**
+    *   Проект собирается со статусом **0 ошибок, 0 предупреждений C# компилятора**.

@@ -10,20 +10,31 @@ namespace AvaloniaApplication1.Services
 {
     public class ConfigurationService : IConfigurationService
     {
-        private readonly string _configFilePath = "config.json";
+        private string _configFilePath = "config.json";
+        public string CurrentFilePath
+        {
+            get => _configFilePath;
+            set => _configFilePath = string.IsNullOrWhiteSpace(value) ? "config.json" : value;
+        }
+
         private readonly JsonSerializerOptions _jsonOptions = new()
         {
             WriteIndented = true,
             PropertyNameCaseInsensitive = true
         };
 
-        public async Task<HmiConfiguration> LoadConfigurationAsync()
+        public async Task<HmiConfiguration> LoadConfigurationAsync(string? filePath = null)
         {
-            if (File.Exists(_configFilePath))
+            if (!string.IsNullOrWhiteSpace(filePath))
+            {
+                CurrentFilePath = filePath;
+            }
+
+            if (File.Exists(CurrentFilePath))
             {
                 try
                 {
-                    using var stream = File.OpenRead(_configFilePath);
+                    using var stream = File.OpenRead(CurrentFilePath);
                     var config = await JsonSerializer.DeserializeAsync<HmiConfiguration>(stream, _jsonOptions);
                     if (config != null)
                     {
@@ -31,7 +42,7 @@ namespace AvaloniaApplication1.Services
                         {
                             var def = await GetDefaultConfigurationAsync();
                             config.Mimic = def.Mimic;
-                            await SaveConfigurationAsync(config);
+                            await SaveConfigurationAsync(config, CurrentFilePath);
                         }
                         return config;
                     }
@@ -39,26 +50,38 @@ namespace AvaloniaApplication1.Services
                 catch (Exception ex)
                 {
                     // For now, write to console. In a real app, log this error.
-                    Console.WriteLine($"Failed to load configuration: {ex.Message}");
+                    Console.WriteLine($"Failed to load configuration from {CurrentFilePath}: {ex.Message}");
                 }
             }
 
             // Fallback to default if file doesn't exist or is invalid
             var defaultConfig = await GetDefaultConfigurationAsync();
-            await SaveConfigurationAsync(defaultConfig);
+            await SaveConfigurationAsync(defaultConfig, CurrentFilePath);
             return defaultConfig;
         }
 
-        public async Task SaveConfigurationAsync(HmiConfiguration config)
+        public async Task SaveConfigurationAsync(HmiConfiguration config, string? filePath = null)
         {
+            var targetPath = !string.IsNullOrWhiteSpace(filePath) ? filePath : CurrentFilePath;
+            if (!string.IsNullOrWhiteSpace(filePath))
+            {
+                CurrentFilePath = filePath;
+            }
+
             try
             {
-                using var stream = File.Create(_configFilePath);
+                var dir = Path.GetDirectoryName(targetPath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                using var stream = File.Create(targetPath);
                 await JsonSerializer.SerializeAsync(stream, config, _jsonOptions);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to save configuration: {ex.Message}");
+                Console.WriteLine($"Failed to save configuration to {targetPath}: {ex.Message}");
             }
         }
 

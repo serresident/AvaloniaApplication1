@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.ViewModels;
 using AvaloniaApplication1.Views;
@@ -196,6 +197,72 @@ namespace AvaloniaApplication1.Services
             };
 
             await window.ShowDialog(MainWindow);
+        }
+
+        public async Task<string?> ShowOpenProjectDialogAsync()
+        {
+            if (MainWindow == null) return null;
+            var topLevel = TopLevel.GetTopLevel(MainWindow);
+            if (topLevel == null) return null;
+
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Загрузить проект HMI",
+                AllowMultiple = false,
+                FileTypeFilter = new List<FilePickerFileType>
+                {
+                    new("Файлы проекта HMI (*.json)")
+                    {
+                        Patterns = new[] { "*.json" },
+                        MimeTypes = new[] { "application/json" }
+                    },
+                    new("Все файлы (*.*)")
+                    {
+                        Patterns = new[] { "*.*" }
+                    }
+                }
+            });
+
+            if (files != null && files.Count > 0)
+            {
+                var file = files[0];
+                return file.TryGetLocalPath() ?? (file.Path.IsFile ? file.Path.LocalPath : null);
+            }
+
+            return null;
+        }
+
+        public async Task<string?> ShowSaveProjectAsDialogAsync(string? defaultFileName = null)
+        {
+            if (MainWindow == null) return null;
+            var topLevel = TopLevel.GetTopLevel(MainWindow);
+            if (topLevel == null) return null;
+
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Сохранить проект HMI как...",
+                DefaultExtension = "json",
+                SuggestedFileName = string.IsNullOrWhiteSpace(defaultFileName) ? "config.json" : defaultFileName,
+                FileTypeChoices = new List<FilePickerFileType>
+                {
+                    new("Файлы проекта HMI (*.json)")
+                    {
+                        Patterns = new[] { "*.json" },
+                        MimeTypes = new[] { "application/json" }
+                    },
+                    new("Все файлы (*.*)")
+                    {
+                        Patterns = new[] { "*.*" }
+                    }
+                }
+            });
+
+            if (file != null)
+            {
+                return file.TryGetLocalPath() ?? (file.Path.IsFile ? file.Path.LocalPath : null);
+            }
+
+            return null;
         }
     }
 }

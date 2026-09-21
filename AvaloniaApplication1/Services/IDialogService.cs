@@ -14,5 +14,9 @@ namespace AvaloniaApplication1.Services
         Task<(double CellSize, double ZoomScale)?> ShowDashboardPropertiesAsync(double currentCellSize, double currentZoomScale);
         Task<ConnectionConfig?> ShowConnectionEditorAsync(ConnectionConfig? existingConfig);
         Task ShowConnectionManagerAsync(HmiConfiguration config);
+
+        // Project File dialogs
+        Task<string?> ShowOpenProjectDialogAsync();
+        Task<string?> ShowSaveProjectAsDialogAsync(string? defaultFileName = null);
     }
 }
