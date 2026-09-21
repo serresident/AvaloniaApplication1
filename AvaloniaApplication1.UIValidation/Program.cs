@@ -91,9 +91,34 @@ public static class Program
         using var session = HeadlessUnitTestSession.StartNew(typeof(Program));
         session.Dispatch(() =>
         {
+            var configService = new ConfigurationService();
+            if (string.Equals(targetView, "MimicView", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(targetView, "Mimic", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(targetView, "MmaPark", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(targetView, "MimicRealLab", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] candidates = new[]
+                {
+                    "config_mma_park.json",
+                    Path.Combine("AvaloniaApplication1", "config_mma_park.json"),
+                    Path.Combine("..", "AvaloniaApplication1", "config_mma_park.json"),
+                    Path.Combine(AppContext.BaseDirectory, "config_mma_park.json"),
+                    Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "AvaloniaApplication1", "config_mma_park.json"),
+                    @"C:\Users\adm\Desktop\Парк хранения ММА4 емкости\config_mma_park.json",
+                    @"C:\Users\adm\projects\AvaloniaApplication1\AvaloniaApplication1\config_mma_park.json"
+                };
+
+                string? mmaConfigPath = candidates.FirstOrDefault(File.Exists);
+                if (mmaConfigPath != null)
+                {
+                    configService.CurrentFilePath = mmaConfigPath;
+                    Console.WriteLine($"[UIValidation] Preloaded config path: {Path.GetFullPath(mmaConfigPath)}");
+                }
+            }
+
             var services = new ServiceCollection();
             services.AddSingleton<IProjectContextService, ProjectContextService>();
-            services.AddSingleton<IConfigurationService, ConfigurationService>();
+            services.AddSingleton<IConfigurationService>(configService);
             services.AddSingleton<IDataCoreService, MockDataCoreService>();
             services.AddSingleton<ISimulationService, MockSimulationService>();
             services.AddSingleton<IAlarmNotificationService, AlarmNotificationService>();
@@ -105,7 +130,7 @@ public static class Program
 
             var mainVm = sp.GetRequiredService<MainViewModel>();
 
-            for (int i = 0; i < 20 && (mainVm.Dashboard == null || mainVm.Dashboard.Widgets.Count == 0); i++)
+            for (int i = 0; i < 40 && (mainVm.Dashboard == null || mainVm.Dashboard.Widgets.Count == 0); i++)
             {
                 Dispatcher.UIThread.RunJobs();
                 Thread.Sleep(50);
@@ -113,15 +138,22 @@ public static class Program
 
             Window window;
             if (string.Equals(targetView, "MimicView", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(targetView, "Mimic", StringComparison.OrdinalIgnoreCase))
+                string.Equals(targetView, "Mimic", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(targetView, "MmaPark", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(targetView, "MimicRealLab", StringComparison.OrdinalIgnoreCase))
             {
                 mainVm.ShowMimicCommand.Execute(null);
-                Dispatcher.UIThread.RunJobs();
+                for (int i = 0; i < 20; i++)
+                {
+                    Dispatcher.UIThread.RunJobs();
+                    Thread.Sleep(20);
+                }
+
                 window = new MainWindow
                 {
                     DataContext = mainVm,
-                    Width = 1400,
-                    Height = 900
+                    Width = 1024,
+                    Height = 768
                 };
             }
             else if (string.Equals(targetView, "DashboardView", StringComparison.OrdinalIgnoreCase))

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using Avalonia.Threading;
@@ -263,10 +264,21 @@ namespace AvaloniaApplication1.ViewModels
             return childWindow;
         }
 
-        private async Task LoadConfigAsync(string? filePath = null)
+        private int _loadVersion = 0;
+
+        public async Task LoadConfigAsync(string? filePath = null)
         {
-            // Stop current telemetry drivers and dispose existing dashboards/windows
+            int version = Interlocked.Increment(ref _loadVersion);
+
+            // Stop current telemetry drivers
             await _dataCoreService.StopAsync();
+
+            var loadedConfig = await _configurationService.LoadConfigurationAsync(filePath);
+
+            if (version != _loadVersion)
+            {
+                return;
+            }
 
             _mainDashboard?.Dispose();
             _mimicDashboard?.Dispose();
@@ -274,7 +286,7 @@ namespace AvaloniaApplication1.ViewModels
                 cw.Dispose();
             ActiveChildWindows.Clear();
 
-            _currentConfig = await _configurationService.LoadConfigurationAsync(filePath);
+            _currentConfig = loadedConfig;
 
             CurrentProjectName = Path.GetFileName(_configurationService.CurrentFilePath);
             WindowTitle = $"Avalonia HMI Dashboard - [{CurrentProjectName}]";

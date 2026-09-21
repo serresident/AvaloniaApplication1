@@ -1,1330 +1,1332 @@
-{
-  "Project": {
-    "Name": "Парк хранения ММА (4 емкости) - Цех 21 ВС-108",
-    "Version": "1.0.0"
-  },
-  "Connections": [
-    {
-      "Id": "wb_mma_park",
-      "Type": "ModbusTCP",
-      "Host": "10.10.10.234",
-      "Port": 502,
-      "PollIntervalMs": 200,
-      "ByteOrder": "CDAB"
-    },
-    {
-      "Id": "mqtt_wb",
-      "Type": "MQTT",
-      "Host": "10.10.10.234",
-      "Port": 1883
-    }
-  ],
-  "BridgeRules": [],
-  "Dashboard": {
-    "CellSize": 160,
-    "Widgets": [
-      {
-        "Type": "RealTimeTrend",
-        "Title": "Уровень Емк. 22 (LT-22)",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30001",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 0,
-          "Col": 0,
-          "SizeX": 2,
-          "SizeY": 2
-        },
-        "MinValue": 0,
-        "MaxValue": 9250,
-        "Format": "{0:F0} мм"
-      },
-      {
-        "Type": "RealTimeTrend",
-        "Title": "Уровень Емк. 23 (LT-23)",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30003",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 0,
-          "Col": 2,
-          "SizeX": 2,
-          "SizeY": 2
-        },
-        "MinValue": 0,
-        "MaxValue": 9250,
-        "Format": "{0:F0} мм"
-      },
-      {
-        "Type": "RealTimeTrend",
-        "Title": "Уровень Емк. 24 (LT-24)",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30005",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 2,
-          "Col": 0,
-          "SizeX": 2,
-          "SizeY": 2
-        },
-        "MinValue": 0,
-        "MaxValue": 9250,
-        "Format": "{0:F0} мм"
-      },
-      {
-        "Type": "RealTimeTrend",
-        "Title": "Уровень Емк. 25 (LT-25)",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30007",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 2,
-          "Col": 2,
-          "SizeX": 2,
-          "SizeY": 2
-        },
-        "MinValue": 0,
-        "MaxValue": 9250,
-        "Format": "{0:F0} мм"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Доза налива (FT2-1)",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "40027",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 0,
-          "Col": 4,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 0,
-        "MaxValue": 60000,
-        "Format": "{0:F0} кг"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Упреждение отсечки",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "40029",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 0,
-          "Col": 5,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 0,
-        "MaxValue": 500,
-        "Format": "{0:F0} кг"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Lmax Емк 22",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "40001",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 1,
-          "Col": 4,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 5000,
-        "MaxValue": 9250,
-        "Format": "{0:F0} мм"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Lmax Емк 23",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "40005",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 1,
-          "Col": 5,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 5000,
-        "MaxValue": 9250,
-        "Format": "{0:F0} мм"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Lmax Емк 24",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "40009",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 2,
-          "Col": 4,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 5000,
-        "MaxValue": 9250,
-        "Format": "{0:F0} мм"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Lmax Емк 25",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "40013",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 2,
-          "Col": 5,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 5000,
-        "MaxValue": 9250,
-        "Format": "{0:F0} мм"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Pmin Насос 502в",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "40017",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 3,
-          "Col": 4,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 0,
-        "MaxValue": 5,
-        "Format": "{0:F1} кгс"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Pmax Насос 502в",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "40019",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 3,
-          "Col": 5,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 1,
-        "MaxValue": 10,
-        "Format": "{0:F1} кгс"
-      }
-    ]
-  },
-  "Mimic": {
-    "CellSize": 10,
-    "Widgets": [
-      {
-        "Type": "ValueDisplay",
-        "Title": "Расход подачи FT1-1",
-        "Position": {
-          "Row": 1,
-          "Col": 1,
-          "SizeX": 14,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30027",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F0} кг/ч"
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Объем FT1-1",
-        "Position": {
-          "Row": 1,
-          "Col": 16,
-          "SizeX": 11,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30029",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} м³/ч"
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Плотность FT1-1",
-        "Position": {
-          "Row": 1,
-          "Col": 28,
-          "SizeX": 12,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30031",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} кг/м³"
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Давление азота (врезка)",
-        "Position": {
-          "Row": 1,
-          "Col": 72,
-          "SizeX": 14,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30023",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F2} кгс/см²"
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Давление азота (панель)",
-        "Position": {
-          "Row": 1,
-          "Col": 87,
-          "SizeX": 14,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30025",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F3} кгс/см²"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Магистраль приема ММА",
-        "Position": {
-          "Row": 5.5,
-          "Col": 1,
-          "SizeX": 68,
-          "SizeY": 1
-        },
-        "PipePoints": "0,0;67,0",
-        "Thickness": 10,
-        "StartFitting": "Flange",
-        "EndFitting": "Cap",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Отвод приема Емк 22",
-        "Position": {
-          "Row": 5.5,
-          "Col": 11,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "None",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Valve",
-        "Title": "LV 22 (Прием)",
-        "Position": {
-          "Row": 9,
-          "Col": 8,
-          "SizeX": 6,
-          "SizeY": 6
-        },
-        "ValveType": "CutOff",
-        "ActuatorType": "Solenoid",
-        "IsVertical": true,
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00012",
-          "DataType": "Bool"
-        },
-        "FeedbackSource": {
-          "ConnId": "wb_mma_park",
-          "Address": "10016",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Впуск в Емк 22",
-        "Position": {
-          "Row": 14.5,
-          "Col": 11,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Отвод приема Емк 23",
-        "Position": {
-          "Row": 5.5,
-          "Col": 28,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "None",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Valve",
-        "Title": "LV 23 (Прием)",
-        "Position": {
-          "Row": 9,
-          "Col": 25,
-          "SizeX": 6,
-          "SizeY": 6
-        },
-        "ValveType": "CutOff",
-        "ActuatorType": "Solenoid",
-        "IsVertical": true,
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00013",
-          "DataType": "Bool"
-        },
-        "FeedbackSource": {
-          "ConnId": "wb_mma_park",
-          "Address": "10018",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Впуск в Емк 23",
-        "Position": {
-          "Row": 14.5,
-          "Col": 28,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Отвод приема Емк 24",
-        "Position": {
-          "Row": 5.5,
-          "Col": 45,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "None",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Valve",
-        "Title": "LV 24 (Прием)",
-        "Position": {
-          "Row": 9,
-          "Col": 42,
-          "SizeX": 6,
-          "SizeY": 6
-        },
-        "ValveType": "CutOff",
-        "ActuatorType": "Solenoid",
-        "IsVertical": true,
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00014",
-          "DataType": "Bool"
-        },
-        "FeedbackSource": {
-          "ConnId": "wb_mma_park",
-          "Address": "10020",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Впуск в Емк 24",
-        "Position": {
-          "Row": 14.5,
-          "Col": 45,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Отвод приема Емк 25",
-        "Position": {
-          "Row": 5.5,
-          "Col": 62,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "None",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Valve",
-        "Title": "LV 25 (Прием)",
-        "Position": {
-          "Row": 9,
-          "Col": 59,
-          "SizeX": 6,
-          "SizeY": 6
-        },
-        "ValveType": "CutOff",
-        "ActuatorType": "Solenoid",
-        "IsVertical": true,
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00015",
-          "DataType": "Bool"
-        },
-        "FeedbackSource": {
-          "ConnId": "wb_mma_park",
-          "Address": "10022",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Впуск в Емк 25",
-        "Position": {
-          "Row": 14.5,
-          "Col": 62,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "PilotLight",
-        "Title": "Lmax 22",
-        "Position": {
-          "Row": 15,
-          "Col": 13,
-          "SizeX": 4,
-          "SizeY": 3
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10001",
-          "DataType": "Bool"
-        },
-        "TrueColor": "#FF1744",
-        "FalseColor": "#263238"
-      },
-      {
-        "Type": "Tank",
-        "Title": "Емкость 22 (500 м³)",
-        "Position": {
-          "Row": 18,
-          "Col": 4,
-          "SizeX": 14,
-          "SizeY": 18
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30001",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F0} мм",
-        "MinValue": 0,
-        "MaxValue": 9250
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Т 22",
-        "Position": {
-          "Row": 36,
-          "Col": 5,
-          "SizeX": 12,
-          "SizeY": 3
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30009",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} °C"
-      },
-      {
-        "Type": "PilotLight",
-        "Title": "Lmax 23",
-        "Position": {
-          "Row": 15,
-          "Col": 30,
-          "SizeX": 4,
-          "SizeY": 3
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10002",
-          "DataType": "Bool"
-        },
-        "TrueColor": "#FF1744",
-        "FalseColor": "#263238"
-      },
-      {
-        "Type": "Tank",
-        "Title": "Емкость 23 (500 м³)",
-        "Position": {
-          "Row": 18,
-          "Col": 21,
-          "SizeX": 14,
-          "SizeY": 18
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30003",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F0} мм",
-        "MinValue": 0,
-        "MaxValue": 9250
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Т 23",
-        "Position": {
-          "Row": 36,
-          "Col": 22,
-          "SizeX": 12,
-          "SizeY": 3
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30011",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} °C"
-      },
-      {
-        "Type": "PilotLight",
-        "Title": "Lmax 24",
-        "Position": {
-          "Row": 15,
-          "Col": 47,
-          "SizeX": 4,
-          "SizeY": 3
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10003",
-          "DataType": "Bool"
-        },
-        "TrueColor": "#FF1744",
-        "FalseColor": "#263238"
-      },
-      {
-        "Type": "Tank",
-        "Title": "Емкость 24 (500 м³)",
-        "Position": {
-          "Row": 18,
-          "Col": 38,
-          "SizeX": 14,
-          "SizeY": 18
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30005",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F0} мм",
-        "MinValue": 0,
-        "MaxValue": 9250
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Т 24",
-        "Position": {
-          "Row": 36,
-          "Col": 39,
-          "SizeX": 12,
-          "SizeY": 3
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30013",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} °C"
-      },
-      {
-        "Type": "PilotLight",
-        "Title": "Lmax 25",
-        "Position": {
-          "Row": 15,
-          "Col": 64,
-          "SizeX": 4,
-          "SizeY": 3
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10004",
-          "DataType": "Bool"
-        },
-        "TrueColor": "#FF1744",
-        "FalseColor": "#263238"
-      },
-      {
-        "Type": "Tank",
-        "Title": "Емкость 25 (500 м³)",
-        "Position": {
-          "Row": 18,
-          "Col": 55,
-          "SizeX": 14,
-          "SizeY": 18
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30007",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F0} мм",
-        "MinValue": 0,
-        "MaxValue": 9250
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Т 25",
-        "Position": {
-          "Row": 36,
-          "Col": 56,
-          "SizeX": 12,
-          "SizeY": 3
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30015",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} °C"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Слив из Емк 22",
-        "Position": {
-          "Row": 35.5,
-          "Col": 11,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Valve",
-        "Title": "V 22 (Выход)",
-        "Position": {
-          "Row": 40,
-          "Col": 8,
-          "SizeX": 6,
-          "SizeY": 6
-        },
-        "ValveType": "CutOff",
-        "ActuatorType": "Manual",
-        "IsVertical": true,
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10017",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Опуск 22 в коллектор",
-        "Position": {
-          "Row": 45.5,
-          "Col": 11,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "None",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Слив из Емк 23",
-        "Position": {
-          "Row": 35.5,
-          "Col": 28,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Valve",
-        "Title": "V 23 (Выход)",
-        "Position": {
-          "Row": 40,
-          "Col": 25,
-          "SizeX": 6,
-          "SizeY": 6
-        },
-        "ValveType": "CutOff",
-        "ActuatorType": "Manual",
-        "IsVertical": true,
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10019",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Опуск 23 в коллектор",
-        "Position": {
-          "Row": 45.5,
-          "Col": 28,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "None",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Слив из Емк 24",
-        "Position": {
-          "Row": 35.5,
-          "Col": 45,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Valve",
-        "Title": "V 24 (Выход)",
-        "Position": {
-          "Row": 40,
-          "Col": 42,
-          "SizeX": 6,
-          "SizeY": 6
-        },
-        "ValveType": "CutOff",
-        "ActuatorType": "Manual",
-        "IsVertical": true,
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10021",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Опуск 24 в коллектор",
-        "Position": {
-          "Row": 45.5,
-          "Col": 45,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "None",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Слив из Емк 25",
-        "Position": {
-          "Row": 35.5,
-          "Col": 62,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Valve",
-        "Title": "V 25 (Выход)",
-        "Position": {
-          "Row": 40,
-          "Col": 59,
-          "SizeX": 6,
-          "SizeY": 6
-        },
-        "ValveType": "CutOff",
-        "ActuatorType": "Manual",
-        "IsVertical": true,
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10023",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Опуск 25 в коллектор",
-        "Position": {
-          "Row": 45.5,
-          "Col": 62,
-          "SizeX": 1,
-          "SizeY": 5
-        },
-        "PipePoints": "0,0;0,4",
-        "Thickness": 8,
-        "StartFitting": "Flange",
-        "EndFitting": "None",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Всасывающий коллектор насосов",
-        "Position": {
-          "Row": 49.5,
-          "Col": 11,
-          "SizeX": 52,
-          "SizeY": 1
-        },
-        "PipePoints": "0,0;51,0",
-        "Thickness": 10,
-        "StartFitting": "Cap",
-        "EndFitting": "None",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "Pump",
-        "Title": "Насос 502в (ГХН)",
-        "Position": {
-          "Row": 54,
-          "Col": 10,
-          "SizeX": 8,
-          "SizeY": 8
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10013",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#455A64"
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Давление 502в",
-        "Position": {
-          "Row": 63,
-          "Col": 8,
-          "SizeX": 12,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30017",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} кгс"
-      },
-      {
-        "Type": "CommandButton",
-        "Title": "Пуск 502в",
-        "Position": {
-          "Row": 68,
-          "Col": 7,
-          "SizeX": 7,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00007",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Momentary"
-      },
-      {
-        "Type": "CommandButton",
-        "Title": "Стоп 502в",
-        "Position": {
-          "Row": 68,
-          "Col": 15,
-          "SizeX": 7,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00008",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Momentary"
-      },
-      {
-        "Type": "Pump",
-        "Title": "Насос 502г (ГХН)",
-        "Position": {
-          "Row": 54,
-          "Col": 28,
-          "SizeX": 8,
-          "SizeY": 8
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10014",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#455A64"
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Давление 502г",
-        "Position": {
-          "Row": 63,
-          "Col": 26,
-          "SizeX": 12,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30019",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} кгс"
-      },
-      {
-        "Type": "CommandButton",
-        "Title": "Пуск 502г",
-        "Position": {
-          "Row": 68,
-          "Col": 25,
-          "SizeX": 7,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00010",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Momentary"
-      },
-      {
-        "Type": "CommandButton",
-        "Title": "Стоп 502г",
-        "Position": {
-          "Row": 68,
-          "Col": 33,
-          "SizeX": 7,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00011",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Momentary"
-      },
-      {
-        "Type": "Pump",
-        "Title": "Насос 502д (СВН)",
-        "Position": {
-          "Row": 54,
-          "Col": 46,
-          "SizeX": 8,
-          "SizeY": 8
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "10015",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#455A64"
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Давление 502д",
-        "Position": {
-          "Row": 63,
-          "Col": 44,
-          "SizeX": 12,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30021",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} кгс"
-      },
-      {
-        "Type": "CommandButton",
-        "Title": "Пуск 502д",
-        "Position": {
-          "Row": 68,
-          "Col": 43,
-          "SizeX": 7,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00004",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Momentary"
-      },
-      {
-        "Type": "CommandButton",
-        "Title": "Стоп 502д",
-        "Position": {
-          "Row": 68,
-          "Col": 51,
-          "SizeX": 7,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00005",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Momentary"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Напорный коллектор отгрузки",
-        "Position": {
-          "Row": 57.5,
-          "Col": 54,
-          "SizeX": 22,
-          "SizeY": 1
-        },
-        "PipePoints": "0,0;21,0",
-        "Thickness": 10,
-        "StartFitting": "None",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Расход налива FT2-1",
-        "Position": {
-          "Row": 46,
-          "Col": 72,
-          "SizeX": 14,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30037",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F0} кг/ч"
-      },
-      {
-        "Type": "ValueDisplay",
-        "Title": "Остаток дозы",
-        "Position": {
-          "Row": 46,
-          "Col": 87,
-          "SizeX": 13,
-          "SizeY": 4
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "30047",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F0} кг"
-      },
-      {
-        "Type": "Valve",
-        "Title": "Отсечной кран налива",
-        "Position": {
-          "Row": 55,
-          "Col": 76,
-          "SizeX": 6,
-          "SizeY": 6
-        },
-        "ValveType": "CutOff",
-        "ActuatorType": "Pneumatic",
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00016",
-          "DataType": "Bool"
-        },
-        "FeedbackSource": {
-          "ConnId": "wb_mma_park",
-          "Address": "10024",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
-      },
-      {
-        "Type": "Pipe",
-        "Title": "Линия налива в цистерну",
-        "Position": {
-          "Row": 57.5,
-          "Col": 82,
-          "SizeX": 18,
-          "SizeY": 1
-        },
-        "PipePoints": "0,0;17,0",
-        "Thickness": 10,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Задать дозу",
-        "Position": {
-          "Row": 52,
-          "Col": 87,
-          "SizeX": 13,
-          "SizeY": 5
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "40027",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F0} кг",
-        "MinValue": 0,
-        "MaxValue": 60000
-      },
-      {
-        "Type": "CommandButton",
-        "Title": "Пуск налива",
-        "Position": {
-          "Row": 63,
-          "Col": 76,
-          "SizeX": 11,
-          "SizeY": 5
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00017",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Toggle"
-      },
-      {
-        "Type": "CommandButton",
-        "Title": "Сброс дозы",
-        "Position": {
-          "Row": 63,
-          "Col": 89,
-          "SizeX": 11,
-          "SizeY": 5
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00018",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Momentary"
-      },
-      {
-        "Type": "CommandButton",
-        "Title": "Квитировать аварии",
-        "Position": {
-          "Row": 69,
-          "Col": 76,
-          "SizeX": 24,
-          "SizeY": 5
-        },
-        "Source": {
-          "ConnId": "wb_mma_park",
-          "Address": "00019",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Momentary"
-      }
-    ]
-  }
+﻿{
+    "Project":  {
+                    "Name":  "Парк хранения ММА (4 емкости) - Цех 21 ВС-108",
+                    "Version":  "1.0.0"
+                },
+    "Connections":  [
+                        {
+                            "Id":  "wb_mma_park",
+                            "Type":  "ModbusTCP",
+                            "Host":  "10.10.10.234",
+                            "Port":  502,
+                            "PollIntervalMs":  200,
+                            "ByteOrder":  "CDAB"
+                        },
+                        {
+                            "Id":  "mqtt_wb",
+                            "Type":  "MQTT",
+                            "Host":  "10.10.10.234",
+                            "Port":  1883
+                        }
+                    ],
+    "BridgeRules":  [
+
+                    ],
+    "Dashboard":  {
+                      "CellSize":  160,
+                      "Widgets":  [
+                                      {
+                                          "Type":  "RealTimeTrend",
+                                          "Title":  "Уровень Емк. 22 (LT-22)",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "30001",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  0,
+                                                           "Col":  0,
+                                                           "SizeX":  2,
+                                                           "SizeY":  2
+                                                       },
+                                          "MinValue":  0,
+                                          "MaxValue":  9250,
+                                          "Format":  "{0:F0} мм"
+                                      },
+                                      {
+                                          "Type":  "RealTimeTrend",
+                                          "Title":  "Уровень Емк. 23 (LT-23)",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "30003",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  0,
+                                                           "Col":  2,
+                                                           "SizeX":  2,
+                                                           "SizeY":  2
+                                                       },
+                                          "MinValue":  0,
+                                          "MaxValue":  9250,
+                                          "Format":  "{0:F0} мм"
+                                      },
+                                      {
+                                          "Type":  "RealTimeTrend",
+                                          "Title":  "Уровень Емк. 24 (LT-24)",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "30005",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  2,
+                                                           "Col":  0,
+                                                           "SizeX":  2,
+                                                           "SizeY":  2
+                                                       },
+                                          "MinValue":  0,
+                                          "MaxValue":  9250,
+                                          "Format":  "{0:F0} мм"
+                                      },
+                                      {
+                                          "Type":  "RealTimeTrend",
+                                          "Title":  "Уровень Емк. 25 (LT-25)",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "30007",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  2,
+                                                           "Col":  2,
+                                                           "SizeX":  2,
+                                                           "SizeY":  2
+                                                       },
+                                          "MinValue":  0,
+                                          "MaxValue":  9250,
+                                          "Format":  "{0:F0} мм"
+                                      },
+                                      {
+                                          "Type":  "SetValue",
+                                          "Title":  "Доза налива (FT2-1)",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "40027",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  0,
+                                                           "Col":  4,
+                                                           "SizeX":  1,
+                                                           "SizeY":  1
+                                                       },
+                                          "MinValue":  0,
+                                          "MaxValue":  60000,
+                                          "Format":  "{0:F0} кг"
+                                      },
+                                      {
+                                          "Type":  "SetValue",
+                                          "Title":  "Упреждение отсечки",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "40029",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  0,
+                                                           "Col":  5,
+                                                           "SizeX":  1,
+                                                           "SizeY":  1
+                                                       },
+                                          "MinValue":  0,
+                                          "MaxValue":  500,
+                                          "Format":  "{0:F0} кг"
+                                      },
+                                      {
+                                          "Type":  "SetValue",
+                                          "Title":  "Lmax Емк 22",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "40001",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  1,
+                                                           "Col":  4,
+                                                           "SizeX":  1,
+                                                           "SizeY":  1
+                                                       },
+                                          "MinValue":  5000,
+                                          "MaxValue":  9250,
+                                          "Format":  "{0:F0} мм"
+                                      },
+                                      {
+                                          "Type":  "SetValue",
+                                          "Title":  "Lmax Емк 23",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "40005",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  1,
+                                                           "Col":  5,
+                                                           "SizeX":  1,
+                                                           "SizeY":  1
+                                                       },
+                                          "MinValue":  5000,
+                                          "MaxValue":  9250,
+                                          "Format":  "{0:F0} мм"
+                                      },
+                                      {
+                                          "Type":  "SetValue",
+                                          "Title":  "Lmax Емк 24",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "40009",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  2,
+                                                           "Col":  4,
+                                                           "SizeX":  1,
+                                                           "SizeY":  1
+                                                       },
+                                          "MinValue":  5000,
+                                          "MaxValue":  9250,
+                                          "Format":  "{0:F0} мм"
+                                      },
+                                      {
+                                          "Type":  "SetValue",
+                                          "Title":  "Lmax Емк 25",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "40013",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  2,
+                                                           "Col":  5,
+                                                           "SizeX":  1,
+                                                           "SizeY":  1
+                                                       },
+                                          "MinValue":  5000,
+                                          "MaxValue":  9250,
+                                          "Format":  "{0:F0} мм"
+                                      },
+                                      {
+                                          "Type":  "SetValue",
+                                          "Title":  "Pmin Насос 502в",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "40017",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  3,
+                                                           "Col":  4,
+                                                           "SizeX":  1,
+                                                           "SizeY":  1
+                                                       },
+                                          "MinValue":  0,
+                                          "MaxValue":  5,
+                                          "Format":  "{0:F1} кгс"
+                                      },
+                                      {
+                                          "Type":  "SetValue",
+                                          "Title":  "Pmax Насос 502в",
+                                          "Source":  {
+                                                         "ConnId":  "wb_mma_park",
+                                                         "Address":  "40019",
+                                                         "DataType":  "Float32"
+                                                     },
+                                          "Position":  {
+                                                           "Row":  3,
+                                                           "Col":  5,
+                                                           "SizeX":  1,
+                                                           "SizeY":  1
+                                                       },
+                                          "MinValue":  1,
+                                          "MaxValue":  10,
+                                          "Format":  "{0:F1} кгс"
+                                      }
+                                  ]
+                  },
+    "Mimic":  {
+                  "CellSize":  10,
+                  "Widgets":  [
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Расход подачи FT1-1",
+                                      "Position":  {
+                                                       "Row":  1,
+                                                       "Col":  2,
+                                                       "SizeX":  14,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30027",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F0} кг/ч"
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Объем FT1-1",
+                                      "Position":  {
+                                                       "Row":  1,
+                                                       "Col":  17,
+                                                       "SizeX":  11,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30029",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F1} м³/ч"
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Плотность FT1-1",
+                                      "Position":  {
+                                                       "Row":  1,
+                                                       "Col":  29,
+                                                       "SizeX":  12,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30031",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F1} кг/м³"
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Давление азота (врезка)",
+                                      "Position":  {
+                                                       "Row":  1,
+                                                       "Col":  69,
+                                                       "SizeX":  14,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30023",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F2} кгс/см²"
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Давление азота (панель)",
+                                      "Position":  {
+                                                       "Row":  1,
+                                                       "Col":  84,
+                                                       "SizeX":  14,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30025",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F3} кгс/см²"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Магистраль приема ММА",
+                                      "Position":  {
+                                                       "Row":  6,
+                                                       "Col":  1,
+                                                       "SizeX":  64,
+                                                       "SizeY":  1
+                                                   },
+                                      "PipePoints":  "0,0;63,0",
+                                      "Thickness":  10,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Cap",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Отвод приема Емк 22",
+                                      "Position":  {
+                                                       "Row":  6,
+                                                       "Col":  10,
+                                                       "SizeX":  1,
+                                                       "SizeY":  4
+                                                   },
+                                      "PipePoints":  "0,0;0,3",
+                                      "Thickness":  8,
+                                      "StartFitting":  "None",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Valve",
+                                      "Title":  "LV 22 (Прием)",
+                                      "Position":  {
+                                                       "Row":  9,
+                                                       "Col":  7,
+                                                       "SizeX":  6,
+                                                       "SizeY":  6
+                                                   },
+                                      "ValveType":  "CutOff",
+                                      "ActuatorType":  "Solenoid",
+                                      "IsVertical":  true,
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00012",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "FeedbackSource":  {
+                                                             "ConnId":  "wb_mma_park",
+                                                             "Address":  "10016",
+                                                             "DataType":  "Bool"
+                                                         },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#D50000"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Впуск в Емк 22",
+                                      "Position":  {
+                                                       "Row":  14,
+                                                       "Col":  10,
+                                                       "SizeX":  1,
+                                                       "SizeY":  3
+                                                   },
+                                      "PipePoints":  "0,0;0,2",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Отвод приема Емк 23",
+                                      "Position":  {
+                                                       "Row":  6,
+                                                       "Col":  26,
+                                                       "SizeX":  1,
+                                                       "SizeY":  4
+                                                   },
+                                      "PipePoints":  "0,0;0,3",
+                                      "Thickness":  8,
+                                      "StartFitting":  "None",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Valve",
+                                      "Title":  "LV 23 (Прием)",
+                                      "Position":  {
+                                                       "Row":  9,
+                                                       "Col":  23,
+                                                       "SizeX":  6,
+                                                       "SizeY":  6
+                                                   },
+                                      "ValveType":  "CutOff",
+                                      "ActuatorType":  "Solenoid",
+                                      "IsVertical":  true,
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00013",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "FeedbackSource":  {
+                                                             "ConnId":  "wb_mma_park",
+                                                             "Address":  "10018",
+                                                             "DataType":  "Bool"
+                                                         },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#D50000"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Впуск в Емк 23",
+                                      "Position":  {
+                                                       "Row":  14,
+                                                       "Col":  26,
+                                                       "SizeX":  1,
+                                                       "SizeY":  3
+                                                   },
+                                      "PipePoints":  "0,0;0,2",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Отвод приема Емк 24",
+                                      "Position":  {
+                                                       "Row":  6,
+                                                       "Col":  42,
+                                                       "SizeX":  1,
+                                                       "SizeY":  4
+                                                   },
+                                      "PipePoints":  "0,0;0,3",
+                                      "Thickness":  8,
+                                      "StartFitting":  "None",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Valve",
+                                      "Title":  "LV 24 (Прием)",
+                                      "Position":  {
+                                                       "Row":  9,
+                                                       "Col":  39,
+                                                       "SizeX":  6,
+                                                       "SizeY":  6
+                                                   },
+                                      "ValveType":  "CutOff",
+                                      "ActuatorType":  "Solenoid",
+                                      "IsVertical":  true,
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00014",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "FeedbackSource":  {
+                                                             "ConnId":  "wb_mma_park",
+                                                             "Address":  "10020",
+                                                             "DataType":  "Bool"
+                                                         },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#D50000"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Впуск в Емк 24",
+                                      "Position":  {
+                                                       "Row":  14,
+                                                       "Col":  42,
+                                                       "SizeX":  1,
+                                                       "SizeY":  3
+                                                   },
+                                      "PipePoints":  "0,0;0,2",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Отвод приема Емк 25",
+                                      "Position":  {
+                                                       "Row":  6,
+                                                       "Col":  58,
+                                                       "SizeX":  1,
+                                                       "SizeY":  4
+                                                   },
+                                      "PipePoints":  "0,0;0,3",
+                                      "Thickness":  8,
+                                      "StartFitting":  "None",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Valve",
+                                      "Title":  "LV 25 (Прием)",
+                                      "Position":  {
+                                                       "Row":  9,
+                                                       "Col":  55,
+                                                       "SizeX":  6,
+                                                       "SizeY":  6
+                                                   },
+                                      "ValveType":  "CutOff",
+                                      "ActuatorType":  "Solenoid",
+                                      "IsVertical":  true,
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00015",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "FeedbackSource":  {
+                                                             "ConnId":  "wb_mma_park",
+                                                             "Address":  "10022",
+                                                             "DataType":  "Bool"
+                                                         },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#D50000"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Впуск в Емк 25",
+                                      "Position":  {
+                                                       "Row":  14,
+                                                       "Col":  58,
+                                                       "SizeX":  1,
+                                                       "SizeY":  3
+                                                   },
+                                      "PipePoints":  "0,0;0,2",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "PilotLight",
+                                      "Title":  "Lmax 22",
+                                      "Position":  {
+                                                       "Row":  14,
+                                                       "Col":  12,
+                                                       "SizeX":  4,
+                                                       "SizeY":  3
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10001",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "TrueColor":  "#FF1744",
+                                      "FalseColor":  "#263238"
+                                  },
+                                  {
+                                      "Type":  "Tank",
+                                      "Title":  "Емкость 22 (500 м³)",
+                                      "Position":  {
+                                                       "Row":  17,
+                                                       "Col":  3,
+                                                       "SizeX":  14,
+                                                       "SizeY":  17
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30001",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F0} мм",
+                                      "MinValue":  0,
+                                      "MaxValue":  9250
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Т 22",
+                                      "Position":  {
+                                                       "Row":  35,
+                                                       "Col":  12,
+                                                       "SizeX":  7,
+                                                       "SizeY":  3
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30009",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F1} °C"
+                                  },
+                                  {
+                                      "Type":  "PilotLight",
+                                      "Title":  "Lmax 23",
+                                      "Position":  {
+                                                       "Row":  14,
+                                                       "Col":  28,
+                                                       "SizeX":  4,
+                                                       "SizeY":  3
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10002",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "TrueColor":  "#FF1744",
+                                      "FalseColor":  "#263238"
+                                  },
+                                  {
+                                      "Type":  "Tank",
+                                      "Title":  "Емкость 23 (500 м³)",
+                                      "Position":  {
+                                                       "Row":  17,
+                                                       "Col":  19,
+                                                       "SizeX":  14,
+                                                       "SizeY":  17
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30003",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F0} мм",
+                                      "MinValue":  0,
+                                      "MaxValue":  9250
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Т 23",
+                                      "Position":  {
+                                                       "Row":  35,
+                                                       "Col":  28,
+                                                       "SizeX":  7,
+                                                       "SizeY":  3
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30011",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F1} °C"
+                                  },
+                                  {
+                                      "Type":  "PilotLight",
+                                      "Title":  "Lmax 24",
+                                      "Position":  {
+                                                       "Row":  14,
+                                                       "Col":  44,
+                                                       "SizeX":  4,
+                                                       "SizeY":  3
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10003",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "TrueColor":  "#FF1744",
+                                      "FalseColor":  "#263238"
+                                  },
+                                  {
+                                      "Type":  "Tank",
+                                      "Title":  "Емкость 24 (500 м³)",
+                                      "Position":  {
+                                                       "Row":  17,
+                                                       "Col":  35,
+                                                       "SizeX":  14,
+                                                       "SizeY":  17
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30005",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F0} мм",
+                                      "MinValue":  0,
+                                      "MaxValue":  9250
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Т 24",
+                                      "Position":  {
+                                                       "Row":  35,
+                                                       "Col":  44,
+                                                       "SizeX":  7,
+                                                       "SizeY":  3
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30013",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F1} °C"
+                                  },
+                                  {
+                                      "Type":  "PilotLight",
+                                      "Title":  "Lmax 25",
+                                      "Position":  {
+                                                       "Row":  14,
+                                                       "Col":  60,
+                                                       "SizeX":  4,
+                                                       "SizeY":  3
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10004",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "TrueColor":  "#FF1744",
+                                      "FalseColor":  "#263238"
+                                  },
+                                  {
+                                      "Type":  "Tank",
+                                      "Title":  "Емкость 25 (500 м³)",
+                                      "Position":  {
+                                                       "Row":  17,
+                                                       "Col":  51,
+                                                       "SizeX":  14,
+                                                       "SizeY":  17
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30007",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F0} мм",
+                                      "MinValue":  0,
+                                      "MaxValue":  9250
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Т 25",
+                                      "Position":  {
+                                                       "Row":  35,
+                                                       "Col":  60,
+                                                       "SizeX":  7,
+                                                       "SizeY":  3
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30015",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F1} °C"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Слив из Емк 22",
+                                      "Position":  {
+                                                       "Row":  34,
+                                                       "Col":  10,
+                                                       "SizeX":  1,
+                                                       "SizeY":  3
+                                                   },
+                                      "PipePoints":  "0,0;0,2",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Valve",
+                                      "Title":  "V 22 (Выход)",
+                                      "Position":  {
+                                                       "Row":  37,
+                                                       "Col":  7,
+                                                       "SizeX":  6,
+                                                       "SizeY":  6
+                                                   },
+                                      "ValveType":  "CutOff",
+                                      "ActuatorType":  "Manual",
+                                      "IsVertical":  true,
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10017",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#D50000"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Опуск 22 в коллектор",
+                                      "Position":  {
+                                                       "Row":  42,
+                                                       "Col":  10,
+                                                       "SizeX":  1,
+                                                       "SizeY":  4
+                                                   },
+                                      "PipePoints":  "0,0;0,3",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "None",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Слив из Емк 23",
+                                      "Position":  {
+                                                       "Row":  34,
+                                                       "Col":  26,
+                                                       "SizeX":  1,
+                                                       "SizeY":  3
+                                                   },
+                                      "PipePoints":  "0,0;0,2",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Valve",
+                                      "Title":  "V 23 (Выход)",
+                                      "Position":  {
+                                                       "Row":  37,
+                                                       "Col":  23,
+                                                       "SizeX":  6,
+                                                       "SizeY":  6
+                                                   },
+                                      "ValveType":  "CutOff",
+                                      "ActuatorType":  "Manual",
+                                      "IsVertical":  true,
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10019",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#D50000"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Опуск 23 в коллектор",
+                                      "Position":  {
+                                                       "Row":  42,
+                                                       "Col":  26,
+                                                       "SizeX":  1,
+                                                       "SizeY":  4
+                                                   },
+                                      "PipePoints":  "0,0;0,3",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "None",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Слив из Емк 24",
+                                      "Position":  {
+                                                       "Row":  34,
+                                                       "Col":  42,
+                                                       "SizeX":  1,
+                                                       "SizeY":  3
+                                                   },
+                                      "PipePoints":  "0,0;0,2",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Valve",
+                                      "Title":  "V 24 (Выход)",
+                                      "Position":  {
+                                                       "Row":  37,
+                                                       "Col":  39,
+                                                       "SizeX":  6,
+                                                       "SizeY":  6
+                                                   },
+                                      "ValveType":  "CutOff",
+                                      "ActuatorType":  "Manual",
+                                      "IsVertical":  true,
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10021",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#D50000"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Опуск 24 в коллектор",
+                                      "Position":  {
+                                                       "Row":  42,
+                                                       "Col":  42,
+                                                       "SizeX":  1,
+                                                       "SizeY":  4
+                                                   },
+                                      "PipePoints":  "0,0;0,3",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "None",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Слив из Емк 25",
+                                      "Position":  {
+                                                       "Row":  34,
+                                                       "Col":  58,
+                                                       "SizeX":  1,
+                                                       "SizeY":  3
+                                                   },
+                                      "PipePoints":  "0,0;0,2",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Valve",
+                                      "Title":  "V 25 (Выход)",
+                                      "Position":  {
+                                                       "Row":  37,
+                                                       "Col":  55,
+                                                       "SizeX":  6,
+                                                       "SizeY":  6
+                                                   },
+                                      "ValveType":  "CutOff",
+                                      "ActuatorType":  "Manual",
+                                      "IsVertical":  true,
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10023",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#D50000"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Опуск 25 в коллектор",
+                                      "Position":  {
+                                                       "Row":  42,
+                                                       "Col":  58,
+                                                       "SizeX":  1,
+                                                       "SizeY":  4
+                                                   },
+                                      "PipePoints":  "0,0;0,3",
+                                      "Thickness":  8,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "None",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Всасывающий коллектор насосов",
+                                      "Position":  {
+                                                       "Row":  45.5,
+                                                       "Col":  10,
+                                                       "SizeX":  50,
+                                                       "SizeY":  1
+                                                   },
+                                      "PipePoints":  "0,0;49,0",
+                                      "Thickness":  10,
+                                      "StartFitting":  "Cap",
+                                      "EndFitting":  "None",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "Pump",
+                                      "Title":  "Насос 502в (ГХН)",
+                                      "Position":  {
+                                                       "Row":  48,
+                                                       "Col":  8,
+                                                       "SizeX":  7,
+                                                       "SizeY":  7
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10013",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#455A64"
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Давление 502в",
+                                      "Position":  {
+                                                       "Row":  56,
+                                                       "Col":  6,
+                                                       "SizeX":  11,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30017",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F1} кгс"
+                                  },
+                                  {
+                                      "Type":  "CommandButton",
+                                      "Title":  "Пуск 502в",
+                                      "Position":  {
+                                                       "Row":  61,
+                                                       "Col":  6,
+                                                       "SizeX":  6,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00007",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ButtonMode":  "Momentary"
+                                  },
+                                  {
+                                      "Type":  "CommandButton",
+                                      "Title":  "Стоп 502в",
+                                      "Position":  {
+                                                       "Row":  61,
+                                                       "Col":  12,
+                                                       "SizeX":  6,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00008",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ButtonMode":  "Momentary"
+                                  },
+                                  {
+                                      "Type":  "Pump",
+                                      "Title":  "Насос 502г (ГХН)",
+                                      "Position":  {
+                                                       "Row":  48,
+                                                       "Col":  25,
+                                                       "SizeX":  7,
+                                                       "SizeY":  7
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10014",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#455A64"
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Давление 502г",
+                                      "Position":  {
+                                                       "Row":  56,
+                                                       "Col":  23,
+                                                       "SizeX":  11,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30019",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F1} кгс"
+                                  },
+                                  {
+                                      "Type":  "CommandButton",
+                                      "Title":  "Пуск 502г",
+                                      "Position":  {
+                                                       "Row":  61,
+                                                       "Col":  23,
+                                                       "SizeX":  6,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00010",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ButtonMode":  "Momentary"
+                                  },
+                                  {
+                                      "Type":  "CommandButton",
+                                      "Title":  "Стоп 502г",
+                                      "Position":  {
+                                                       "Row":  61,
+                                                       "Col":  29,
+                                                       "SizeX":  6,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00011",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ButtonMode":  "Momentary"
+                                  },
+                                  {
+                                      "Type":  "Pump",
+                                      "Title":  "Насос 502д (СВН)",
+                                      "Position":  {
+                                                       "Row":  48,
+                                                       "Col":  42,
+                                                       "SizeX":  7,
+                                                       "SizeY":  7
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "10015",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#455A64"
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Давление 502д",
+                                      "Position":  {
+                                                       "Row":  56,
+                                                       "Col":  40,
+                                                       "SizeX":  11,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30021",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F1} кгс"
+                                  },
+                                  {
+                                      "Type":  "CommandButton",
+                                      "Title":  "Пуск 502д",
+                                      "Position":  {
+                                                       "Row":  61,
+                                                       "Col":  40,
+                                                       "SizeX":  6,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00004",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ButtonMode":  "Momentary"
+                                  },
+                                  {
+                                      "Type":  "CommandButton",
+                                      "Title":  "Стоп 502д",
+                                      "Position":  {
+                                                       "Row":  61,
+                                                       "Col":  46,
+                                                       "SizeX":  6,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00005",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ButtonMode":  "Momentary"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Напорный коллектор отгрузки",
+                                      "Position":  {
+                                                       "Row":  51.5,
+                                                       "Col":  49,
+                                                       "SizeX":  23,
+                                                       "SizeY":  1
+                                                   },
+                                      "PipePoints":  "0,0;22,0",
+                                      "Thickness":  10,
+                                      "StartFitting":  "None",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Расход налива FT2-1",
+                                      "Position":  {
+                                                       "Row":  39,
+                                                       "Col":  70,
+                                                       "SizeX":  13,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30037",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F0} кг/ч"
+                                  },
+                                  {
+                                      "Type":  "ValueDisplay",
+                                      "Title":  "Остаток дозы",
+                                      "Position":  {
+                                                       "Row":  39,
+                                                       "Col":  84,
+                                                       "SizeX":  13,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "30047",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F0} кг"
+                                  },
+                                  {
+                                      "Type":  "Valve",
+                                      "Title":  "Отсечной кран налива",
+                                      "Position":  {
+                                                       "Row":  48.5,
+                                                       "Col":  72,
+                                                       "SizeX":  6,
+                                                       "SizeY":  6
+                                                   },
+                                      "ValveType":  "CutOff",
+                                      "ActuatorType":  "Pneumatic",
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00016",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "FeedbackSource":  {
+                                                             "ConnId":  "wb_mma_park",
+                                                             "Address":  "10024",
+                                                             "DataType":  "Bool"
+                                                         },
+                                      "ActiveColor":  "#00E676",
+                                      "InactiveColor":  "#D50000"
+                                  },
+                                  {
+                                      "Type":  "Pipe",
+                                      "Title":  "Линия налива в цистерну",
+                                      "Position":  {
+                                                       "Row":  51.5,
+                                                       "Col":  78,
+                                                       "SizeX":  20,
+                                                       "SizeY":  1
+                                                   },
+                                      "PipePoints":  "0,0;19,0",
+                                      "Thickness":  10,
+                                      "StartFitting":  "Flange",
+                                      "EndFitting":  "Flange",
+                                      "ShowFlanges":  true
+                                  },
+                                  {
+                                      "Type":  "SetValue",
+                                      "Title":  "Задать дозу",
+                                      "Position":  {
+                                                       "Row":  45,
+                                                       "Col":  84,
+                                                       "SizeX":  13,
+                                                       "SizeY":  5
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "40027",
+                                                     "DataType":  "Float32"
+                                                 },
+                                      "Format":  "{0:F0} кг",
+                                      "MinValue":  0,
+                                      "MaxValue":  60000
+                                  },
+                                  {
+                                      "Type":  "CommandButton",
+                                      "Title":  "Пуск налива",
+                                      "Position":  {
+                                                       "Row":  55,
+                                                       "Col":  70,
+                                                       "SizeX":  13,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00017",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ButtonMode":  "Toggle"
+                                  },
+                                  {
+                                      "Type":  "CommandButton",
+                                      "Title":  "Сброс дозы",
+                                      "Position":  {
+                                                       "Row":  55,
+                                                       "Col":  84,
+                                                       "SizeX":  13,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00018",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ButtonMode":  "Momentary"
+                                  },
+                                  {
+                                      "Type":  "CommandButton",
+                                      "Title":  "Квитировать аварии",
+                                      "Position":  {
+                                                       "Row":  61,
+                                                       "Col":  70,
+                                                       "SizeX":  27,
+                                                       "SizeY":  4
+                                                   },
+                                      "Source":  {
+                                                     "ConnId":  "wb_mma_park",
+                                                     "Address":  "00019",
+                                                     "DataType":  "Bool"
+                                                 },
+                                      "ButtonMode":  "Momentary"
+                                  }
+                              ]
+              }
 }
