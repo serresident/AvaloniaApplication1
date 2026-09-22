@@ -519,6 +519,30 @@
   - [x] Headless-рендеринг `MimicView` и `ValveControlPopupView`
   - [x] Сборка решения: 0 ошибок, 0 предупреждений
 
+# Tasks: 511 ContainerButtons, Settings Window, Password Protection & Runtime UI (Сессия 34 — Выполнено)
+
+- [x] Реорганизация функций 511 аппарата:
+  - [x] Упаковка 8 SetValue виджетов в 2 `ContainerButton` («🎛️ Уставки дозирования и нагрева», «⚙️ Параметры ПИД и pH»)
+  - [x] Синхронизация `config.json` и `Assets/default_config.json`
+- [x] Режим запуска приложения:
+  - [x] Установка дефолтного запуска в режиме Runtime (`IsDesignMode = false`) в `ProjectContextService.cs`
+- [x] Защита режима редактирования паролем:
+  - [x] Добавление `SecurityConfig` (`RequirePasswordForDesignMode`, `DesignModePassword`) в `HmiConfiguration.cs`
+  - [x] Создание `PasswordPromptViewModel.cs` и `PasswordPromptWindow.axaml` с виртуальным PIN-падом
+  - [x] Запрос пароля при переключении `ToggleDesignModeCommand` в `MainViewModel.cs`
+- [x] Окно настроек (`SettingsWindow`):
+  - [x] Разработка `SettingsViewModel.cs` и `SettingsWindow.axaml` с 4 вкладками (Проект, Мнемосхема, Безопасность, Связь)
+  - [x] Интеграция команд вызова `OpenSettingsCommand` (`Ctrl+,`)
+- [x] Очистка панели управления в Runtime:
+  - [x] Скрытие вкладок дашборда, кнопок загрузки/сохранения и симуляции в режиме исполнения
+  - [x] Отображение только бейджа `📁 {CurrentProjectName}` и кнопки входа в режим редактирования
+- [x] Тестирование и верификация:
+  - [x] Разработан автоматический тест №13 в `AvaloniaApplication1.UIValidation`
+  - [x] Успешное выполнение всех 13 тестов (13/13 PASS, 100%)
+  - [x] Headless-рендеринг `MainWindow`, `SettingsWindow`, `PasswordPromptWindow`
+  - [x] Чистая сборка: 0 ошибок, 0 предупреждений
+
+
 
 
 

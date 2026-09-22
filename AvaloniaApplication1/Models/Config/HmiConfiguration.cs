@@ -6,6 +6,7 @@ namespace AvaloniaApplication1.Models.Config
     public class HmiConfiguration
     {
         public ProjectConfig Project { get; set; } = new();
+        public SecurityConfig Security { get; set; } = new();
         public List<ConnectionConfig> Connections { get; set; } = new();
         public List<BridgeRuleConfig> BridgeRules { get; set; } = new();
         public DashboardConfig Dashboard { get; set; } = new();
@@ -16,6 +17,12 @@ namespace AvaloniaApplication1.Models.Config
     {
         public string Name { get; set; } = string.Empty;
         public string Version { get; set; } = "1.0.0";
+    }
+
+    public class SecurityConfig
+    {
+        public bool RequirePasswordForDesignMode { get; set; } = false;
+        public string DesignModePassword { get; set; } = "1234";
     }
 
     public class ConnectionConfig

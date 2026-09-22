@@ -3,6 +3,10 @@
     "Name": "Аппарат 511 - Отделение азосочетания (Цех 15)",
     "Version": "1.0.0"
   },
+  "Security": {
+    "RequirePasswordForDesignMode": false,
+    "DesignModePassword": "1234"
+  },
   "Connections": [
     {
       "Id": "plc_511",
@@ -90,148 +94,176 @@
         "Format": "{0:F1} м³/ч"
       },
       {
-        "Type": "SetValue",
-        "Title": "Уставка Т нагрева",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40121",
-          "DataType": "Float32"
-        },
+        "Type": "ContainerButton",
+        "Title": "🎛️ Уставки дозирования и нагрева",
         "Position": {
           "Row": 0,
           "Col": 4,
-          "SizeX": 1,
-          "SizeY": 1
+          "SizeX": 2,
+          "SizeY": 2
         },
-        "MinValue": 0,
-        "MaxValue": 100,
-        "Format": "{0:F1} °C"
+        "CellSize": 140,
+        "ZoomScale": 1.0,
+        "Children": [
+          {
+            "Type": "SetValue",
+            "Title": "Уставка Т нагрева",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40121",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 0,
+              "Col": 0,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 100,
+            "Format": "{0:F1} °C"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "Уставка дозы воды",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40119",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 0,
+              "Col": 1,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 20,
+            "Format": "{0:F1} м³"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "Уставка диазо",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40123",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 1,
+              "Col": 0,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 25,
+            "Format": "{0:F1} м³/ч"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "Целевой pH",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40153",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 1,
+              "Col": 1,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 7,
+            "MaxValue": 12,
+            "Format": "{0:F2} pH"
+          }
+        ]
       },
       {
-        "Type": "SetValue",
-        "Title": "Уставка дозы воды",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40119",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 0,
-          "Col": 5,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 0,
-        "MaxValue": 20,
-        "Format": "{0:F1} м³"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Уставка диазо",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40123",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 1,
-          "Col": 4,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 0,
-        "MaxValue": 25,
-        "Format": "{0:F1} м³/ч"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "Целевой pH",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40153",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 1,
-          "Col": 5,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 7,
-        "MaxValue": 12,
-        "Format": "{0:F2} pH"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "ПИД пара: Kp",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40133",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 2,
-          "Col": 4,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 0,
-        "MaxValue": 50,
-        "Format": "{0:F1}"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "ПИД пара: Tn",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40135",
-          "DataType": "Float32"
-        },
+        "Type": "ContainerButton",
+        "Title": "⚙️ Параметры ПИД и pH",
         "Position": {
           "Row": 2,
-          "Col": 5,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 0,
-        "MaxValue": 100,
-        "Format": "{0:F1} с"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "pH Мин",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40149",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 3,
           "Col": 4,
-          "SizeX": 1,
-          "SizeY": 1
+          "SizeX": 2,
+          "SizeY": 2
         },
-        "MinValue": 7,
-        "MaxValue": 12,
-        "Format": "{0:F2} pH"
-      },
-      {
-        "Type": "SetValue",
-        "Title": "pH Макс",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40151",
-          "DataType": "Float32"
-        },
-        "Position": {
-          "Row": 3,
-          "Col": 5,
-          "SizeX": 1,
-          "SizeY": 1
-        },
-        "MinValue": 7,
-        "MaxValue": 14,
-        "Format": "{0:F2} pH"
+        "CellSize": 140,
+        "ZoomScale": 1.0,
+        "Children": [
+          {
+            "Type": "SetValue",
+            "Title": "ПИД пара: Kp",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40133",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 0,
+              "Col": 0,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 50,
+            "Format": "{0:F1}"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "ПИД пара: Tn",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40135",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 0,
+              "Col": 1,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 100,
+            "Format": "{0:F1} с"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "pH Мин",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40149",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 1,
+              "Col": 0,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 7,
+            "MaxValue": 12,
+            "Format": "{0:F2} pH"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "pH Макс",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40151",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 1,
+              "Col": 1,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 7,
+            "MaxValue": 14,
+            "Format": "{0:F2} pH"
+          }
+        ]
       }
     ]
   },

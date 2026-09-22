@@ -26,41 +26,55 @@
         <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenProjectCommand}" />
         <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveConfigCommand}" />
         <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveConfigAsCommand}" />
+        <KeyBinding Gesture="Ctrl+OemComma" Command="{Binding OpenSettingsCommand}" />
     </Window.KeyBindings>
 
     <Grid RowDefinitions="Auto,*">
         <Border Grid.Row="0" Background="#333337" Padding="8,4">
             <Grid ColumnDefinitions="Auto,*,Auto">
-                <!-- Left Section: Navigation & Window Count -->
+                <!-- Left Section: Title, Windows Count, Tabs (in Design) -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <TextBlock Text="HMI Dashboard" Foreground="White" FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBlock Text="HMI SCADA" Foreground="White" FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0" />
                     <TextBlock Text="{Binding ActiveChildWindows.Count, StringFormat='[{0}]'}" Foreground="#FF5252" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" ToolTip.Tip="Количество открытых окон" />
+                    
+                    <!-- Dashboard tab visible in Design mode -->
                     <Button Command="{Binding ShowDashboardCommand}"
                             Content="📊 Дашборд"
                             Background="{Binding IsMimicActive, Converter={StaticResource DashboardTabColor}}"
-                            Foreground="White" CornerRadius="4" Padding="10,4" BorderThickness="0" />
+                            Foreground="White" CornerRadius="4" Padding="10,4" BorderThickness="0"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}" />
                     <Button Command="{Binding ShowMimicCommand}"
                             Content="📐 Мнемосхема"
                             Background="{Binding IsMimicActive, Converter={StaticResource MimicTabColor}}"
-                            Foreground="White" CornerRadius="4" Padding="10,4" BorderThickness="0" />
+                            Foreground="White" CornerRadius="4" Padding="10,4" BorderThickness="0"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}" />
                 </StackPanel>
 
-                <!-- Right Section: Projects, Tools & Mode Switch -->
+                <!-- Right Section: Current Config Badge, Settings & Mode Switch -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                     <!-- Active Project Name Badge (ALWAYS VISIBLE) -->
-                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="6,3"
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             VerticalAlignment="Center"
                             ToolTip.Tip="Текущий активный файл конфигурации проекта">
                         <TextBlock Text="{Binding CurrentProjectName, StringFormat='📁 {0}'}" 
-                                   Foreground="#9CDCFE" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                   Foreground="#9CDCFE" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Border>
 
-                    <!-- Open Project Button (ALWAYS VISIBLE) -->
+                    <!-- Settings Button (Design mode) -->
+                    <Button Command="{Binding OpenSettingsCommand}"
+                            Content="⚙️ Настройки"
+                            Background="#3E3E42"
+                            Foreground="White" CornerRadius="4" Padding="8,4"
+                            ToolTip.Tip="Настройки проекта, мнемосхемы и пароля"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+
+                    <!-- Open Project Button (Design mode) -->
                     <Button Command="{Binding OpenProjectCommand}"
                             Content="📂 Загрузить..."
                             Background="#0E639C"
                             Foreground="White" CornerRadius="4" Padding="8,4"
-                            ToolTip.Tip="Загрузить проект из файла JSON (Ctrl+O)"/>
+                            ToolTip.Tip="Загрузить проект из файла JSON (Ctrl+O)"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
 
                     <!-- Save Project Button -->
                     <Button Command="{Binding SaveConfigCommand}"
@@ -85,6 +99,8 @@
                             Foreground="White" CornerRadius="4" Padding="7,4"
                             ToolTip.Tip="Менеджер подключений (Modbus, MQTT)"
                             IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+
+                    <!-- Simulation Controls -->
                     <Button Command="{Binding ToggleSimulationCommand}"
                             Background="{Binding IsSimulationRunning, Converter={StaticResource BoolToColor}}"
                             Foreground="White" CornerRadius="4" Padding="7,4"
@@ -104,10 +120,12 @@
                             Foreground="White" CornerRadius="4" Padding="6,4"
                             ToolTip.Tip="Сбросить симуляцию к начальным значениям"
                             IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+
+                    <!-- Mode Toggle Button (ALWAYS VISIBLE) -->
                     <Button Command="{Binding ToggleDesignModeCommand}" 
                             Background="{Binding ProjectContext.IsDesignMode, Converter={StaticResource BoolToColor}}" 
                             Foreground="White" CornerRadius="4" Padding="8,4"
-                            ToolTip.Tip="Переключить режим редактирования мнемосхемы и виджетов (Ctrl+E)">
+                            ToolTip.Tip="Переключить режим редактирования (Ctrl+E)">
                         <Button.Content>
                             <Binding Path="ProjectContext.IsDesignMode">
                                 <Binding.Converter>

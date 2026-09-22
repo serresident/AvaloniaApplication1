@@ -199,6 +199,59 @@ namespace AvaloniaApplication1.Services
             await window.ShowDialog(MainWindow);
         }
 
+        public async Task<bool> PromptPasswordAsync(string expectedPassword, string title = "Вход в режим редактирования")
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var vm = new PasswordPromptViewModel
+            {
+                Title = title,
+                ExpectedPassword = expectedPassword
+            };
+
+            if (MainWindow != null)
+            {
+                var window = new PasswordPromptWindow
+                {
+                    DataContext = vm
+                };
+                vm.OnResult = (success) =>
+                {
+                    tcs.TrySetResult(success);
+                    window.Close();
+                };
+                await window.ShowDialog(MainWindow);
+                return await tcs.Task;
+            }
+            else if (ChildWindowService != null)
+            {
+                var childWindow = ChildWindowService.OpenChildWindow(title, vm);
+                if (childWindow != null)
+                {
+                    childWindow.Width = 360;
+                    childWindow.Height = 440;
+                    vm.OnResult = (success) =>
+                    {
+                        tcs.TrySetResult(success);
+                        childWindow.CloseCommand.Execute(null);
+                    };
+                    return await tcs.Task;
+                }
+            }
+
+            return false;
+        }
+
+        public async Task ShowSettingsAsync(HmiConfiguration config, IConfigurationService configService)
+        {
+            if (MainWindow == null) return;
+
+            var window = new SettingsWindow();
+            var vm = new SettingsViewModel(config, configService, this, () => window.Close());
+            window.DataContext = vm;
+
+            await window.ShowDialog(MainWindow);
+        }
+
         public async Task<string?> ShowOpenProjectDialogAsync()
         {
             if (MainWindow == null) return null;

@@ -128,6 +128,24 @@ public static class Program
                     Console.WriteLine($"[UIValidation] Preloaded config path: {Path.GetFullPath(mmaConfigPath)}");
                 }
             }
+            else
+            {
+                string[] defaultCandidates = new[]
+                {
+                    "config.json",
+                    Path.Combine("AvaloniaApplication1", "config.json"),
+                    Path.Combine("..", "AvaloniaApplication1", "config.json"),
+                    Path.Combine(AppContext.BaseDirectory, "config.json"),
+                    Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "AvaloniaApplication1", "config.json")
+                };
+
+                string? defConfigPath = defaultCandidates.FirstOrDefault(File.Exists);
+                if (defConfigPath != null)
+                {
+                    configService.CurrentFilePath = defConfigPath;
+                    Console.WriteLine($"[UIValidation] Preloaded default config path: {Path.GetFullPath(defConfigPath)}");
+                }
+            }
 
             var services = new ServiceCollection();
             services.AddSingleton<IProjectContextService, ProjectContextService>();
@@ -226,6 +244,39 @@ public static class Program
                     {
                         DataContext = popupVm
                     }
+                };
+            }
+            else if (string.Equals(targetView, "SettingsWindow", StringComparison.OrdinalIgnoreCase))
+            {
+                var cfgService = sp.GetRequiredService<IConfigurationService>();
+                var settingsVm = new SettingsViewModel(new HmiConfiguration
+                {
+                    Project = new ProjectConfig { Name = "Аппарат 511 - Цех 15", Version = "1.0.0" },
+                    Security = new SecurityConfig { RequirePasswordForDesignMode = true, DesignModePassword = "1234" },
+                    Mimic = new DashboardConfig { CellSize = 10, ZoomScale = 1.0 }
+                }, cfgService, sp.GetRequiredService<IDialogService>());
+
+                window = new SettingsWindow
+                {
+                    DataContext = settingsVm,
+                    Width = 700,
+                    Height = 550
+                };
+            }
+            else if (string.Equals(targetView, "PasswordPromptWindow", StringComparison.OrdinalIgnoreCase))
+            {
+                var promptVm = new PasswordPromptViewModel
+                {
+                    Title = "Вход в режим редактирования",
+                    ExpectedPassword = "1234",
+                    Password = "12"
+                };
+
+                window = new PasswordPromptWindow
+                {
+                    DataContext = promptVm,
+                    Width = 360,
+                    Height = 450
                 };
             }
             else
@@ -630,7 +681,59 @@ public static class Program
         if (!popupVm.HasClosedFeedbackSource || !popupVm.IsOpenLimitSwitch || !popupVm.IsClosedLimitSwitch || !popupVm.IsSensorFault)
             throw new Exception("ValveControlPopupViewModel did not correctly reflect dual limit switch state.");
 
-        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (12/12) PASSED SUCCESSFULLY!");
+        // 13. Test SecurityConfig, Password Protection, Runtime Startup & ContainerButton Packaging
+        Console.WriteLine("[Validation] Running Test 13: Security Config, Password Protection & 511 ContainerButtons...");
+        
+        // 13.1 Default startup mode is Runtime (IsDesignMode = false)
+        var freshProjContext = new ProjectContextService();
+        if (freshProjContext.IsDesignMode)
+            throw new Exception("Default startup mode is NOT Runtime (IsDesignMode should be false).");
+
+        // 13.2 PasswordPromptViewModel logic
+        var promptTestVm = new PasswordPromptViewModel
+        {
+            ExpectedPassword = "5555",
+            Password = "wrong"
+        };
+        bool? promptResult = null;
+        promptTestVm.OnResult = res => promptResult = res;
+
+        promptTestVm.ConfirmCommand.Execute(null);
+        if (!promptTestVm.HasError || promptResult.HasValue)
+            throw new Exception("PasswordPromptViewModel failed to reject incorrect password.");
+
+        promptTestVm.ClearCommand.Execute(null);
+        promptTestVm.AppendDigitCommand.Execute("5");
+        promptTestVm.AppendDigitCommand.Execute("5");
+        promptTestVm.AppendDigitCommand.Execute("5");
+        promptTestVm.AppendDigitCommand.Execute("5");
+        promptTestVm.ConfirmCommand.Execute(null);
+
+        if (promptTestVm.HasError || promptResult != true)
+            throw new Exception("PasswordPromptViewModel failed to accept correct password '5555'.");
+
+        // 13.3 Test 511 default_config ContainerButton packaging
+        var config511Path = Path.Combine(AppContext.BaseDirectory, "config.json");
+        if (!File.Exists(config511Path))
+            config511Path = Path.Combine("..", "..", "..", "..", "AvaloniaApplication1", "config.json");
+
+        if (File.Exists(config511Path))
+        {
+            var config511Json = File.ReadAllText(config511Path);
+            var parsed511 = JsonSerializer.Deserialize<HmiConfiguration>(config511Json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (parsed511 == null)
+                throw new Exception("Failed to deserialize 511 config.json.");
+
+            var containerButtons = parsed511.Dashboard.Widgets.OfType<ContainerButtonConfig>().ToList();
+            if (containerButtons.Count < 2)
+                throw new Exception($"Expected at least 2 ContainerButtons for 511 apparatus, found {containerButtons.Count}.");
+
+            int totalChildren = containerButtons.Sum(c => c.Children?.Count ?? 0);
+            if (totalChildren < 8)
+                throw new Exception($"Expected 8 encapsulated SetValue widgets inside ContainerButtons, found {totalChildren}.");
+        }
+
+        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (13/13) PASSED SUCCESSFULLY!");
     }
 
     private static VisualTreeNode DumpVisualTree(Visual visual)

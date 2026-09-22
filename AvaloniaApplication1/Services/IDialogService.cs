@@ -15,6 +15,10 @@ namespace AvaloniaApplication1.Services
         Task<ConnectionConfig?> ShowConnectionEditorAsync(ConnectionConfig? existingConfig);
         Task ShowConnectionManagerAsync(HmiConfiguration config);
 
+        // Security & Settings
+        Task<bool> PromptPasswordAsync(string expectedPassword, string title = "Вход в режим редактирования");
+        Task ShowSettingsAsync(HmiConfiguration config, IConfigurationService configService);
+
         // Project File dialogs
         Task<string?> ShowOpenProjectDialogAsync();
         Task<string?> ShowSaveProjectAsDialogAsync(string? defaultFileName = null);

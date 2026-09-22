@@ -1,0 +1,182 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        xmlns:cfg="clr-namespace:AvaloniaApplication1.Models.Config"
+        xmlns:c="clr-namespace:AvaloniaApplication1.Converters"
+        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="550"
+        x:Class="AvaloniaApplication1.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        x:CompileBindings="True"
+        Title="Настройки системы и мнемосхемы"
+        Width="700" Height="550"
+        MinWidth="600" MinHeight="450"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="16">
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#2D2D30" CornerRadius="6" Padding="14,10" Margin="0,0,0,12" BorderBrush="#3E3E42" BorderThickness="1">
+            <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0" Text="⚙️" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="Настройки мнемосхемы и проекта" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
+                    <TextBlock Text="Конфигурация технологической схемы, параметров защиты и коммуникаций" FontSize="12" Foreground="#858585" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Tab Control -->
+        <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="12">
+            <!-- TAB 1: Проект -->
+            <TabItem Header="📁 Проект и файл" FontSize="13">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="14" Margin="10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Название технологического проекта:" Foreground="#D4D4D4" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding ProjectName, Mode=TwoWay}"
+                                     Background="#1E1E1E" Foreground="#9CDCFE" BorderBrush="#3E3E42" Height="32" CornerRadius="4" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Версия проекта:" Foreground="#D4D4D4" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding ProjectVersion, Mode=TwoWay}"
+                                     Background="#1E1E1E" Foreground="#9CDCFE" BorderBrush="#3E3E42" Height="32" CornerRadius="4" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Текущий файл конфигурации (JSON):" Foreground="#D4D4D4" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding CurrentFilePath}"
+                                     IsReadOnly="True"
+                                     Background="#1A1A1A" Foreground="#CE9178" BorderBrush="#3E3E42" Height="32" CornerRadius="4" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB 2: Мнемосхема -->
+            <TabItem Header="📐 Мнемосхема" FontSize="13">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="16" Margin="10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Размер ячейки сетки мнемосхемы (пикселей):" Foreground="#D4D4D4" FontWeight="SemiBold" />
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                                <Slider Grid.Column="0"
+                                        Minimum="5" Maximum="40"
+                                        Value="{Binding MimicCellSize, Mode=TwoWay}"
+                                        VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding MimicCellSize, StringFormat='{}{0} px'}"
+                                           Foreground="#4EC9B0" FontWeight="Bold" FontSize="14"
+                                           VerticalAlignment="Center" Margin="12,0,0,0" Width="60" />
+                            </Grid>
+                            <TextBlock Text="Рекомендуемый шаг: 10 px для схемы 1024x768" FontSize="11" Foreground="#858585" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Масштаб по умолчанию (Zoom Scale):" Foreground="#D4D4D4" FontWeight="SemiBold" />
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                                <Slider Grid.Column="0"
+                                        Minimum="0.5" Maximum="2.0"
+                                        Value="{Binding MimicZoomScale, Mode=TwoWay}"
+                                        VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding MimicZoomScale, StringFormat='{}{0:P0}'}"
+                                           Foreground="#4EC9B0" FontWeight="Bold" FontSize="14"
+                                           VerticalAlignment="Center" Margin="12,0,0,0" Width="60" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB 3: Безопасность -->
+            <TabItem Header="🔒 Безопасность" FontSize="13">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="16" Margin="10">
+                        <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="12">
+                            <StackPanel Spacing="10">
+                                <CheckBox IsChecked="{Binding RequirePassword, Mode=TwoWay}"
+                                          Foreground="#FFFFFF" FontWeight="SemiBold">
+                                    <TextBlock Text="Запрашивать пароль при входе в режим редактирования (Design Mode)"
+                                               TextWrapping="Wrap" VerticalAlignment="Center" />
+                                </CheckBox>
+                                <TextBlock Text="Защищает мнемосхему от случайного изменения оператором в процессе технологического процесса."
+                                           FontSize="11" Foreground="#858585" Margin="28,0,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Spacing="6" IsVisible="{Binding RequirePassword}">
+                            <TextBlock Text="Пароль администратора для режима редактирования:" Foreground="#D4D4D4" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding DesignPassword, Mode=TwoWay}"
+                                     PasswordChar="●"
+                                     Background="#1E1E1E" Foreground="#4EC9B0" BorderBrush="#3E3E42" Height="36" CornerRadius="4" />
+                            <TextBlock Text="По умолчанию: 1234. Поддерживаются любые символы и цифры." FontSize="11" Foreground="#858585" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB 4: Связь -->
+            <TabItem Header="📡 Связь и драйверы" FontSize="13">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="14" Margin="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Сконфигурированные подключения:" Foreground="#D4D4D4" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <Button Grid.Column="1"
+                                    Content="🛠️ Менеджер подключений..."
+                                    Command="{Binding OpenConnectionsManagerCommand}"
+                                    Background="#6A1B9A" Foreground="White"
+                                    Padding="10,6" CornerRadius="4" />
+                        </Grid>
+
+                        <ListBox ItemsSource="{Binding Connections}"
+                                 Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4"
+                                 MinHeight="140">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="cfg:ConnectionConfig">
+                                    <Border Padding="6,4" BorderBrush="#2D2D30" BorderThickness="0,0,0,1">
+                                        <Grid ColumnDefinitions="100,120,*,80">
+                                            <TextBlock Grid.Column="0" Text="{Binding Id}" FontWeight="Bold" Foreground="#4EC9B0" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Type}" Foreground="#DCDCAA" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Host}" Foreground="#9CDCFE" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="3" Text="{Binding PollIntervalMs, StringFormat='{}{0} ms'}" Foreground="#858585" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <!-- Footer / Action Buttons -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" Margin="0,14,0,0" VerticalAlignment="Center">
+            <TextBlock Grid.Column="0"
+                       Text="{Binding StatusMessage}"
+                       Foreground="#4EC9B0"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center" />
+
+            <Button Grid.Column="1"
+                    Content="Отмена"
+                    Command="{Binding CancelCommand}"
+                    Background="#3E3E42"
+                    Foreground="White"
+                    CornerRadius="4"
+                    Padding="14,6"
+                    Margin="0,0,10,0" />
+
+            <Button Grid.Column="2"
+                    Content="💾 Сохранить настройки"
+                    Command="{Binding SaveSettingsCommand}"
+                    Background="#008A00"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    CornerRadius="4"
+                    Padding="16,6" />
+        </Grid>
+    </Grid>
+</Window>

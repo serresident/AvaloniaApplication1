@@ -6,11 +6,7 @@ namespace AvaloniaApplication1.Services
 {
     public class ProjectContextService : IProjectContextService
     {
-#if DEBUG
-        private bool _isDesignMode = true;
-#else
-        private bool _isDesignMode;
-#endif
+        private bool _isDesignMode = false;
 
         public bool IsDesignMode
         {

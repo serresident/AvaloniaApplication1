@@ -106,9 +106,42 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         [RelayCommand]
-        private void ToggleDesignMode()
+        private async Task ToggleDesignModeAsync()
         {
-            ProjectContext.IsDesignMode = !ProjectContext.IsDesignMode;
+            if (!ProjectContext.IsDesignMode)
+            {
+                var reqPassword = _currentConfig?.Security?.RequirePasswordForDesignMode ?? false;
+                if (reqPassword)
+                {
+                    var expected = !string.IsNullOrEmpty(_currentConfig?.Security?.DesignModePassword) 
+                        ? _currentConfig.Security.DesignModePassword 
+                        : "1234";
+
+                    var isSuccess = await _dialogService.PromptPasswordAsync(expected, "Вход в режим редактирования");
+                    if (!isSuccess)
+                    {
+                        ShowToast("Вход отменен или неверный пароль.");
+                        return;
+                    }
+                }
+
+                ProjectContext.IsDesignMode = true;
+                ShowToast("Режим редактирования (Design Mode).");
+            }
+            else
+            {
+                ProjectContext.IsDesignMode = false;
+                ShowToast("Режим исполнения (Runtime).");
+            }
+        }
+
+        [RelayCommand]
+        private async Task OpenSettingsAsync()
+        {
+            if (_currentConfig == null) return;
+            await _dialogService.ShowSettingsAsync(_currentConfig, _configurationService);
+            OnPropertyChanged(nameof(CurrentProjectName));
+            OnPropertyChanged(nameof(WindowTitle));
         }
 
         [ObservableProperty]
