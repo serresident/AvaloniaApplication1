@@ -42,6 +42,24 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _isSelected;
 
+        [ObservableProperty]
+        private double _fontSize;
+
+        [ObservableProperty]
+        private bool _autoScaleText = true;
+
+        [ObservableProperty]
+        private bool _showTitle = true;
+
+        [ObservableProperty]
+        private bool _showBorder = true;
+
+        [ObservableProperty]
+        private string _labelPosition = "Default";
+
+        [ObservableProperty]
+        private bool _compactMode;
+
         public IProjectContextService ProjectContext { get; }
 
         /// <summary>
@@ -61,6 +79,13 @@ namespace AvaloniaApplication1.ViewModels
             SizeX = config.Position.SizeX;
             SizeY = config.Position.SizeY;
             Source = config.Source;
+
+            FontSize = config.FontSize;
+            AutoScaleText = config.AutoScaleText;
+            ShowTitle = config.ShowTitle;
+            ShowBorder = config.ShowBorder;
+            LabelPosition = config.LabelPosition;
+            CompactMode = config.CompactMode;
 
             // --- Rx.NET Data Routing (Phase 1) ---
             if (Source != null && !string.IsNullOrEmpty(Source.ConnId) && !string.IsNullOrEmpty(Source.Address))

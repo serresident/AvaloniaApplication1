@@ -45,6 +45,33 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string _selectedDataType = DataTypes.All[0];
 
+        // --- Layout, Typography & Adaptability ---
+        [ObservableProperty]
+        private bool _showTitle = true;
+
+        [ObservableProperty]
+        private bool _showBorder = true;
+
+        [ObservableProperty]
+        private bool _autoScaleText = true;
+
+        [ObservableProperty]
+        private double _customFontSize = 0;
+
+        public string[] AvailableLabelPositions => new[] { "Bottom", "Top", "Left", "Right", "Inside", "None" };
+
+        [ObservableProperty]
+        private string _selectedLabelPosition = "Bottom";
+
+        [ObservableProperty]
+        private bool _compactMode = false;
+
+        [ObservableProperty]
+        private bool _showStatusText = true;
+
+        [ObservableProperty]
+        private double _labelOffset = 0;
+
         // --- Widget-specific: ValueDisplay ---
         [ObservableProperty]
         private string _format = "{0}";
@@ -209,6 +236,12 @@ namespace AvaloniaApplication1.ViewModels
                 _isEditing = true;
                 SelectedWidgetType = existingConfig.Type;
                 Title = existingConfig.Title;
+                ShowTitle = existingConfig.ShowTitle;
+                ShowBorder = existingConfig.ShowBorder;
+                AutoScaleText = existingConfig.AutoScaleText;
+                CustomFontSize = existingConfig.FontSize;
+                SelectedLabelPosition = existingConfig.LabelPosition ?? "Bottom";
+                CompactMode = existingConfig.CompactMode;
                 Row = existingConfig.Position.Row;
                 Col = existingConfig.Position.Col;
                 SizeX = existingConfig.Position.SizeX;
@@ -240,6 +273,8 @@ namespace AvaloniaApplication1.ViewModels
                     Tolerance = vc.Tolerance; 
                     ModeConnectionId = vc.ModeSource?.ConnId; 
                     ModeAddress = vc.ModeSource?.Address ?? string.Empty; 
+                    ShowStatusText = vc.ShowStatusText;
+                    LabelOffset = vc.LabelOffset;
                 }
                 if (existingConfig is TankConfig tc) { Format = tc.Format; MinValue = tc.MinValue; MaxValue = tc.MaxValue; ValueColor = tc.ValueColor; ValueFontSize = tc.ValueFontSize; }
                 if (existingConfig is PumpConfig pu) { ActiveColor = pu.ActiveColor; InactiveColor = pu.InactiveColor; ControlWindowWidth = pu.ControlWindowWidth; ControlWindowHeight = pu.ControlWindowHeight; }
@@ -393,7 +428,9 @@ namespace AvaloniaApplication1.ViewModels
                     Rotation = SelectedRotation,
                     AlarmDisabled = false,
                     Tolerance = Tolerance == 0 ? 10.0 : Tolerance,
-                    ModeSource = !string.IsNullOrEmpty(ModeAddress) ? new DataSourceConfig { ConnId = ModeConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" } : null
+                    ModeSource = !string.IsNullOrEmpty(ModeAddress) ? new DataSourceConfig { ConnId = ModeConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" } : null,
+                    ShowStatusText = ShowStatusText,
+                    LabelOffset = LabelOffset
                 },
                 "Tank" => new TankConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
                 "Pump" => new PumpConfig { ActiveColor = ActiveColor, InactiveColor = InactiveColor, ControlWindowWidth = ControlWindowWidth, ControlWindowHeight = ControlWindowHeight },
@@ -411,6 +448,12 @@ namespace AvaloniaApplication1.ViewModels
 
             config.Type = SelectedWidgetType;
             config.Title = Title;
+            config.ShowTitle = ShowTitle;
+            config.ShowBorder = ShowBorder;
+            config.AutoScaleText = AutoScaleText;
+            config.FontSize = CustomFontSize;
+            config.LabelPosition = SelectedLabelPosition;
+            config.CompactMode = CompactMode;
             config.Position = new WidgetPosition { Row = Row, Col = Col, SizeX = SizeX, SizeY = SizeY };
             config.Source = new DataSourceConfig { ConnId = SelectedConnectionId ?? string.Empty, Address = Address, DataType = SelectedDataType };
 

@@ -331,7 +331,7 @@
                               "Type": "StackPanel",
                               "Name": null,
                               "Bounds": {
-                                "X": 460,
+                                "X": 438,
                                 "Y": 3,
                                 "Width": 347,
                                 "Height": 23
@@ -487,7 +487,7 @@
                                   ]
                                 },
                                 {
-                                  "Type": "Border",
+                                  "Type": "Button",
                                   "Name": null,
                                   "Bounds": {
                                     "X": 174,
@@ -510,13 +510,13 @@
                                   "IsVisible": true,
                                   "Children": [
                                     {
-                                      "Type": "TextBlock",
-                                      "Name": null,
+                                      "Type": "ContentPresenter",
+                                      "Name": "PART_ContentPresenter",
                                       "Bounds": {
-                                        "X": 9,
-                                        "Y": 4,
-                                        "Width": 60,
-                                        "Height": 15
+                                        "X": 0,
+                                        "Y": 0,
+                                        "Width": 78,
+                                        "Height": 23
                                       },
                                       "Margin": {
                                         "Left": 0,
@@ -525,13 +525,38 @@
                                         "Bottom": 0
                                       },
                                       "Padding": {
-                                        "Left": 0,
-                                        "Top": 0,
-                                        "Right": 0,
-                                        "Bottom": 0
+                                        "Left": 8,
+                                        "Top": 3,
+                                        "Right": 8,
+                                        "Bottom": 3
                                       },
                                       "IsVisible": true,
-                                      "Children": []
+                                      "Children": [
+                                        {
+                                          "Type": "TextBlock",
+                                          "Name": null,
+                                          "Bounds": {
+                                            "X": 9,
+                                            "Y": 4,
+                                            "Width": 60,
+                                            "Height": 15
+                                          },
+                                          "Margin": {
+                                            "Left": 0,
+                                            "Top": 0,
+                                            "Right": 0,
+                                            "Bottom": 0
+                                          },
+                                          "Padding": {
+                                            "Left": 0,
+                                            "Top": 0,
+                                            "Right": 0,
+                                            "Bottom": 0
+                                          },
+                                          "IsVisible": true,
+                                          "Children": []
+                                        }
+                                      ]
                                     }
                                   ]
                                 },
@@ -590,9 +615,9 @@
                               "Type": "StackPanel",
                               "Name": null,
                               "Bounds": {
-                                "X": 1134,
+                                "X": 1092,
                                 "Y": 0,
-                                "Width": 250,
+                                "Width": 292,
                                 "Height": 29
                               },
                               "Margin": {
@@ -657,175 +682,201 @@
                                   "Type": "Button",
                                   "Name": null,
                                   "Bounds": {
-                                    "X": 0,
-                                    "Y": 0,
-                                    "Width": 0,
-                                    "Height": 0
-                                  },
-                                  "Margin": {
-                                    "Left": 0,
-                                    "Top": 0,
-                                    "Right": 0,
-                                    "Bottom": 0
-                                  },
-                                  "Padding": {
-                                    "Left": 8,
-                                    "Top": 4,
-                                    "Right": 8,
-                                    "Bottom": 4
-                                  },
-                                  "IsVisible": false,
-                                  "Children": []
-                                },
-                                {
-                                  "Type": "Button",
-                                  "Name": null,
-                                  "Bounds": {
-                                    "X": 0,
-                                    "Y": 0,
-                                    "Width": 0,
-                                    "Height": 0
-                                  },
-                                  "Margin": {
-                                    "Left": 0,
-                                    "Top": 0,
-                                    "Right": 0,
-                                    "Bottom": 0
-                                  },
-                                  "Padding": {
-                                    "Left": 8,
-                                    "Top": 4,
-                                    "Right": 8,
-                                    "Bottom": 4
-                                  },
-                                  "IsVisible": false,
-                                  "Children": []
-                                },
-                                {
-                                  "Type": "Button",
-                                  "Name": null,
-                                  "Bounds": {
-                                    "X": 0,
-                                    "Y": 0,
-                                    "Width": 0,
-                                    "Height": 0
-                                  },
-                                  "Margin": {
-                                    "Left": 0,
-                                    "Top": 0,
-                                    "Right": 0,
-                                    "Bottom": 0
-                                  },
-                                  "Padding": {
-                                    "Left": 7,
-                                    "Top": 4,
-                                    "Right": 7,
-                                    "Bottom": 4
-                                  },
-                                  "IsVisible": false,
-                                  "Children": []
-                                },
-                                {
-                                  "Type": "Button",
-                                  "Name": null,
-                                  "Bounds": {
-                                    "X": 0,
-                                    "Y": 0,
-                                    "Width": 0,
-                                    "Height": 0
-                                  },
-                                  "Margin": {
-                                    "Left": 0,
-                                    "Top": 0,
-                                    "Right": 0,
-                                    "Bottom": 0
-                                  },
-                                  "Padding": {
-                                    "Left": 7,
-                                    "Top": 4,
-                                    "Right": 7,
-                                    "Bottom": 4
-                                  },
-                                  "IsVisible": false,
-                                  "Children": []
-                                },
-                                {
-                                  "Type": "Button",
-                                  "Name": null,
-                                  "Bounds": {
-                                    "X": 0,
-                                    "Y": 0,
-                                    "Width": 0,
-                                    "Height": 0
-                                  },
-                                  "Margin": {
-                                    "Left": 0,
-                                    "Top": 0,
-                                    "Right": 0,
-                                    "Bottom": 0
-                                  },
-                                  "Padding": {
-                                    "Left": 7,
-                                    "Top": 4,
-                                    "Right": 7,
-                                    "Bottom": 4
-                                  },
-                                  "IsVisible": false,
-                                  "Children": []
-                                },
-                                {
-                                  "Type": "Button",
-                                  "Name": null,
-                                  "Bounds": {
-                                    "X": 0,
-                                    "Y": 0,
-                                    "Width": 0,
-                                    "Height": 0
-                                  },
-                                  "Margin": {
-                                    "Left": 0,
-                                    "Top": 0,
-                                    "Right": 0,
-                                    "Bottom": 0
-                                  },
-                                  "Padding": {
-                                    "Left": 7,
-                                    "Top": 4,
-                                    "Right": 7,
-                                    "Bottom": 4
-                                  },
-                                  "IsVisible": false,
-                                  "Children": []
-                                },
-                                {
-                                  "Type": "Button",
-                                  "Name": null,
-                                  "Bounds": {
-                                    "X": 0,
-                                    "Y": 0,
-                                    "Width": 0,
-                                    "Height": 0
-                                  },
-                                  "Margin": {
-                                    "Left": 0,
-                                    "Top": 0,
-                                    "Right": 0,
-                                    "Bottom": 0
-                                  },
-                                  "Padding": {
-                                    "Left": 6,
-                                    "Top": 4,
-                                    "Right": 6,
-                                    "Bottom": 4
-                                  },
-                                  "IsVisible": false,
-                                  "Children": []
-                                },
-                                {
-                                  "Type": "Button",
-                                  "Name": null,
-                                  "Bounds": {
                                     "X": 107,
+                                    "Y": 0,
+                                    "Width": 38,
+                                    "Height": 29
+                                  },
+                                  "Margin": {
+                                    "Left": 0,
+                                    "Top": 0,
+                                    "Right": 0,
+                                    "Bottom": 0
+                                  },
+                                  "Padding": {
+                                    "Left": 8,
+                                    "Top": 4,
+                                    "Right": 8,
+                                    "Bottom": 4
+                                  },
+                                  "IsVisible": true,
+                                  "Children": [
+                                    {
+                                      "Type": "ContentPresenter",
+                                      "Name": "PART_ContentPresenter",
+                                      "Bounds": {
+                                        "X": 0,
+                                        "Y": 0,
+                                        "Width": 38,
+                                        "Height": 29
+                                      },
+                                      "Margin": {
+                                        "Left": 0,
+                                        "Top": 0,
+                                        "Right": 0,
+                                        "Bottom": 0
+                                      },
+                                      "Padding": {
+                                        "Left": 8,
+                                        "Top": 4,
+                                        "Right": 8,
+                                        "Bottom": 4
+                                      },
+                                      "IsVisible": true,
+                                      "Children": [
+                                        {
+                                          "Type": "AccessText",
+                                          "Name": null,
+                                          "Bounds": {
+                                            "X": 9,
+                                            "Y": 5,
+                                            "Width": 20,
+                                            "Height": 19
+                                          },
+                                          "Margin": {
+                                            "Left": 0,
+                                            "Top": 0,
+                                            "Right": 0,
+                                            "Bottom": 0
+                                          },
+                                          "Padding": {
+                                            "Left": 0,
+                                            "Top": 0,
+                                            "Right": 0,
+                                            "Bottom": 0
+                                          },
+                                          "IsVisible": true,
+                                          "Children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "Type": "Button",
+                                  "Name": null,
+                                  "Bounds": {
+                                    "X": 0,
+                                    "Y": 0,
+                                    "Width": 0,
+                                    "Height": 0
+                                  },
+                                  "Margin": {
+                                    "Left": 0,
+                                    "Top": 0,
+                                    "Right": 0,
+                                    "Bottom": 0
+                                  },
+                                  "Padding": {
+                                    "Left": 8,
+                                    "Top": 4,
+                                    "Right": 8,
+                                    "Bottom": 4
+                                  },
+                                  "IsVisible": false,
+                                  "Children": []
+                                },
+                                {
+                                  "Type": "Button",
+                                  "Name": null,
+                                  "Bounds": {
+                                    "X": 0,
+                                    "Y": 0,
+                                    "Width": 0,
+                                    "Height": 0
+                                  },
+                                  "Margin": {
+                                    "Left": 0,
+                                    "Top": 0,
+                                    "Right": 0,
+                                    "Bottom": 0
+                                  },
+                                  "Padding": {
+                                    "Left": 8,
+                                    "Top": 4,
+                                    "Right": 8,
+                                    "Bottom": 4
+                                  },
+                                  "IsVisible": false,
+                                  "Children": []
+                                },
+                                {
+                                  "Type": "Button",
+                                  "Name": null,
+                                  "Bounds": {
+                                    "X": 0,
+                                    "Y": 0,
+                                    "Width": 0,
+                                    "Height": 0
+                                  },
+                                  "Margin": {
+                                    "Left": 0,
+                                    "Top": 0,
+                                    "Right": 0,
+                                    "Bottom": 0
+                                  },
+                                  "Padding": {
+                                    "Left": 7,
+                                    "Top": 4,
+                                    "Right": 7,
+                                    "Bottom": 4
+                                  },
+                                  "IsVisible": false,
+                                  "Children": []
+                                },
+                                {
+                                  "Type": "Button",
+                                  "Name": null,
+                                  "Bounds": {
+                                    "X": 0,
+                                    "Y": 0,
+                                    "Width": 0,
+                                    "Height": 0
+                                  },
+                                  "Margin": {
+                                    "Left": 0,
+                                    "Top": 0,
+                                    "Right": 0,
+                                    "Bottom": 0
+                                  },
+                                  "Padding": {
+                                    "Left": 7,
+                                    "Top": 4,
+                                    "Right": 7,
+                                    "Bottom": 4
+                                  },
+                                  "IsVisible": false,
+                                  "Children": []
+                                },
+                                {
+                                  "Type": "Button",
+                                  "Name": null,
+                                  "Bounds": {
+                                    "X": 0,
+                                    "Y": 0,
+                                    "Width": 0,
+                                    "Height": 0
+                                  },
+                                  "Margin": {
+                                    "Left": 0,
+                                    "Top": 0,
+                                    "Right": 0,
+                                    "Bottom": 0
+                                  },
+                                  "Padding": {
+                                    "Left": 7,
+                                    "Top": 4,
+                                    "Right": 7,
+                                    "Bottom": 4
+                                  },
+                                  "IsVisible": false,
+                                  "Children": []
+                                },
+                                {
+                                  "Type": "Button",
+                                  "Name": null,
+                                  "Bounds": {
+                                    "X": 149,
                                     "Y": 0,
                                     "Width": 143,
                                     "Height": 29
@@ -1280,22 +1331,22 @@
                                                                                           "Type": "Border",
                                                                                           "Name": null,
                                                                                           "Bounds": {
-                                                                                            "X": 5,
-                                                                                            "Y": 5,
-                                                                                            "Width": 310,
-                                                                                            "Height": 310
+                                                                                            "X": 1,
+                                                                                            "Y": 1,
+                                                                                            "Width": 318,
+                                                                                            "Height": 318
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
-                                                                                            "Left": 12,
-                                                                                            "Top": 12,
-                                                                                            "Right": 12,
-                                                                                            "Bottom": 12
+                                                                                            "Left": 6,
+                                                                                            "Top": 6,
+                                                                                            "Right": 6,
+                                                                                            "Bottom": 6
                                                                                           },
                                                                                           "IsVisible": true,
                                                                                           "Children": [
@@ -1303,10 +1354,10 @@
                                                                                               "Type": "Grid",
                                                                                               "Name": null,
                                                                                               "Bounds": {
-                                                                                                "X": 13,
-                                                                                                "Y": 13,
-                                                                                                "Width": 284,
-                                                                                                "Height": 284
+                                                                                                "X": 7,
+                                                                                                "Y": 7,
+                                                                                                "Width": 304,
+                                                                                                "Height": 304
                                                                                               },
                                                                                               "Margin": {
                                                                                                 "Left": 0,
@@ -1323,26 +1374,26 @@
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
                                                                                                     "Y": 0,
-                                                                                                    "Width": 284,
-                                                                                                    "Height": 17
+                                                                                                    "Width": 304,
+                                                                                                    "Height": 14
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
                                                                                                     "Top": 0,
                                                                                                     "Right": 0,
-                                                                                                    "Bottom": 8
+                                                                                                    "Bottom": 4
                                                                                                   },
                                                                                                   "Padding": null,
                                                                                                   "IsVisible": true,
                                                                                                   "Children": [
                                                                                                     {
-                                                                                                      "Type": "TextBlock",
+                                                                                                      "Type": "Viewbox",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
                                                                                                         "X": 0,
                                                                                                         "Y": 0,
-                                                                                                        "Width": 241,
-                                                                                                        "Height": 16
+                                                                                                        "Width": 107.33,
+                                                                                                        "Height": 14
                                                                                                       },
                                                                                                       "Margin": {
                                                                                                         "Left": 0,
@@ -1350,23 +1401,63 @@
                                                                                                         "Right": 0,
                                                                                                         "Bottom": 0
                                                                                                       },
-                                                                                                      "Padding": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
-                                                                                                      },
+                                                                                                      "Padding": null,
                                                                                                       "IsVisible": true,
-                                                                                                      "Children": []
+                                                                                                      "Children": [
+                                                                                                        {
+                                                                                                          "Type": "ViewboxContainer",
+                                                                                                          "Name": null,
+                                                                                                          "Bounds": {
+                                                                                                            "X": 0,
+                                                                                                            "Y": 0,
+                                                                                                            "Width": 115,
+                                                                                                            "Height": 15
+                                                                                                          },
+                                                                                                          "Margin": {
+                                                                                                            "Left": 0,
+                                                                                                            "Top": 0,
+                                                                                                            "Right": 0,
+                                                                                                            "Bottom": 0
+                                                                                                          },
+                                                                                                          "Padding": null,
+                                                                                                          "IsVisible": true,
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "TextBlock",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 115,
+                                                                                                                "Height": 15
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": []
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
                                                                                                     },
                                                                                                     {
-                                                                                                      "Type": "TextBlock",
+                                                                                                      "Type": "Viewbox",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
-                                                                                                        "X": 241,
+                                                                                                        "X": 269,
                                                                                                         "Y": 0,
-                                                                                                        "Width": 43,
-                                                                                                        "Height": 17
+                                                                                                        "Width": 35,
+                                                                                                        "Height": 14
                                                                                                       },
                                                                                                       "Margin": {
                                                                                                         "Left": 0,
@@ -1374,14 +1465,54 @@
                                                                                                         "Right": 0,
                                                                                                         "Bottom": 0
                                                                                                       },
-                                                                                                      "Padding": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
-                                                                                                      },
+                                                                                                      "Padding": null,
                                                                                                       "IsVisible": true,
-                                                                                                      "Children": []
+                                                                                                      "Children": [
+                                                                                                        {
+                                                                                                          "Type": "ViewboxContainer",
+                                                                                                          "Name": null,
+                                                                                                          "Bounds": {
+                                                                                                            "X": 0,
+                                                                                                            "Y": 0,
+                                                                                                            "Width": 40,
+                                                                                                            "Height": 16
+                                                                                                          },
+                                                                                                          "Margin": {
+                                                                                                            "Left": 0,
+                                                                                                            "Top": 0,
+                                                                                                            "Right": 0,
+                                                                                                            "Bottom": 0
+                                                                                                          },
+                                                                                                          "Padding": null,
+                                                                                                          "IsVisible": true,
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "TextBlock",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 40,
+                                                                                                                "Height": 16
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": []
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
                                                                                                     }
                                                                                                   ]
                                                                                                 },
@@ -1390,9 +1521,9 @@
                                                                                                   "Name": null,
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
-                                                                                                    "Y": 25,
-                                                                                                    "Width": 284,
-                                                                                                    "Height": 259
+                                                                                                    "Y": 18,
+                                                                                                    "Width": 304,
+                                                                                                    "Height": 286
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
@@ -1418,10 +1549,10 @@
                                                                                             "Height": 0
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
                                                                                             "Left": 0,
@@ -1526,22 +1657,22 @@
                                                                                           "Type": "Border",
                                                                                           "Name": null,
                                                                                           "Bounds": {
-                                                                                            "X": 5,
-                                                                                            "Y": 5,
-                                                                                            "Width": 310,
-                                                                                            "Height": 310
+                                                                                            "X": 1,
+                                                                                            "Y": 1,
+                                                                                            "Width": 318,
+                                                                                            "Height": 318
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
-                                                                                            "Left": 12,
-                                                                                            "Top": 12,
-                                                                                            "Right": 12,
-                                                                                            "Bottom": 12
+                                                                                            "Left": 6,
+                                                                                            "Top": 6,
+                                                                                            "Right": 6,
+                                                                                            "Bottom": 6
                                                                                           },
                                                                                           "IsVisible": true,
                                                                                           "Children": [
@@ -1549,10 +1680,10 @@
                                                                                               "Type": "Grid",
                                                                                               "Name": null,
                                                                                               "Bounds": {
-                                                                                                "X": 13,
-                                                                                                "Y": 13,
-                                                                                                "Width": 284,
-                                                                                                "Height": 284
+                                                                                                "X": 7,
+                                                                                                "Y": 7,
+                                                                                                "Width": 304,
+                                                                                                "Height": 304
                                                                                               },
                                                                                               "Margin": {
                                                                                                 "Left": 0,
@@ -1569,26 +1700,26 @@
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
                                                                                                     "Y": 0,
-                                                                                                    "Width": 284,
-                                                                                                    "Height": 17
+                                                                                                    "Width": 304,
+                                                                                                    "Height": 14
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
                                                                                                     "Top": 0,
                                                                                                     "Right": 0,
-                                                                                                    "Bottom": 8
+                                                                                                    "Bottom": 4
                                                                                                   },
                                                                                                   "Padding": null,
                                                                                                   "IsVisible": true,
                                                                                                   "Children": [
                                                                                                     {
-                                                                                                      "Type": "TextBlock",
+                                                                                                      "Type": "Viewbox",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
                                                                                                         "X": 0,
                                                                                                         "Y": 0,
-                                                                                                        "Width": 229,
-                                                                                                        "Height": 16
+                                                                                                        "Width": 87.73,
+                                                                                                        "Height": 14
                                                                                                       },
                                                                                                       "Margin": {
                                                                                                         "Left": 0,
@@ -1596,23 +1727,63 @@
                                                                                                         "Right": 0,
                                                                                                         "Bottom": 0
                                                                                                       },
-                                                                                                      "Padding": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
-                                                                                                      },
+                                                                                                      "Padding": null,
                                                                                                       "IsVisible": true,
-                                                                                                      "Children": []
+                                                                                                      "Children": [
+                                                                                                        {
+                                                                                                          "Type": "ViewboxContainer",
+                                                                                                          "Name": null,
+                                                                                                          "Bounds": {
+                                                                                                            "X": 0,
+                                                                                                            "Y": 0,
+                                                                                                            "Width": 94,
+                                                                                                            "Height": 15
+                                                                                                          },
+                                                                                                          "Margin": {
+                                                                                                            "Left": 0,
+                                                                                                            "Top": 0,
+                                                                                                            "Right": 0,
+                                                                                                            "Bottom": 0
+                                                                                                          },
+                                                                                                          "Padding": null,
+                                                                                                          "IsVisible": true,
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "TextBlock",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 94,
+                                                                                                                "Height": 15
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": []
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
                                                                                                     },
                                                                                                     {
-                                                                                                      "Type": "TextBlock",
+                                                                                                      "Type": "Viewbox",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
-                                                                                                        "X": 229,
+                                                                                                        "X": 259,
                                                                                                         "Y": 0,
-                                                                                                        "Width": 55,
-                                                                                                        "Height": 17
+                                                                                                        "Width": 44.62,
+                                                                                                        "Height": 14
                                                                                                       },
                                                                                                       "Margin": {
                                                                                                         "Left": 0,
@@ -1620,14 +1791,54 @@
                                                                                                         "Right": 0,
                                                                                                         "Bottom": 0
                                                                                                       },
-                                                                                                      "Padding": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
-                                                                                                      },
+                                                                                                      "Padding": null,
                                                                                                       "IsVisible": true,
-                                                                                                      "Children": []
+                                                                                                      "Children": [
+                                                                                                        {
+                                                                                                          "Type": "ViewboxContainer",
+                                                                                                          "Name": null,
+                                                                                                          "Bounds": {
+                                                                                                            "X": 0,
+                                                                                                            "Y": 0,
+                                                                                                            "Width": 51,
+                                                                                                            "Height": 16
+                                                                                                          },
+                                                                                                          "Margin": {
+                                                                                                            "Left": 0,
+                                                                                                            "Top": 0,
+                                                                                                            "Right": 0,
+                                                                                                            "Bottom": 0
+                                                                                                          },
+                                                                                                          "Padding": null,
+                                                                                                          "IsVisible": true,
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "TextBlock",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 51,
+                                                                                                                "Height": 16
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": []
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
                                                                                                     }
                                                                                                   ]
                                                                                                 },
@@ -1636,9 +1847,9 @@
                                                                                                   "Name": null,
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
-                                                                                                    "Y": 25,
-                                                                                                    "Width": 284,
-                                                                                                    "Height": 259
+                                                                                                    "Y": 18,
+                                                                                                    "Width": 304,
+                                                                                                    "Height": 286
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
@@ -1664,10 +1875,10 @@
                                                                                             "Height": 0
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
                                                                                             "Left": 0,
@@ -1772,22 +1983,22 @@
                                                                                           "Type": "Border",
                                                                                           "Name": null,
                                                                                           "Bounds": {
-                                                                                            "X": 5,
-                                                                                            "Y": 5,
-                                                                                            "Width": 310,
-                                                                                            "Height": 310
+                                                                                            "X": 1,
+                                                                                            "Y": 1,
+                                                                                            "Width": 318,
+                                                                                            "Height": 318
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
-                                                                                            "Left": 12,
-                                                                                            "Top": 12,
-                                                                                            "Right": 12,
-                                                                                            "Bottom": 12
+                                                                                            "Left": 6,
+                                                                                            "Top": 6,
+                                                                                            "Right": 6,
+                                                                                            "Bottom": 6
                                                                                           },
                                                                                           "IsVisible": true,
                                                                                           "Children": [
@@ -1795,10 +2006,10 @@
                                                                                               "Type": "Grid",
                                                                                               "Name": null,
                                                                                               "Bounds": {
-                                                                                                "X": 13,
-                                                                                                "Y": 13,
-                                                                                                "Width": 284,
-                                                                                                "Height": 284
+                                                                                                "X": 7,
+                                                                                                "Y": 7,
+                                                                                                "Width": 304,
+                                                                                                "Height": 304
                                                                                               },
                                                                                               "Margin": {
                                                                                                 "Left": 0,
@@ -1815,26 +2026,26 @@
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
                                                                                                     "Y": 0,
-                                                                                                    "Width": 284,
-                                                                                                    "Height": 17
+                                                                                                    "Width": 304,
+                                                                                                    "Height": 14
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
                                                                                                     "Top": 0,
                                                                                                     "Right": 0,
-                                                                                                    "Bottom": 8
+                                                                                                    "Bottom": 4
                                                                                                   },
                                                                                                   "Padding": null,
                                                                                                   "IsVisible": true,
                                                                                                   "Children": [
                                                                                                     {
-                                                                                                      "Type": "TextBlock",
+                                                                                                      "Type": "Viewbox",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
                                                                                                         "X": 0,
                                                                                                         "Y": 0,
-                                                                                                        "Width": 227,
-                                                                                                        "Height": 16
+                                                                                                        "Width": 143.73,
+                                                                                                        "Height": 14
                                                                                                       },
                                                                                                       "Margin": {
                                                                                                         "Left": 0,
@@ -1842,23 +2053,63 @@
                                                                                                         "Right": 0,
                                                                                                         "Bottom": 0
                                                                                                       },
-                                                                                                      "Padding": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
-                                                                                                      },
+                                                                                                      "Padding": null,
                                                                                                       "IsVisible": true,
-                                                                                                      "Children": []
+                                                                                                      "Children": [
+                                                                                                        {
+                                                                                                          "Type": "ViewboxContainer",
+                                                                                                          "Name": null,
+                                                                                                          "Bounds": {
+                                                                                                            "X": 0,
+                                                                                                            "Y": 0,
+                                                                                                            "Width": 154,
+                                                                                                            "Height": 15
+                                                                                                          },
+                                                                                                          "Margin": {
+                                                                                                            "Left": 0,
+                                                                                                            "Top": 0,
+                                                                                                            "Right": 0,
+                                                                                                            "Bottom": 0
+                                                                                                          },
+                                                                                                          "Padding": null,
+                                                                                                          "IsVisible": true,
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "TextBlock",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 154,
+                                                                                                                "Height": 15
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": []
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
                                                                                                     },
                                                                                                     {
-                                                                                                      "Type": "TextBlock",
+                                                                                                      "Type": "Viewbox",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
-                                                                                                        "X": 227,
+                                                                                                        "X": 258,
                                                                                                         "Y": 0,
-                                                                                                        "Width": 57,
-                                                                                                        "Height": 17
+                                                                                                        "Width": 46.38,
+                                                                                                        "Height": 14
                                                                                                       },
                                                                                                       "Margin": {
                                                                                                         "Left": 0,
@@ -1866,14 +2117,54 @@
                                                                                                         "Right": 0,
                                                                                                         "Bottom": 0
                                                                                                       },
-                                                                                                      "Padding": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
-                                                                                                      },
+                                                                                                      "Padding": null,
                                                                                                       "IsVisible": true,
-                                                                                                      "Children": []
+                                                                                                      "Children": [
+                                                                                                        {
+                                                                                                          "Type": "ViewboxContainer",
+                                                                                                          "Name": null,
+                                                                                                          "Bounds": {
+                                                                                                            "X": 0,
+                                                                                                            "Y": 0,
+                                                                                                            "Width": 53,
+                                                                                                            "Height": 16
+                                                                                                          },
+                                                                                                          "Margin": {
+                                                                                                            "Left": 0,
+                                                                                                            "Top": 0,
+                                                                                                            "Right": 0,
+                                                                                                            "Bottom": 0
+                                                                                                          },
+                                                                                                          "Padding": null,
+                                                                                                          "IsVisible": true,
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "TextBlock",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 53,
+                                                                                                                "Height": 16
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": []
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
                                                                                                     }
                                                                                                   ]
                                                                                                 },
@@ -1882,9 +2173,9 @@
                                                                                                   "Name": null,
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
-                                                                                                    "Y": 25,
-                                                                                                    "Width": 284,
-                                                                                                    "Height": 259
+                                                                                                    "Y": 18,
+                                                                                                    "Width": 304,
+                                                                                                    "Height": 286
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
@@ -1910,10 +2201,10 @@
                                                                                             "Height": 0
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
                                                                                             "Left": 0,
@@ -2018,22 +2309,22 @@
                                                                                           "Type": "Border",
                                                                                           "Name": null,
                                                                                           "Bounds": {
-                                                                                            "X": 5,
-                                                                                            "Y": 5,
-                                                                                            "Width": 310,
-                                                                                            "Height": 310
+                                                                                            "X": 1,
+                                                                                            "Y": 1,
+                                                                                            "Width": 318,
+                                                                                            "Height": 318
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
-                                                                                            "Left": 12,
-                                                                                            "Top": 12,
-                                                                                            "Right": 12,
-                                                                                            "Bottom": 12
+                                                                                            "Left": 6,
+                                                                                            "Top": 6,
+                                                                                            "Right": 6,
+                                                                                            "Bottom": 6
                                                                                           },
                                                                                           "IsVisible": true,
                                                                                           "Children": [
@@ -2041,10 +2332,10 @@
                                                                                               "Type": "Grid",
                                                                                               "Name": null,
                                                                                               "Bounds": {
-                                                                                                "X": 13,
-                                                                                                "Y": 13,
-                                                                                                "Width": 284,
-                                                                                                "Height": 284
+                                                                                                "X": 7,
+                                                                                                "Y": 7,
+                                                                                                "Width": 304,
+                                                                                                "Height": 304
                                                                                               },
                                                                                               "Margin": {
                                                                                                 "Left": 0,
@@ -2061,26 +2352,26 @@
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
                                                                                                     "Y": 0,
-                                                                                                    "Width": 284,
-                                                                                                    "Height": 17
+                                                                                                    "Width": 304,
+                                                                                                    "Height": 14
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
                                                                                                     "Top": 0,
                                                                                                     "Right": 0,
-                                                                                                    "Bottom": 8
+                                                                                                    "Bottom": 4
                                                                                                   },
                                                                                                   "Padding": null,
                                                                                                   "IsVisible": true,
                                                                                                   "Children": [
                                                                                                     {
-                                                                                                      "Type": "TextBlock",
+                                                                                                      "Type": "Viewbox",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
                                                                                                         "X": 0,
                                                                                                         "Y": 0,
-                                                                                                        "Width": 227,
-                                                                                                        "Height": 16
+                                                                                                        "Width": 98,
+                                                                                                        "Height": 14
                                                                                                       },
                                                                                                       "Margin": {
                                                                                                         "Left": 0,
@@ -2088,23 +2379,63 @@
                                                                                                         "Right": 0,
                                                                                                         "Bottom": 0
                                                                                                       },
-                                                                                                      "Padding": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
-                                                                                                      },
+                                                                                                      "Padding": null,
                                                                                                       "IsVisible": true,
-                                                                                                      "Children": []
+                                                                                                      "Children": [
+                                                                                                        {
+                                                                                                          "Type": "ViewboxContainer",
+                                                                                                          "Name": null,
+                                                                                                          "Bounds": {
+                                                                                                            "X": 0,
+                                                                                                            "Y": 0,
+                                                                                                            "Width": 105,
+                                                                                                            "Height": 15
+                                                                                                          },
+                                                                                                          "Margin": {
+                                                                                                            "Left": 0,
+                                                                                                            "Top": 0,
+                                                                                                            "Right": 0,
+                                                                                                            "Bottom": 0
+                                                                                                          },
+                                                                                                          "Padding": null,
+                                                                                                          "IsVisible": true,
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "TextBlock",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 105,
+                                                                                                                "Height": 15
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": []
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
                                                                                                     },
                                                                                                     {
-                                                                                                      "Type": "TextBlock",
+                                                                                                      "Type": "Viewbox",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
-                                                                                                        "X": 227,
+                                                                                                        "X": 258,
                                                                                                         "Y": 0,
-                                                                                                        "Width": 57,
-                                                                                                        "Height": 17
+                                                                                                        "Width": 46.38,
+                                                                                                        "Height": 14
                                                                                                       },
                                                                                                       "Margin": {
                                                                                                         "Left": 0,
@@ -2112,14 +2443,54 @@
                                                                                                         "Right": 0,
                                                                                                         "Bottom": 0
                                                                                                       },
-                                                                                                      "Padding": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
-                                                                                                      },
+                                                                                                      "Padding": null,
                                                                                                       "IsVisible": true,
-                                                                                                      "Children": []
+                                                                                                      "Children": [
+                                                                                                        {
+                                                                                                          "Type": "ViewboxContainer",
+                                                                                                          "Name": null,
+                                                                                                          "Bounds": {
+                                                                                                            "X": 0,
+                                                                                                            "Y": 0,
+                                                                                                            "Width": 53,
+                                                                                                            "Height": 16
+                                                                                                          },
+                                                                                                          "Margin": {
+                                                                                                            "Left": 0,
+                                                                                                            "Top": 0,
+                                                                                                            "Right": 0,
+                                                                                                            "Bottom": 0
+                                                                                                          },
+                                                                                                          "Padding": null,
+                                                                                                          "IsVisible": true,
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "TextBlock",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 53,
+                                                                                                                "Height": 16
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": []
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
                                                                                                     }
                                                                                                   ]
                                                                                                 },
@@ -2128,9 +2499,9 @@
                                                                                                   "Name": null,
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
-                                                                                                    "Y": 25,
-                                                                                                    "Width": 284,
-                                                                                                    "Height": 259
+                                                                                                    "Y": 18,
+                                                                                                    "Width": 304,
+                                                                                                    "Height": 286
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
@@ -2156,10 +2527,10 @@
                                                                                             "Height": 0
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
                                                                                             "Left": 0,
@@ -2264,16 +2635,16 @@
                                                                                           "Type": "Border",
                                                                                           "Name": null,
                                                                                           "Bounds": {
-                                                                                            "X": 5,
-                                                                                            "Y": 5,
-                                                                                            "Width": 310,
-                                                                                            "Height": 310
+                                                                                            "X": 1,
+                                                                                            "Y": 1,
+                                                                                            "Width": 318,
+                                                                                            "Height": 318
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
                                                                                             "Left": 0,
@@ -2289,8 +2660,8 @@
                                                                                               "Bounds": {
                                                                                                 "X": 1,
                                                                                                 "Y": 1,
-                                                                                                "Width": 308,
-                                                                                                "Height": 308
+                                                                                                "Width": 316,
+                                                                                                "Height": 316
                                                                                               },
                                                                                               "Margin": {
                                                                                                 "Left": 0,
@@ -2299,10 +2670,10 @@
                                                                                                 "Bottom": 0
                                                                                               },
                                                                                               "Padding": {
-                                                                                                "Left": 8,
-                                                                                                "Top": 5,
-                                                                                                "Right": 8,
-                                                                                                "Bottom": 6
+                                                                                                "Left": 2,
+                                                                                                "Top": 1,
+                                                                                                "Right": 2,
+                                                                                                "Bottom": 1
                                                                                               },
                                                                                               "IsVisible": true,
                                                                                               "Children": [
@@ -2312,8 +2683,8 @@
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
                                                                                                     "Y": 0,
-                                                                                                    "Width": 308,
-                                                                                                    "Height": 308
+                                                                                                    "Width": 316,
+                                                                                                    "Height": 316
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
@@ -2322,27 +2693,27 @@
                                                                                                     "Bottom": 0
                                                                                                   },
                                                                                                   "Padding": {
-                                                                                                    "Left": 8,
-                                                                                                    "Top": 5,
-                                                                                                    "Right": 8,
-                                                                                                    "Bottom": 6
+                                                                                                    "Left": 2,
+                                                                                                    "Top": 1,
+                                                                                                    "Right": 2,
+                                                                                                    "Bottom": 1
                                                                                                   },
                                                                                                   "IsVisible": true,
                                                                                                   "Children": [
                                                                                                     {
-                                                                                                      "Type": "StackPanel",
+                                                                                                      "Type": "Grid",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
-                                                                                                        "X": 13,
-                                                                                                        "Y": 124,
-                                                                                                        "Width": 282,
-                                                                                                        "Height": 60
+                                                                                                        "X": 7,
+                                                                                                        "Y": 134,
+                                                                                                        "Width": 302,
+                                                                                                        "Height": 49
                                                                                                       },
                                                                                                       "Margin": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
+                                                                                                        "Left": 4,
+                                                                                                        "Top": 4,
+                                                                                                        "Right": 4,
+                                                                                                        "Bottom": 4
                                                                                                       },
                                                                                                       "Padding": null,
                                                                                                       "IsVisible": true,
@@ -2351,10 +2722,10 @@
                                                                                                           "Type": "TextBlock",
                                                                                                           "Name": null,
                                                                                                           "Bounds": {
-                                                                                                            "X": 124,
+                                                                                                            "X": 138,
                                                                                                             "Y": 0,
-                                                                                                            "Width": 33,
-                                                                                                            "Height": 33
+                                                                                                            "Width": 25,
+                                                                                                            "Height": 25
                                                                                                           },
                                                                                                           "Margin": {
                                                                                                             "Left": 0,
@@ -2372,28 +2743,68 @@
                                                                                                           "Children": []
                                                                                                         },
                                                                                                         {
-                                                                                                          "Type": "TextBlock",
+                                                                                                          "Type": "Viewbox",
                                                                                                           "Name": null,
                                                                                                           "Bounds": {
                                                                                                             "X": 0,
-                                                                                                            "Y": 38,
-                                                                                                            "Width": 282,
-                                                                                                            "Height": 22
+                                                                                                            "Y": 25,
+                                                                                                            "Width": 302,
+                                                                                                            "Height": 23.23
                                                                                                           },
                                                                                                           "Margin": {
-                                                                                                            "Left": 0,
-                                                                                                            "Top": 5,
-                                                                                                            "Right": 0,
-                                                                                                            "Bottom": 0
-                                                                                                          },
-                                                                                                          "Padding": {
                                                                                                             "Left": 0,
                                                                                                             "Top": 0,
                                                                                                             "Right": 0,
                                                                                                             "Bottom": 0
                                                                                                           },
+                                                                                                          "Padding": null,
                                                                                                           "IsVisible": true,
-                                                                                                          "Children": []
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "ViewboxContainer",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 247,
+                                                                                                                "Height": 19
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": null,
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": [
+                                                                                                                {
+                                                                                                                  "Type": "TextBlock",
+                                                                                                                  "Name": null,
+                                                                                                                  "Bounds": {
+                                                                                                                    "X": 0,
+                                                                                                                    "Y": 0,
+                                                                                                                    "Width": 247,
+                                                                                                                    "Height": 19
+                                                                                                                  },
+                                                                                                                  "Margin": {
+                                                                                                                    "Left": 0,
+                                                                                                                    "Top": 0,
+                                                                                                                    "Right": 0,
+                                                                                                                    "Bottom": 0
+                                                                                                                  },
+                                                                                                                  "Padding": {
+                                                                                                                    "Left": 0,
+                                                                                                                    "Top": 0,
+                                                                                                                    "Right": 0,
+                                                                                                                    "Bottom": 0
+                                                                                                                  },
+                                                                                                                  "IsVisible": true,
+                                                                                                                  "Children": []
+                                                                                                                }
+                                                                                                              ]
+                                                                                                            }
+                                                                                                          ]
                                                                                                         }
                                                                                                       ]
                                                                                                     }
@@ -2413,10 +2824,10 @@
                                                                                             "Height": 0
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
                                                                                             "Left": 0,
@@ -2590,16 +3001,16 @@
                                                                                           "Type": "Border",
                                                                                           "Name": null,
                                                                                           "Bounds": {
-                                                                                            "X": 5,
-                                                                                            "Y": 5,
-                                                                                            "Width": 310,
-                                                                                            "Height": 310
+                                                                                            "X": 1,
+                                                                                            "Y": 1,
+                                                                                            "Width": 318,
+                                                                                            "Height": 318
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
                                                                                             "Left": 0,
@@ -2615,8 +3026,8 @@
                                                                                               "Bounds": {
                                                                                                 "X": 1,
                                                                                                 "Y": 1,
-                                                                                                "Width": 308,
-                                                                                                "Height": 308
+                                                                                                "Width": 316,
+                                                                                                "Height": 316
                                                                                               },
                                                                                               "Margin": {
                                                                                                 "Left": 0,
@@ -2625,10 +3036,10 @@
                                                                                                 "Bottom": 0
                                                                                               },
                                                                                               "Padding": {
-                                                                                                "Left": 8,
-                                                                                                "Top": 5,
-                                                                                                "Right": 8,
-                                                                                                "Bottom": 6
+                                                                                                "Left": 2,
+                                                                                                "Top": 1,
+                                                                                                "Right": 2,
+                                                                                                "Bottom": 1
                                                                                               },
                                                                                               "IsVisible": true,
                                                                                               "Children": [
@@ -2638,8 +3049,8 @@
                                                                                                   "Bounds": {
                                                                                                     "X": 0,
                                                                                                     "Y": 0,
-                                                                                                    "Width": 308,
-                                                                                                    "Height": 308
+                                                                                                    "Width": 316,
+                                                                                                    "Height": 316
                                                                                                   },
                                                                                                   "Margin": {
                                                                                                     "Left": 0,
@@ -2648,27 +3059,27 @@
                                                                                                     "Bottom": 0
                                                                                                   },
                                                                                                   "Padding": {
-                                                                                                    "Left": 8,
-                                                                                                    "Top": 5,
-                                                                                                    "Right": 8,
-                                                                                                    "Bottom": 6
+                                                                                                    "Left": 2,
+                                                                                                    "Top": 1,
+                                                                                                    "Right": 2,
+                                                                                                    "Bottom": 1
                                                                                                   },
                                                                                                   "IsVisible": true,
                                                                                                   "Children": [
                                                                                                     {
-                                                                                                      "Type": "StackPanel",
+                                                                                                      "Type": "Grid",
                                                                                                       "Name": null,
                                                                                                       "Bounds": {
-                                                                                                        "X": 54,
-                                                                                                        "Y": 124,
-                                                                                                        "Width": 201,
-                                                                                                        "Height": 60
+                                                                                                        "X": 7,
+                                                                                                        "Y": 129,
+                                                                                                        "Width": 302,
+                                                                                                        "Height": 58
                                                                                                       },
                                                                                                       "Margin": {
-                                                                                                        "Left": 0,
-                                                                                                        "Top": 0,
-                                                                                                        "Right": 0,
-                                                                                                        "Bottom": 0
+                                                                                                        "Left": 4,
+                                                                                                        "Top": 4,
+                                                                                                        "Right": 4,
+                                                                                                        "Bottom": 4
                                                                                                       },
                                                                                                       "Padding": null,
                                                                                                       "IsVisible": true,
@@ -2677,10 +3088,10 @@
                                                                                                           "Type": "TextBlock",
                                                                                                           "Name": null,
                                                                                                           "Bounds": {
-                                                                                                            "X": 84,
+                                                                                                            "X": 138,
                                                                                                             "Y": 0,
-                                                                                                            "Width": 33,
-                                                                                                            "Height": 33
+                                                                                                            "Width": 25,
+                                                                                                            "Height": 25
                                                                                                           },
                                                                                                           "Margin": {
                                                                                                             "Left": 0,
@@ -2698,28 +3109,68 @@
                                                                                                           "Children": []
                                                                                                         },
                                                                                                         {
-                                                                                                          "Type": "TextBlock",
+                                                                                                          "Type": "Viewbox",
                                                                                                           "Name": null,
                                                                                                           "Bounds": {
                                                                                                             "X": 0,
-                                                                                                            "Y": 38,
-                                                                                                            "Width": 201,
-                                                                                                            "Height": 22
+                                                                                                            "Y": 25,
+                                                                                                            "Width": 302,
+                                                                                                            "Height": 32.6
                                                                                                           },
                                                                                                           "Margin": {
-                                                                                                            "Left": 0,
-                                                                                                            "Top": 5,
-                                                                                                            "Right": 0,
-                                                                                                            "Bottom": 0
-                                                                                                          },
-                                                                                                          "Padding": {
                                                                                                             "Left": 0,
                                                                                                             "Top": 0,
                                                                                                             "Right": 0,
                                                                                                             "Bottom": 0
                                                                                                           },
+                                                                                                          "Padding": null,
                                                                                                           "IsVisible": true,
-                                                                                                          "Children": []
+                                                                                                          "Children": [
+                                                                                                            {
+                                                                                                              "Type": "ViewboxContainer",
+                                                                                                              "Name": null,
+                                                                                                              "Bounds": {
+                                                                                                                "X": 0,
+                                                                                                                "Y": 0,
+                                                                                                                "Width": 176,
+                                                                                                                "Height": 19
+                                                                                                              },
+                                                                                                              "Margin": {
+                                                                                                                "Left": 0,
+                                                                                                                "Top": 0,
+                                                                                                                "Right": 0,
+                                                                                                                "Bottom": 0
+                                                                                                              },
+                                                                                                              "Padding": null,
+                                                                                                              "IsVisible": true,
+                                                                                                              "Children": [
+                                                                                                                {
+                                                                                                                  "Type": "TextBlock",
+                                                                                                                  "Name": null,
+                                                                                                                  "Bounds": {
+                                                                                                                    "X": 0,
+                                                                                                                    "Y": 0,
+                                                                                                                    "Width": 176,
+                                                                                                                    "Height": 19
+                                                                                                                  },
+                                                                                                                  "Margin": {
+                                                                                                                    "Left": 0,
+                                                                                                                    "Top": 0,
+                                                                                                                    "Right": 0,
+                                                                                                                    "Bottom": 0
+                                                                                                                  },
+                                                                                                                  "Padding": {
+                                                                                                                    "Left": 0,
+                                                                                                                    "Top": 0,
+                                                                                                                    "Right": 0,
+                                                                                                                    "Bottom": 0
+                                                                                                                  },
+                                                                                                                  "IsVisible": true,
+                                                                                                                  "Children": []
+                                                                                                                }
+                                                                                                              ]
+                                                                                                            }
+                                                                                                          ]
                                                                                                         }
                                                                                                       ]
                                                                                                     }
@@ -2739,10 +3190,10 @@
                                                                                             "Height": 0
                                                                                           },
                                                                                           "Margin": {
-                                                                                            "Left": 5,
-                                                                                            "Top": 5,
-                                                                                            "Right": 5,
-                                                                                            "Bottom": 5
+                                                                                            "Left": 1,
+                                                                                            "Top": 1,
+                                                                                            "Right": 1,
+                                                                                            "Bottom": 1
                                                                                           },
                                                                                           "Padding": {
                                                                                             "Left": 0,

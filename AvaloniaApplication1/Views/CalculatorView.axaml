@@ -1,0 +1,169 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="480"
+             x:Class="AvaloniaApplication1.Views.CalculatorView"
+             x:DataType="vm:CalculatorViewModel"
+             x:CompileBindings="True">
+
+    <UserControl.Styles>
+        <Style Selector="Button.calc-btn">
+            <Setter Property="Background" Value="#333842" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Margin" Value="2" />
+        </Style>
+        <Style Selector="Button.calc-btn:pointerover">
+            <Setter Property="Background" Value="#454D5A" />
+        </Style>
+        <Style Selector="Button.calc-op">
+            <Setter Property="Background" Value="#007ACC" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Margin" Value="2" />
+        </Style>
+        <Style Selector="Button.calc-op:pointerover">
+            <Setter Property="Background" Value="#0098FF" />
+        </Style>
+        <Style Selector="Button.calc-action">
+            <Setter Property="Background" Value="#D50000" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Margin" Value="2" />
+        </Style>
+    </UserControl.Styles>
+
+    <TabControl Background="#1E222B" Margin="0" Padding="0">
+        <!-- 1. Инженерный калькулятор -->
+        <TabItem Header="🔢 Калькулятор" FontSize="12">
+            <Grid RowDefinitions="Auto,*" Margin="8">
+                <!-- Дисплей калькулятора -->
+                <Border Grid.Row="0" Background="#12151B" BorderBrush="#374151" BorderThickness="1" CornerRadius="8" Padding="12,8" Margin="0,0,0,8">
+                    <StackPanel>
+                        <TextBlock Text="{Binding ExpressionHistory}" Foreground="#888888" FontSize="11" HorizontalAlignment="Right" MinHeight="16" />
+                        <Viewbox MaxHeight="38" HorizontalAlignment="Right">
+                            <TextBlock Text="{Binding Display}" Foreground="#00E5FF" FontSize="26" FontWeight="Bold" FontFamily="Consolas, monospace" HorizontalAlignment="Right" />
+                        </Viewbox>
+                    </StackPanel>
+                </Border>
+
+                <!-- Сетка кнопок -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" RowDefinitions="*,*,*,*,*">
+                    <!-- Строка 1 -->
+                    <Button Grid.Row="0" Grid.Column="0" Content="C" Classes="calc-action" Command="{Binding ClearCommand}" ToolTip.Tip="Очистить всё (C)" />
+                    <Button Grid.Row="0" Grid.Column="1" Content="⌫" Classes="calc-btn" Command="{Binding BackspaceCommand}" ToolTip.Tip="Удалить последний символ" />
+                    <Button Grid.Row="0" Grid.Column="2" Content="√" Classes="calc-btn" Command="{Binding SqrtCommand}" ToolTip.Tip="Квадратный корень" />
+                    <Button Grid.Row="0" Grid.Column="3" Content="÷" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="÷" ToolTip.Tip="Разделить" />
+
+                    <!-- Строка 2 -->
+                    <Button Grid.Row="1" Grid.Column="0" Content="7" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="7" />
+                    <Button Grid.Row="1" Grid.Column="1" Content="8" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="8" />
+                    <Button Grid.Row="1" Grid.Column="2" Content="9" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="9" />
+                    <Button Grid.Row="1" Grid.Column="3" Content="×" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="×" ToolTip.Tip="Умножить" />
+
+                    <!-- Строка 3 -->
+                    <Button Grid.Row="2" Grid.Column="0" Content="4" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="4" />
+                    <Button Grid.Row="2" Grid.Column="1" Content="5" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="5" />
+                    <Button Grid.Row="2" Grid.Column="2" Content="6" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="6" />
+                    <Button Grid.Row="2" Grid.Column="3" Content="-" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="-" ToolTip.Tip="Вычесть" />
+
+                    <!-- Строка 4 -->
+                    <Button Grid.Row="3" Grid.Column="0" Content="1" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="1" />
+                    <Button Grid.Row="3" Grid.Column="1" Content="2" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="2" />
+                    <Button Grid.Row="3" Grid.Column="2" Content="3" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="3" />
+                    <Button Grid.Row="3" Grid.Column="3" Content="+" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="+" ToolTip.Tip="Сложить" />
+
+                    <!-- Строка 5 -->
+                    <Button Grid.Row="4" Grid.Column="0" Content="±" Classes="calc-btn" Command="{Binding ToggleSignCommand}" ToolTip.Tip="Сменить знак" />
+                    <Button Grid.Row="4" Grid.Column="1" Content="0" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="0" />
+                    <Button Grid.Row="4" Grid.Column="2" Content="," Classes="calc-btn" Command="{Binding InputDecimalCommand}" ToolTip.Tip="Десятичный разделитель" />
+                    <Button Grid.Row="4" Grid.Column="3" Content="=" Classes="calc-op" Background="#00C853" Command="{Binding CalculateResultCommand}" ToolTip.Tip="Вычислить результат (=)" />
+                </Grid>
+            </Grid>
+        </TabItem>
+
+        <!-- 2. Технологический пересчет величин -->
+        <TabItem Header="📐 Тех. расчеты" FontSize="12">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="10" Margin="10">
+                    <!-- Блок: Масса и Объем -->
+                    <Border Background="#161920" BorderBrush="#2D3748" BorderThickness="1" CornerRadius="8" Padding="10">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="⚖️ Масса, Объем и Плотность" FontWeight="Bold" Foreground="#00E5FF" FontSize="13" />
+                            <TextBlock Text="Формула: m = V × ρ" Foreground="#888888" FontSize="11" />
+
+                            <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,Auto,Auto" Margin="0,4,0,0">
+                                <StackPanel Grid.Row="0" Grid.Column="0">
+                                    <TextBlock Text="Объем V (м³):" Foreground="Gray" FontSize="11" />
+                                    <NumericUpDown Value="{Binding TechVolume, Mode=TwoWay}" Minimum="0" Maximum="10000" Increment="1" FormatString="{}{0:F2}" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="2">
+                                    <TextBlock Text="Плотность ρ (кг/м³):" Foreground="Gray" FontSize="11" />
+                                    <NumericUpDown Value="{Binding TechDensity, Mode=TwoWay}" Minimum="100" Maximum="3000" Increment="10" FormatString="{}{0:F1}" />
+                                </StackPanel>
+
+                                <Border Grid.Row="1" Grid.ColumnSpan="3" Height="1" Background="#2D3748" Margin="0,8" />
+
+                                <StackPanel Grid.Row="2" Grid.Column="0">
+                                    <TextBlock Text="Масса (кг):" Foreground="Gray" FontSize="11" />
+                                    <TextBlock Text="{Binding TechMass, StringFormat=\{0:N1\} кг}" Foreground="#00E676" FontWeight="Bold" FontSize="14" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Grid.Column="2">
+                                    <TextBlock Text="Масса (тонн):" Foreground="Gray" FontSize="11" />
+                                    <TextBlock Text="{Binding TechMassTons, StringFormat=\{0:N3\} т}" Foreground="#00E676" FontWeight="Bold" FontSize="14" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Блок: Пересчет давления -->
+                    <Border Background="#161920" BorderBrush="#2D3748" BorderThickness="1" CornerRadius="8" Padding="10">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="💨 Пересчет единиц давления" FontWeight="Bold" Foreground="#00E5FF" FontSize="13" />
+                            
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Давление в бар:" Foreground="Gray" FontSize="11" />
+                                <NumericUpDown Value="{Binding PressureBar, Mode=TwoWay}" Minimum="0" Maximum="1000" Increment="0.1" FormatString="{}{0:F2}" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="0,6,0,0">
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,4,4">
+                                    <TextBlock Text="кгс/см² (атм):" Foreground="Gray" FontSize="11" />
+                                    <TextBlock Text="{Binding PressureKgs, StringFormat=\{0:F3\} кгс/см²}" Foreground="#FFD600" FontWeight="Bold" FontSize="13" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,4">
+                                    <TextBlock Text="кПа:" Foreground="Gray" FontSize="11" />
+                                    <TextBlock Text="{Binding PressureKpa, StringFormat=\{0:F1\} кПа}" Foreground="#FFD600" FontWeight="Bold" FontSize="13" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,4,4,0">
+                                    <TextBlock Text="МПа:" Foreground="Gray" FontSize="11" />
+                                    <TextBlock Text="{Binding PressureMpa, StringFormat=\{0:F4\} МПа}" Foreground="#FFD600" FontWeight="Bold" FontSize="13" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+    </TabControl>
+</UserControl>

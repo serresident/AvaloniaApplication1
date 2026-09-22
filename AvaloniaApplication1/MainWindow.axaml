@@ -23,6 +23,8 @@
     </Window.Resources>
 
     <Window.KeyBindings>
+        <KeyBinding Gesture="F10" Command="{Binding OpenCalculatorCommand}" />
+        <KeyBinding Gesture="F1" Command="{Binding OpenSettingsCommand}" />
         <KeyBinding Gesture="Ctrl+E" Command="{Binding ToggleDesignModeCommand}" />
         <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenProjectCommand}" />
         <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveConfigCommand}" />
@@ -55,7 +57,7 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <!-- Live Clock & Date Badge -->
                     <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
-                            ToolTip.Tip="Текущее системное время и дата">
+                            ToolTip.Tip="Текущее системное время и дата оператора">
                         <StackPanel Orientation="Horizontal" Spacing="5">
                             <TextBlock Text="🕒" FontSize="11" VerticalAlignment="Center" />
                             <TextBlock Text="{Binding CurrentTimeText}" Foreground="#4EC9B0" FontSize="12" FontWeight="Bold" FontFamily="Consolas, monospace" VerticalAlignment="Center" />
@@ -64,20 +66,21 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Connection Status Badge -->
-                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
-                            ToolTip.Tip="Статус сетевого драйвера и коммуникаций">
+                    <!-- Connection Status Badge (Clickable) -->
+                    <Button Command="{Binding OpenConnectionManagerCommand}"
+                            Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                            ToolTip.Tip="Статус сетевых драйверов (нажмите для открытия менеджера связей)">
                         <TextBlock Text="{Binding ConnectionStatusText}" Foreground="#DCDCAA" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    </Border>
+                    </Button>
 
                     <!-- Alarms Counter Badge -->
                     <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
-                            ToolTip.Tip="Сводка активных аварийных сигналов">
+                            ToolTip.Tip="Сводка активных аварийных сигналов технологического процесса">
                         <TextBlock Text="{Binding ActiveAlarmsText}" Foreground="#9CDCFE" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Border>
                 </StackPanel>
 
-                <!-- Right Section: Current Config Badge, Settings & Mode Switch -->
+                <!-- Right Section: Current Config Badge, Calculator, Settings & Mode Switch -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                     <!-- Active Project Name Badge (ALWAYS VISIBLE) -->
                     <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
@@ -87,12 +90,19 @@
                                    Foreground="#9CDCFE" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Border>
 
+                    <!-- Calculator Button (ALWAYS VISIBLE) -->
+                    <Button Command="{Binding OpenCalculatorCommand}"
+                            Content="🧮"
+                            Background="#2A3344"
+                            Foreground="#00E5FF" CornerRadius="4" Padding="8,4"
+                            ToolTip.Tip="Открыть технологический калькулятор и пересчет величин (F10)" />
+
                     <!-- Settings Button (Design mode) -->
                     <Button Command="{Binding OpenSettingsCommand}"
                             Content="⚙️ Настройки"
                             Background="#3E3E42"
                             Foreground="White" CornerRadius="4" Padding="8,4"
-                            ToolTip.Tip="Настройки проекта, мнемосхемы и пароля"
+                            ToolTip.Tip="Настройки проекта, мнемосхемы, симуляции и пароля (Ctrl+,)"
                             IsVisible="{Binding ProjectContext.IsDesignMode}"/>
 
                     <!-- Open Project Button (Design mode) -->
@@ -125,27 +135,6 @@
                             Background="#6A1B9A"
                             Foreground="White" CornerRadius="4" Padding="7,4"
                             ToolTip.Tip="Менеджер подключений (Modbus, MQTT)"
-                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
-
-                    <!-- Simulation Controls -->
-                    <Button Command="{Binding ToggleSimulationCommand}"
-                            Background="{Binding IsSimulationRunning, Converter={StaticResource BoolToColor}}"
-                            Foreground="White" CornerRadius="4" Padding="7,4"
-                            ToolTip.Tip="Запуск/остановка внутренней симуляции тегов"
-                            IsVisible="{Binding ProjectContext.IsDesignMode}">
-                        <Button.Content>
-                            <Binding Path="IsSimulationRunning">
-                                <Binding.Converter>
-                                    <c:BoolToStringConverter TrueString="⏹ Стоп" FalseString="▶ Sim" />
-                                </Binding.Converter>
-                            </Binding>
-                        </Button.Content>
-                    </Button>
-                    <Button Command="{Binding ResetSimulationCommand}"
-                            Content="🔄"
-                            Background="#5A5A5A"
-                            Foreground="White" CornerRadius="4" Padding="6,4"
-                            ToolTip.Tip="Сбросить симуляцию к начальным значениям"
                             IsVisible="{Binding ProjectContext.IsDesignMode}"/>
 
                     <!-- Mode Toggle Button (ALWAYS VISIBLE) -->
@@ -231,7 +220,8 @@
                                             CornerRadius="0"
                                             VerticalContentAlignment="Center" 
                                             HorizontalContentAlignment="Center"
-                                            BorderThickness="0">
+                                            BorderThickness="0"
+                                            ToolTip.Tip="Свернуть окно">
                                         <Button.Styles>
                                             <Style Selector="Button:pointerover">
                                                 <Setter Property="Background" Value="#505052"/>
@@ -250,7 +240,8 @@
                                             CornerRadius="0"
                                             VerticalContentAlignment="Center" 
                                             HorizontalContentAlignment="Center"
-                                            BorderThickness="0">
+                                            BorderThickness="0"
+                                            ToolTip.Tip="Закрыть окно">
                                         <Button.Styles>
                                             <Style Selector="Button:pointerover">
                                                 <Setter Property="Background" Value="#E81123"/>
@@ -272,6 +263,9 @@
                                             </DataTemplate>
                                             <DataTemplate DataType="{x:Type vm:NumpadViewModel}">
                                                 <v:NumpadView />
+                                            </DataTemplate>
+                                            <DataTemplate DataType="{x:Type vm:CalculatorViewModel}">
+                                                <v:CalculatorView />
                                             </DataTemplate>
                                         </ContentControl.DataTemplates>
                                     </ContentControl>

@@ -74,6 +74,12 @@ namespace AvaloniaApplication1.ViewModels
         // --- New HMI Properties ---
 
         [ObservableProperty]
+        private bool _showStatusText = true;
+
+        [ObservableProperty]
+        private double _labelOffset = 0.0;
+
+        [ObservableProperty]
         private int _rotation;
 
         [ObservableProperty]
@@ -131,6 +137,8 @@ namespace AvaloniaApplication1.ViewModels
             ActuatorType = string.IsNullOrEmpty(config.ActuatorType) ? "Solenoid" : config.ActuatorType;
 
             // Load new config values
+            ShowStatusText = config.ShowStatusText;
+            LabelOffset = config.LabelOffset;
             Rotation = config.Rotation;
             Tolerance = config.Tolerance == 0 ? DefaultTolerance : config.Tolerance;
             AlarmDisabled = config.AlarmDisabled;
@@ -461,10 +469,10 @@ namespace AvaloniaApplication1.ViewModels
             if (_controlWindow != null)
             {
                 // Position window
-                if (_lastPopupX.HasValue && _lastPopupY.HasValue)
+                if (_lastPopupX is double px && _lastPopupY is double py)
                 {
-                    _controlWindow.X = _lastPopupX.Value;
-                    _controlWindow.Y = _lastPopupY.Value;
+                    _controlWindow.X = px;
+                    _controlWindow.Y = py;
                 }
                 else
                 {

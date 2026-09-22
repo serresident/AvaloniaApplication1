@@ -15,6 +15,11 @@
         WindowStartupLocation="CenterOwner"
         Background="#1E1E1E">
 
+    <Window.Resources>
+        <c:BoolToStringConverter x:Key="BoolToSimText" TrueString="⏹️ Остановить симуляцию" FalseString="▶️ Запустить симуляцию" />
+        <c:BoolToBrushConverter x:Key="BoolToSimBg" TrueBrush="#D50000" FalseBrush="#00897B" />
+    </Window.Resources>
+
     <Grid RowDefinitions="Auto,*,Auto" Margin="16">
         <!-- Header -->
         <Border Grid.Row="0" Background="#2D2D30" CornerRadius="6" Padding="14,10" Margin="0,0,0,12" BorderBrush="#3E3E42" BorderThickness="1">
@@ -51,6 +56,16 @@
                                      IsReadOnly="True"
                                      Background="#1A1A1A" Foreground="#CE9178" BorderBrush="#3E3E42" Height="32" CornerRadius="4" />
                         </StackPanel>
+
+                        <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,6,0,0">
+                            <StackPanel Spacing="6">
+                                <CheckBox IsChecked="{Binding IsCompactMode, Mode=TwoWay}" Foreground="#FFFFFF" FontWeight="SemiBold">
+                                    <TextBlock Text="Компактный режим (Оптимизация под разрешение 1024x768)" VerticalAlignment="Center" />
+                                </CheckBox>
+                                <TextBlock Text="Автоматически уменьшает внутренние отступы виджетов и масштабирует шрифты для предотвращения наложений на небольших панелях."
+                                           FontSize="11" Foreground="#858585" Margin="28,0,0,0" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -147,6 +162,80 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB 5: Симуляция -->
+            <TabItem Header="🎮 Симуляция" FontSize="13">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="16" Margin="10">
+                        <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="14">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Управление программным симулятором техпроцесса" FontWeight="Bold" Foreground="#00E5FF" FontSize="14" />
+                                <TextBlock Text="Симулятор генерирует тестовые значения расхода, температуры, уровня и давления при отсутствии физического подключения к ПЛК."
+                                           FontSize="12" Foreground="#858585" TextWrapping="Wrap" />
+
+                                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+                                    <Button Content="{Binding IsSimulationRunning, Converter={StaticResource BoolToSimText}}"
+                                            Command="{Binding ToggleSimulationCommand}"
+                                            Background="{Binding IsSimulationRunning, Converter={StaticResource BoolToSimBg}}"
+                                            Foreground="White" FontWeight="Bold" Padding="16,8" CornerRadius="6" />
+
+                                    <Button Content="🔄 Сброс параметров"
+                                            Command="{Binding ResetSimulationCommand}"
+                                            Background="#3E3E42" Foreground="White" Padding="14,8" CornerRadius="6" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB 6: Справка и горячие клавиши -->
+            <TabItem Header="❓ Справка" FontSize="13">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="14" Margin="10">
+                        <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="14">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="⌨️ Горячие клавиши оператора и инженера" FontWeight="Bold" Foreground="#4EC9B0" FontSize="14" />
+                                
+                                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="F10" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Открыть технологический калькулятор и конвертер величин" Foreground="#D4D4D4" Margin="0,3" />
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Ctrl + E" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Переключение режима Редактирования / Исполнения (Design / Runtime)" Foreground="#D4D4D4" Margin="0,3" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Ctrl + S" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="Сохранить текущий проект конфигурации мнемосхемы" Foreground="#D4D4D4" Margin="0,3" />
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Ctrl + Shift + S" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Сохранить проект как новый JSON файл" Foreground="#D4D4D4" Margin="0,3" />
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Ctrl + O" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3" />
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="Загрузить проект конфигурации мнемосхемы" Foreground="#D4D4D4" Margin="0,3" />
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Ctrl + ," FontWeight="Bold" Foreground="#00E5FF" Margin="0,3" />
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Text="Открыть настройки проекта, симуляции и безопасности" Foreground="#D4D4D4" Margin="0,3" />
+
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="2x Клик (Design)" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3" />
+                                    <TextBlock Grid.Row="6" Grid.Column="1" Text="Открыть окно редактирования свойств и адресов виджета" Foreground="#D4D4D4" Margin="0,3" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="14">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="ℹ️ Особенности работы в режиме SCADA / HMI" FontWeight="Bold" Foreground="#FFD700" FontSize="14" />
+                                <TextBlock Text="• Режим исполнения (Runtime): интерфейс защищен от случайного смещения элементов, кнопки и задвижки работают в оперативном режиме, статус онлайн отображает состояние связи с ПЛК."
+                                           FontSize="12" Foreground="#D4D4D4" TextWrapping="Wrap" />
+                                <TextBlock Text="• Отсечные клапаны: поддерживают двухсигнальную обратную связь (концевики SQH - Открыт и SQL - Закрыт) с автоматической диагностикой рассогласования и аварий."
+                                           FontSize="12" Foreground="#D4D4D4" TextWrapping="Wrap" />
+                                <TextBlock Text="• Контроллер Wiren Board: IP 10.10.10.234, протоколы Modbus TCP (порт 502) и MQTT (порт 1883)."
+                                           FontSize="12" Foreground="#D4D4D4" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

@@ -33,6 +33,12 @@ namespace AvaloniaApplication1.ViewModels
         private double _preMinimizeHeight = 380;
 
         public Action? CloseAction { get; set; }
+        public Action? BringToFrontAction { get; set; }
+
+        public void BringToFront()
+        {
+            BringToFrontAction?.Invoke();
+        }
 
         public ChildWindowViewModel(string title, object content)
         {

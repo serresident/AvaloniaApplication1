@@ -126,6 +126,7 @@ namespace AvaloniaApplication1.ViewModels
             {
                 CurrentTimeText = DateTime.Now.ToString("HH:mm:ss");
                 CurrentDateText = DateTime.Now.ToString("dd.MM.yyyy");
+                UpdateConnectionStatus();
                 UpdateWindowTitle();
             };
             _clockTimer.Start();
@@ -134,11 +135,52 @@ namespace AvaloniaApplication1.ViewModels
             LoadConfigAsync().FireAndForget(context: "MainViewModel.ctor");
         }
 
+        private void UpdateConnectionStatus()
+        {
+            if (IsSimulationRunning)
+            {
+                ConnectionStatusText = "🟡 Симуляция";
+                return;
+            }
+
+            var count = _currentConfig?.Connections?.Count ?? 0;
+            if (count == 0)
+            {
+                ConnectionStatusText = "⚪ Нет связей";
+            }
+            else
+            {
+                ConnectionStatusText = $"🟢 Онлайн ({count})";
+            }
+        }
+
         public void UpdateWindowTitle()
         {
             var modeText = ProjectContext.IsDesignMode ? "✏️ Наладка" : "🔒 Исполнение";
-            var simText = IsSimulationRunning ? "🟡 Симуляция" : "🟢 Онлайн";
+            var simText = IsSimulationRunning ? "🟡 Симуляция" : ConnectionStatusText;
             WindowTitle = $"[{CurrentProjectName}] — HMI SCADA | {simText} | {modeText} | {CurrentTimeText}";
+        }
+
+        [RelayCommand]
+        public void OpenCalculator()
+        {
+            var existing = System.Linq.Enumerable.FirstOrDefault(ActiveChildWindows, cw => cw.Content is CalculatorViewModel);
+            if (existing != null)
+            {
+                existing.BringToFront();
+                if (existing.IsMinimized) existing.IsMinimized = false;
+                return;
+            }
+
+            var calcVm = new CalculatorViewModel();
+            var child = OpenChildWindow("🧮 Технологический калькулятор", calcVm);
+            if (child != null)
+            {
+                child.Width = 360;
+                child.Height = 490;
+                child.X = 80;
+                child.Y = 60;
+            }
         }
 
         [RelayCommand]
@@ -320,6 +362,17 @@ namespace AvaloniaApplication1.ViewModels
                 ActiveChildWindows.Remove(childWindow);
                 childWindow.Dispose();
                 originalClose?.Invoke();
+            };
+
+            childWindow.BringToFrontAction = () =>
+            {
+                int max = 0;
+                foreach (var w in ActiveChildWindows)
+                {
+                    if (w.ZIndex > max) max = w.ZIndex;
+                }
+                childWindow.ZIndex = max + 1;
+                if (childWindow.IsMinimized) childWindow.IsMinimized = false;
             };
 
             // Stagger coordinates slightly

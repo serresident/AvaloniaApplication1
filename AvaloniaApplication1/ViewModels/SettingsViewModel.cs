@@ -42,18 +42,28 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private int _selectedTabIndex;
 
+        [ObservableProperty]
+        private bool _isCompactMode;
+
+        [ObservableProperty]
+        private bool _isSimulationRunning;
+
+        private readonly ISimulationService? _simulationService;
+
         public ObservableCollection<ConnectionConfig> Connections { get; } = new();
 
         public SettingsViewModel(
             HmiConfiguration config,
             IConfigurationService configService,
             IDialogService? dialogService = null,
-            Action? closeAction = null)
+            Action? closeAction = null,
+            ISimulationService? simulationService = null)
         {
             _config = config;
             _configService = configService;
             _dialogService = dialogService;
             _closeAction = closeAction;
+            _simulationService = simulationService;
 
             _config.Project ??= new ProjectConfig();
             _config.Security ??= new SecurityConfig();
@@ -61,6 +71,7 @@ namespace AvaloniaApplication1.ViewModels
 
             ProjectName = _config.Project.Name;
             ProjectVersion = _config.Project.Version;
+            IsCompactMode = _config.Project.IsCompactMode;
             CurrentFilePath = _configService.CurrentFilePath;
 
             MimicCellSize = _config.Mimic.CellSize > 0 ? _config.Mimic.CellSize : 10;
@@ -81,10 +92,37 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         [RelayCommand]
+        private async Task ToggleSimulationAsync()
+        {
+            if (_simulationService == null) return;
+            if (IsSimulationRunning)
+            {
+                await _simulationService.StopSimulationAsync();
+                IsSimulationRunning = false;
+                StatusMessage = "Симуляция остановлена.";
+            }
+            else
+            {
+                await _simulationService.StartSimulationAsync();
+                IsSimulationRunning = true;
+                StatusMessage = "Симуляция запущена.";
+            }
+        }
+
+        [RelayCommand]
+        private void ResetSimulation()
+        {
+            if (_simulationService == null) return;
+            _simulationService.ResetSimulation();
+            StatusMessage = "Параметры симуляции сброшены.";
+        }
+
+        [RelayCommand]
         private async Task SaveSettingsAsync()
         {
             _config.Project.Name = ProjectName;
             _config.Project.Version = ProjectVersion;
+            _config.Project.IsCompactMode = IsCompactMode;
             _config.Mimic.CellSize = MimicCellSize;
             _config.Mimic.ZoomScale = MimicZoomScale;
             _config.Security.RequirePasswordForDesignMode = RequirePassword;

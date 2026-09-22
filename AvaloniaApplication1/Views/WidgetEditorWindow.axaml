@@ -22,37 +22,67 @@
             <StackPanel Spacing="12">
 
                 <!-- Header -->
-                <TextBlock Text="Widget Properties" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,8" />
+                <TextBlock Text="Свойства виджета мнемосхемы" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,8" />
 
                 <!-- Widget Type -->
-                <TextBlock Text="Widget Type" Foreground="#AAAAAA" FontSize="12" />
+                <TextBlock Text="Тип виджета" Foreground="#AAAAAA" FontSize="12" />
                 <ComboBox ItemsSource="{Binding AvailableWidgetTypes}" 
                           SelectedItem="{Binding SelectedWidgetType}"
                           HorizontalAlignment="Stretch" />
 
                 <!-- Title -->
-                <TextBlock Text="Title" Foreground="#AAAAAA" FontSize="12" />
-                <TextBox Text="{Binding Title}" PlaceholderText="Widget title..." />
+                <TextBlock Text="Наименование / Заголовок" Foreground="#AAAAAA" FontSize="12" />
+                <TextBox Text="{Binding Title}" PlaceholderText="Заголовок или тег виджета..." />
+
+                <!-- Typography & Display Section -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Отображение и типографика" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <Grid ColumnDefinitions="*,10,*">
+                            <CheckBox Grid.Column="0" Content="Показывать заголовок" IsChecked="{Binding ShowTitle}" Foreground="White" />
+                            <CheckBox Grid.Column="2" Content="Показывать рамку" IsChecked="{Binding ShowBorder}" Foreground="White" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <CheckBox Grid.Column="0" Content="Автомасштаб текста" IsChecked="{Binding AutoScaleText}" Foreground="White" />
+                            <CheckBox Grid.Column="2" Content="Компактный режим" IsChecked="{Binding CompactMode}" Foreground="White" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Размер шрифта (0 = авто)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding CustomFontSize}" Minimum="0" Maximum="72" FormatString="0 px" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Положение подписи" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableLabelPositions}"
+                                          SelectedItem="{Binding SelectedLabelPosition}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
                 <!-- Position Section -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Position &amp; Size" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Позиция и размеры (сетка)" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
                         <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,8,Auto">
                             <StackPanel Grid.Row="0" Grid.Column="0">
-                                <TextBlock Text="Row" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Строка (Row / Y)" Foreground="#AAAAAA" FontSize="11" />
                                 <NumericUpDown Value="{Binding Row}" Minimum="0" Maximum="100" FormatString="0" />
                             </StackPanel>
                             <StackPanel Grid.Row="0" Grid.Column="2">
-                                <TextBlock Text="Column" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Колонка (Col / X)" Foreground="#AAAAAA" FontSize="11" />
                                 <NumericUpDown Value="{Binding Col}" Minimum="0" Maximum="100" FormatString="0" />
                             </StackPanel>
                             <StackPanel Grid.Row="2" Grid.Column="0">
-                                <TextBlock Text="Width (cells)" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Ширина (ячеек)" Foreground="#AAAAAA" FontSize="11" />
                                 <NumericUpDown Value="{Binding SizeX}" Minimum="1" Maximum="100" FormatString="0" />
                             </StackPanel>
                             <StackPanel Grid.Row="2" Grid.Column="2">
-                                <TextBlock Text="Height (cells)" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Высота (ячеек)" Foreground="#AAAAAA" FontSize="11" />
                                 <NumericUpDown Value="{Binding SizeY}" Minimum="1" Maximum="100" FormatString="0" />
                             </StackPanel>
                         </Grid>
@@ -62,18 +92,18 @@
                 <!-- Data Source Section -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Data Source" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Источник данных (Связь с ПЛК / Тэг)" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
                         
-                        <TextBlock Text="Connection" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Подключение (Драйвер)" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
                                   SelectedItem="{Binding SelectedConnectionId}"
                                   HorizontalAlignment="Stretch"
-                                  PlaceholderText="Select connection..." />
+                                  PlaceholderText="Выберите подключение..." />
 
-                        <TextBlock Text="Address (register/topic)" Foreground="#AAAAAA" FontSize="11" />
-                        <TextBox Text="{Binding Address}" PlaceholderText="e.g. 40001 or sensor/temp" />
+                        <TextBlock Text="Адрес тэга (регистр / топик MQTT)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding Address}" PlaceholderText="напр. 40001, 10001 или /devices/wb-mwac/controls/K1" />
 
-                        <TextBlock Text="Data Type" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Тип данных тэга" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableDataTypes}" 
                                   SelectedItem="{Binding SelectedDataType}"
                                   HorizontalAlignment="Stretch" />
@@ -84,17 +114,17 @@
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowValueDisplaySettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Value Display Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
-                        <TextBlock Text="Display Format" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Настройки отображения значения" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Формат вывода числа / строки" Foreground="#AAAAAA" FontSize="11" />
                         <controls:FormatEditorBox Format="{Binding Format}" />
 
                         <Grid ColumnDefinitions="*,10,*">
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Text Color" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Цвет текста значения" Foreground="#AAAAAA" FontSize="11" />
                                 <controls:ColorPickerBox SelectedColorHex="{Binding ValueColor}" />
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="Font Size" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Размер шрифта значения" Foreground="#AAAAAA" FontSize="11" />
                                 <NumericUpDown Value="{Binding ValueFontSize}" Minimum="8" Maximum="120" FormatString="F0" />
                             </StackPanel>
                         </Grid>
@@ -105,14 +135,14 @@
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowPilotLightSettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Pilot Light Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Настройки индикатора (Pilot Light)" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         <Grid ColumnDefinitions="*,10,*">
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="True Color" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Цвет «ИСТИНА / ВКЛ»" Foreground="#AAAAAA" FontSize="11" />
                                 <controls:ColorPickerBox SelectedColorHex="{Binding TrueColor}" />
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="False Color" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Цвет «ЛОЖЬ / ВЫКЛ»" Foreground="#AAAAAA" FontSize="11" />
                                 <controls:ColorPickerBox SelectedColorHex="{Binding FalseColor}" />
                             </StackPanel>
                         </Grid>
@@ -169,70 +199,83 @@
                     </StackPanel>
                 </Border>
 
-
                 <!-- Slider Settings -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowSliderSettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Slider Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Настройки шкалы и диапазона" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         <Grid ColumnDefinitions="*,10,*">
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Min Value" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Мин. значение" Foreground="#AAAAAA" FontSize="11" />
                                 <NumericUpDown Value="{Binding MinValue}" FormatString="F1" />
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="Max Value" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Макс. значение" Foreground="#AAAAAA" FontSize="11" />
                                 <NumericUpDown Value="{Binding MaxValue}" FormatString="F1" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>
                 </Border>
+
                 <!-- Pipe Settings -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowPipeSettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Pipe Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Параметры трубопровода" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         
-                        <TextBlock Text="Pipe Points (e.g. 0,0;5,0;5,3)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Узловые точки сетки (напр. 0,0;5,0;5,3)" Foreground="#AAAAAA" FontSize="11" />
                         <TextBox Text="{Binding PipePoints}" PlaceholderText="0,0;5,0;5,3" />
 
-                        <TextBlock Text="Thickness" Foreground="#AAAAAA" FontSize="11" />
-                        <NumericUpDown Value="{Binding Thickness}" Minimum="4" Maximum="32" FormatString="0" />
+                        <TextBlock Text="Толщина трубы (px)" Foreground="#AAAAAA" FontSize="11" />
+                        <NumericUpDown Value="{Binding Thickness}" Minimum="4" Maximum="32" FormatString="0 px" />
 
-                        <TextBlock Text="Start Fitting" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Фитинг начала" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableFittings}" 
                                   SelectedItem="{Binding SelectedStartFitting}"
                                   HorizontalAlignment="Stretch" />
 
-                        <TextBlock Text="End Fitting" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Фитинг окончания" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableFittings}" 
                                   SelectedItem="{Binding SelectedEndFitting}"
                                   HorizontalAlignment="Stretch" />
                         
-                        <CheckBox Content="Show Flanges" IsChecked="{Binding ShowFlanges}" Foreground="White" />
+                        <CheckBox Content="Отображать соединительные фланцы" IsChecked="{Binding ShowFlanges}" Foreground="White" />
                     </StackPanel>
-                </Border>                <!-- Valve Settings -->
+                </Border>
+
+                <!-- Valve Settings -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowValveSettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Valve Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Параметры задвижки / клапана" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         
-                        <TextBlock Text="Valve Type" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Тип клапана (Отсечной / Регулирующий)" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableValveTypes}" 
                                   SelectedItem="{Binding SelectedValveType}"
                                   HorizontalAlignment="Stretch" />
 
-                        <TextBlock Text="Actuator Type" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Тип привода" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableActuatorTypes}" 
                                   SelectedItem="{Binding SelectedActuatorType}"
                                   HorizontalAlignment="Stretch" />
 
-                        <CheckBox Content="Vertical Orientation" IsChecked="{Binding IsVertical}" Foreground="White" Margin="0,4,0,0" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <CheckBox Grid.Column="0" Content="Вертикальная ориентация" IsChecked="{Binding IsVertical}" Foreground="White" />
+                            <CheckBox Grid.Column="2" Content="Показ текста статуса" IsChecked="{Binding ShowStatusText}" Foreground="White" />
+                        </Grid>
 
-                        <TextBlock Text="Rotation Angle" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
-                        <ComboBox ItemsSource="{Binding AvailableRotations}" 
-                                  SelectedItem="{Binding SelectedRotation}"
-                                  HorizontalAlignment="Stretch" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Угол поворота (°)" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableRotations}" 
+                                          SelectedItem="{Binding SelectedRotation}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Смещение подписи (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding LabelOffset}" Minimum="-50" Maximum="50" FormatString="0 px" />
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
 
@@ -240,45 +283,41 @@
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowRegulatingSettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Feedback &amp; Mode Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Обратная связь и концевые выключатели" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         
-                        <TextBlock Text="Концевик «Открыт» / Feedback (SQH / Положение)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBlock Text="Концевик «Открыт» / Положение (SQH / FB)" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
                                   SelectedItem="{Binding FeedbackConnectionId}"
                                   HorizontalAlignment="Stretch"
-                                  PlaceholderText="Same as main or select..." />
-
-                        <TextBox Text="{Binding FeedbackAddress}" PlaceholderText="e.g. 10016 or 40002" />
+                                  PlaceholderText="Как у основного или выберите..." />
+                        <TextBox Text="{Binding FeedbackAddress}" PlaceholderText="напр. 10016 или 40002" />
 
                         <TextBlock Text="Концевик «Закрыт» (SQL / Closed Feedback)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
                                   SelectedItem="{Binding ClosedFeedbackConnectionId}"
                                   HorizontalAlignment="Stretch"
-                                  PlaceholderText="Same as main or select..." />
+                                  PlaceholderText="Как у основного или выберите..." />
+                        <TextBox Text="{Binding ClosedFeedbackAddress}" PlaceholderText="напр. 10017" />
 
-                        <TextBox Text="{Binding ClosedFeedbackAddress}" PlaceholderText="e.g. 10017" />
+                        <TextBlock Text="Допустимое рассогласование (%)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <NumericUpDown Value="{Binding Tolerance}" Minimum="0" Maximum="100" FormatString="0.0 '%'" />
 
-                        <TextBlock Text="Mismatch Tolerance (%)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
-                        <NumericUpDown Value="{Binding Tolerance}" Minimum="0" Maximum="100" FormatString="0.0" />
-
-                        <TextBlock Text="Mode Tag Connection" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <TextBlock Text="Тэг режима управления (Ручной / Авто)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
                                   SelectedItem="{Binding ModeConnectionId}"
                                   HorizontalAlignment="Stretch"
-                                  PlaceholderText="Same as main or select..." />
+                                  PlaceholderText="Как у основного или выберите..." />
+                        <TextBox Text="{Binding ModeAddress}" PlaceholderText="напр. 40003 или valve/mode" />
 
-                        <TextBlock Text="Mode Tag Address" Foreground="#AAAAAA" FontSize="11" />
-                        <TextBox Text="{Binding ModeAddress}" PlaceholderText="e.g. 40003 or valve/mode" />
-
-                        <TextBlock Text="Control Window Size" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" Margin="0,4,0,0" />
+                        <TextBlock Text="Размеры диалогового окна управления" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" Margin="0,4,0,0" />
                         <Grid ColumnDefinitions="*,10,*">
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Width (px)" Foreground="#AAAAAA" FontSize="11" />
-                                <NumericUpDown Value="{Binding ControlWindowWidth}" Minimum="200" Maximum="800" FormatString="0" />
+                                <TextBlock Text="Ширина (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ControlWindowWidth}" Minimum="200" Maximum="800" FormatString="0 px" />
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="Height (px)" Foreground="#AAAAAA" FontSize="11" />
-                                <NumericUpDown Value="{Binding ControlWindowHeight}" Minimum="200" Maximum="600" FormatString="0" />
+                                <TextBlock Text="Высота (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ControlWindowHeight}" Minimum="200" Maximum="600" FormatString="0 px" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -288,14 +327,14 @@
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowIndustrialSettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Mimic Color Settings" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Цветовое кодирование мнемосхемы" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         <Grid ColumnDefinitions="*,10,*">
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Active Color" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Цвет «Активно / Открыто / Поток»" Foreground="#AAAAAA" FontSize="11" />
                                 <controls:ColorPickerBox SelectedColorHex="{Binding ActiveColor}" />
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="Inactive Color" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBlock Text="Цвет «Неактивно / Закрыто / Стоп»" Foreground="#AAAAAA" FontSize="11" />
                                 <controls:ColorPickerBox SelectedColorHex="{Binding InactiveColor}" />
                             </StackPanel>
                         </Grid>
@@ -306,7 +345,7 @@
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowContainerSettings}">
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Container Window Settings" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Параметры контейнера подэкрана" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
                         <Grid ColumnDefinitions="*,10,*">
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="Размер сетки контейнера (px)" Foreground="#AAAAAA" FontSize="11" />
@@ -327,14 +366,14 @@
         <Border Grid.Row="1" Background="#252526" BorderBrush="#3E3E42" BorderThickness="0,1,0,0" Padding="20,14">
             <Grid ColumnDefinitions="*,12,*">
                 <Button Grid.Column="0" 
-                        Content="❌  Cancel" 
+                        Content="❌  Отмена" 
                         IsCancel="True"
                         Command="{Binding CancelCommand}"
                         HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                         Background="#3E3E42" Foreground="White" CornerRadius="6" 
                         Padding="12,10" FontSize="14" />
                 <Button Grid.Column="2" 
-                        Content="✅  OK" 
+                        Content="💾  Применить" 
                         Command="{Binding SaveCommand}"
                         HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                         Background="#007ACC" Foreground="White" CornerRadius="6" 

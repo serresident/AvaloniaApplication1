@@ -17,6 +17,7 @@ namespace AvaloniaApplication1.Models.Config
     {
         public string Name { get; set; } = string.Empty;
         public string Version { get; set; } = "1.0.0";
+        public bool IsCompactMode { get; set; } = false;
     }
 
     public class SecurityConfig
@@ -63,6 +64,14 @@ namespace AvaloniaApplication1.Models.Config
         public string Title { get; set; } = string.Empty;
         public DataSourceConfig Source { get; set; } = new();
         public WidgetPosition Position { get; set; } = new();
+
+        // Responsive typography & layout properties
+        public double FontSize { get; set; } = 0;              // 0 = auto-scale from cell size
+        public bool AutoScaleText { get; set; } = true;         // Wrap in Viewbox
+        public bool ShowTitle { get; set; } = true;             // Show / hide title
+        public bool ShowBorder { get; set; } = true;            // Background panel border
+        public string LabelPosition { get; set; } = "Default";  // Default | Top | Bottom | Left | Right | Inside | Hidden
+        public bool CompactMode { get; set; } = false;
     }
 
     // Generic fallback for unknown widgets
@@ -73,6 +82,8 @@ namespace AvaloniaApplication1.Models.Config
         public string Format { get; set; } = "{0}";
         public string ValueColor { get; set; } = string.Empty;
         public double ValueFontSize { get; set; } = 0;
+        public string LayoutMode { get; set; } = "Vertical";    // Vertical | Horizontal | ValueOnly
+        public string Unit { get; set; } = string.Empty;
     }
 
     public class PilotLightConfig : WidgetConfig
@@ -98,6 +109,9 @@ namespace AvaloniaApplication1.Models.Config
         // Colors
         public string ColorOn       { get; set; } = "#00AA44";
         public string ColorOff      { get; set; } = "#AA2200";
+        public bool ShowIconOnly    { get; set; } = false;
+        public string Icon          { get; set; } = string.Empty;
+        public double CornerRadius  { get; set; } = 6;
     }
 
     public class SliderConfig : WidgetConfig
@@ -113,6 +127,8 @@ namespace AvaloniaApplication1.Models.Config
         public double MaxValue { get; set; } = 100;
         public string ValueColor { get; set; } = string.Empty;
         public double ValueFontSize { get; set; } = 0;
+        public string Unit { get; set; } = string.Empty;
+        public string LayoutMode { get; set; } = "Vertical";
     }
 
     public class RealTimeTrendConfig : WidgetConfig
@@ -146,6 +162,8 @@ namespace AvaloniaApplication1.Models.Config
         public bool AlarmDisabled { get; set; } = false;
         public double Tolerance { get; set; } = 10.0;
         public DataSourceConfig? ModeSource { get; set; }
+        public bool ShowStatusText { get; set; } = true;
+        public double LabelOffset { get; set; } = 0;
     }
 
     public class TankConfig : WidgetConfig
@@ -155,6 +173,7 @@ namespace AvaloniaApplication1.Models.Config
         public double MaxValue { get; set; } = 100;
         public string ValueColor { get; set; } = string.Empty;
         public double ValueFontSize { get; set; } = 0;
+        public bool LabelInside { get; set; } = false;
     }
 
     public class PumpConfig : WidgetConfig
@@ -163,6 +182,7 @@ namespace AvaloniaApplication1.Models.Config
         public string InactiveColor { get; set; } = string.Empty;
         public double ControlWindowWidth { get; set; } = 0;
         public double ControlWindowHeight { get; set; } = 0;
+        public bool ShowStatusText { get; set; } = true;
     }
 
     public class HeatExchangerConfig : WidgetConfig

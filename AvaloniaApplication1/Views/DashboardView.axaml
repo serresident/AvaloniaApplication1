@@ -12,8 +12,20 @@
 
      <UserControl.Resources>
          <c:BoolToBrushConverter x:Key="BoolToColor" TrueBrush="#FF0000" FalseBrush="#440000" />
+         <c:BoolToBrushConverter x:Key="BoolToBorderBg" TrueBrush="#2D2D30" FalseBrush="Transparent" />
+         <c:BoolToBrushConverter x:Key="BoolToBorderStroke" TrueBrush="#3E3E42" FalseBrush="Transparent" />
          <c:HexToBrushConverter x:Key="HexToBrush" />
      </UserControl.Resources>
+
+     <UserControl.Styles>
+         <Style Selector="Button.hmi-compact">
+             <Setter Property="Padding" Value="2,1" />
+             <Setter Property="MinHeight" Value="14" />
+             <Setter Property="MinWidth" Value="14" />
+             <Setter Property="HorizontalContentAlignment" Value="Center" />
+             <Setter Property="VerticalContentAlignment" Value="Center" />
+         </Style>
+     </UserControl.Styles>
 
      <Grid>
          <ScrollViewer Name="DashboardScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
@@ -42,14 +54,22 @@
                       <!-- ValueDisplay -->
                       <DataTemplate DataType="{x:Type vm:ValueDisplayViewModel}">
                           <Grid ClipToBounds="False">
-                              <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
-                                  <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                      <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                      <TextBlock Text="{Binding DisplayValue}" Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}" FontSize="{Binding ValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" />
-                                  </StackPanel>
+                              <Border Background="{Binding ShowBorder, Converter={StaticResource BoolToBorderBg}}"
+                                      BorderBrush="{Binding ShowBorder, Converter={StaticResource BoolToBorderStroke}}"
+                                      BorderThickness="1" CornerRadius="6" Margin="1" Padding="4,2">
+                                  <Grid RowDefinitions="Auto,*">
+                                      <Viewbox Grid.Row="0" MaxHeight="14" Stretch="Uniform" HorizontalAlignment="Center" IsVisible="{Binding ShowTitle}">
+                                          <TextBlock Text="{Binding Title}" Foreground="#9E9E9E" FontSize="12" HorizontalAlignment="Center" />
+                                      </Viewbox>
+                                      <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,1">
+                                          <TextBlock Text="{Binding DisplayValue}"
+                                                     Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}"
+                                                     FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                      </Viewbox>
+                                  </Grid>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -60,14 +80,20 @@
                       <!-- PilotLight -->
                       <DataTemplate DataType="{x:Type vm:PilotLightViewModel}">
                           <Grid ClipToBounds="False">
-                              <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
-                                  <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                      <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                      <Ellipse Width="40" Height="40" Stroke="Black" StrokeThickness="2" Fill="{Binding IsOn, Converter={StaticResource BoolToColor}}" />
-                                  </StackPanel>
+                              <Border Background="{Binding ShowBorder, Converter={StaticResource BoolToBorderBg}}"
+                                      BorderBrush="{Binding ShowBorder, Converter={StaticResource BoolToBorderStroke}}"
+                                      BorderThickness="1" CornerRadius="6" Margin="1" Padding="4,2">
+                                  <Grid RowDefinitions="Auto,*">
+                                      <Viewbox Grid.Row="0" MaxHeight="14" Stretch="Uniform" HorizontalAlignment="Center" IsVisible="{Binding ShowTitle}">
+                                          <TextBlock Text="{Binding Title}" Foreground="#9E9E9E" FontSize="12" HorizontalAlignment="Center" />
+                                      </Viewbox>
+                                      <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2">
+                                          <Ellipse Width="32" Height="32" Stroke="#222222" StrokeThickness="2" Fill="{Binding IsOn, Converter={StaticResource BoolToColor}}" />
+                                      </Viewbox>
+                                  </Grid>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -78,30 +104,34 @@
                       <!-- CommandButton -->
                       <DataTemplate DataType="{x:Type vm:CommandButtonViewModel}">
                           <Grid ClipToBounds="False">
-                              <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
+                              <Border Background="{Binding ShowBorder, Converter={StaticResource BoolToBorderBg}}"
+                                      BorderBrush="{Binding ShowBorder, Converter={StaticResource BoolToBorderStroke}}"
+                                      BorderThickness="1" CornerRadius="6" Margin="1" Padding="0">
                                   <Button Command="{Binding ExecuteCommandCommand}"
                                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                          CornerRadius="7" Background="{Binding CurrentBackground}">
+                                          Classes="hmi-compact"
+                                          CornerRadius="5" Background="{Binding CurrentBackground}">
                                       <Grid>
-                                          <!-- Main Label -->
-                                          <TextBlock Text="{Binding CurrentLabel}"
-                                                     FontSize="16" FontWeight="Bold"
-                                                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                     Foreground="White" TextWrapping="Wrap" TextAlignment="Center"
-                                                     Margin="8,4" />
+                                          <!-- Main Label with Auto-Fit Viewbox -->
+                                          <Viewbox Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2">
+                                              <TextBlock Text="{Binding CurrentLabel}"
+                                                         FontWeight="Bold"
+                                                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                         Foreground="White" TextWrapping="Wrap" TextAlignment="Center" />
+                                          </Viewbox>
                                           <!-- ToggleSwitch mode: left OFF / right ON labels -->
                                           <StackPanel Orientation="Horizontal"
                                                       IsVisible="{Binding IsToggleSwitchMode}"
                                                       VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                                                      Margin="0,0,0,4" Spacing="8">
+                                                      Margin="0,0,0,2" Spacing="6">
                                               <TextBlock Text="{Binding TypedConfig.LabelOff}"
-                                                         Foreground="#CCCCCC" FontSize="11" />
-                                              <TextBlock Text="⟵" Foreground="#888888" FontSize="11"
+                                                         Foreground="#CCCCCC" FontSize="10" />
+                                              <TextBlock Text="⟵" Foreground="#888888" FontSize="10"
                                                          IsVisible="{Binding !IsActive}" />
-                                              <TextBlock Text="⟶" Foreground="White" FontSize="11"
+                                              <TextBlock Text="⟶" Foreground="White" FontSize="10"
                                                          IsVisible="{Binding IsActive}" />
                                               <TextBlock Text="{Binding TypedConfig.LabelOn}"
-                                                         Foreground="White" FontSize="11" />
+                                                         Foreground="White" FontSize="10" />
                                           </StackPanel>
                                       </Grid>
                                   </Button>
@@ -109,7 +139,7 @@
                               <!-- Design Overlay -->
                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle"
                                       Background="#33000000" BorderBrush="#007ACC" BorderThickness="2"
-                                      CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                                      CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14"
                                                  HorizontalAlignment="Right" VerticalAlignment="Bottom"
@@ -122,16 +152,20 @@
                       <!-- ContainerButton -->
                       <DataTemplate DataType="{x:Type vm:ContainerButtonViewModel}">
                           <Grid ClipToBounds="False">
-                              <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
-                                  <Button Command="{Binding OpenContainerCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="8" Background="#005A9E">
-                                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                          <TextBlock Text="📁" FontSize="24" HorizontalAlignment="Center" Foreground="White" />
-                                          <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White" TextWrapping="Wrap" TextAlignment="Center" Margin="0,5,0,0"/>
-                                      </StackPanel>
+                              <Border Background="{Binding ShowBorder, Converter={StaticResource BoolToBorderBg}}"
+                                      BorderBrush="{Binding ShowBorder, Converter={StaticResource BoolToBorderStroke}}"
+                                      BorderThickness="1" CornerRadius="6" Margin="1" Padding="0">
+                                  <Button Command="{Binding OpenContainerCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="6" Background="#005A9E" Classes="hmi-compact">
+                                      <Grid RowDefinitions="Auto,*" Margin="4">
+                                          <TextBlock Grid.Row="0" Text="📁" FontSize="18" HorizontalAlignment="Center" Foreground="White" />
+                                          <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                              <TextBlock Text="{Binding Title}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White" TextWrapping="Wrap" TextAlignment="Center" />
+                                          </Viewbox>
+                                      </Grid>
                                   </Button>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                        <!-- Floating Toolbar -->
                                        <Border VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-36,0,0" Height="28" Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="4,2" ZIndex="105" BoxShadow="0 2 8 0 #80000000">
@@ -148,15 +182,21 @@
                       <!-- Slider -->
                       <DataTemplate DataType="{x:Type vm:SliderViewModel}">
                           <Grid ClipToBounds="False">
-                              <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
-                                  <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10">
-                                      <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                      <TextBlock Text="{Binding SliderValue, StringFormat=\{0:F0\}}" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                      <Slider Minimum="0" Maximum="100" Value="{Binding SliderValue, Mode=TwoWay}" />
-                                  </StackPanel>
+                              <Border Background="{Binding ShowBorder, Converter={StaticResource BoolToBorderBg}}"
+                                      BorderBrush="{Binding ShowBorder, Converter={StaticResource BoolToBorderStroke}}"
+                                      BorderThickness="1" CornerRadius="6" Margin="1" Padding="4">
+                                  <Grid RowDefinitions="Auto,Auto,*">
+                                      <Viewbox Grid.Row="0" MaxHeight="14" Stretch="Uniform" HorizontalAlignment="Center" IsVisible="{Binding ShowTitle}">
+                                          <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="12" HorizontalAlignment="Center" />
+                                      </Viewbox>
+                                      <Viewbox Grid.Row="1" MaxHeight="20" Stretch="Uniform" HorizontalAlignment="Center">
+                                          <TextBlock Text="{Binding SliderValue, StringFormat=\{0:F0\}}" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" />
+                                      </Viewbox>
+                                      <Slider Grid.Row="2" Minimum="0" Maximum="100" Value="{Binding SliderValue, Mode=TwoWay}" VerticalAlignment="Center" />
+                                  </Grid>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -167,21 +207,27 @@
                       <!-- SetValue -->
                       <DataTemplate DataType="{x:Type vm:SetValueViewModel}">
                           <Grid ClipToBounds="False">
-                              <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5">
-                                  <Button Command="{Binding InputSetpointCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="8" Background="#232325" Padding="5">
-                                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                          <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="13" HorizontalAlignment="Center" Margin="0,0,0,6" />
-                                          <Border Background="#1E1E1E" BorderBrush="#007ACC" BorderThickness="1" CornerRadius="4" Padding="12,6">
-                                              <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
-                                                  <TextBlock Text="{Binding DisplayValue}" Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}" FontSize="{Binding ValueFontSize}" FontWeight="Bold" VerticalAlignment="Center" />
-                                                  <TextBlock Text="✏️" Foreground="#888" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" />
-                                              </StackPanel>
+                              <Border Background="{Binding ShowBorder, Converter={StaticResource BoolToBorderBg}}"
+                                      BorderBrush="{Binding ShowBorder, Converter={StaticResource BoolToBorderStroke}}"
+                                      BorderThickness="1" CornerRadius="6" Margin="1" Padding="0">
+                                  <Button Command="{Binding InputSetpointCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="6" Background="#232325" Classes="hmi-compact">
+                                      <Grid RowDefinitions="Auto,*" Margin="4,2">
+                                          <Viewbox Grid.Row="0" MaxHeight="14" Stretch="Uniform" HorizontalAlignment="Center" IsVisible="{Binding ShowTitle}">
+                                              <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="12" HorizontalAlignment="Center" />
+                                          </Viewbox>
+                                          <Border Grid.Row="1" Background="#1E1E1E" BorderBrush="#007ACC" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,2,0,0">
+                                              <Grid ColumnDefinitions="*,Auto">
+                                                  <Viewbox Grid.Column="0" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                      <TextBlock Text="{Binding DisplayValue}" Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}" FontWeight="Bold" VerticalAlignment="Center" />
+                                                  </Viewbox>
+                                                  <TextBlock Grid.Column="1" Text="✏️" Foreground="#888" FontSize="10" VerticalAlignment="Center" Margin="2,0,0,0" />
+                                              </Grid>
                                           </Border>
-                                      </StackPanel>
+                                      </Grid>
                                   </Button>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -192,12 +238,16 @@
                       <!-- RealTimeTrend -->
                       <DataTemplate DataType="{x:Type vm:RealTimeTrendViewModel}">
                           <Grid ClipToBounds="False">
-                              <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="8" Margin="5" Padding="12">
+                              <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Margin="1" Padding="6">
                                   <Grid RowDefinitions="Auto,*">
                                       <!-- Header with Live Value -->
-                                      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
-                                          <TextBlock Grid.Column="0" Text="{Binding Title}" Foreground="Gray" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                          <TextBlock Grid.Column="1" Text="{Binding LatestValueDisplay}" Foreground="#00FFCC" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" />
+                                      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                                          <Viewbox Grid.Column="0" MaxHeight="14" Stretch="Uniform" HorizontalAlignment="Left">
+                                              <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                          </Viewbox>
+                                          <Viewbox Grid.Column="1" MaxHeight="14" Stretch="Uniform" HorizontalAlignment="Right">
+                                              <TextBlock Text="{Binding LatestValueDisplay}" Foreground="#00FFCC" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                          </Viewbox>
                                       </Grid>
                                       <!-- Trend Line Control -->
                                       <v:TrendLineControl Grid.Row="1" 
@@ -207,7 +257,7 @@
                                   </Grid>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
@@ -245,38 +295,40 @@
                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                        Background="Transparent" BorderThickness="0" Padding="0"
                                        ClipToBounds="False">
-                                   <Border Background="Transparent" BorderThickness="0" Margin="0" ClipToBounds="False">
-                                       <Grid ClipToBounds="False">
-                                           <!-- Valve Graphic filling the widget bounds -->
-                                           <v:ValveControl 
-                                               ValveType="{Binding ValveType}"
-                                               IsOpen="{Binding IsOpen}"
-                                               IsMoving="{Binding IsMoving}"
-                                               IsSensorFault="{Binding IsSensorFault}"
-                                               Setpoint="{Binding Setpoint}"
-                                               Feedback="{Binding Feedback}"
-                                               HasFeedbackSource="{Binding HasFeedbackSource}"
-                                               IsVertical="{Binding IsVertical}"
-                                               ActuatorType="{Binding ActuatorType}"
-                                               ActiveColor="{Binding ActiveColor}"
-                                               InactiveColor="{Binding InactiveColor}"
-                                               Rotation="{Binding Rotation}"
-                                               IsAlarmFlashing="{Binding IsAlarmFlashing}"
-                                               IsAlarmFlashState="{Binding IsAlarmFlashState}"
-                                               ShowStaticAlarmIcon="{Binding ShowStaticAlarmIcon}"
-                                               ShowFeedbackBar="True" />
+                                   <Grid ClipToBounds="False" RowDefinitions="*,Auto">
+                                       <!-- Valve Graphic filling the widget bounds -->
+                                       <v:ValveControl Grid.Row="0"
+                                           ValveType="{Binding ValveType}"
+                                           IsOpen="{Binding IsOpen}"
+                                           IsMoving="{Binding IsMoving}"
+                                           IsSensorFault="{Binding IsSensorFault}"
+                                           Setpoint="{Binding Setpoint}"
+                                           Feedback="{Binding Feedback}"
+                                           HasFeedbackSource="{Binding HasFeedbackSource}"
+                                           IsVertical="{Binding IsVertical}"
+                                           ActuatorType="{Binding ActuatorType}"
+                                           ActiveColor="{Binding ActiveColor}"
+                                           InactiveColor="{Binding InactiveColor}"
+                                           Rotation="{Binding Rotation}"
+                                           IsAlarmFlashing="{Binding IsAlarmFlashing}"
+                                           IsAlarmFlashState="{Binding IsAlarmFlashState}"
+                                           ShowStaticAlarmIcon="{Binding ShowStaticAlarmIcon}"
+                                           ShowFeedbackBar="True" />
 
-                                           <!-- Title and Value overlaid at bottom of widget -->
-                                           <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-24" IsHitTestVisible="False">
+                                       <!-- Title and Value cleanly positioned without overflowing -->
+                                       <StackPanel Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" IsHitTestVisible="False" Margin="0,1,0,0">
+                                           <Viewbox MaxHeight="12" Stretch="Uniform" IsVisible="{Binding ShowTitle}">
                                                <TextBlock Text="{Binding Title}" FontSize="11" Foreground="Gray" HorizontalAlignment="Center" />
+                                           </Viewbox>
+                                           <Viewbox MaxHeight="12" Stretch="Uniform" IsVisible="{Binding ShowStatusText}">
                                                <TextBlock Text="{Binding DisplayValue}" FontSize="11" FontWeight="Bold" Foreground="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" HorizontalAlignment="Center" />
-                                           </StackPanel>
-                                       </Grid>
-                                   </Border>
+                                           </Viewbox>
+                                       </StackPanel>
+                                   </Grid>
                                </Button>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
@@ -287,12 +339,14 @@
                        <!-- Tank (Бак / Резервуар) -->
                        <DataTemplate DataType="{x:Type vm:TankWidgetViewModel}">
                            <Grid ClipToBounds="False">
-                               <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1.5" CornerRadius="8" Margin="4">
-                                   <Grid RowDefinitions="Auto,*,Auto">
-                                       <TextBlock Grid.Row="0" Text="{Binding Title}" Foreground="Gray" FontSize="12" HorizontalAlignment="Center" Margin="0,4" />
+                               <Border Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1.5" CornerRadius="6" Margin="1">
+                                   <Grid RowDefinitions="Auto,*,Auto" Margin="2">
+                                       <Viewbox Grid.Row="0" MaxHeight="13" Stretch="Uniform" HorizontalAlignment="Center" IsVisible="{Binding ShowTitle}">
+                                           <TextBlock Text="{Binding Title}" Foreground="Gray" FontSize="11" HorizontalAlignment="Center" />
+                                       </Viewbox>
                                        
-                                       <Grid Grid.Row="1" Margin="10,0,10,4">
-                                           <Border Background="#151515" BorderBrush="#555" BorderThickness="1.5" CornerRadius="4">
+                                       <Grid Grid.Row="1" Margin="4,2">
+                                           <Border Background="#151515" BorderBrush="#555" BorderThickness="1" CornerRadius="3">
                                                <Grid VerticalAlignment="Stretch">
                                                    <ProgressBar Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" Value="{Binding CurrentLevel}" 
                                                                 Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -301,12 +355,14 @@
                                            </Border>
                                        </Grid>
                                        
-                                       <TextBlock Grid.Row="2" Text="{Binding DisplayValue}" Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}" FontSize="{Binding ValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,4" />
+                                       <Viewbox Grid.Row="2" MaxHeight="13" Stretch="Uniform" HorizontalAlignment="Center">
+                                           <TextBlock Text="{Binding DisplayValue}" Foreground="{Binding ValueColor, Converter={StaticResource HexToBrush}}" FontSize="{Binding ValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" />
+                                       </Viewbox>
                                    </Grid>
                                </Border>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
@@ -320,9 +376,9 @@
                                <Button Command="{Binding OpenControlPopupCommand}"
                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                        Background="Transparent" BorderThickness="0" Padding="0">
-                                   <Border Background="#2B2B2B" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Margin="2">
-                                       <Grid RowDefinitions="*,Auto">
-                                           <Viewbox Grid.Row="0" Margin="10,10,10,4">
+                                   <Border Background="#2B2B2B" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Margin="1">
+                                       <Grid RowDefinitions="*,Auto" Margin="2">
+                                           <Viewbox Grid.Row="0" Margin="4">
                                                <Grid Width="50" Height="50">
                                                    <Ellipse Fill="#151515" Stroke="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" StrokeThickness="2.5" />
                                                    <Path Data="M 25 5 L 25 45 M 5 25 L 45 25 M 10 10 L 40 40 M 10 40 L 40 10" 
@@ -331,16 +387,20 @@
                                                </Grid>
                                            </Viewbox>
                                            
-                                           <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,4">
-                                               <TextBlock Text="{Binding Title}" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" />
-                                               <TextBlock Text="{Binding DisplayValue}" FontSize="12" FontWeight="Bold" Foreground="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" HorizontalAlignment="Center" />
+                                           <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,1,0,1">
+                                               <Viewbox MaxHeight="12" Stretch="Uniform" IsVisible="{Binding ShowTitle}">
+                                                   <TextBlock Text="{Binding Title}" FontSize="11" Foreground="Gray" HorizontalAlignment="Center" />
+                                               </Viewbox>
+                                               <Viewbox MaxHeight="12" Stretch="Uniform">
+                                                   <TextBlock Text="{Binding DisplayValue}" FontSize="11" FontWeight="Bold" Foreground="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" HorizontalAlignment="Center" />
+                                               </Viewbox>
                                            </StackPanel>
                                        </Grid>
                                    </Border>
                                </Button>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>

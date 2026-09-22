@@ -557,7 +557,32 @@
 - [x] Верификация и тесты:
   - [x] Успешное выполнение всех 13 тестов UIValidation (13/13 PASS, 100%)
   - [x] Визуальная инспекция скриншота `artifacts/ui_preview.png`
-  - [x] Сборка решения: 0 ошибок, 0 предупреждений
+  # Tasks: Responsive Typography, Russian Localized UI, MDI Calculator & Driver Connection Health (Сессия 36 — Выполнено)
+
+- [x] Адаптивная типографика и устранение срезания/наездов текста:
+  - [x] Расширение `WidgetConfig` свойствами: `FontSize`, `AutoScaleText`, `ShowTitle`, `ShowBorder`, `LabelPosition`, `CompactMode`
+  - [x] Расширение `CommandButtonConfig`, `ValueDisplayConfig`, `ValveConfig`, `TankConfig`, `PumpConfig`, `ProjectConfig` (`IsCompactMode`)
+  - [x] Внедрение класса кнопок `.hmi-compact` с минимальными внутренними отступами (`Padding="2,1"`)
+  - [x] Оборачивание текстовых меток виджетов в `Viewbox Stretch="Uniform"` для гарантированного автоматического вписывания
+  - [x] Устранение жесткого выноса подписей клапанов (`Margin="0,0,0,-24"`) с переходом на структурированный `Grid RowDefinitions="*,Auto"`
+- [x] Русскоязычный интерфейс и контекстные подсказки:
+  - [x] Полная русификация всех надписей, кнопок и форм (`WidgetEditorWindow`, `SettingsWindow`, `MainWindow`)
+  - [x] Добавление подробных подсказок `ToolTip.Tip` для оператора (горячие клавиши, назначение элементов)
+  - [x] Актуализация раздела помощи: создана вкладка «❓ Справка» в `SettingsWindow` с перечнем горячих клавиш и регламентом работы
+- [x] Инженерно-технологический калькулятор (MDI):
+  - [x] Разработка `CalculatorViewModel.cs` и `CalculatorView.axaml` (базовые расчеты $+,-,\times,\div,\sqrt{},\pm,\text{C},\leftarrow$ + расчет массы жидкости $m=V\times\rho$ и конвертер давлений бар/МПа/кПа/кгс/см²)
+  - [x] Кнопка вызова `🧮` в шапке окна и горячая клавиша `F10` с автофокусом/BringToFront
+- [x] Перенос симулятора в настройки:
+  - [x] Удаление кнопок симуляции из шапки `MainWindow.axaml`
+  - [x] Размещение управления симулятором во вкладке «🎮 Симуляция» в `SettingsWindow.axaml`
+- [x] Динамический статус связи:
+  - [x] Отслеживание активных подключений в `MainViewModel.cs` (`🟢 Онлайн ({count})` / `⚪ Нет связей` / `🟡 Симуляция`)
+  - [x] Кликабельный бейдж связи в шапке для быстрого вызова менеджера подключений
+- [x] Тестирование и верификация:
+  - [x] Разработан автоматический тест №14 в `AvaloniaApplication1.UIValidation/Program.cs`
+  - [x] Успешное выполнение всех 14 тестов (14/14 PASS, 100%)
+  - [x] Headless-рендеринг `MainWindow` и `SettingsWindow` в `artifacts/ui_preview.png`
+  - [x] Чистая сборка: 0 ошибок, 0 предупреждений
 
 
 

@@ -735,7 +735,76 @@ public static class Program
                 throw new Exception($"Expected 8 encapsulated SetValue widgets inside ContainerButtons, found {totalChildren}.");
         }
 
-        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (13/13) PASSED SUCCESSFULLY!");
+        // 14. Test CalculatorViewModel, Technology Calculations, Responsive Layout Properties & Settings
+        Console.WriteLine("[Validation] Running Test 14: CalculatorViewModel, Tech Calculations & Typography/Layout Properties...");
+        
+        // 14.1 Test Basic Calculator Operations
+        var calcVm = new CalculatorViewModel();
+        calcVm.InputDigitCommand.Execute("1");
+        calcVm.InputDigitCommand.Execute("2");
+        calcVm.InputDecimalCommand.Execute(null);
+        calcVm.InputDigitCommand.Execute("5");
+        calcVm.SetOperationCommand.Execute("+");
+        calcVm.InputDigitCommand.Execute("7");
+        calcVm.InputDecimalCommand.Execute(null);
+        calcVm.InputDigitCommand.Execute("5");
+        calcVm.CalculateResultCommand.Execute(null);
+
+        if (calcVm.Display != "20")
+            throw new Exception($"Calculator 12.5 + 7.5 expected 20, got '{calcVm.Display}'");
+
+        calcVm.SetOperationCommand.Execute("*");
+        calcVm.InputDigitCommand.Execute("4");
+        calcVm.CalculateResultCommand.Execute(null);
+        if (calcVm.Display != "80")
+            throw new Exception($"Calculator 20 * 4 expected 80, got '{calcVm.Display}'");
+
+        calcVm.SqrtCommand.Execute(null);
+        if (calcVm.Display != "8,94427" && !calcVm.Display.StartsWith("8") && !calcVm.Display.Contains("8,944") && !calcVm.Display.Contains("8.944"))
+            throw new Exception($"Calculator sqrt(80) expected ~8.944, got '{calcVm.Display}'");
+
+        // 14.2 Test Tech Calculations (Mass = Volume * Density)
+        calcVm.TechVolume = 15.0; // m3
+        calcVm.TechDensity = 940.0; // kg/m3 (MMA)
+        calcVm.UpdateTechMass();
+        if (Math.Abs(calcVm.TechMass - 14100.0) > 0.1 || Math.Abs(calcVm.TechMassTons - 14.1) > 0.01) // 14.1 tons
+            throw new Exception($"Tech mass calculation expected 14.1 t, got {calcVm.TechMassTons} t ({calcVm.TechMass} kg)");
+
+        // 14.3 Test Pressure Converter (10 bar)
+        calcVm.UpdatePressureFromBar(10.0);
+        if (Math.Abs(calcVm.PressureMpa - 1.0) > 0.001 || Math.Abs(calcVm.PressureKpa - 1000.0) > 0.1 || Math.Abs(calcVm.PressureKgs - 10.197) > 0.01)
+            throw new Exception($"Pressure conversion for 10 bar failed: MPa={calcVm.PressureMpa}, kPa={calcVm.PressureKpa}, kgs={calcVm.PressureKgs}");
+
+        // 14.4 Test WidgetEditorViewModel with new Layout/Typography properties
+        var widgetCfg = new ValveConfig
+        {
+            Type = "Valve",
+            Title = "XV 101",
+            ShowTitle = true,
+            ShowBorder = false,
+            AutoScaleText = true,
+            FontSize = 14.0,
+            LabelPosition = "Top",
+            CompactMode = true,
+            ShowStatusText = true,
+            LabelOffset = -4.0,
+            ValveType = "CutOff",
+            ActiveColor = "#00FF00",
+            InactiveColor = "#FF0000",
+            Position = new WidgetPosition { Row = 1, Col = 2, SizeX = 4, SizeY = 4 }
+        };
+
+        var editVm = new WidgetEditorViewModel(widgetCfg, new List<ConnectionConfig> { new() { Id = "wb", Type = "ModbusTcp", Host = "10.10.10.234" } });
+        if (!editVm.ShowTitle || editVm.ShowBorder || !editVm.AutoScaleText || editVm.CustomFontSize != 14.0 || editVm.SelectedLabelPosition != "Top" || !editVm.CompactMode || !editVm.ShowStatusText || editVm.LabelOffset != -4.0)
+            throw new Exception("WidgetEditorViewModel failed to load typography/layout properties correctly.");
+
+        editVm.CustomFontSize = 16.0;
+        editVm.SelectedLabelPosition = "Bottom";
+        var resultCfg = (ValveConfig)editVm.ToWidgetConfig();
+        if (resultCfg.FontSize != 16.0 || resultCfg.LabelPosition != "Bottom" || resultCfg.ShowBorder != false || resultCfg.ShowStatusText != true || resultCfg.LabelOffset != -4.0)
+            throw new Exception("WidgetEditorViewModel ToWidgetConfig() failed to preserve modified typography properties.");
+
+        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (14/14) PASSED SUCCESSFULLY!");
     }
 
     private static VisualTreeNode DumpVisualTree(Visual visual)

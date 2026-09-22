@@ -18,12 +18,18 @@ namespace AvaloniaApplication1.Services
         private readonly IDataCoreService _dataCoreService;
         private readonly IProjectContextService _projectContext;
         private readonly IWidgetFactory _widgetFactory;
+        private readonly ISimulationService? _simulationService;
 
-        public DialogService(IDataCoreService dataCoreService, IProjectContextService projectContext, IWidgetFactory widgetFactory)
+        public DialogService(
+            IDataCoreService dataCoreService, 
+            IProjectContextService projectContext, 
+            IWidgetFactory widgetFactory,
+            ISimulationService? simulationService = null)
         {
             _dataCoreService = dataCoreService;
             _projectContext = projectContext;
             _widgetFactory = widgetFactory;
+            _simulationService = simulationService;
         }
 
         public IChildWindowService? ChildWindowService { get; set; }
@@ -256,7 +262,7 @@ namespace AvaloniaApplication1.Services
             if (MainWindow == null) return;
 
             var window = new SettingsWindow();
-            var vm = new SettingsViewModel(config, configService, this, () => window.Close());
+            var vm = new SettingsViewModel(config, configService, this, () => window.Close(), _simulationService);
             window.DataContext = vm;
 
             await window.ShowDialog(MainWindow);
