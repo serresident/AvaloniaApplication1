@@ -70,6 +70,22 @@ namespace AvaloniaApplication1.ViewModels
             });
         }
 
+        [ObservableProperty]
+        private string _currentTimeText = DateTime.Now.ToString("HH:mm:ss");
+
+        [ObservableProperty]
+        private string _currentDateText = DateTime.Now.ToString("dd.MM.yyyy");
+
+        [ObservableProperty]
+        private string _connectionStatusText = "🟢 Онлайн";
+
+        [ObservableProperty]
+        private string _activeAlarmsText = "🔔 0 Аварий";
+
+        [ObservableProperty]
+        private bool _hasActiveAlarms = false;
+
+        private DispatcherTimer? _clockTimer;
         private DashboardViewModel? _mainDashboard;
         private DashboardViewModel? _mimicDashboard;
 
@@ -101,37 +117,65 @@ namespace AvaloniaApplication1.ViewModels
                 ds.ChildWindowService = this;
             }
 
+            // Start 1-second system clock timer for informative header & title bar
+            _clockTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
+            _clockTimer.Tick += (s, e) =>
+            {
+                CurrentTimeText = DateTime.Now.ToString("HH:mm:ss");
+                CurrentDateText = DateTime.Now.ToString("dd.MM.yyyy");
+                UpdateWindowTitle();
+            };
+            _clockTimer.Start();
+
             // Load configuration
             LoadConfigAsync().FireAndForget(context: "MainViewModel.ctor");
+        }
+
+        public void UpdateWindowTitle()
+        {
+            var modeText = ProjectContext.IsDesignMode ? "✏️ Наладка" : "🔒 Исполнение";
+            var simText = IsSimulationRunning ? "🟡 Симуляция" : "🟢 Онлайн";
+            WindowTitle = $"[{CurrentProjectName}] — HMI SCADA | {simText} | {modeText} | {CurrentTimeText}";
         }
 
         [RelayCommand]
         private async Task ToggleDesignModeAsync()
         {
-            if (!ProjectContext.IsDesignMode)
+            try
             {
-                var reqPassword = _currentConfig?.Security?.RequirePasswordForDesignMode ?? false;
-                if (reqPassword)
+                if (!ProjectContext.IsDesignMode)
                 {
-                    var expected = !string.IsNullOrEmpty(_currentConfig?.Security?.DesignModePassword) 
-                        ? _currentConfig.Security.DesignModePassword 
-                        : "1234";
-
-                    var isSuccess = await _dialogService.PromptPasswordAsync(expected, "Вход в режим редактирования");
-                    if (!isSuccess)
+                    var reqPassword = _currentConfig?.Security?.RequirePasswordForDesignMode ?? false;
+                    if (reqPassword)
                     {
-                        ShowToast("Вход отменен или неверный пароль.");
-                        return;
-                    }
-                }
+                        var expected = !string.IsNullOrEmpty(_currentConfig?.Security?.DesignModePassword) 
+                            ? _currentConfig.Security.DesignModePassword 
+                            : "1234";
 
-                ProjectContext.IsDesignMode = true;
-                ShowToast("Режим редактирования (Design Mode).");
+                        var isSuccess = await _dialogService.PromptPasswordAsync(expected, "Вход в режим редактирования");
+                        if (!isSuccess)
+                        {
+                            ShowToast("Вход отменен или неверный пароль.");
+                            return;
+                        }
+                    }
+
+                    ProjectContext.IsDesignMode = true;
+                    ShowToast("Режим редактирования (Design Mode).");
+                }
+                else
+                {
+                    ProjectContext.IsDesignMode = false;
+                    ShowToast("Режим исполнения (Runtime).");
+                }
             }
-            else
+            finally
             {
-                ProjectContext.IsDesignMode = false;
-                ShowToast("Режим исполнения (Runtime).");
+                UpdateWindowTitle();
+                ToggleDesignModeCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -359,6 +403,7 @@ namespace AvaloniaApplication1.ViewModels
         public void Dispose()
         {
             _toastTimer?.Stop();
+            _clockTimer?.Stop();
             _mainDashboard?.Dispose();
             _mimicDashboard?.Dispose();
             foreach (var cw in ActiveChildWindows)

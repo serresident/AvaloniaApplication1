@@ -10,6 +10,7 @@
         x:DataType="vm:MainViewModel"
         x:CompileBindings="True"
         Title="{Binding WindowTitle}"
+        Icon="/Assets/app_icon.png"
         Width="1400" Height="900"
         MinWidth="1024" MinHeight="600"
         WindowStartupLocation="CenterScreen"
@@ -48,6 +49,32 @@
                             Background="{Binding IsMimicActive, Converter={StaticResource MimicTabColor}}"
                             Foreground="White" CornerRadius="4" Padding="10,4" BorderThickness="0"
                             IsVisible="{Binding ProjectContext.IsDesignMode}" />
+                </StackPanel>
+
+                <!-- Center Section: Live Clock, Connection Health & Alarms Status -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!-- Live Clock & Date Badge -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                            ToolTip.Tip="Текущее системное время и дата">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="🕒" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding CurrentTimeText}" Foreground="#4EC9B0" FontSize="12" FontWeight="Bold" FontFamily="Consolas, monospace" VerticalAlignment="Center" />
+                            <TextBlock Text="|" Foreground="#555555" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding CurrentDateText}" Foreground="#858585" FontSize="11" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Connection Status Badge -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                            ToolTip.Tip="Статус сетевого драйвера и коммуникаций">
+                        <TextBlock Text="{Binding ConnectionStatusText}" Foreground="#DCDCAA" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </Border>
+
+                    <!-- Alarms Counter Badge -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                            ToolTip.Tip="Сводка активных аварийных сигналов">
+                        <TextBlock Text="{Binding ActiveAlarmsText}" Foreground="#9CDCFE" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </Border>
                 </StackPanel>
 
                 <!-- Right Section: Current Config Badge, Settings & Mode Switch -->

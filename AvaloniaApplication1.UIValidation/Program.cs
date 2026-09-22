@@ -101,6 +101,8 @@ public static class Program
         var outDir = Path.Combine(Directory.GetCurrentDirectory(), "artifacts");
         Directory.CreateDirectory(outDir);
 
+        EnsureAppIconGenerated();
+
         using var session = HeadlessUnitTestSession.StartNew(typeof(Program));
         session.Dispatch(() =>
         {
@@ -785,5 +787,179 @@ public static class Program
         }
 
         return node;
+    }
+
+    private static void EnsureAppIconGenerated()
+    {
+        try
+        {
+            var candidates = new[]
+            {
+                Path.Combine(Directory.GetCurrentDirectory(), "AvaloniaApplication1", "Assets", "app_icon.png"),
+                Path.Combine(Directory.GetCurrentDirectory(), "Assets", "app_icon.png"),
+                Path.Combine(AppContext.BaseDirectory, "Assets", "app_icon.png"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "AvaloniaApplication1", "Assets", "app_icon.png")
+            };
+
+            var targetPath = candidates.FirstOrDefault(p => Directory.Exists(Path.GetDirectoryName(p))) 
+                             ?? candidates[0];
+
+            var targetDir = Path.GetDirectoryName(targetPath);
+            if (!string.IsNullOrEmpty(targetDir) && !Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
+
+            // Create 256x256 icon with SkiaSharp
+            using var surface = SkiaSharp.SKSurface.Create(new SkiaSharp.SKImageInfo(256, 256, SkiaSharp.SKColorType.Rgba8888, SkiaSharp.SKAlphaType.Premul));
+            var canvas = surface.Canvas;
+            canvas.Clear(SkiaSharp.SKColors.Transparent);
+
+            // 1. Dark Rounded Background with gradient
+            using (var bgPaint = new SkiaSharp.SKPaint
+            {
+                IsAntialias = true,
+                Shader = SkiaSharp.SKShader.CreateLinearGradient(
+                    new SkiaSharp.SKPoint(0, 0),
+                    new SkiaSharp.SKPoint(256, 256),
+                    new[] { new SkiaSharp.SKColor(0x1F, 0x24, 0x30), new SkiaSharp.SKColor(0x0C, 0x0F, 0x14) },
+                    null,
+                    SkiaSharp.SKShaderTileMode.Clamp)
+            })
+            {
+                canvas.DrawRoundRect(new SkiaSharp.SKRect(8, 8, 248, 248), 52, 52, bgPaint);
+            }
+
+            // 2. Glowing Neon Border
+            using (var borderPaint = new SkiaSharp.SKPaint
+            {
+                IsAntialias = true,
+                Style = SkiaSharp.SKPaintStyle.Stroke,
+                StrokeWidth = 4f,
+                Shader = SkiaSharp.SKShader.CreateLinearGradient(
+                    new SkiaSharp.SKPoint(0, 0),
+                    new SkiaSharp.SKPoint(256, 256),
+                    new[] { new SkiaSharp.SKColor(0x00, 0xE5, 0xFF), new SkiaSharp.SKColor(0x29, 0x79, 0xFF), new SkiaSharp.SKColor(0x00, 0xE6, 0x76) },
+                    null,
+                    SkiaSharp.SKShaderTileMode.Clamp)
+            })
+            {
+                canvas.DrawRoundRect(new SkiaSharp.SKRect(8, 8, 248, 248), 52, 52, borderPaint);
+            }
+
+            // 3. Gauge Track (Dark ring)
+            using (var trackPaint = new SkiaSharp.SKPaint
+            {
+                IsAntialias = true,
+                Style = SkiaSharp.SKPaintStyle.Stroke,
+                StrokeWidth = 14f,
+                StrokeCap = SkiaSharp.SKStrokeCap.Round,
+                Color = new SkiaSharp.SKColor(0x2A, 0x33, 0x44)
+            })
+            {
+                using var path = new SkiaSharp.SKPath();
+                path.AddArc(new SkiaSharp.SKRect(44, 44, 212, 212), 135, 270);
+                canvas.DrawPath(path, trackPaint);
+            }
+
+            // 4. Active Gauge Arc (Neon Cyan to Green)
+            using (var arcPaint = new SkiaSharp.SKPaint
+            {
+                IsAntialias = true,
+                Style = SkiaSharp.SKPaintStyle.Stroke,
+                StrokeWidth = 14f,
+                StrokeCap = SkiaSharp.SKStrokeCap.Round,
+                Shader = SkiaSharp.SKShader.CreateLinearGradient(
+                    new SkiaSharp.SKPoint(44, 180),
+                    new SkiaSharp.SKPoint(212, 100),
+                    new[] { new SkiaSharp.SKColor(0x00, 0xE5, 0xFF), new SkiaSharp.SKColor(0x00, 0xE6, 0x76) },
+                    null,
+                    SkiaSharp.SKShaderTileMode.Clamp)
+            })
+            {
+                using var path = new SkiaSharp.SKPath();
+                path.AddArc(new SkiaSharp.SKRect(44, 44, 212, 212), 135, 195);
+                canvas.DrawPath(path, arcPaint);
+            }
+
+            // 5. Central Industrial Icon (SCADA Flame/Sensor/Nodes & Core)
+            // Center glowing node
+            using (var centerGlow = new SkiaSharp.SKPaint
+            {
+                IsAntialias = true,
+                Color = new SkiaSharp.SKColor(0x00, 0xE5, 0xFF, 0x40)
+            })
+            {
+                canvas.DrawCircle(128, 134, 44, centerGlow);
+            }
+
+            // Stylized Valve / Flange Triangles in center
+            using (var valvePaint = new SkiaSharp.SKPaint
+            {
+                IsAntialias = true,
+                Style = SkiaSharp.SKPaintStyle.Fill,
+                Shader = SkiaSharp.SKShader.CreateLinearGradient(
+                    new SkiaSharp.SKPoint(80, 134),
+                    new SkiaSharp.SKPoint(176, 134),
+                    new[] { new SkiaSharp.SKColor(0x00, 0xE5, 0xFF), new SkiaSharp.SKColor(0x69, 0xF0, 0xAE) },
+                    null,
+                    SkiaSharp.SKShaderTileMode.Clamp)
+            })
+            {
+                // Left triangle
+                using var leftTri = new SkiaSharp.SKPath();
+                leftTri.MoveTo(88, 114);
+                leftTri.LineTo(128, 134);
+                leftTri.LineTo(88, 154);
+                leftTri.Close();
+                canvas.DrawPath(leftTri, valvePaint);
+
+                // Right triangle
+                using var rightTri = new SkiaSharp.SKPath();
+                rightTri.MoveTo(168, 114);
+                rightTri.LineTo(128, 134);
+                rightTri.LineTo(168, 154);
+                rightTri.Close();
+                canvas.DrawPath(rightTri, valvePaint);
+
+                // Center actuator stem & circle
+                canvas.DrawRect(124, 102, 8, 24, valvePaint);
+                canvas.DrawCircle(128, 98, 10, valvePaint);
+            }
+
+            // 6. Text "HMI" at the bottom
+            using (var font = new SkiaSharp.SKFont(SkiaSharp.SKTypeface.FromFamilyName("Arial", SkiaSharp.SKFontStyleWeight.Bold, SkiaSharp.SKFontStyleWidth.Normal, SkiaSharp.SKFontStyleSlant.Upright), 28f))
+            using (var textPaint = new SkiaSharp.SKPaint
+            {
+                IsAntialias = true,
+                Color = SkiaSharp.SKColors.White
+            })
+            {
+                canvas.DrawText("HMI", 128, 206, SkiaSharp.SKTextAlign.Center, font, textPaint);
+            }
+
+            // Save to all target paths
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SkiaSharp.SKEncodedImageFormat.Png, 100);
+
+            foreach (var path in candidates)
+            {
+                try
+                {
+                    var dir = Path.GetDirectoryName(path);
+                    if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+                    {
+                        using var stream = File.OpenWrite(path);
+                        data.SaveTo(stream);
+                        Console.WriteLine($"[UIValidation] Generated app icon: {Path.GetFullPath(path)}");
+                    }
+                }
+                catch { }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[UIValidation] App icon generation notice: {ex.Message}");
+        }
     }
 }

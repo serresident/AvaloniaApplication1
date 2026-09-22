@@ -542,6 +542,23 @@
   - [x] Headless-рендеринг `MainWindow`, `SettingsWindow`, `PasswordPromptWindow`
   - [x] Чистая сборка: 0 ошибок, 0 предупреждений
 
+# Tasks: Fix Design Mode Button Freeze, App Icon & Live Header Status (Сессия 35 — Выполнено)
+
+- [x] Исправление бага блокировки кнопки Design Mode:
+  - [x] Обработка `window.Closed` и `childWindow.CloseAction` в `DialogService.cs` с гарантированным завершением задачи `TrySetResult(false)`
+  - [x] Оборачивание `ToggleDesignModeAsync` в блок `try-finally` с гарантированным вызовом `ToggleDesignModeCommand.NotifyCanExecuteChanged()`
+- [x] Фирменная иконка приложения HMI SCADA:
+  - [x] Генерация иконки `Assets/app_icon.png` (256x256) через SkiaSharp
+  - [x] Привязка иконки к `MainWindow.axaml` (`Icon="/Assets/app_icon.png"`)
+- [x] Панель оперативной телеметрии в шапке окна:
+  - [x] Посекундный таймер в `MainViewModel.cs` для обновления живого времени (`HH:mm:ss`) и даты (`dd.MM.yyyy`)
+  - [x] Бейджи статуса связи с ПЛК (`🟢 Онлайн` / `🟡 Симуляция`) и аварий (`🔔 0 Аварий`)
+  - [x] Информативный заголовок окна OS `[Проект] — HMI SCADA | Онлайн | Runtime | 12:00:00`
+- [x] Верификация и тесты:
+  - [x] Успешное выполнение всех 13 тестов UIValidation (13/13 PASS, 100%)
+  - [x] Визуальная инспекция скриншота `artifacts/ui_preview.png`
+  - [x] Сборка решения: 0 ошибок, 0 предупреждений
+
 
 
 

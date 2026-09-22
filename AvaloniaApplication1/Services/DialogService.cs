@@ -219,6 +219,10 @@ namespace AvaloniaApplication1.Services
                     tcs.TrySetResult(success);
                     window.Close();
                 };
+                window.Closed += (s, e) =>
+                {
+                    tcs.TrySetResult(false);
+                };
                 await window.ShowDialog(MainWindow);
                 return await tcs.Task;
             }
@@ -233,6 +237,12 @@ namespace AvaloniaApplication1.Services
                     {
                         tcs.TrySetResult(success);
                         childWindow.CloseCommand.Execute(null);
+                    };
+                    var originalClose = childWindow.CloseAction;
+                    childWindow.CloseAction = () =>
+                    {
+                        tcs.TrySetResult(false);
+                        originalClose?.Invoke();
                     };
                     return await tcs.Task;
                 }
