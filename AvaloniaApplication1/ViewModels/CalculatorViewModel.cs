@@ -40,7 +40,7 @@ namespace AvaloniaApplication1.ViewModels
         private bool _hasMemory = false;
         #endregion
 
-        #region History Log
+        #region History Log (Standard Calculator)
         public ObservableCollection<CalculationHistoryItem> HistoryLog { get; } = new();
 
         [ObservableProperty]
@@ -51,6 +51,13 @@ namespace AvaloniaApplication1.ViewModels
 
         [ObservableProperty]
         private string _clipboardStatusMessage = string.Empty;
+        #endregion
+
+        #region Tech History Log (Engineering Calculations)
+        public ObservableCollection<CalculationHistoryItem> TechHistoryLog { get; } = new();
+
+        [ObservableProperty]
+        private bool _isTechHistoryOpen = false;
         #endregion
 
         #region Tech Mode 1: Масса / Объем / Плотность
@@ -318,13 +325,37 @@ namespace AvaloniaApplication1.ViewModels
         private void ToggleHistory()
         {
             IsHistoryOpen = !IsHistoryOpen;
-            OnToggleHistory?.Invoke(IsHistoryOpen);
+            NotifyHistoryState();
+        }
+
+        [RelayCommand]
+        private void ToggleTechHistory()
+        {
+            IsTechHistoryOpen = !IsTechHistoryOpen;
+            NotifyHistoryState();
+        }
+
+        public void NotifyHistoryState()
+        {
+            bool anyOpen = (SelectedTabIndex == 0 && IsHistoryOpen) || (SelectedTabIndex == 1 && IsTechHistoryOpen);
+            OnToggleHistory?.Invoke(anyOpen);
+        }
+
+        partial void OnSelectedTabIndexChanged(int value)
+        {
+            NotifyHistoryState();
         }
 
         [RelayCommand]
         private void ClearHistory()
         {
             HistoryLog.Clear();
+        }
+
+        [RelayCommand]
+        private void ClearTechHistory()
+        {
+            TechHistoryLog.Clear();
         }
 
         [RelayCommand]
@@ -336,13 +367,23 @@ namespace AvaloniaApplication1.ViewModels
                 _isNewNumber = true;
             }
         }
+
+        [RelayCommand]
+        private void SelectTechHistoryItem(CalculationHistoryItem? item)
+        {
+            if (item != null && !string.IsNullOrWhiteSpace(item.Result))
+            {
+                // Помещаем результат расчета прямо в буфер HMI для быстрой вставки в уставку
+                CopyToClipboard(item.Result);
+            }
+        }
         #endregion
 
         #region Internal HMI Clipboard Operations
         [RelayCommand]
-        public void CopyToClipboard(string? customVal = null)
+        public void CopyToClipboard(object? customVal = null)
         {
-            var val = customVal ?? Display;
+            var val = customVal?.ToString() ?? Display;
             if (!string.IsNullOrEmpty(val) && val != "Ошибка")
             {
                 // Заменяем запятую на точку для удобства ввода в контроллеры
@@ -373,6 +414,45 @@ namespace AvaloniaApplication1.ViewModels
         #endregion
 
         #region Tech Mode Logic
+        partial void OnTechVolumeChanged(double value) => UpdateTechMass();
+        partial void OnTechDensityChanged(double value) => UpdateTechMass();
+        partial void OnPressureBarChanged(double value) => UpdatePressureFromBar(value);
+
+        [RelayCommand]
+        public void CalculateTechMass()
+        {
+            UpdateTechMass();
+            var expr = $"V={TechVolume:F2} м³ × ρ={TechDensity:F1} кг/м³";
+            var resStr = $"{TechMass:F1} кг ({TechMassTons:F3} т)";
+            AddTechHistoryEntry(expr, resStr);
+            ClipboardStatusMessage = $"Рассчитано: {resStr}";
+        }
+
+        [RelayCommand]
+        public void CalculatePressure()
+        {
+            UpdatePressureFromBar(PressureBar);
+            var expr = $"P={PressureBar:F2} бар";
+            var resStr = $"{PressureKgs:F3} кгс/см² | {PressureMpa:F3} МПа";
+            AddTechHistoryEntry(expr, resStr);
+            ClipboardStatusMessage = $"Рассчитано: {resStr}";
+        }
+
+        private void AddTechHistoryEntry(string expression, string result)
+        {
+            TechHistoryLog.Insert(0, new CalculationHistoryItem
+            {
+                Expression = expression,
+                Result = result,
+                Timestamp = DateTime.Now.ToString("HH:mm:ss")
+            });
+
+            while (TechHistoryLog.Count > 30)
+            {
+                TechHistoryLog.RemoveAt(TechHistoryLog.Count - 1);
+            }
+        }
+
         public void UpdateTechMass()
         {
             TechMass = Math.Round(TechVolume * TechDensity, 2);

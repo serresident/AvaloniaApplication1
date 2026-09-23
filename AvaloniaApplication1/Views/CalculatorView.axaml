@@ -83,7 +83,7 @@
         </Style>
     </UserControl.Styles>
 
-    <TabControl Background="#1E222B" Margin="0" Padding="0">
+    <TabControl Background="#1E222B" Margin="0" Padding="0" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
         <!-- 1. Инженерный калькулятор -->
         <TabItem Header="🔢 Калькулятор" FontSize="12">
             <Grid ColumnDefinitions="*,Auto">
@@ -178,10 +178,10 @@
                                                 Command="{Binding ((vm:CalculatorViewModel)DataContext).SelectHistoryItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}"
                                                 HorizontalAlignment="Stretch" Margin="2,2" Padding="6,4">
-                                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Timestamp}" Foreground="#666" FontSize="10" />
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Expression}" Foreground="#AAA" FontSize="11" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Result}" Foreground="#00E5FF" FontWeight="Bold" FontSize="12" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Timestamp}" Foreground="#666" FontSize="10" Margin="0,0,6,0" />
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Result}" Foreground="#00E5FF" FontWeight="Bold" FontSize="12" HorizontalAlignment="Right" />
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Expression}" Foreground="#AAA" FontSize="11" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
                                             </Grid>
                                         </Button>
                                     </DataTemplate>
@@ -195,66 +195,125 @@
 
         <!-- 2. Технологический пересчет величин -->
         <TabItem Header="📐 Тех. расчеты" FontSize="12">
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                <StackPanel Spacing="10" Margin="10">
-                    <!-- Блок: Масса и Объем -->
-                    <Border Background="#161920" BorderBrush="#2D3748" BorderThickness="1" CornerRadius="8" Padding="10">
-                        <StackPanel Spacing="6">
-                            <TextBlock Text="⚖️ Масса, Объем и Плотность" FontWeight="Bold" Foreground="#00E5FF" FontSize="13" />
-                            <TextBlock Text="Формула: m = V × ρ" Foreground="#888888" FontSize="11" />
+            <Grid ColumnDefinitions="*,Auto">
+                <!-- Основная зона тех. расчетов -->
+                <Grid Grid.Column="0" RowDefinitions="Auto,*" Margin="8">
+                    <!-- Верхняя панель: статус и кнопка журнала тех. расчетов -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="2,0,2,6">
+                        <TextBlock Grid.Column="0" Text="{Binding ClipboardStatusMessage}" Foreground="#00E676" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        <Button Grid.Column="1" Content="📜 Тех. журнал" Classes="calc-tool" Command="{Binding ToggleTechHistoryCommand}" ToolTip.Tip="Открыть/закрыть журнал технологических расчетов" Height="26" Padding="8,2" />
+                    </Grid>
 
-                            <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,Auto,Auto" Margin="0,4,0,0">
-                                <StackPanel Grid.Row="0" Grid.Column="0">
-                                    <TextBlock Text="Объем V (м³):" Foreground="Gray" FontSize="11" />
-                                    <NumericUpDown Value="{Binding TechVolume, Mode=TwoWay}" Minimum="0" Maximum="10000" Increment="1" FormatString="{}{0:F2}" />
-                                </StackPanel>
-                                <StackPanel Grid.Row="0" Grid.Column="2">
-                                    <TextBlock Text="Плотность ρ (кг/м³):" Foreground="Gray" FontSize="11" />
-                                    <NumericUpDown Value="{Binding TechDensity, Mode=TwoWay}" Minimum="100" Maximum="3000" Increment="10" FormatString="{}{0:F1}" />
-                                </StackPanel>
+                    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="10" Margin="2">
+                            <!-- Блок: Масса и Объем -->
+                            <Border Background="#161920" BorderBrush="#2D3748" BorderThickness="1" CornerRadius="8" Padding="10">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="⚖️ Масса, Объем и Плотность" FontWeight="Bold" Foreground="#00E5FF" FontSize="13" />
+                                    <TextBlock Text="Формула: m = V × ρ" Foreground="#888888" FontSize="11" />
 
-                                <Border Grid.Row="1" Grid.ColumnSpan="3" Height="1" Background="#2D3748" Margin="0,8" />
+                                    <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,Auto,Auto" Margin="0,4,0,0">
+                                        <StackPanel Grid.Row="0" Grid.Column="0">
+                                            <TextBlock Text="Объем V (м³):" Foreground="Gray" FontSize="11" />
+                                            <NumericUpDown Value="{Binding TechVolume, Mode=TwoWay}" Minimum="0" Maximum="10000" Increment="1" FormatString="{}{0:F2}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="0" Grid.Column="2">
+                                            <TextBlock Text="Плотность ρ (кг/м³):" Foreground="Gray" FontSize="11" />
+                                            <NumericUpDown Value="{Binding TechDensity, Mode=TwoWay}" Minimum="100" Maximum="3000" Increment="10" FormatString="{}{0:F1}" />
+                                        </StackPanel>
 
-                                <StackPanel Grid.Row="2" Grid.Column="0">
-                                    <TextBlock Text="Масса (кг):" Foreground="Gray" FontSize="11" />
-                                    <TextBlock Text="{Binding TechMass, StringFormat=\{0:N1\} кг}" Foreground="#00E676" FontWeight="Bold" FontSize="14" />
+                                        <Border Grid.Row="1" Grid.ColumnSpan="3" Height="1" Background="#2D3748" Margin="0,8" />
+
+                                        <StackPanel Grid.Row="2" Grid.Column="0">
+                                            <TextBlock Text="Масса (кг):" Foreground="Gray" FontSize="11" />
+                                            <TextBlock Text="{Binding TechMass, StringFormat=\{0:N1\} кг}" Foreground="#00E676" FontWeight="Bold" FontSize="14" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="2" Grid.Column="2">
+                                            <TextBlock Text="Масса (тонн):" Foreground="Gray" FontSize="11" />
+                                            <TextBlock Text="{Binding TechMassTons, StringFormat=\{0:N3\} т}" Foreground="#00E676" FontWeight="Bold" FontSize="14" />
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Кнопки расчета массы и отправки в буфер уставки -->
+                                    <StackPanel Spacing="4" Margin="0,8,0,0">
+                                        <Button Content="⚡ Рассчитать массу" Classes="calc-op" Command="{Binding CalculateTechMassCommand}" Height="28" FontSize="12" HorizontalAlignment="Stretch" ToolTip.Tip="Вычислить массу и записать в тех. журнал" />
+                                        <Grid ColumnDefinitions="*,*">
+                                            <Button Grid.Column="0" Content="📋 В уставку (кг)" Classes="calc-tool" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding TechMass}" Height="26" ToolTip.Tip="Скопировать массу в кг в буфер HMI" Margin="0,0,3,0" />
+                                            <Button Grid.Column="1" Content="📋 В уставку (т)" Classes="calc-tool" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding TechMassTons}" Height="26" ToolTip.Tip="Скопировать массу в тоннах в буфер HMI" Margin="3,0,0,0" />
+                                        </Grid>
+                                    </StackPanel>
                                 </StackPanel>
-                                <StackPanel Grid.Row="2" Grid.Column="2">
-                                    <TextBlock Text="Масса (тонн):" Foreground="Gray" FontSize="11" />
-                                    <TextBlock Text="{Binding TechMassTons, StringFormat=\{0:N3\} т}" Foreground="#00E676" FontWeight="Bold" FontSize="14" />
+                            </Border>
+
+                            <!-- Блок: Пересчет давления -->
+                            <Border Background="#161920" BorderBrush="#2D3748" BorderThickness="1" CornerRadius="8" Padding="10">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="💨 Пересчет единиц давления" FontWeight="Bold" Foreground="#00E5FF" FontSize="13" />
+                                    
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Давление в бар:" Foreground="Gray" FontSize="11" />
+                                        <NumericUpDown Value="{Binding PressureBar, Mode=TwoWay}" Minimum="0" Maximum="1000" Increment="0.1" FormatString="{}{0:F2}" />
+                                    </StackPanel>
+
+                                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="0,6,0,0">
+                                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,4,4">
+                                            <TextBlock Text="кгс/см² (атм):" Foreground="Gray" FontSize="11" />
+                                            <TextBlock Text="{Binding PressureKgs, StringFormat=\{0:F3\} кгс/см²}" Foreground="#FFD600" FontWeight="Bold" FontSize="13" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,4">
+                                            <TextBlock Text="кПа:" Foreground="Gray" FontSize="11" />
+                                            <TextBlock Text="{Binding PressureKpa, StringFormat=\{0:F1\} кПа}" Foreground="#FFD600" FontWeight="Bold" FontSize="13" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,4,4,0">
+                                            <TextBlock Text="МПа:" Foreground="Gray" FontSize="11" />
+                                            <TextBlock Text="{Binding PressureMpa, StringFormat=\{0:F4\} МПа}" Foreground="#FFD600" FontWeight="Bold" FontSize="13" />
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Кнопки расчета давления и отправки в буфер уставки -->
+                                    <StackPanel Spacing="4" Margin="0,8,0,0">
+                                        <Button Content="⚡ Рассчитать давление" Classes="calc-op" Command="{Binding CalculatePressureCommand}" Height="28" FontSize="12" HorizontalAlignment="Stretch" ToolTip.Tip="Пересчитать единицы давления и записать в тех. журнал" />
+                                        <Grid ColumnDefinitions="*,*">
+                                            <Button Grid.Column="0" Content="📋 В уставку (кгс)" Classes="calc-tool" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding PressureKgs}" Height="26" ToolTip.Tip="Скопировать кгс/см² в буфер HMI" Margin="0,0,3,0" />
+                                            <Button Grid.Column="1" Content="📋 В уставку (МПа)" Classes="calc-tool" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding PressureMpa}" Height="26" ToolTip.Tip="Скопировать МПа в буфер HMI" Margin="3,0,0,0" />
+                                        </Grid>
+                                    </StackPanel>
                                 </StackPanel>
-                            </Grid>
+                            </Border>
                         </StackPanel>
-                    </Border>
+                    </ScrollViewer>
+                </Grid>
 
-                    <!-- Блок: Пересчет давления -->
-                    <Border Background="#161920" BorderBrush="#2D3748" BorderThickness="1" CornerRadius="8" Padding="10">
-                        <StackPanel Spacing="6">
-                            <TextBlock Text="💨 Пересчет единиц давления" FontWeight="Bold" Foreground="#00E5FF" FontSize="13" />
-                            
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Давление в бар:" Foreground="Gray" FontSize="11" />
-                                <NumericUpDown Value="{Binding PressureBar, Mode=TwoWay}" Minimum="0" Maximum="1000" Increment="0.1" FormatString="{}{0:F2}" />
-                            </StackPanel>
+                <!-- Боковая выдвижная панель: Технологический журнал -->
+                <Border Grid.Column="1" Width="200" Background="#161920" BorderBrush="#2D3748" BorderThickness="1,0,0,0" IsVisible="{Binding IsTechHistoryOpen}">
+                    <Grid RowDefinitions="Auto,*">
+                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="8,8,8,6">
+                            <TextBlock Grid.Column="0" Text="📜 Тех. журнал" FontWeight="Bold" Foreground="#00E5FF" FontSize="13" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="🗑️" Classes="calc-tool" Command="{Binding ClearTechHistoryCommand}" Width="28" Height="26" ToolTip.Tip="Очистить тех. журнал" />
+                        </Grid>
 
-                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="0,6,0,0">
-                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,4,4">
-                                    <TextBlock Text="кгс/см² (атм):" Foreground="Gray" FontSize="11" />
-                                    <TextBlock Text="{Binding PressureKgs, StringFormat=\{0:F3\} кгс/см²}" Foreground="#FFD600" FontWeight="Bold" FontSize="13" />
-                                </StackPanel>
-                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,4">
-                                    <TextBlock Text="кПа:" Foreground="Gray" FontSize="11" />
-                                    <TextBlock Text="{Binding PressureKpa, StringFormat=\{0:F1\} кПа}" Foreground="#FFD600" FontWeight="Bold" FontSize="13" />
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,4,4,0">
-                                    <TextBlock Text="МПа:" Foreground="Gray" FontSize="11" />
-                                    <TextBlock Text="{Binding PressureMpa, StringFormat=\{0:F4\} МПа}" Foreground="#FFD600" FontWeight="Bold" FontSize="13" />
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
+                        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding TechHistoryLog}" Margin="4,0,4,4">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:CalculationHistoryItem">
+                                        <Button Classes="calc-tool" 
+                                                Command="{Binding ((vm:CalculatorViewModel)DataContext).SelectTechHistoryItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                HorizontalAlignment="Stretch" Margin="2,2" Padding="6,4"
+                                                ToolTip.Tip="Нажмите, чтобы скопировать результат в буфер HMI">
+                                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Timestamp}" Foreground="#666" FontSize="10" Margin="0,0,6,0" />
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Result}" Foreground="#00E5FF" FontWeight="Bold" FontSize="11" HorizontalAlignment="Right" />
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Expression}" Foreground="#AAA" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
         </TabItem>
     </TabControl>
 </UserControl>

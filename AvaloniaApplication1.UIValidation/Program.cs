@@ -299,6 +299,26 @@ public static class Program
                     }
                 };
             }
+            else if (string.Equals(targetView, "TechCalculatorView", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(targetView, "TechCalculator", StringComparison.OrdinalIgnoreCase))
+            {
+                var clip = sp.GetRequiredService<IHmiClipboardService>();
+                var calcVm = new CalculatorViewModel(clip);
+                calcVm.SelectedTabIndex = 1;
+                calcVm.CalculateTechMassCommand.Execute(null);
+                calcVm.CalculatePressureCommand.Execute(null);
+                calcVm.ToggleTechHistoryCommand.Execute(null); // Show with tech history panel open
+                window = new Window
+                {
+                    Title = "TechCalculatorView Preview",
+                    Width = 560,
+                    Height = 520,
+                    Content = new CalculatorView
+                    {
+                        DataContext = calcVm
+                    }
+                };
+            }
             else if (string.Equals(targetView, "NumpadView", StringComparison.OrdinalIgnoreCase) ||
                      string.Equals(targetView, "Numpad", StringComparison.OrdinalIgnoreCase))
             {
@@ -912,6 +932,68 @@ public static class Program
         numpadVm.PasteFromClipboardCommand.Execute(null);
         if (numpadVm.InputValue != "42.8")
             throw new Exception($"NumpadViewModel paste second value failed: expected '42.8', got '{numpadVm.InputValue}'.");
+
+        // 15.6 Test Tech Calculations & Separate TechHistoryLog
+        calcWithClipVm.TechVolume = 20.0;
+        calcWithClipVm.TechDensity = 940.0;
+        calcWithClipVm.CalculateTechMassCommand.Execute(null);
+        var massEntry = calcWithClipVm.TechHistoryLog[0];
+        if (calcWithClipVm.TechHistoryLog.Count != 1 || !massEntry.Result.Contains("18800") || (!massEntry.Result.Contains("18.8") && !massEntry.Result.Contains("18,8")))
+            throw new Exception($"CalculateTechMassCommand failed to populate TechHistoryLog correctly: count={calcWithClipVm.TechHistoryLog.Count}, Result='{massEntry.Result}'");
+
+        calcWithClipVm.PressureBar = 5.0;
+        calcWithClipVm.CalculatePressureCommand.Execute(null);
+        var pressEntry = calcWithClipVm.TechHistoryLog[0];
+        if (calcWithClipVm.TechHistoryLog.Count != 2 || (!pressEntry.Expression.Contains("5.00") && !pressEntry.Expression.Contains("5,00")))
+            throw new Exception($"CalculatePressureCommand failed to add second entry to TechHistoryLog: count={calcWithClipVm.TechHistoryLog.Count}, Expr='{pressEntry.Expression}'");
+
+        // Test Tech History Toggle callback
+        bool techHistoryOpenReported = false;
+        calcWithClipVm.SelectedTabIndex = 1;
+        calcWithClipVm.OnToggleHistory = isOpen => techHistoryOpenReported = isOpen;
+        calcWithClipVm.ToggleTechHistoryCommand.Execute(null);
+        if (!calcWithClipVm.IsTechHistoryOpen || !techHistoryOpenReported)
+            throw new Exception("ToggleTechHistoryCommand failed to open tech history or notify width resize.");
+
+        // Test Tech History Clear
+        calcWithClipVm.ClearTechHistoryCommand.Execute(null);
+        if (calcWithClipVm.TechHistoryLog.Count != 0)
+            throw new Exception("ClearTechHistoryCommand failed: TechHistoryLog should be empty.");
+
+        // 15.7 Test Calculator Session Persistence (MDI open/close keeps history and memory)
+        mainVm.OpenCalculator();
+        var openCalcWindow = mainVm.ActiveChildWindows.FirstOrDefault(cw => cw.Content is CalculatorViewModel);
+        if (openCalcWindow == null)
+            throw new Exception("Failed to open Calculator in MainViewModel.");
+
+        var vmFromWindow = (CalculatorViewModel)openCalcWindow.Content;
+        vmFromWindow.InputDigitCommand.Execute("9");
+        vmFromWindow.InputDigitCommand.Execute("9");
+        vmFromWindow.MemoryStoreCommand.Execute(null); // Save 99 in memory
+        vmFromWindow.SetOperationCommand.Execute("+");
+        vmFromWindow.InputDigitCommand.Execute("1");
+        vmFromWindow.CalculateResultCommand.Execute(null); // 99 + 1 = 100
+
+        int historyCountBeforeClose = vmFromWindow.HistoryLog.Count;
+
+        // Simulate closing the calculator window
+        openCalcWindow.CloseCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+        if (mainVm.ActiveChildWindows.Any(cw => cw.Content is CalculatorViewModel))
+            throw new Exception("Calculator window failed to close.");
+
+        // Re-open calculator
+        mainVm.OpenCalculator();
+        Dispatcher.UIThread.RunJobs();
+        var reopenedWindow = mainVm.ActiveChildWindows.FirstOrDefault(cw => cw.Content is CalculatorViewModel);
+        if (reopenedWindow == null)
+            throw new Exception("Failed to re-open Calculator in MainViewModel.");
+
+        var reopenedVm = (CalculatorViewModel)reopenedWindow.Content;
+        if (reopenedVm.HistoryLog.Count != historyCountBeforeClose || !reopenedVm.HasMemory || Math.Abs(reopenedVm.MemoryValue - 99.0) > 0.001)
+            throw new Exception("Calculator state (history log or memory) was lost after closing and re-opening the window!");
+
+        reopenedWindow.CloseCommand.Execute(null);
 
         Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (15/15) PASSED SUCCESSFULLY!");
     }

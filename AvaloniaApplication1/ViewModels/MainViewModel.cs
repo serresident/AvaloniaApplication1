@@ -164,6 +164,8 @@ namespace AvaloniaApplication1.ViewModels
             WindowTitle = $"[{CurrentProjectName}] — HMI SCADA | {simText} | {modeText} | {CurrentTimeText}";
         }
 
+        private CalculatorViewModel? _cachedCalculatorVm;
+
         [RelayCommand]
         public void OpenCalculator()
         {
@@ -175,11 +177,17 @@ namespace AvaloniaApplication1.ViewModels
                 return;
             }
 
-            var calcVm = new CalculatorViewModel(_hmiClipboardService);
+            // Переиспользуем экземпляр для сохранения журналов и состояния памяти в течение сеанса
+            _cachedCalculatorVm ??= new CalculatorViewModel(_hmiClipboardService);
+            var calcVm = _cachedCalculatorVm;
+
+            bool anyHistoryOpen = (calcVm.SelectedTabIndex == 0 && calcVm.IsHistoryOpen) ||
+                                  (calcVm.SelectedTabIndex == 1 && calcVm.IsTechHistoryOpen);
+
             var child = OpenChildWindow("🧮 Технологический калькулятор", calcVm);
             if (child != null)
             {
-                child.Width = 360;
+                child.Width = anyHistoryOpen ? 560 : 360;
                 child.Height = 520;
                 child.X = 80;
                 child.Y = 60;
