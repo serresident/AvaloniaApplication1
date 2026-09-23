@@ -676,6 +676,27 @@
   - [x] Headless-рендеринг `DashboardView` и `MainWindow` в `artifacts/ui_preview.png`
   - [x] Чистая сборка: 0 ошибок, 0 предупреждений
 
+# Tasks: Live Drag, Smart Alignment Guides, Coordinate Badge & Header Grip (Сессия 41 — Выполнено)
+
+- [x] Интерактивное перемещение в реальном времени (Live Drag):
+  - [x] Замена маленького эскиза сетки `GridOverlay` на прямое перемещение виджетов в `DashboardPanel.cs`
+  - [x] Синхронное резиновое смещение присоединенных трубопроводов на лету при перемещении
+  - [x] Синхронное смещение группы выделенных виджетов и внутренних труб
+  - [x] Безопасный откат позиций в `OnPointerCaptureLost`
+- [x] Умные динамические направляющие выравнивания (Smart Alignment Guides):
+  - [x] Вычисление совпадений границ (Left, Center, Right) и горизонталей (Top, Middle, Bottom) с соседними элементами
+  - [x] Отрисовка динамических пурпурных линий (`SmartGuideLine`) в `SelectionOverlay` (Zero-Allocation в `Render()`)
+- [x] Индикатор координат перемещения (Drag Coordinate Badge):
+  - [x] Бейдж `(X, Y)` рядом с курсором при перемещении элементов
+- [x] Удобные зоны захвата (Header Grip + Border Frame):
+  - [x] Убран темный непрозрачный оверлей (`Background="{x:Null}"`), кнопки виджетов доступны для кликов
+  - [x] Добавлена верхняя плашка-ручка с иконкой `⋮⋮` (`Header Grip`) для быстрого и четкого перетаскивания
+- [x] Автоматическое тестирование и рендеринг:
+  - [x] Комплексный тест №18 в `AvaloniaApplication1.UIValidation/Program.cs`
+  - [x] 18/18 тестов пройдено успешно (100% PASS)
+  - [x] Headless-рендер `DashboardView` и валидация UI в `artifacts/ui_preview.png`
+
+
 
 
 

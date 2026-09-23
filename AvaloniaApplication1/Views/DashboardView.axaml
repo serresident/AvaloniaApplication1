@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -69,8 +69,11 @@
                                   </Grid>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
+                                      <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                          <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                      </Border>
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
                               </Border>
@@ -93,8 +96,11 @@
                                   </Grid>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
+                                      <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                          <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                      </Border>
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
                               </Border>
@@ -138,9 +144,12 @@
                               </Border>
                               <!-- Design Overlay -->
                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle"
-                                      Background="#33000000" BorderBrush="#007ACC" BorderThickness="2"
+                                      Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2"
                                       CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
+                                      <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                          <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                      </Border>
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14"
                                                  HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                                  Margin="0,0,4,2" IsHitTestVisible="False" />
@@ -165,8 +174,12 @@
                                   </Button>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
+                                       <!-- Header Grip Bar -->
+                                       <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                           <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                       </Border>
                                        <!-- Floating Toolbar -->
                                        <Border VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-36,0,0" Height="28" Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="4,2" ZIndex="105" BoxShadow="0 2 8 0 #80000000">
                                            <StackPanel Orientation="Horizontal" Spacing="6">
@@ -196,8 +209,11 @@
                                   </Grid>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
+                                      <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                          <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                      </Border>
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
                               </Border>
@@ -227,8 +243,11 @@
                                   </Button>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
+                                      <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                          <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                      </Border>
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
                               </Border>
@@ -257,8 +276,11 @@
                                   </Grid>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
+                                      <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                          <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                      </Border>
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
                               </Border>
@@ -328,8 +350,11 @@
                                </Button>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
+                                        <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                            <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                        </Border>
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
                                </Border>
@@ -362,8 +387,11 @@
                                </Border>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
+                                        <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                            <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                        </Border>
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
                                </Border>
@@ -400,8 +428,11 @@
                                </Button>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="6" Margin="1" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
+                                        <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                            <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                        </Border>
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
                                </Border>
@@ -430,8 +461,11 @@
                                </Border>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
+                                        <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                            <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                        </Border>
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
                                </Border>
@@ -464,8 +498,11 @@
                                </Button>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
+                                        <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                            <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                        </Border>
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
                                </Border>
@@ -493,8 +530,11 @@
                                </Border>
 
                                <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
+                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
                                    <Grid ClipToBounds="False">
+                                        <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                            <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                        </Border>
                                        <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                    </Grid>
                                </Border>
@@ -511,8 +551,11 @@
                                   </StackPanel>
                               </Border>
                               <!-- Design Overlay -->
-                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="#33000000" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
+                              <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="5" ZIndex="100" ClipToBounds="False">
                                   <Grid ClipToBounds="False">
+                                        <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
+                                            <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
+                                        </Border>
                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
                                   </Grid>
                               </Border>

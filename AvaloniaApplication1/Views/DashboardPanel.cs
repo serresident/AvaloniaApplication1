@@ -15,6 +15,13 @@ using AvaloniaApplication1.Views.DashboardPanelHelpers;
 
 namespace AvaloniaApplication1.Views
 {
+    public class SmartGuideLine
+    {
+        public Point Start { get; set; }
+        public Point End { get; set; }
+        public bool IsVertical { get; set; }
+    }
+
     /// <summary>
     /// A lightweight control drawn underneath the widgets to show grid lines and drag highlight.
     /// Added as first child of DashboardPanel when in design mode.
@@ -102,6 +109,8 @@ namespace AvaloniaApplication1.Views
 
         public Rect? SelectionBoxRect { get; set; }
         public bool IsCrossingSelection { get; set; }
+        public List<SmartGuideLine> ActiveSmartGuides { get; } = new();
+        public (double Col, double Row, Point CursorPos)? DragCurrentBadge { get; set; }
 
         public List<WidgetViewModelBase> GetSelectedWidgets()
         {
@@ -1459,9 +1468,10 @@ namespace AvaloniaApplication1.Views
                 // Require minimum movement to start drag (avoid accidental drags when clicking overlay buttons)
                 if (!_isDragging)
                 {
-                    if (Math.Abs(delta.X) > 10 || Math.Abs(delta.Y) > 10)
+                    if (Math.Abs(delta.X) > 4 || Math.Abs(delta.Y) > 4)
                     {
                         _isDragging = true;
+                        Cursor = new Cursor(StandardCursorType.SizeAll);
                     }
                     else
                     {
@@ -1469,17 +1479,109 @@ namespace AvaloniaApplication1.Views
                     }
                 }
 
-                // Update highlight position for move
+                GetSnappedPosition(_dragChild, point, out double newCol, out double newRow);
+
+                double deltaCol = newCol - _dragOriginalCol;
+                double deltaRow = newRow - _dragOriginalRow;
+
+                // Ensure none of the moving widgets go out of bounds (< 0)
+                if (_dragOriginalPositions.Count > 0)
+                {
+                    double minOrigCol = _dragOriginalPositions.Values.Min(p => p.Col);
+                    double minOrigRow = _dragOriginalPositions.Values.Min(p => p.Row);
+                    if (minOrigCol + deltaCol < 0) deltaCol = -minOrigCol;
+                    if (minOrigRow + deltaRow < 0) deltaRow = -minOrigRow;
+                }
+
+                // 1. Update connected external pipes for rubber-banding LIVE
+                if (_connectedPipePoints.Count > 0)
+                {
+                    foreach (var conn in _connectedPipePoints)
+                    {
+                        var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
+                        if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
+                        {
+                            var oldPt = pipePoints[conn.PointIndex];
+                            double targetX = oldPt.X + deltaCol;
+                            double targetY = oldPt.Y + deltaRow;
+                            
+                            pipePoints[conn.PointIndex] = new Point(targetX, targetY);
+
+                            double pipeCol = conn.PipeVm.Col;
+                            double pipeRow = conn.PipeVm.Row;
+
+                            var relativePoints = pipePoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
+                            string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                            
+                            if (conn.PipeVm.PipePoints != newPointsStr)
+                            {
+                                conn.PipeVm.PipePoints = newPointsStr;
+                            }
+
+                            var pipeChild = FindChildForVm(conn.PipeVm);
+                            if (pipeChild != null)
+                            {
+                                SetCol(pipeChild, conn.PipeVm.Col);
+                                SetRow(pipeChild, conn.PipeVm.Row);
+                                SetSizeX(pipeChild, conn.PipeVm.SizeX);
+                                SetSizeY(pipeChild, conn.PipeVm.SizeY);
+                                pipeChild.InvalidateArrange();
+                                pipeChild.InvalidateVisual();
+                            }
+                        }
+                    }
+                }
+
+                // 2. Move any pipes that were part of the selected group LIVE
+                foreach (var kvp in _dragOriginalPipePoints)
+                {
+                    var pvm = kvp.Key;
+                    var origPoints = kvp.Value;
+                    var shiftedPoints = origPoints.Select(p => new Point(p.X + deltaCol, p.Y + deltaRow)).ToList();
+
+                    if (_dragOriginalPositions.TryGetValue(pvm, out var origPos))
+                    {
+                        double pipeCol = origPos.Col + deltaCol;
+                        double pipeRow = origPos.Row + deltaRow;
+
+                        var relativePoints = shiftedPoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
+                        string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                        pvm.PipePoints = newPointsStr;
+                    }
+                }
+
+                // 3. Move all selected widgets LIVE
+                foreach (var kvp in _dragOriginalPositions)
+                {
+                    var vm = kvp.Key;
+                    double targetCol = kvp.Value.Col + deltaCol;
+                    double targetRow = kvp.Value.Row + deltaRow;
+
+                    vm.Col = targetCol;
+                    vm.Row = targetRow;
+
+                    var child = FindChildForVm(vm);
+                    if (child != null)
+                    {
+                        SetCol(child, targetCol);
+                        SetRow(child, targetRow);
+                        child.InvalidateArrange();
+                        child.InvalidateVisual();
+                    }
+                }
+
+                // 4. Update Smart Guides and Drag Coordinate Badge
+                UpdateSmartGuidesAndPosition(_dragVm.Col, _dragVm.Row, _dragVm.SizeX, _dragVm.SizeY);
+                DragCurrentBadge = (_dragVm.Col, _dragVm.Row, point);
+
                 if (_gridOverlay != null)
                 {
-                    _gridOverlay.ShowHighlight = true;
-                    GetSnappedPosition(_dragChild, point, out double snappedCol, out double snappedRow);
-                    _gridOverlay.HighlightCol = snappedCol;
-                    _gridOverlay.HighlightRow = snappedRow;
-                    _gridOverlay.HighlightSizeX = GetSizeX(_dragChild);
-                    _gridOverlay.HighlightSizeY = GetSizeY(_dragChild);
+                    _gridOverlay.ShowHighlight = false;
                     _gridOverlay.InvalidateVisual();
                 }
+
+                InvalidateArrange();
+                _selectionOverlay?.InvalidateVisual();
             }
         }
 
@@ -1695,8 +1797,13 @@ namespace AvaloniaApplication1.Views
                     }
                 }
 
+                ActiveSmartGuides.Clear();
+                DragCurrentBadge = null;
+                Cursor = null;
+
                 InvalidateMeasure();
                 InvalidateArrange();
+                _selectionOverlay?.InvalidateVisual();
             }
             else if (!_isDragging && _dragVm != null)
             {
@@ -1770,8 +1877,24 @@ namespace AvaloniaApplication1.Views
                         SetRow(child, kvp.Value.Row);
                     }
                 }
+
+                foreach (var kvp in _dragOriginalPipePoints)
+                {
+                    var pvm = kvp.Key;
+                    if (_dragOriginalPositions.TryGetValue(pvm, out var origPos))
+                    {
+                        var relativePoints = kvp.Value.Select(p => new Point(p.X - origPos.Col, p.Y - origPos.Row)).ToList();
+                        pvm.PipePoints = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                    }
+                }
+
+                ActiveSmartGuides.Clear();
+                DragCurrentBadge = null;
+                Cursor = null;
+
                 InvalidateMeasure();
                 InvalidateArrange();
+                _selectionOverlay?.InvalidateVisual();
             }
 
             ClearDragState();
@@ -1788,6 +1911,9 @@ namespace AvaloniaApplication1.Views
             _dragOriginalPositions.Clear();
             _dragOriginalPipePoints.Clear();
             _wasAlreadySelectedOnPressed = false;
+            ActiveSmartGuides.Clear();
+            DragCurrentBadge = null;
+            Cursor = null;
 
             if (ActiveSnapTarget != null)
             {
@@ -1990,6 +2116,83 @@ namespace AvaloniaApplication1.Views
             double v = ((p3.X - p1.X) * (p2.Y - p1.Y) - (p3.Y - p1.Y) * (p2.X - p1.X)) / d;
 
             return (u >= 0 && u <= 1) && (v >= 0 && v <= 1);
+        }
+
+        public void UpdateSmartGuidesAndPosition(double targetCol, double targetRow, int sizeX, int sizeY)
+        {
+            ActiveSmartGuides.Clear();
+            double myLeft = targetCol * CellWidth;
+            double myCenter = (targetCol + sizeX / 2.0) * CellWidth;
+            double myRight = (targetCol + sizeX) * CellWidth;
+
+            double myTop = targetRow * CellHeight;
+            double myMiddle = (targetRow + sizeY / 2.0) * CellHeight;
+            double myBottom = (targetRow + sizeY) * CellHeight;
+
+            bool xGuideAdded = false;
+            bool yGuideAdded = false;
+
+            foreach (var child in Children)
+            {
+                if (child.DataContext is WidgetViewModelBase otherVm && 
+                    !_dragOriginalPositions.ContainsKey(otherVm) && 
+                    !(otherVm is PipeWidgetViewModel))
+                {
+                    double otherLeft = otherVm.Col * CellWidth;
+                    double otherCenter = (otherVm.Col + otherVm.SizeX / 2.0) * CellWidth;
+                    double otherRight = (otherVm.Col + otherVm.SizeX) * CellWidth;
+
+                    double otherTop = otherVm.Row * CellHeight;
+                    double otherMiddle = (otherVm.Row + otherVm.SizeY / 2.0) * CellHeight;
+                    double otherBottom = (otherVm.Row + otherVm.SizeY) * CellHeight;
+
+                    // Check X alignments (Left, Center, Right)
+                    if (!xGuideAdded)
+                    {
+                        double? matchX = null;
+                        if (Math.Abs(myLeft - otherLeft) < 1.0 || Math.Abs(myLeft - otherRight) < 1.0) matchX = myLeft;
+                        else if (Math.Abs(myRight - otherRight) < 1.0 || Math.Abs(myRight - otherLeft) < 1.0) matchX = myRight;
+                        else if (Math.Abs(myCenter - otherCenter) < 1.0) matchX = myCenter;
+
+                        if (matchX.HasValue)
+                        {
+                            double minY = Math.Min(myTop, otherTop) - 20;
+                            double maxY = Math.Max(myBottom, otherBottom) + 20;
+                            ActiveSmartGuides.Add(new SmartGuideLine
+                            {
+                                Start = new Point(matchX.Value, Math.Max(0, minY)),
+                                End = new Point(matchX.Value, maxY),
+                                IsVertical = true
+                            });
+                            xGuideAdded = true;
+                        }
+                    }
+
+                    // Check Y alignments (Top, Middle, Bottom)
+                    if (!yGuideAdded)
+                    {
+                        double? matchY = null;
+                        if (Math.Abs(myTop - otherTop) < 1.0 || Math.Abs(myTop - otherBottom) < 1.0) matchY = myTop;
+                        else if (Math.Abs(myBottom - otherBottom) < 1.0 || Math.Abs(myBottom - otherTop) < 1.0) matchY = myBottom;
+                        else if (Math.Abs(myMiddle - otherMiddle) < 1.0) matchY = myMiddle;
+
+                        if (matchY.HasValue)
+                        {
+                            double minX = Math.Min(myLeft, otherLeft) - 20;
+                            double maxX = Math.Max(myRight, otherRight) + 20;
+                            ActiveSmartGuides.Add(new SmartGuideLine
+                            {
+                                Start = new Point(Math.Max(0, minX), matchY.Value),
+                                End = new Point(maxX, matchY.Value),
+                                IsVertical = false
+                            });
+                            yGuideAdded = true;
+                        }
+                    }
+
+                    if (xGuideAdded && yGuideAdded) break;
+                }
+            }
         }
 
         private bool IsPointNearSegment(Point p, Point s1, Point s2, double maxDistance)

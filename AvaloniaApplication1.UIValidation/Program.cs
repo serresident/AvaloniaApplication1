@@ -1235,7 +1235,90 @@ public static class Program
                     throw new Exception("DuplicateSelectedWidgetsCommand should select the 3 new duplicated widgets.");
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (17/17) PASSED SUCCESSFULLY!");
+            // 18. Test Live Dragging, Smart Alignment Guides, Coordinate Badge and Rubber-banding (Test 18)
+            Console.WriteLine("[UIValidation] Testing Live Dragging, Smart Alignment Guides & Coordinate Badge (Test 18)...");
+            {
+                var livePanel = new DashboardPanel
+                {
+                    CellWidth = 20,
+                    CellHeight = 20,
+                    IsDesignMode = true
+                };
+
+                var v1Config = new ValveConfig
+                {
+                    Type = "Valve",
+                    Title = "Valve 1",
+                    Position = new WidgetPosition { Col = 10, Row = 10, SizeX = 4, SizeY = 4 }
+                };
+                var v1Vm = new ValveWidgetViewModel(v1Config, new MockDataCoreService(), mainVm.ProjectContext);
+                var v1Control = new ContentControl { DataContext = v1Vm };
+                DashboardPanel.SetCol(v1Control, 10);
+                DashboardPanel.SetRow(v1Control, 10);
+                DashboardPanel.SetSizeX(v1Control, 4);
+                DashboardPanel.SetSizeY(v1Control, 4);
+                livePanel.Children.Add(v1Control);
+
+                var v2Config = new PumpConfig
+                {
+                    Type = "Pump",
+                    Title = "Pump 1",
+                    Position = new WidgetPosition { Col = 25, Row = 10, SizeX = 4, SizeY = 4 }
+                };
+                var v2Vm = new PumpWidgetViewModel(v2Config, new MockDataCoreService(), mainVm.ProjectContext);
+                var v2Control = new ContentControl { DataContext = v2Vm };
+                DashboardPanel.SetCol(v2Control, 25);
+                DashboardPanel.SetRow(v2Control, 10);
+                DashboardPanel.SetSizeX(v2Control, 4);
+                DashboardPanel.SetSizeY(v2Control, 4);
+                livePanel.Children.Add(v2Control);
+
+                // 18.1 Test Smart Alignment Guides: Vertical Alignment
+                // Dragging a widget at Col=10 (same Col as v1)
+                livePanel.UpdateSmartGuidesAndPosition(10, 30, 4, 4);
+                if (livePanel.ActiveSmartGuides.Count == 0)
+                    throw new Exception("Smart Guides failed to detect vertical alignment at Col=10.");
+                var vGuide = livePanel.ActiveSmartGuides.FirstOrDefault(g => g.IsVertical);
+                if (vGuide == null || Math.Abs(vGuide.Start.X - 10 * 20) > 1.0)
+                    throw new Exception($"Smart Guide vertical line X ({vGuide?.Start.X}) does not match expected {10 * 20}.");
+
+                // 18.2 Test Smart Alignment Guides: Horizontal Alignment
+                // Dragging a widget at Row=10 (same Row as v1 and v2)
+                livePanel.UpdateSmartGuidesAndPosition(40, 10, 4, 4);
+                if (livePanel.ActiveSmartGuides.Count == 0)
+                    throw new Exception("Smart Guides failed to detect horizontal alignment at Row=10.");
+                var hGuide = livePanel.ActiveSmartGuides.FirstOrDefault(g => !g.IsVertical);
+                if (hGuide == null || Math.Abs(hGuide.Start.Y - 10 * 20) > 1.0)
+                    throw new Exception($"Smart Guide horizontal line Y ({hGuide?.Start.Y}) does not match expected {10 * 20}.");
+
+                // 18.3 Test Coordinate Badge
+                livePanel.DragCurrentBadge = (12, 18, new Point(240, 360));
+                if (!livePanel.DragCurrentBadge.HasValue ||
+                    livePanel.DragCurrentBadge.Value.Col != 12 ||
+                    livePanel.DragCurrentBadge.Value.Row != 18 ||
+                    livePanel.DragCurrentBadge.Value.CursorPos.X != 240)
+                {
+                    throw new Exception("DragCurrentBadge property failed to store coordinate badge state.");
+                }
+
+                // 18.4 Test SelectionOverlay rendering with Smart Guides & Coordinate Badge
+                var overlay = new SelectionOverlay(livePanel);
+                v1Vm.IsSelected = true;
+                // Render via Dispatcher / Layout
+                livePanel.Children.Add(overlay);
+                livePanel.Measure(new Size(1000, 1000));
+                livePanel.Arrange(new Rect(0, 0, 1000, 1000));
+                overlay.InvalidateVisual();
+                Dispatcher.UIThread.RunJobs();
+
+                // Clear drag state
+                livePanel.ActiveSmartGuides.Clear();
+                livePanel.DragCurrentBadge = null;
+                if (livePanel.ActiveSmartGuides.Count != 0 || livePanel.DragCurrentBadge.HasValue)
+                    throw new Exception("ActiveSmartGuides or DragCurrentBadge failed to clear.");
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (18/18) PASSED SUCCESSFULLY!");
         }
     }
 
