@@ -25,6 +25,7 @@ namespace AvaloniaApplication1.ViewModels
         private readonly ISimulationService _simulationService;
         private readonly IDialogService _dialogService;
         private readonly IWidgetFactory _widgetFactory;
+        private readonly IHmiClipboardService? _hmiClipboardService;
         private HmiConfiguration? _currentConfig;
 
         public IProjectContextService ProjectContext { get; }
@@ -97,13 +98,15 @@ namespace AvaloniaApplication1.ViewModels
             ISimulationService simulationService,
             IProjectContextService projectContext,
             IDialogService dialogService,
-            IWidgetFactory widgetFactory)
+            IWidgetFactory widgetFactory,
+            IHmiClipboardService? hmiClipboardService = null)
         {
             _configurationService = configurationService;
             _dataCoreService = dataCoreService;
             _simulationService = simulationService;
             _dialogService = dialogService;
             _widgetFactory = widgetFactory;
+            _hmiClipboardService = hmiClipboardService;
             ProjectContext = projectContext;
 
             if (_widgetFactory is WidgetFactory factory)
@@ -172,14 +175,20 @@ namespace AvaloniaApplication1.ViewModels
                 return;
             }
 
-            var calcVm = new CalculatorViewModel();
+            var calcVm = new CalculatorViewModel(_hmiClipboardService);
             var child = OpenChildWindow("🧮 Технологический калькулятор", calcVm);
             if (child != null)
             {
                 child.Width = 360;
-                child.Height = 490;
+                child.Height = 520;
                 child.X = 80;
                 child.Y = 60;
+
+                calcVm.CloseAction = () => child.CloseCommand.Execute(null);
+                calcVm.OnToggleHistory = (isOpen) =>
+                {
+                    child.Width = isOpen ? 560 : 360;
+                };
             }
         }
 

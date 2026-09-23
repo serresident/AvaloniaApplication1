@@ -19,17 +19,20 @@ namespace AvaloniaApplication1.Services
         private readonly IProjectContextService _projectContext;
         private readonly IWidgetFactory _widgetFactory;
         private readonly ISimulationService? _simulationService;
+        private readonly IHmiClipboardService? _hmiClipboardService;
 
         public DialogService(
             IDataCoreService dataCoreService, 
             IProjectContextService projectContext, 
             IWidgetFactory widgetFactory,
-            ISimulationService? simulationService = null)
+            ISimulationService? simulationService = null,
+            IHmiClipboardService? hmiClipboardService = null)
         {
             _dataCoreService = dataCoreService;
             _projectContext = projectContext;
             _widgetFactory = widgetFactory;
             _simulationService = simulationService;
+            _hmiClipboardService = hmiClipboardService;
         }
 
         public IChildWindowService? ChildWindowService { get; set; }
@@ -42,7 +45,7 @@ namespace AvaloniaApplication1.Services
 
             var tcs = new TaskCompletionSource<string?>();
 
-            var vm = new NumpadViewModel { InputValue = initialValue };
+            var vm = new NumpadViewModel(_hmiClipboardService) { InputValue = initialValue };
             var childWindow = ChildWindowService.OpenChildWindow(title, vm);
             
             if (childWindow != null)

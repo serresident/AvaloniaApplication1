@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="480"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="520"
              x:Class="AvaloniaApplication1.Views.CalculatorView"
              x:DataType="vm:CalculatorViewModel"
              x:CompileBindings="True">
@@ -51,54 +51,145 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Margin" Value="2" />
         </Style>
+        <Style Selector="Button.calc-mem">
+            <Setter Property="Background" Value="#252A34" />
+            <Setter Property="Foreground" Value="#00E5FF" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Margin" Value="1" />
+        </Style>
+        <Style Selector="Button.calc-mem:pointerover">
+            <Setter Property="Background" Value="#374151" />
+        </Style>
+        <Style Selector="Button.calc-tool">
+            <Setter Property="Background" Value="#2A303C" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Margin" Value="2,1" />
+        </Style>
+        <Style Selector="Button.calc-tool:pointerover">
+            <Setter Property="Background" Value="#3F495A" />
+        </Style>
     </UserControl.Styles>
 
     <TabControl Background="#1E222B" Margin="0" Padding="0">
         <!-- 1. Инженерный калькулятор -->
         <TabItem Header="🔢 Калькулятор" FontSize="12">
-            <Grid RowDefinitions="Auto,*" Margin="8">
-                <!-- Дисплей калькулятора -->
-                <Border Grid.Row="0" Background="#12151B" BorderBrush="#374151" BorderThickness="1" CornerRadius="8" Padding="12,8" Margin="0,0,0,8">
-                    <StackPanel>
-                        <TextBlock Text="{Binding ExpressionHistory}" Foreground="#888888" FontSize="11" HorizontalAlignment="Right" MinHeight="16" />
-                        <Viewbox MaxHeight="38" HorizontalAlignment="Right">
-                            <TextBlock Text="{Binding Display}" Foreground="#00E5FF" FontSize="26" FontWeight="Bold" FontFamily="Consolas, monospace" HorizontalAlignment="Right" />
-                        </Viewbox>
-                    </StackPanel>
-                </Border>
+            <Grid ColumnDefinitions="*,Auto">
+                <!-- Основная зона калькулятора -->
+                <Grid Grid.Column="0" RowDefinitions="Auto,Auto,Auto,*" Margin="8">
+                    <!-- Дисплей калькулятора -->
+                    <Border Grid.Row="0" Background="#12151B" BorderBrush="#374151" BorderThickness="1" CornerRadius="8" Padding="10,6" Margin="0,0,0,6">
+                        <StackPanel>
+                            <!-- Верхняя информационная строка дисплея: индикатор памяти [M], статус буфера, выражение -->
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
+                                    <Border Background="#00E5FF" CornerRadius="2" Padding="4,1" Margin="0,0,4,0" IsVisible="{Binding HasMemory}">
+                                        <TextBlock Text="M" Foreground="#12151B" FontSize="10" FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="{Binding ClipboardStatusMessage}" Foreground="#00E676" FontSize="10" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="2" Text="{Binding ExpressionHistory}" Foreground="#888888" FontSize="11" HorizontalAlignment="Right" MinHeight="16" />
+                            </Grid>
+                            
+                            <!-- Главные цифры дисплея -->
+                            <Viewbox MaxHeight="36" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding Display}" Foreground="#00E5FF" FontSize="26" FontWeight="Bold" FontFamily="Consolas, monospace" HorizontalAlignment="Right" />
+                            </Viewbox>
+                        </StackPanel>
+                    </Border>
 
-                <!-- Сетка кнопок -->
-                <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" RowDefinitions="*,*,*,*,*">
-                    <!-- Строка 1 -->
-                    <Button Grid.Row="0" Grid.Column="0" Content="C" Classes="calc-action" Command="{Binding ClearCommand}" ToolTip.Tip="Очистить всё (C)" />
-                    <Button Grid.Row="0" Grid.Column="1" Content="⌫" Classes="calc-btn" Command="{Binding BackspaceCommand}" ToolTip.Tip="Удалить последний символ" />
-                    <Button Grid.Row="0" Grid.Column="2" Content="√" Classes="calc-btn" Command="{Binding SqrtCommand}" ToolTip.Tip="Квадратный корень" />
-                    <Button Grid.Row="0" Grid.Column="3" Content="÷" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="÷" ToolTip.Tip="Разделить" />
+                    <!-- Строка памяти: MC, MR, M+, M-, MS -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*" Height="26" Margin="0,0,0,4">
+                        <Button Grid.Column="0" Content="MC" Classes="calc-mem" Command="{Binding MemoryClearCommand}" ToolTip.Tip="Очистить память (MC)" />
+                        <Button Grid.Column="1" Content="MR" Classes="calc-mem" Command="{Binding MemoryRecallCommand}" ToolTip.Tip="Восстановить из памяти (MR)" />
+                        <Button Grid.Column="2" Content="M+" Classes="calc-mem" Command="{Binding MemoryAddCommand}" ToolTip.Tip="Прибавить к памяти (M+)" />
+                        <Button Grid.Column="3" Content="M-" Classes="calc-mem" Command="{Binding MemorySubtractCommand}" ToolTip.Tip="Вычесть из памяти (M-)" />
+                        <Button Grid.Column="4" Content="MS" Classes="calc-mem" Command="{Binding MemoryStoreCommand}" ToolTip.Tip="Сохранить в память (MS)" />
+                    </Grid>
 
-                    <!-- Строка 2 -->
-                    <Button Grid.Row="1" Grid.Column="0" Content="7" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="7" />
-                    <Button Grid.Row="1" Grid.Column="1" Content="8" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="8" />
-                    <Button Grid.Row="1" Grid.Column="2" Content="9" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="9" />
-                    <Button Grid.Row="1" Grid.Column="3" Content="×" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="×" ToolTip.Tip="Умножить" />
+                    <!-- Панель быстрых инструментов: В уставку, Из буфера, Журнал -->
+                    <Grid Grid.Row="2" ColumnDefinitions="1.2*,1*,1*" Height="28" Margin="0,0,0,6">
+                        <Button Grid.Column="0" Content="📋 В уставку" Classes="calc-tool" Command="{Binding CopyToClipboardCommand}" ToolTip.Tip="Скопировать число в буфер HMI для вставки в уставку (Ctrl+C)" Background="#1E3A4B" Foreground="#4DD0E1" />
+                        <Button Grid.Column="1" Content="📥 Из буфера" Classes="calc-tool" Command="{Binding PasteFromClipboardCommand}" ToolTip.Tip="Вставить из буфера HMI (Ctrl+V)" />
+                        <Button Grid.Column="2" Content="📜 Журнал" Classes="calc-tool" Command="{Binding ToggleHistoryCommand}" ToolTip.Tip="Открыть/закрыть журнал расчетов" />
+                    </Grid>
 
-                    <!-- Строка 3 -->
-                    <Button Grid.Row="2" Grid.Column="0" Content="4" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="4" />
-                    <Button Grid.Row="2" Grid.Column="1" Content="5" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="5" />
-                    <Button Grid.Row="2" Grid.Column="2" Content="6" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="6" />
-                    <Button Grid.Row="2" Grid.Column="3" Content="-" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="-" ToolTip.Tip="Вычесть" />
+                    <!-- Сетка кнопок -->
+                    <Grid Grid.Row="3" ColumnDefinitions="*,*,*,*" RowDefinitions="*,*,*,*,*">
+                        <!-- Строка 1 -->
+                        <Button Grid.Row="0" Grid.Column="0" Content="C" Classes="calc-action" Command="{Binding ClearCommand}" ToolTip.Tip="Очистить всё (C / Escape)" />
+                        <Button Grid.Row="0" Grid.Column="1" Content="⌫" Classes="calc-btn" Command="{Binding BackspaceCommand}" ToolTip.Tip="Удалить последний символ (Backspace)" />
+                        <Button Grid.Row="0" Grid.Column="2" Content="√" Classes="calc-btn" Command="{Binding SqrtCommand}" ToolTip.Tip="Квадратный корень" />
+                        <Button Grid.Row="0" Grid.Column="3" Content="÷" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="÷" ToolTip.Tip="Разделить (/)" />
 
-                    <!-- Строка 4 -->
-                    <Button Grid.Row="3" Grid.Column="0" Content="1" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="1" />
-                    <Button Grid.Row="3" Grid.Column="1" Content="2" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="2" />
-                    <Button Grid.Row="3" Grid.Column="2" Content="3" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="3" />
-                    <Button Grid.Row="3" Grid.Column="3" Content="+" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="+" ToolTip.Tip="Сложить" />
+                        <!-- Строка 2 -->
+                        <Button Grid.Row="1" Grid.Column="0" Content="7" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="7" />
+                        <Button Grid.Row="1" Grid.Column="1" Content="8" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="8" />
+                        <Button Grid.Row="1" Grid.Column="2" Content="9" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="9" />
+                        <Button Grid.Row="1" Grid.Column="3" Content="×" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="×" ToolTip.Tip="Умножить (*)" />
 
-                    <!-- Строка 5 -->
-                    <Button Grid.Row="4" Grid.Column="0" Content="±" Classes="calc-btn" Command="{Binding ToggleSignCommand}" ToolTip.Tip="Сменить знак" />
-                    <Button Grid.Row="4" Grid.Column="1" Content="0" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="0" />
-                    <Button Grid.Row="4" Grid.Column="2" Content="," Classes="calc-btn" Command="{Binding InputDecimalCommand}" ToolTip.Tip="Десятичный разделитель" />
-                    <Button Grid.Row="4" Grid.Column="3" Content="=" Classes="calc-op" Background="#00C853" Command="{Binding CalculateResultCommand}" ToolTip.Tip="Вычислить результат (=)" />
+                        <!-- Строка 3 -->
+                        <Button Grid.Row="2" Grid.Column="0" Content="4" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="4" />
+                        <Button Grid.Row="2" Grid.Column="1" Content="5" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="5" />
+                        <Button Grid.Row="2" Grid.Column="2" Content="6" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="6" />
+                        <Button Grid.Row="2" Grid.Column="3" Content="-" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="-" ToolTip.Tip="Вычесть (-)" />
+
+                        <!-- Строка 4 -->
+                        <Button Grid.Row="3" Grid.Column="0" Content="1" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="1" />
+                        <Button Grid.Row="3" Grid.Column="1" Content="2" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="2" />
+                        <Button Grid.Row="3" Grid.Column="2" Content="3" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="3" />
+                        <Button Grid.Row="3" Grid.Column="3" Content="+" Classes="calc-op" Command="{Binding SetOperationCommand}" CommandParameter="+" ToolTip.Tip="Сложить (+)" />
+
+                        <!-- Строка 5 -->
+                        <Button Grid.Row="4" Grid.Column="0" Content="±" Classes="calc-btn" Command="{Binding ToggleSignCommand}" ToolTip.Tip="Сменить знак" />
+                        <Button Grid.Row="4" Grid.Column="1" Content="0" Classes="calc-btn" Command="{Binding InputDigitCommand}" CommandParameter="0" />
+                        <Button Grid.Row="4" Grid.Column="2" Content="," Classes="calc-btn" Command="{Binding InputDecimalCommand}" ToolTip.Tip="Десятичный разделитель (, или .)" />
+                        <Button Grid.Row="4" Grid.Column="3" Content="=" Classes="calc-op" Background="#00C853" Command="{Binding CalculateResultCommand}" ToolTip.Tip="Вычислить результат (= или Enter)" />
+                    </Grid>
                 </Grid>
+
+                <!-- Боковая выдвижная панель: Журнал расчетов -->
+                <Border Grid.Column="1" Width="200" Background="#161920" BorderBrush="#2D3748" BorderThickness="1,0,0,0" IsVisible="{Binding IsHistoryOpen}">
+                    <Grid RowDefinitions="Auto,*">
+                        <!-- Заголовок журнала и кнопка очистки -->
+                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="8,8,8,6">
+                            <TextBlock Grid.Column="0" Text="📜 Журнал" FontWeight="Bold" Foreground="#00E5FF" FontSize="13" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="🗑️" Classes="calc-tool" Command="{Binding ClearHistoryCommand}" Width="28" Height="26" ToolTip.Tip="Очистить журнал" />
+                        </Grid>
+
+                        <!-- Список истории -->
+                        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding HistoryLog}" Margin="4,0,4,4">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:CalculationHistoryItem">
+                                        <Button Classes="calc-tool" 
+                                                Command="{Binding ((vm:CalculatorViewModel)DataContext).SelectHistoryItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                HorizontalAlignment="Stretch" Margin="2,2" Padding="6,4">
+                                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Timestamp}" Foreground="#666" FontSize="10" />
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Expression}" Foreground="#AAA" FontSize="11" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Result}" Foreground="#00E5FF" FontWeight="Bold" FontSize="12" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
             </Grid>
         </TabItem>
 

@@ -64,6 +64,7 @@ namespace AvaloniaApplication1
             services.AddSingleton<IAlarmNotificationService>(sp => sp.GetRequiredService<AlarmNotificationService>());
             
             services.AddSingleton<IDialogService, DialogService>();
+            services.AddSingleton<IHmiClipboardService, HmiClipboardService>();
 
             // ViewModels
             services.AddSingleton<IWidgetFactory, WidgetFactory>();

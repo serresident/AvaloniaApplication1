@@ -582,6 +582,28 @@
   - [x] Разработан автоматический тест №14 в `AvaloniaApplication1.UIValidation/Program.cs`
   - [x] Успешное выполнение всех 14 тестов (14/14 PASS, 100%)
   - [x] Headless-рендеринг `MainWindow` и `SettingsWindow` в `artifacts/ui_preview.png`
+  # Tasks: Calculator Polish — Memory, History Journal, Keyboard Input & HMI Clipboard (Сессия 37 — Выполнено)
+
+- [x] Изолированный HMI-буфер обмена C# без обращения к системному буферу ОС (Linux Debian ARM Kiosk ready):
+  - [x] Создан интерфейс `IHmiClipboardService` и синглтон-сервис `HmiClipboardService`
+  - [x] Регистрация в DI `App.axaml.cs` и внедрение в `MainViewModel`, `CalculatorViewModel`, `NumpadViewModel`, `DialogService`
+- [x] Функции памяти в инженерном калькуляторе (`MC`, `MR`, `M+`, `M-`, `MS`):
+  - [x] Реализована логика ячейки памяти `MemoryValue`, индикатор `[M]` на дисплее
+  - [x] Размещен компактный ряд кнопок памяти в `CalculatorView.axaml`
+- [x] Журнал расчетов (История операций):
+  - [x] Структура `CalculationHistoryItem` с фиксацией времени, выражения и результата
+  - [x] Боковая выдвижная панель `📜 Журнал` с динамическим расширением MDI-окна (360 -> 560 px) через `OnToggleHistory`
+  - [x] Выбор исторического значения в дисплей по клику и кнопка быстрой очистки `🗑️`
+- [x] Полноценный ввод с клавиатуры:
+  - [x] Клавиатурный обработчик `OnKeyDown` в `CalculatorView.axaml.cs`: цифры 0-9, операции `+,-,*,/`, Enter (`=`), Backspace (`⌫`), Escape (закрытие окна), `Ctrl+C` (копировать в HMI-буфер), `Ctrl+V` (вставить из HMI-буфера)
+  - [x] В `NumpadView.axaml.cs`: добавлена обработка горячей клавиши `Ctrl+V`
+- [x] Интеграция с задатчиками уставок (`SetValue` / `Numpad`):
+  - [x] Кнопка `📋 В уставку` на панели калькулятора и в блоках технологических расчетов (масса, давление)
+  - [x] В `NumpadView.axaml` добавлена компактная кнопка `📥 Вставить из калькулятора: {значение}`
+- [x] Тестирование и верификация:
+  - [x] Разработан автоматический тест №15 в `AvaloniaApplication1.UIValidation/Program.cs`
+  - [x] Успешное прохождение всех 15 тестов (15/15 PASS, 100%)
+  - [x] Headless-рендеринг `CalculatorView`, `NumpadView`, `MainWindow` в `artifacts/ui_preview.png`
   - [x] Чистая сборка: 0 ошибок, 0 предупреждений
 
 

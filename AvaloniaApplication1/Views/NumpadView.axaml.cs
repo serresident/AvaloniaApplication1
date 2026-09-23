@@ -25,6 +25,13 @@ namespace AvaloniaApplication1.Views
 
             if (DataContext is NumpadViewModel vm)
             {
+                if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.V)
+                {
+                    vm.PasteFromClipboardCommand.Execute(null);
+                    e.Handled = true;
+                    return;
+                }
+
                 switch (e.Key)
                 {
                     case Key.D0:

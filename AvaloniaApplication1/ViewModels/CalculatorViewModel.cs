@@ -1,12 +1,24 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using AvaloniaApplication1.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AvaloniaApplication1.ViewModels
 {
+    public class CalculationHistoryItem
+    {
+        public string Expression { get; set; } = string.Empty;
+        public string Result { get; set; } = string.Empty;
+        public string Timestamp { get; set; } = string.Empty;
+        public string FullDisplay => $"{Expression} {Result}";
+    }
+
     public partial class CalculatorViewModel : ViewModelBase
     {
+        private readonly IHmiClipboardService? _clipboard;
+
         [ObservableProperty]
         private string _display = "0";
 
@@ -19,6 +31,27 @@ namespace AvaloniaApplication1.ViewModels
         private double _firstOperand = 0;
         private string _pendingOperation = string.Empty;
         private bool _isNewNumber = true;
+
+        #region Memory (MC, MR, M+, M-, MS)
+        [ObservableProperty]
+        private double _memoryValue = 0;
+
+        [ObservableProperty]
+        private bool _hasMemory = false;
+        #endregion
+
+        #region History Log
+        public ObservableCollection<CalculationHistoryItem> HistoryLog { get; } = new();
+
+        [ObservableProperty]
+        private bool _isHistoryOpen = false;
+
+        public Action<bool>? OnToggleHistory { get; set; }
+        public Action? CloseAction { get; set; }
+
+        [ObservableProperty]
+        private string _clipboardStatusMessage = string.Empty;
+        #endregion
 
         #region Tech Mode 1: Масса / Объем / Плотность
         [ObservableProperty]
@@ -48,8 +81,9 @@ namespace AvaloniaApplication1.ViewModels
         private double _pressureMpa = 0.1; // МПа
         #endregion
 
-        public CalculatorViewModel()
+        public CalculatorViewModel(IHmiClipboardService? clipboard = null)
         {
+            _clipboard = clipboard;
             UpdateTechMass();
         }
 
@@ -139,9 +173,13 @@ namespace AvaloniaApplication1.ViewModels
                 }
                 else
                 {
-                    ExpressionHistory = $"{_firstOperand} {_pendingOperation} {secondOperand} =";
-                    Display = result.ToString("G10", CultureInfo.CurrentCulture);
+                    var expr = $"{_firstOperand} {_pendingOperation} {secondOperand} =";
+                    var resStr = result.ToString("G10", CultureInfo.CurrentCulture);
+                    ExpressionHistory = expr;
+                    Display = resStr;
                     _firstOperand = result;
+
+                    AddHistoryEntry(expr, resStr);
                 }
 
                 _pendingOperation = string.Empty;
@@ -191,15 +229,146 @@ namespace AvaloniaApplication1.ViewModels
                 if (val >= 0)
                 {
                     var res = Math.Sqrt(val);
-                    ExpressionHistory = $"√({val}) =";
-                    Display = res.ToString("G10", CultureInfo.CurrentCulture);
+                    var expr = $"√({val}) =";
+                    var resStr = res.ToString("G10", CultureInfo.CurrentCulture);
+                    ExpressionHistory = expr;
+                    Display = resStr;
                     _isNewNumber = true;
+
+                    AddHistoryEntry(expr, resStr);
                 }
                 else
                 {
                     Display = "Ошибка";
                 }
             }
+        }
+        #endregion
+
+        #region Memory Operations
+        [RelayCommand]
+        private void MemoryClear()
+        {
+            MemoryValue = 0;
+            HasMemory = false;
+        }
+
+        [RelayCommand]
+        private void MemoryRecall()
+        {
+            if (HasMemory)
+            {
+                Display = MemoryValue.ToString("G10", CultureInfo.CurrentCulture);
+                _isNewNumber = true;
+            }
+        }
+
+        [RelayCommand]
+        private void MemoryAdd()
+        {
+            if (double.TryParse(Display.Replace(",", "."), CultureInfo.InvariantCulture, out var val))
+            {
+                MemoryValue += val;
+                HasMemory = Math.Abs(MemoryValue) > 1e-12;
+                _isNewNumber = true;
+            }
+        }
+
+        [RelayCommand]
+        private void MemorySubtract()
+        {
+            if (double.TryParse(Display.Replace(",", "."), CultureInfo.InvariantCulture, out var val))
+            {
+                MemoryValue -= val;
+                HasMemory = Math.Abs(MemoryValue) > 1e-12;
+                _isNewNumber = true;
+            }
+        }
+
+        [RelayCommand]
+        private void MemoryStore()
+        {
+            if (double.TryParse(Display.Replace(",", "."), CultureInfo.InvariantCulture, out var val))
+            {
+                MemoryValue = val;
+                HasMemory = Math.Abs(MemoryValue) > 1e-12;
+                _isNewNumber = true;
+            }
+        }
+        #endregion
+
+        #region History Operations
+        private void AddHistoryEntry(string expression, string result)
+        {
+            HistoryLog.Insert(0, new CalculationHistoryItem
+            {
+                Expression = expression,
+                Result = result,
+                Timestamp = DateTime.Now.ToString("HH:mm:ss")
+            });
+
+            // Ограничение размера журнала
+            while (HistoryLog.Count > 30)
+            {
+                HistoryLog.RemoveAt(HistoryLog.Count - 1);
+            }
+        }
+
+        [RelayCommand]
+        private void ToggleHistory()
+        {
+            IsHistoryOpen = !IsHistoryOpen;
+            OnToggleHistory?.Invoke(IsHistoryOpen);
+        }
+
+        [RelayCommand]
+        private void ClearHistory()
+        {
+            HistoryLog.Clear();
+        }
+
+        [RelayCommand]
+        private void SelectHistoryItem(CalculationHistoryItem? item)
+        {
+            if (item != null)
+            {
+                Display = item.Result;
+                _isNewNumber = true;
+            }
+        }
+        #endregion
+
+        #region Internal HMI Clipboard Operations
+        [RelayCommand]
+        public void CopyToClipboard(string? customVal = null)
+        {
+            var val = customVal ?? Display;
+            if (!string.IsNullOrEmpty(val) && val != "Ошибка")
+            {
+                // Заменяем запятую на точку для удобства ввода в контроллеры
+                val = val.Replace(",", ".");
+                if (_clipboard != null)
+                {
+                    _clipboard.CurrentValue = val;
+                }
+                ClipboardStatusMessage = $"В буфере HMI: {val}";
+            }
+        }
+
+        [RelayCommand]
+        public void PasteFromClipboard()
+        {
+            if (_clipboard != null && !string.IsNullOrEmpty(_clipboard.CurrentValue))
+            {
+                Display = _clipboard.CurrentValue.Replace(".", ",");
+                _isNewNumber = true;
+            }
+        }
+
+        [RelayCommand]
+        public void CloseWindow()
+        {
+            CloseAction?.Invoke();
         }
         #endregion
 

@@ -157,6 +157,7 @@ public static class Program
             services.AddSingleton<IAlarmNotificationService, AlarmNotificationService>();
             services.AddSingleton<IWidgetFactory, WidgetFactory>();
             services.AddSingleton<IDialogService, DialogService>();
+            services.AddSingleton<IHmiClipboardService, HmiClipboardService>();
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<IChildWindowService>(sp => sp.GetRequiredService<MainViewModel>());
             using var sp = services.BuildServiceProvider();
@@ -279,6 +280,43 @@ public static class Program
                     DataContext = promptVm,
                     Width = 360,
                     Height = 450
+                };
+            }
+            else if (string.Equals(targetView, "CalculatorView", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(targetView, "Calculator", StringComparison.OrdinalIgnoreCase))
+            {
+                var clip = sp.GetRequiredService<IHmiClipboardService>();
+                var calcVm = new CalculatorViewModel(clip);
+                calcVm.ToggleHistoryCommand.Execute(null); // Show with history panel open
+                window = new Window
+                {
+                    Title = "CalculatorView Preview",
+                    Width = 560,
+                    Height = 520,
+                    Content = new CalculatorView
+                    {
+                        DataContext = calcVm
+                    }
+                };
+            }
+            else if (string.Equals(targetView, "NumpadView", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(targetView, "Numpad", StringComparison.OrdinalIgnoreCase))
+            {
+                var clip = sp.GetRequiredService<IHmiClipboardService>();
+                clip.CurrentValue = "125.5";
+                var numpadVm = new NumpadViewModel(clip)
+                {
+                    InputValue = "100.0"
+                };
+                window = new Window
+                {
+                    Title = "NumpadView Preview",
+                    Width = 320,
+                    Height = 420,
+                    Content = new NumpadView
+                    {
+                        DataContext = numpadVm
+                    }
                 };
             }
             else
@@ -804,7 +842,78 @@ public static class Program
         if (resultCfg.FontSize != 16.0 || resultCfg.LabelPosition != "Bottom" || resultCfg.ShowBorder != false || resultCfg.ShowStatusText != true || resultCfg.LabelOffset != -4.0)
             throw new Exception("WidgetEditorViewModel ToWidgetConfig() failed to preserve modified typography properties.");
 
-        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (14/14) PASSED SUCCESSFULLY!");
+        // 15. Test Calculator Memory, History Journal, Internal HMI Clipboard & Numpad Integration
+        Console.WriteLine("[Validation] Running Test 15: Memory, History Journal, HMI Clipboard & Numpad Integration...");
+        var clipboard = new HmiClipboardService();
+        var calcWithClipVm = new CalculatorViewModel(clipboard);
+        
+        // 15.1 Test Memory Operations (MC, MR, M+, M-, MS)
+        calcWithClipVm.InputDigitCommand.Execute("5");
+        calcWithClipVm.InputDigitCommand.Execute("0");
+        calcWithClipVm.MemoryStoreCommand.Execute(null); // M = 50
+        if (!calcWithClipVm.HasMemory || Math.Abs(calcWithClipVm.MemoryValue - 50.0) > 0.001)
+            throw new Exception("Calculator MemoryStore (MS) failed: HasMemory should be true, MemoryValue should be 50.");
+
+        calcWithClipVm.ClearCommand.Execute(null);
+        calcWithClipVm.InputDigitCommand.Execute("2");
+        calcWithClipVm.InputDigitCommand.Execute("5");
+        calcWithClipVm.MemoryAddCommand.Execute(null); // M = 50 + 25 = 75
+        if (Math.Abs(calcWithClipVm.MemoryValue - 75.0) > 0.001)
+            throw new Exception($"Calculator MemoryAdd (M+) failed: expected 75, got {calcWithClipVm.MemoryValue}.");
+
+        calcWithClipVm.ClearCommand.Execute(null);
+        calcWithClipVm.MemoryRecallCommand.Execute(null); // MR -> 75
+        if (calcWithClipVm.Display != "75")
+            throw new Exception($"Calculator MemoryRecall (MR) failed: expected display '75', got '{calcWithClipVm.Display}'.");
+
+        calcWithClipVm.MemoryClearCommand.Execute(null); // MC -> 0
+        if (calcWithClipVm.HasMemory || Math.Abs(calcWithClipVm.MemoryValue) > 0.001)
+            throw new Exception("Calculator MemoryClear (MC) failed: HasMemory should be false.");
+
+        // 15.2 Test History Journal & Toggle
+        bool historyOpenReported = false;
+        calcWithClipVm.OnToggleHistory = isOpen => historyOpenReported = isOpen;
+        calcWithClipVm.ToggleHistoryCommand.Execute(null);
+        if (!calcWithClipVm.IsHistoryOpen || !historyOpenReported)
+            throw new Exception("Calculator ToggleHistory failed to open or trigger callback.");
+
+        // Perform calculation to populate HistoryLog
+        calcWithClipVm.ClearCommand.Execute(null);
+        calcWithClipVm.InputDigitCommand.Execute("1");
+        calcWithClipVm.InputDigitCommand.Execute("0");
+        calcWithClipVm.InputDigitCommand.Execute("0");
+        calcWithClipVm.SetOperationCommand.Execute("+");
+        calcWithClipVm.InputDigitCommand.Execute("2");
+        calcWithClipVm.InputDigitCommand.Execute("5");
+        calcWithClipVm.CalculateResultCommand.Execute(null); // 100 + 25 = 125
+
+        if (calcWithClipVm.HistoryLog.Count != 1 || calcWithClipVm.HistoryLog[0].Result != "125")
+            throw new Exception("Calculator HistoryLog failed to record calculation (expected 1 entry with Result=125).");
+
+        // 15.3 Test Internal HMI Clipboard (no OS clipboard)
+        calcWithClipVm.CopyToClipboardCommand.Execute(null);
+        if (!clipboard.HasValue || clipboard.CurrentValue != "125")
+            throw new Exception($"HMI Clipboard copy failed: HasValue={clipboard.HasValue}, Value='{clipboard.CurrentValue}'.");
+
+        // 15.4 Test NumpadViewModel Clipboard Insertion
+        using var numpadVm = new NumpadViewModel(clipboard);
+        if (!numpadVm.HasClipboardValue || numpadVm.ClipboardPreview != "125")
+            throw new Exception($"NumpadViewModel failed to detect clipboard value: HasClipboardValue={numpadVm.HasClipboardValue}, Preview='{numpadVm.ClipboardPreview}'.");
+
+        numpadVm.PasteFromClipboardCommand.Execute(null);
+        if (numpadVm.InputValue != "125")
+            throw new Exception($"NumpadViewModel paste failed: expected '125', got '{numpadVm.InputValue}'.");
+
+        // 15.5 Test Live Clipboard Notification
+        clipboard.CurrentValue = "42.8";
+        Dispatcher.UIThread.RunJobs();
+        if (numpadVm.ClipboardPreview != "42.8")
+            throw new Exception($"NumpadViewModel did not update preview on clipboard change: expected '42.8', got '{numpadVm.ClipboardPreview}'.");
+        numpadVm.PasteFromClipboardCommand.Execute(null);
+        if (numpadVm.InputValue != "42.8")
+            throw new Exception($"NumpadViewModel paste second value failed: expected '42.8', got '{numpadVm.InputValue}'.");
+
+        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (15/15) PASSED SUCCESSFULLY!");
     }
 
     private static VisualTreeNode DumpVisualTree(Visual visual)
