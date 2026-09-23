@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.Immutable;
 using Avalonia.VisualTree;
 using AvaloniaApplication1.ViewModels;
 
@@ -12,6 +13,21 @@ namespace AvaloniaApplication1.Views
     public class SelectionOverlay : Control
     {
         private DashboardPanel? _panel;
+
+        // Cached brushes and pens for zero-allocation rendering in Render()
+        private static readonly IBrush SelectionFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(30, 0, 122, 255));
+        private static readonly IPen SelectionBorderPen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 122, 255)), 2.0);
+        private static readonly IBrush HandleBrush = Brushes.White;
+        private static readonly IPen HandlePen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 122, 255)), 1.5);
+
+        private static readonly IPen SnapRingPen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 230, 118)), 2.5);
+        private static readonly IBrush SnapFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(70, 0, 230, 118));
+
+        private static readonly IBrush RubberBandFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(35, 0, 122, 255));
+        private static readonly IPen RubberBandBorderPen = new ImmutablePen(
+            new ImmutableSolidColorBrush(Color.FromRgb(0, 122, 255)),
+            1.5,
+            new ImmutableDashStyle(new double[] { 4, 3 }, 0));
 
         public SelectionOverlay()
         {
@@ -56,22 +72,26 @@ namespace AvaloniaApplication1.Views
         {
             base.Render(context);
 
-            if (_panel != null && _panel.IsDesignMode && _panel.SelectedVm != null)
-            {
-                Control? selectedControl = null;
-                foreach (var child in _panel.Children)
-                {
-                    if (child.DataContext == _panel.SelectedVm)
-                    {
-                        selectedControl = child;
-                        break;
-                    }
-                }
+            if (_panel == null || !_panel.IsDesignMode) return;
 
+            // 1. Render Rubber-band Selection Box if currently dragging
+            if (_panel.SelectionBoxRect.HasValue)
+            {
+                var box = _panel.SelectionBoxRect.Value;
+                if (box.Width > 1 && box.Height > 1)
+                {
+                    context.DrawRectangle(RubberBandFillBrush, RubberBandBorderPen, box, 2, 2);
+                }
+            }
+
+            // 2. Render Selection Borders and Handles for ALL Selected Widgets
+            var selectedWidgets = _panel.GetSelectedWidgets();
+            foreach (var widgetVm in selectedWidgets)
+            {
                 double col, row;
                 double sizeX, sizeY;
 
-                if (_panel.SelectedVm is PipeWidgetViewModel pipeVm)
+                if (widgetVm is PipeWidgetViewModel pipeVm)
                 {
                     var points = pipeVm.GetAbsoluteGridPoints();
                     if (points.Count >= 2)
@@ -96,10 +116,10 @@ namespace AvaloniaApplication1.Views
                 }
                 else
                 {
-                    col = _panel.SelectedVm.Col;
-                    row = _panel.SelectedVm.Row;
-                    sizeX = _panel.SelectedVm.SizeX;
-                    sizeY = _panel.SelectedVm.SizeY;
+                    col = widgetVm.Col;
+                    row = widgetVm.Row;
+                    sizeX = widgetVm.SizeX;
+                    sizeY = widgetVm.SizeY;
                 }
 
                 double x = col * _panel.CellWidth;
@@ -107,24 +127,20 @@ namespace AvaloniaApplication1.Views
                 double w = sizeX * _panel.CellWidth;
                 double h = sizeY * _panel.CellHeight;
 
-                var fillBrush = new SolidColorBrush(Color.FromArgb(30, 0, 122, 255));
-                var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 2.0);
-                context.DrawRectangle(fillBrush, borderPen, new Rect(x, y, w, h), 4, 4);
+                context.DrawRectangle(SelectionFillBrush, SelectionBorderPen, new Rect(x, y, w, h), 4, 4);
 
-                var handleBrush = Brushes.White;
-                var handlePen = new Pen(new SolidColorBrush(Color.FromRgb(0, 122, 255)), 1.5);
-                context.DrawEllipse(handleBrush, handlePen, new Point(x, y), 4, 4);
-                context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y), 4, 4);
-                context.DrawEllipse(handleBrush, handlePen, new Point(x, y + h), 4, 4);
-                context.DrawEllipse(handleBrush, handlePen, new Point(x + w, y + h), 4, 4);
+                // Draw corner handles
+                context.DrawEllipse(HandleBrush, HandlePen, new Point(x, y), 4, 4);
+                context.DrawEllipse(HandleBrush, HandlePen, new Point(x + w, y), 4, 4);
+                context.DrawEllipse(HandleBrush, HandlePen, new Point(x, y + h), 4, 4);
+                context.DrawEllipse(HandleBrush, HandlePen, new Point(x + w, y + h), 4, 4);
             }
 
-            if (_panel != null && _panel.IsDesignMode && _panel.ActiveSnapTarget.HasValue)
+            // 3. Render Snap Target Marker
+            if (_panel.ActiveSnapTarget.HasValue)
             {
                 var snapPt = _panel.ActiveSnapTarget.Value;
-                var snapRingPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 230, 118)), 2.5);
-                var snapFill = new SolidColorBrush(Color.FromArgb(70, 0, 230, 118));
-                context.DrawEllipse(snapFill, snapRingPen, snapPt, 11, 11);
+                context.DrawEllipse(SnapFillBrush, SnapRingPen, snapPt, 11, 11);
                 context.DrawEllipse(Brushes.White, null, snapPt, 3.5, 3.5);
             }
         }

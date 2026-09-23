@@ -537,6 +537,56 @@
                  <TextBlock Text="{Binding ZoomScale, StringFormat=\{0:P0\}}" Foreground="White" Width="45" TextAlignment="Right" VerticalAlignment="Center" FontSize="12" />
                  <Border Width="1" Background="#3E3E42" Height="16" Margin="5,0" />
                  <Button Content="100%" Command="{Binding ResetZoomCommand}" FontSize="11" Padding="6,3" Background="#4A4A4D" Foreground="White" CornerRadius="4" VerticalAlignment="Center" />
+                 <Border Width="1" Background="#3E3E42" Height="16" Margin="5,0" />
+                 <ToggleButton IsChecked="{Binding IsMultiSelectMode, Mode=TwoWay}"
+                               ToolTip.Tip="Режим мультивыбора (для кликов без зажатия Ctrl)"
+                               Padding="8,4" FontSize="11" CornerRadius="4">
+                     <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                         <TextBlock Text="🗂️" FontSize="12" VerticalAlignment="Center" />
+                         <TextBlock Text="Мультивыбор" FontSize="11" VerticalAlignment="Center" />
+                     </StackPanel>
+                 </ToggleButton>
+             </StackPanel>
+         </Border>
+
+         <!-- Floating Multi-Selection Inspector Card (Visible only when multiple items are selected in Design Mode) -->
+         <Border IsVisible="{Binding HasMultiSelection}"
+                 HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                 Margin="0,0,0,20" Padding="12,8"
+                 Background="#252528" BorderBrush="#007ACC" BorderThickness="1.5"
+                 CornerRadius="8" BoxShadow="0 4 16 0 #B0000000" ZIndex="1001">
+             <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                     <TextBlock Text="🗂️" FontSize="14" VerticalAlignment="Center" />
+                     <TextBlock Text="{Binding SelectedWidgetsCount, StringFormat='Выделено: {0}'}" 
+                                FontWeight="Bold" Foreground="#00E5FF" VerticalAlignment="Center" FontSize="12" />
+                 </StackPanel>
+
+                 <TextBlock Text="{Binding SelectedWidgetsSummary}" 
+                            Foreground="#CCCCCC" VerticalAlignment="Center" FontSize="11" MaxWidth="280" TextTrimming="CharacterEllipsis" />
+
+                 <Button Content="🗑️ Удалить группу" 
+                         Command="{Binding RemoveSelectedWidgetsCommand}" 
+                         Background="#C62828" Foreground="White"
+                         Padding="8,4" FontSize="11" CornerRadius="4" VerticalAlignment="Center">
+                     <Button.Styles>
+                         <Style Selector="Button:pointerover">
+                             <Setter Property="Background" Value="#E53935" />
+                         </Style>
+                     </Button.Styles>
+                 </Button>
+
+                 <Button Content="✖ Снять" 
+                         Command="{Binding ClearSelectionCommand}" 
+                         Background="#3E3E42" Foreground="#AAAAAA"
+                         Padding="8,4" FontSize="11" CornerRadius="4" VerticalAlignment="Center">
+                     <Button.Styles>
+                         <Style Selector="Button:pointerover">
+                             <Setter Property="Background" Value="#4E4E52" />
+                             <Setter Property="Foreground" Value="White" />
+                         </Style>
+                     </Button.Styles>
+                 </Button>
              </StackPanel>
          </Border>
 

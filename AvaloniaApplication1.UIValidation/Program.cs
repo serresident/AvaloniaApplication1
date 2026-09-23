@@ -995,7 +995,142 @@ public static class Program
 
         reopenedWindow.CloseCommand.Execute(null);
 
-        Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (15/15) PASSED SUCCESSFULLY!");
+        // 16. Multi-Selection, Group Move and Rubber-Band Box Validations
+        {
+            Console.WriteLine("[UIValidation] Testing Multi-Selection and Group Operations (Test 16)...");
+
+            var multiConfig = new DashboardConfig
+            {
+                CellSize = 40,
+                ZoomScale = 1.0,
+                Widgets = new List<WidgetConfig>
+                {
+                    new ValveConfig { Title = "Valve 1", Position = new WidgetPosition { Col = 2, Row = 2, SizeX = 4, SizeY = 4 }, Type = "Valve" },
+                    new PumpConfig { Title = "Pump 1", Position = new WidgetPosition { Col = 8, Row = 2, SizeX = 6, SizeY = 6 }, Type = "Pump" },
+                    new TankConfig { Title = "Tank 1", Position = new WidgetPosition { Col = 16, Row = 2, SizeX = 6, SizeY = 10 }, Type = "Tank" }
+                }
+            };
+
+            var multiWidgetFactory = sp.GetRequiredService<IWidgetFactory>();
+            var multiDialogService = sp.GetRequiredService<IDialogService>();
+            var multiHmiConfig = new HmiConfiguration();
+            var multiDashboardVm = new DashboardViewModel(
+                multiConfig, 
+                new MockDataCoreService(), 
+                mainVm.ProjectContext, 
+                multiHmiConfig, 
+                multiDialogService, 
+                multiWidgetFactory);
+
+            // 16.1 Test Multi-Selection Mode Toggle & Initial State
+            if (multiDashboardVm.IsMultiSelectMode)
+                throw new Exception("DashboardViewModel.IsMultiSelectMode should initially be false.");
+            
+            multiDashboardVm.ToggleMultiSelectModeCommand.Execute(null);
+            if (!multiDashboardVm.IsMultiSelectMode)
+                throw new Exception("ToggleMultiSelectModeCommand failed to enable multi-select mode.");
+
+            // 16.2 Test Selecting Multiple Widgets and Summary calculation
+            var w1 = multiDashboardVm.Widgets[0];
+            var w2 = multiDashboardVm.Widgets[1];
+            var w3 = multiDashboardVm.Widgets[2];
+
+            w1.IsSelected = true;
+            w2.IsSelected = true;
+
+            if (multiDashboardVm.SelectedWidgetsCount != 2)
+                throw new Exception($"Expected 2 selected widgets, got {multiDashboardVm.SelectedWidgetsCount}.");
+            if (!multiDashboardVm.HasMultiSelection)
+                throw new Exception("HasMultiSelection should be true when 2 widgets are selected.");
+            if (string.IsNullOrEmpty(multiDashboardVm.SelectedWidgetsSummary) || !multiDashboardVm.SelectedWidgetsSummary.Contains("Valve") || !multiDashboardVm.SelectedWidgetsSummary.Contains("Pump"))
+                throw new Exception($"SelectedWidgetsSummary expected to contain Valve and Pump, got '{multiDashboardVm.SelectedWidgetsSummary}'.");
+
+            // 16.3 Test DashboardPanel Selection and Multi-Selection Helpers
+            var multiPanel = new DashboardPanel
+            {
+                CellWidth = 40,
+                CellHeight = 40,
+                IsDesignMode = true
+            };
+
+            // Attach controls corresponding to widgets
+            var c1 = new ContentControl { DataContext = w1 };
+            DashboardPanel.SetCol(c1, w1.Col);
+            DashboardPanel.SetRow(c1, w1.Row);
+            DashboardPanel.SetSizeX(c1, w1.SizeX);
+            DashboardPanel.SetSizeY(c1, w1.SizeY);
+            multiPanel.Children.Add(c1);
+
+            var c2 = new ContentControl { DataContext = w2 };
+            DashboardPanel.SetCol(c2, w2.Col);
+            DashboardPanel.SetRow(c2, w2.Row);
+            DashboardPanel.SetSizeX(c2, w2.SizeX);
+            DashboardPanel.SetSizeY(c2, w2.SizeY);
+            multiPanel.Children.Add(c2);
+
+            var c3 = new ContentControl { DataContext = w3 };
+            DashboardPanel.SetCol(c3, w3.Col);
+            DashboardPanel.SetRow(c3, w3.Row);
+            DashboardPanel.SetSizeX(c3, w3.SizeX);
+            DashboardPanel.SetSizeY(c3, w3.SizeY);
+            multiPanel.Children.Add(c3);
+
+            var panelSelected = multiPanel.GetSelectedWidgets();
+            if (panelSelected.Count != 2 || !panelSelected.Contains(w1) || !panelSelected.Contains(w2))
+                throw new Exception($"DashboardPanel.GetSelectedWidgets failed: returned {panelSelected.Count} items.");
+
+            // 16.4 Test Rubber-Band Box Selection Intersection Logic
+            var rubberBandBox = new Rect(0, 0, 600, 350);
+            multiPanel.SelectionBoxRect = rubberBandBox;
+            if (!multiPanel.SelectionBoxRect.HasValue || multiPanel.SelectionBoxRect.Value.Width != 600)
+                throw new Exception("SelectionBoxRect assignment failed.");
+
+            var w1Rect = new Rect(w1.Col * 40, w1.Row * 40, w1.SizeX * 40, w1.SizeY * 40);
+            if (!rubberBandBox.Intersects(w1Rect))
+                throw new Exception("Rubber band box should intersect w1Rect.");
+
+            // 16.5 Test Group Drag (moving w1 and w2 together by deltaCol = +3, deltaRow = +4)
+            double origW1Col = w1.Col;
+            double origW1Row = w1.Row;
+            double origW2Col = w2.Col;
+            double origW2Row = w2.Row;
+
+            double deltaCol = 3;
+            double deltaRow = 4;
+
+            foreach (var sel in multiPanel.GetSelectedWidgets())
+            {
+                sel.Col += deltaCol;
+                sel.Row += deltaRow;
+                sel.OriginalConfig.Position.Col = sel.Col;
+                sel.OriginalConfig.Position.Row = sel.Row;
+            }
+
+            if (w1.Col != origW1Col + deltaCol || w1.Row != origW1Row + deltaRow)
+                throw new Exception($"Group drag failed for w1: expected ({origW1Col + deltaCol}, {origW1Row + deltaRow}), got ({w1.Col}, {w1.Row}).");
+            if (w2.Col != origW2Col + deltaCol || w2.Row != origW2Row + deltaRow)
+                throw new Exception($"Group drag failed for w2: expected ({origW2Col + deltaCol}, {origW2Row + deltaRow}), got ({w2.Col}, {w2.Row}).");
+            if (w3.Col != 16 || w3.Row != 2)
+                throw new Exception($"Unselected widget w3 was unexpectedly moved to ({w3.Col}, {w3.Row}).");
+
+            // 16.6 Test ClearSelection
+            multiDashboardVm.ClearSelectionCommand.Execute(null);
+            if (multiDashboardVm.SelectedWidgetsCount != 0 || multiDashboardVm.HasMultiSelection)
+                throw new Exception("ClearSelectionCommand failed to clear selection state.");
+            if (multiPanel.GetSelectedWidgets().Count != 0)
+                throw new Exception("DashboardPanel.GetSelectedWidgets should be empty after ClearSelection.");
+
+            // 16.7 Test Group Deletion (RemoveSelectedWidgetsCommand)
+            w1.IsSelected = true;
+            w2.IsSelected = true;
+            multiDashboardVm.RemoveSelectedWidgetsCommand.Execute(null);
+            if (multiDashboardVm.Widgets.Count != 1 || multiDashboardVm.Widgets[0] != w3)
+                throw new Exception($"RemoveSelectedWidgetsCommand failed: expected 1 remaining widget (w3), got {multiDashboardVm.Widgets.Count}.");
+            if (multiConfig.Widgets.Count != 1)
+                throw new Exception("RemoveSelectedWidgetsCommand failed to remove widgets from DashboardConfig.");
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (16/16) PASSED SUCCESSFULLY!");
+        }
     }
 
     private static VisualTreeNode DumpVisualTree(Visual visual)

@@ -30,6 +30,18 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private double _zoomScale = 1.0;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasMultiSelection))]
+        private int _selectedWidgetsCount;
+
+        [ObservableProperty]
+        private string _selectedWidgetsSummary = string.Empty;
+
+        [ObservableProperty]
+        private bool _isMultiSelectMode;
+
+        public bool HasMultiSelection => SelectedWidgetsCount > 1;
+
         public event Action<double, double>? OnGridOrScaleChanged;
 
         public void AdjustZoom(double delta)
@@ -83,6 +95,7 @@ namespace AvaloniaApplication1.ViewModels
                     Widgets.Add(vm);
                 }
             }
+            UpdateSelectedWidgetsInfo();
         }
 
         private WidgetViewModelBase? CreateWidgetViewModel(WidgetConfig widgetConfig)
@@ -339,7 +352,42 @@ namespace AvaloniaApplication1.ViewModels
             widget.PropertyChanged -= OnWidgetPropertyChanged;
             widget.Dispose();
             Widgets.Remove(widget);
+            UpdateSelectedWidgetsInfo();
             ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void RemoveSelectedWidgets()
+        {
+            var selectedList = Widgets.Where(w => w.IsSelected).ToList();
+            if (selectedList.Count == 0) return;
+
+            foreach (var w in selectedList)
+            {
+                w.IsSelected = false;
+                _dashboardConfig.Widgets.Remove(w.OriginalConfig);
+                w.PropertyChanged -= OnWidgetPropertyChanged;
+                w.Dispose();
+                Widgets.Remove(w);
+            }
+            UpdateSelectedWidgetsInfo();
+            ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void ClearSelection()
+        {
+            foreach (var w in Widgets)
+            {
+                w.IsSelected = false;
+            }
+            UpdateSelectedWidgetsInfo();
+        }
+
+        [RelayCommand]
+        public void ToggleMultiSelectMode()
+        {
+            IsMultiSelectMode = !IsMultiSelectMode;
         }
 
         [RelayCommand]
@@ -404,6 +452,7 @@ namespace AvaloniaApplication1.ViewModels
                 vm.IsSelected = true;
                 vm.PropertyChanged += OnWidgetPropertyChanged;
                 Widgets.Add(vm);
+                UpdateSelectedWidgetsInfo();
                 ResolvePipeConnections();
             }
         }
@@ -469,6 +518,27 @@ namespace AvaloniaApplication1.ViewModels
                 e.PropertyName == "PipePoints")
             {
                 ResolvePipeConnections();
+            }
+            else if (e.PropertyName == nameof(WidgetViewModelBase.IsSelected))
+            {
+                UpdateSelectedWidgetsInfo();
+            }
+        }
+
+        public void UpdateSelectedWidgetsInfo()
+        {
+            var selectedList = Widgets.Where(w => w.IsSelected).ToList();
+            SelectedWidgetsCount = selectedList.Count;
+            if (selectedList.Count == 0)
+            {
+                SelectedWidgetsSummary = string.Empty;
+            }
+            else
+            {
+                var groupSummary = selectedList
+                    .GroupBy(w => string.IsNullOrEmpty(w.Type) ? "Widget" : w.Type)
+                    .Select(g => $"{g.Key}: {g.Count()}");
+                SelectedWidgetsSummary = string.Join(", ", groupSummary);
             }
         }
 

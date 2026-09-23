@@ -88,25 +88,101 @@ namespace AvaloniaApplication1.Views
             {
                 if (_selectedVm != value)
                 {
-                    if (_selectedVm != null)
+                    if (value == null)
                     {
-                        _selectedVm.IsSelected = false;
-                        if (_selectedVm is PipeWidgetViewModel oldPipe)
-                        {
-                            oldPipe.IsEditingVertices = false;
-                        }
+                        ClearAllSelection();
                     }
-                    _selectedVm = value;
-                    if (_selectedVm != null) _selectedVm.IsSelected = true;
-                    InvalidateVisual();
-                    _selectionOverlay?.InvalidateVisual();
+                    else
+                    {
+                        SelectWidget(value, addToSelection: false);
+                    }
                 }
             }
         }
+
+        public Rect? SelectionBoxRect { get; set; }
+
+        public List<WidgetViewModelBase> GetSelectedWidgets()
+        {
+            var result = new List<WidgetViewModelBase>();
+            foreach (var child in Children)
+            {
+                if (child.DataContext is WidgetViewModelBase vm && vm.IsSelected && !result.Contains(vm))
+                {
+                    result.Add(vm);
+                }
+            }
+            return result;
+        }
+
+        public void ClearAllSelection()
+        {
+            foreach (var child in Children)
+            {
+                if (child.DataContext is WidgetViewModelBase vm)
+                {
+                    vm.IsSelected = false;
+                    if (vm is PipeWidgetViewModel pipeVm)
+                    {
+                        pipeVm.IsEditingVertices = false;
+                    }
+                }
+            }
+            _selectedVm = null;
+            InvalidateVisual();
+            _selectionOverlay?.InvalidateVisual();
+        }
+
+        public void SelectWidget(WidgetViewModelBase vm, bool addToSelection = false)
+        {
+            if (!addToSelection)
+            {
+                foreach (var child in Children)
+                {
+                    if (child.DataContext is WidgetViewModelBase other && other != vm)
+                    {
+                        other.IsSelected = false;
+                        if (other is PipeWidgetViewModel pipeVm)
+                        {
+                            pipeVm.IsEditingVertices = false;
+                        }
+                    }
+                }
+            }
+
+            vm.IsSelected = true;
+            _selectedVm = vm;
+            InvalidateVisual();
+            _selectionOverlay?.InvalidateVisual();
+        }
+
+        public void DeselectWidget(WidgetViewModelBase vm)
+        {
+            vm.IsSelected = false;
+            if (vm is PipeWidgetViewModel pipeVm)
+            {
+                pipeVm.IsEditingVertices = false;
+            }
+
+            if (_selectedVm == vm)
+            {
+                _selectedVm = GetSelectedWidgets().LastOrDefault();
+            }
+
+            InvalidateVisual();
+            _selectionOverlay?.InvalidateVisual();
+        }
+
         private bool _isDragging;
         private bool _isResizing;
         private int _dragOriginalSizeX;
         private int _dragOriginalSizeY;
+
+        private bool _isBoxSelecting;
+        private Point _boxSelectStartPoint;
+        private bool _wasAlreadySelectedOnPressed;
+        private readonly Dictionary<WidgetViewModelBase, (double Col, double Row)> _dragOriginalPositions = new();
+        private readonly Dictionary<PipeWidgetViewModel, List<Point>> _dragOriginalPipePoints = new();
 
         // Pipe drag state
         private PipeControl? _draggedPipeControl;
@@ -327,14 +403,11 @@ namespace AvaloniaApplication1.Views
                 {
                     if (vm.IsSelected)
                     {
-                        if (SelectedVm != vm)
-                        {
-                            SelectedVm = vm;
-                        }
+                        _selectedVm = vm;
                     }
-                    else if (SelectedVm == vm)
+                    else if (_selectedVm == vm)
                     {
-                        SelectedVm = null;
+                        _selectedVm = GetSelectedWidgets().LastOrDefault();
                     }
                     InvalidateVisual();
                     _selectionOverlay?.InvalidateVisual();
@@ -371,7 +444,7 @@ namespace AvaloniaApplication1.Views
                         var vm = child.DataContext as WidgetViewModelBase;
                         if (vm != null && vm.IsSelected)
                         {
-                            SelectedVm = vm;
+                            _selectedVm = vm;
                         }
                         child.InvalidateMeasure();
                         child.InvalidateVisual();
@@ -411,7 +484,7 @@ namespace AvaloniaApplication1.Views
                 var vm = child.DataContext as WidgetViewModelBase;
                 if (vm != null && vm.IsSelected)
                 {
-                    SelectedVm = vm;
+                    _selectedVm = vm;
                 }
 
                 // Clean orphaned selection reference
@@ -680,8 +753,39 @@ namespace AvaloniaApplication1.Views
 
             if (clickedChild != null && clickedVm != null)
             {
-                bool wasSelected = SelectedVm == clickedVm;
-                SelectedVm = clickedVm;
+                var dashboardVm = GetDashboardViewModel();
+                bool isMultiSelectModifier = e.KeyModifiers.HasFlag(KeyModifiers.Control) || 
+                                             e.KeyModifiers.HasFlag(KeyModifiers.Shift) || 
+                                             (dashboardVm != null && dashboardVm.IsMultiSelectMode);
+
+                bool wasSelected = clickedVm.IsSelected;
+                _wasAlreadySelectedOnPressed = wasSelected;
+
+                if (isMultiSelectModifier)
+                {
+                    if (!wasSelected)
+                    {
+                        SelectWidget(clickedVm, addToSelection: true);
+                    }
+                    else
+                    {
+                        _selectedVm = clickedVm;
+                    }
+                }
+                else
+                {
+                    // Single select mode: if clicked item was not selected, select it exclusively
+                    if (!wasSelected)
+                    {
+                        SelectWidget(clickedVm, addToSelection: false);
+                    }
+                    else
+                    {
+                        // Already selected: retain group selection during drag
+                        _selectedVm = clickedVm;
+                    }
+                }
+
                 clickedWidget = true;
 
                 double col = clickedVm.Col;
@@ -699,10 +803,11 @@ namespace AvaloniaApplication1.Views
                 }
 
                 // Check if click was in the bottom-right corner for resize (20x20 pixels)
-                // ONLY allow resize if the widget was ALREADY selected and not in pipe vertex edit mode!
+                // ONLY allow resize if ONLY this single widget is selected and not in pipe vertex edit mode!
+                var allSelectedNow = GetSelectedWidgets();
                 bool isEditingPipe = clickedVm is PipeWidgetViewModel pvm && pvm.IsEditingVertices;
                 var resizeRect = new Rect(childBounds.Right - 20, childBounds.Bottom - 20, 20, 20);
-                if (wasSelected && !isEditingPipe && resizeRect.Contains(point))
+                if (allSelectedNow.Count == 1 && wasSelected && !isEditingPipe && resizeRect.Contains(point))
                 {
                     _dragChild = clickedChild;
                     _dragVm = clickedVm;
@@ -726,41 +831,66 @@ namespace AvaloniaApplication1.Views
                     _isDragging = false;
                     _isResizing = false;
                     
-                    // Collect connected pipes for rubber-banding
-                    _connectedPipePoints.Clear();
-                    bool isValve = string.Equals(clickedVm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
-                    bool isPump = string.Equals(clickedVm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
-                    bool isExchanger = string.Equals(clickedVm.Type, "HeatExchanger", StringComparison.OrdinalIgnoreCase);
-                    bool isReactor = string.Equals(clickedVm.Type, "Reactor", StringComparison.OrdinalIgnoreCase);
-                    if (isValve || isPump || isExchanger || isReactor)
-                    {
-                        var (p1, p2) = VisualPortHelper.GetVisualPortsInGrid(clickedChild, clickedVm, this);
+                    // Group drag setup
+                    _dragOriginalPositions.Clear();
+                    _dragOriginalPipePoints.Clear();
 
-                        foreach (var otherChild in Children)
+                    if (!allSelectedNow.Contains(clickedVm))
+                    {
+                        allSelectedNow.Add(clickedVm);
+                    }
+
+                    foreach (var sel in allSelectedNow)
+                    {
+                        _dragOriginalPositions[sel] = (sel.Col, sel.Row);
+                        if (sel is PipeWidgetViewModel pipeVm)
                         {
-                            if (otherChild.DataContext is PipeWidgetViewModel pipeVm)
+                            _dragOriginalPipePoints[pipeVm] = pipeVm.GetAbsoluteGridPoints().ToList();
+                        }
+                    }
+
+                    // Collect connected pipes for rubber-banding (only for pipes NOT moving with group)
+                    _connectedPipePoints.Clear();
+                    foreach (var movingVm in allSelectedNow)
+                    {
+                        bool isValve = string.Equals(movingVm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
+                        bool isPump = string.Equals(movingVm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
+                        bool isExchanger = string.Equals(movingVm.Type, "HeatExchanger", StringComparison.OrdinalIgnoreCase);
+                        bool isReactor = string.Equals(movingVm.Type, "Reactor", StringComparison.OrdinalIgnoreCase);
+                        if (isValve || isPump || isExchanger || isReactor)
+                        {
+                            var movingChild = FindChildForVm(movingVm);
+                            if (movingChild != null)
                             {
-                                var points = pipeVm.GetAbsoluteGridPoints();
-                                for (int i = 0; i < points.Count; i++)
+                                var (p1, p2) = VisualPortHelper.GetVisualPortsInGrid(movingChild, movingVm, this);
+
+                                foreach (var otherChild in Children)
                                 {
-                                    var pt = points[i];
-                                    if (Math.Abs(pt.X - p1.X) < 0.01 && Math.Abs(pt.Y - p1.Y) < 0.01)
+                                    if (otherChild.DataContext is PipeWidgetViewModel pipeVm && !_dragOriginalPositions.ContainsKey(pipeVm))
                                     {
-                                        _connectedPipePoints.Add(new ConnectedPipePoint
+                                        var points = pipeVm.GetAbsoluteGridPoints();
+                                        for (int i = 0; i < points.Count; i++)
                                         {
-                                            PipeVm = pipeVm,
-                                            PointIndex = i,
-                                            IsPort1 = true
-                                        });
-                                    }
-                                    else if (Math.Abs(pt.X - p2.X) < 0.01 && Math.Abs(pt.Y - p2.Y) < 0.01)
-                                    {
-                                        _connectedPipePoints.Add(new ConnectedPipePoint
-                                        {
-                                            PipeVm = pipeVm,
-                                            PointIndex = i,
-                                            IsPort1 = false
-                                        });
+                                            var pt = points[i];
+                                            if (Math.Abs(pt.X - p1.X) < 0.01 && Math.Abs(pt.Y - p1.Y) < 0.01)
+                                            {
+                                                _connectedPipePoints.Add(new ConnectedPipePoint
+                                                {
+                                                    PipeVm = pipeVm,
+                                                    PointIndex = i,
+                                                    IsPort1 = true
+                                                });
+                                            }
+                                            else if (Math.Abs(pt.X - p2.X) < 0.01 && Math.Abs(pt.Y - p2.Y) < 0.01)
+                                            {
+                                                _connectedPipePoints.Add(new ConnectedPipePoint
+                                                {
+                                                    PipeVm = pipeVm,
+                                                    PointIndex = i,
+                                                    IsPort1 = false
+                                                });
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -775,12 +905,37 @@ namespace AvaloniaApplication1.Views
 
             if (!clickedWidget)
             {
-                SelectedVm = null;
                 if (IsDesignMode && e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
                 {
                     ShowCanvasContextMenu(point);
                     e.Handled = true;
                     return;
+                }
+
+                if (IsDesignMode && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+                {
+                    var dashboardVm = GetDashboardViewModel();
+                    bool isMultiSelectModifier = e.KeyModifiers.HasFlag(KeyModifiers.Control) || 
+                                                 e.KeyModifiers.HasFlag(KeyModifiers.Shift) || 
+                                                 (dashboardVm != null && dashboardVm.IsMultiSelectMode);
+
+                    if (!isMultiSelectModifier)
+                    {
+                        ClearAllSelection();
+                    }
+
+                    _isBoxSelecting = true;
+                    _boxSelectStartPoint = point;
+                    SelectionBoxRect = new Rect(point.X, point.Y, 0, 0);
+                    _selectionOverlay?.InvalidateVisual();
+
+                    e.Pointer.Capture(this);
+                    e.Handled = true;
+                    return;
+                }
+                else
+                {
+                    ClearAllSelection();
                 }
             }
         }
@@ -1139,6 +1294,48 @@ namespace AvaloniaApplication1.Views
                 return;
             }
 
+            if (_isBoxSelecting)
+            {
+                double minX = Math.Min(_boxSelectStartPoint.X, point.X);
+                double minY = Math.Min(_boxSelectStartPoint.Y, point.Y);
+                double maxX = Math.Max(_boxSelectStartPoint.X, point.X);
+                double maxY = Math.Max(_boxSelectStartPoint.Y, point.Y);
+
+                var boxRect = new Rect(minX, minY, Math.Max(1, maxX - minX), Math.Max(1, maxY - minY));
+                SelectionBoxRect = boxRect;
+
+                var dashboardVm = GetDashboardViewModel();
+                bool isMultiSelectModifier = e.KeyModifiers.HasFlag(KeyModifiers.Control) || 
+                                             e.KeyModifiers.HasFlag(KeyModifiers.Shift) || 
+                                             (dashboardVm != null && dashboardVm.IsMultiSelectMode);
+
+                foreach (var child in Children)
+                {
+                    if (child.DataContext is WidgetViewModelBase vm)
+                    {
+                        var widgetRect = new Rect(
+                            vm.Col * CellWidth,
+                            vm.Row * CellHeight,
+                            Math.Max(1, vm.SizeX) * CellWidth,
+                            Math.Max(1, vm.SizeY) * CellHeight);
+
+                        bool intersects = boxRect.Intersects(widgetRect);
+                        if (intersects)
+                        {
+                            vm.IsSelected = true;
+                        }
+                        else if (!isMultiSelectModifier)
+                        {
+                            vm.IsSelected = false;
+                        }
+                    }
+                }
+
+                _selectionOverlay?.InvalidateVisual();
+                e.Handled = true;
+                return;
+            }
+
             if (_dragChild == null || _dragVm == null)
             {
                 // Hover cursor support for resize handle
@@ -1224,6 +1421,21 @@ namespace AvaloniaApplication1.Views
         protected override void OnPointerReleased(PointerReleasedEventArgs e)
         {
             base.OnPointerReleased(e);
+
+            if (_isBoxSelecting)
+            {
+                _isBoxSelecting = false;
+                SelectionBoxRect = null;
+                _selectionOverlay?.InvalidateVisual();
+                var selectedWidgets = GetSelectedWidgets();
+                _selectedVm = selectedWidgets.LastOrDefault();
+                if (e.Pointer.Captured == this)
+                {
+                    e.Pointer.Capture(null);
+                }
+                e.Handled = true;
+                return;
+            }
 
             if (_draggedPipeControl != null)
             {
@@ -1325,71 +1537,120 @@ namespace AvaloniaApplication1.Views
                     _selectionOverlay?.InvalidateVisual();
                 }
 
-                // Update connected pipes for rubber-banding
+                double deltaCol = newCol - _dragOriginalCol;
+                double deltaRow = newRow - _dragOriginalRow;
+
+                // Ensure none of the moving widgets go out of bounds (< 0)
+                if (_dragOriginalPositions.Count > 0)
+                {
+                    double minOrigCol = _dragOriginalPositions.Values.Min(p => p.Col);
+                    double minOrigRow = _dragOriginalPositions.Values.Min(p => p.Row);
+                    if (minOrigCol + deltaCol < 0) deltaCol = -minOrigCol;
+                    if (minOrigRow + deltaRow < 0) deltaRow = -minOrigRow;
+                }
+
+                // 1. Update connected external pipes for rubber-banding
                 if (_connectedPipePoints.Count > 0)
                 {
-                    bool isValve = string.Equals(_dragVm.Type, "Valve", StringComparison.OrdinalIgnoreCase);
-                    bool isPump = string.Equals(_dragVm.Type, "Pump", StringComparison.OrdinalIgnoreCase);
-                    if (isValve || isPump)
+                    foreach (var conn in _connectedPipePoints)
                     {
-                        double deltaCol = newCol - _dragOriginalCol;
-                        double deltaRow = newRow - _dragOriginalRow;
-
-                        foreach (var conn in _connectedPipePoints)
+                        var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
+                        if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
                         {
-                            var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
-                            if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
+                            var oldPt = pipePoints[conn.PointIndex];
+                            double targetX = oldPt.X + deltaCol;
+                            double targetY = oldPt.Y + deltaRow;
+                            
+                            pipePoints[conn.PointIndex] = new Point(targetX, targetY);
+
+                            double pipeCol = conn.PipeVm.Col;
+                            double pipeRow = conn.PipeVm.Row;
+
+                            var relativePoints = pipePoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
+                            string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                            
+                            if (conn.PipeVm.PipePoints != newPointsStr)
                             {
-                                var oldPt = pipePoints[conn.PointIndex];
-                                double targetX = oldPt.X + deltaCol;
-                                double targetY = oldPt.Y + deltaRow;
-                                
-                                pipePoints[conn.PointIndex] = new Point(targetX, targetY);
+                                conn.PipeVm.PipePoints = newPointsStr;
+                            }
 
-                                double pipeCol = conn.PipeVm.Col;
-                                double pipeRow = conn.PipeVm.Row;
-
-                                var relativePoints = pipePoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
-                                string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
-                                
-                                if (conn.PipeVm.PipePoints != newPointsStr)
-                                {
-                                    conn.PipeVm.PipePoints = newPointsStr;
-                                }
-
-                                var pipeChild = FindChildForVm(conn.PipeVm);
-                                if (pipeChild != null)
-                                {
-                                    SetCol(pipeChild, conn.PipeVm.Col);
-                                    SetRow(pipeChild, conn.PipeVm.Row);
-                                    SetSizeX(pipeChild, conn.PipeVm.SizeX);
-                                    SetSizeY(pipeChild, conn.PipeVm.SizeY);
-                                    pipeChild.InvalidateMeasure();
-                                    pipeChild.InvalidateArrange();
-                                    pipeChild.InvalidateVisual();
-                                }
+                            var pipeChild = FindChildForVm(conn.PipeVm);
+                            if (pipeChild != null)
+                            {
+                                SetCol(pipeChild, conn.PipeVm.Col);
+                                SetRow(pipeChild, conn.PipeVm.Row);
+                                SetSizeX(pipeChild, conn.PipeVm.SizeX);
+                                SetSizeY(pipeChild, conn.PipeVm.SizeY);
+                                pipeChild.InvalidateMeasure();
+                                pipeChild.InvalidateArrange();
+                                pipeChild.InvalidateVisual();
                             }
                         }
                     }
                 }
 
-                // Update the VM (which updates the UI via bindings)
-                _dragVm.Row = newRow;
-                _dragVm.Col = newCol;
-
-                if (_dragChild != null)
+                // 2. Move any pipes that were part of the selected group
+                foreach (var kvp in _dragOriginalPipePoints)
                 {
-                    SetCol(_dragChild, newCol);
-                    SetRow(_dragChild, newRow);
+                    var pvm = kvp.Key;
+                    var origPoints = kvp.Value;
+                    var shiftedPoints = origPoints.Select(p => new Point(p.X + deltaCol, p.Y + deltaRow)).ToList();
+
+                    if (_dragOriginalPositions.TryGetValue(pvm, out var origPos))
+                    {
+                        double pipeCol = origPos.Col + deltaCol;
+                        double pipeRow = origPos.Row + deltaRow;
+
+                        var relativePoints = shiftedPoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
+                        string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                        pvm.PipePoints = newPointsStr;
+                    }
                 }
 
-                // Sync back to the OriginalConfig for JSON persistence
-                _dragVm.OriginalConfig.Position.Row = newRow;
-                _dragVm.OriginalConfig.Position.Col = newCol;
+                // 3. Move all selected widgets
+                foreach (var kvp in _dragOriginalPositions)
+                {
+                    var vm = kvp.Key;
+                    double targetCol = kvp.Value.Col + deltaCol;
+                    double targetRow = kvp.Value.Row + deltaRow;
 
-                // Force re-layout
+                    vm.Col = targetCol;
+                    vm.Row = targetRow;
+                    vm.OriginalConfig.Position.Col = targetCol;
+                    vm.OriginalConfig.Position.Row = targetRow;
+
+                    var child = FindChildForVm(vm);
+                    if (child != null)
+                    {
+                        SetCol(child, targetCol);
+                        SetRow(child, targetRow);
+                        child.InvalidateMeasure();
+                        child.InvalidateArrange();
+                        child.InvalidateVisual();
+                    }
+                }
+
                 InvalidateMeasure();
                 InvalidateArrange();
+            }
+            else if (!_isDragging && _dragVm != null)
+            {
+                // Simple click without dragging
+                var dashboardVm = GetDashboardViewModel();
+                bool isMultiSelectModifier = e.KeyModifiers.HasFlag(KeyModifiers.Control) || 
+                                             e.KeyModifiers.HasFlag(KeyModifiers.Shift) || 
+                                             (dashboardVm != null && dashboardVm.IsMultiSelectMode);
+
+                if (!isMultiSelectModifier)
+                {
+                    // Regular click on a selected item when multiple were selected: collapse selection to this single item
+                    SelectWidget(_dragVm, addToSelection: false);
+                }
+                else if (_wasAlreadySelectedOnPressed)
+                {
+                    // Click with modifier on already selected item: toggle selection off
+                    DeselectWidget(_dragVm);
+                }
             }
 
             // Clear drag state FIRST so OnPointerCaptureLost doesn't revert anything
@@ -1405,6 +1666,13 @@ namespace AvaloniaApplication1.Views
         protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
         {
             base.OnPointerCaptureLost(e);
+
+            if (_isBoxSelecting)
+            {
+                _isBoxSelecting = false;
+                SelectionBoxRect = null;
+                _selectionOverlay?.InvalidateVisual();
+            }
 
             if (_draggedPipeControl != null)
             {
@@ -1424,10 +1692,19 @@ namespace AvaloniaApplication1.Views
                 InvalidateMeasure();
                 InvalidateArrange();
             }
-            else if (_isDragging && _dragVm != null)
+            else if (_isDragging && _dragOriginalPositions.Count > 0)
             {
-                _dragVm.Row = _dragOriginalRow;
-                _dragVm.Col = _dragOriginalCol;
+                foreach (var kvp in _dragOriginalPositions)
+                {
+                    kvp.Key.Row = kvp.Value.Row;
+                    kvp.Key.Col = kvp.Value.Col;
+                    var child = FindChildForVm(kvp.Key);
+                    if (child != null)
+                    {
+                        SetCol(child, kvp.Value.Col);
+                        SetRow(child, kvp.Value.Row);
+                    }
+                }
                 InvalidateMeasure();
                 InvalidateArrange();
             }
@@ -1443,6 +1720,9 @@ namespace AvaloniaApplication1.Views
             _isResizing = false;
             _connectedPipePoints.Clear();
             _isSnappedToEquipmentPort = false;
+            _dragOriginalPositions.Clear();
+            _dragOriginalPipePoints.Clear();
+            _wasAlreadySelectedOnPressed = false;
 
             if (ActiveSnapTarget != null)
             {
@@ -1542,13 +1822,21 @@ namespace AvaloniaApplication1.Views
                 var dashboardVm = GetDashboardViewModel();
                 if (dashboardVm != null)
                 {
-                    var toRemove = SelectedVm;
-                    dashboardVm.RemoveWidgetCommand.Execute(toRemove);
-                    SelectedVm = null;
-                    InvalidateVisual();
-                    _selectionOverlay?.InvalidateVisual();
-                    e.Handled = true;
-                    return;
+                    var selectedWidgets = GetSelectedWidgets();
+                    if (selectedWidgets.Count > 1)
+                    {
+                        dashboardVm.RemoveSelectedWidgetsCommand.Execute(null);
+                        ClearAllSelection();
+                        e.Handled = true;
+                        return;
+                    }
+                    else if (selectedWidgets.Count == 1)
+                    {
+                        dashboardVm.RemoveWidgetCommand.Execute(selectedWidgets[0]);
+                        ClearAllSelection();
+                        e.Handled = true;
+                        return;
+                    }
                 }
             }
 
