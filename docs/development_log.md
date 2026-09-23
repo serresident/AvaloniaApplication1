@@ -1199,5 +1199,24 @@
     *   Headless-рендер `DashboardView` выполнен успешно (`artifacts/ui_preview.png`).
     *   Сборка проекта: **0 ошибок, 0 предупреждений**.
 
+---
+
+## 📅 23.09.2026 (Сессия 42 — Единая адаптивная нижняя панель инструментов мнемосхемы DashboardView)
+
+### 📌 Достижение: Устранение коллизий плавающих панелей, объединение тулбара и плашки мультивыбора в единый адаптивный WrapPanel-контейнер
+
+*   **Консолидация в единый контейнер (`DashboardView.axaml`):**
+    *   Ликвидирована отдельная центрированная плавающая панель `HorizontalAlignment="Center" VerticalAlignment="Bottom"`, перекрывавшая нижний левый тулбар при выделении виджетов.
+    *   Все постоянные элементы управления масштабом (слайдер, проценты, кнопка 100%, режим «Мультивыбор») и контекстные инструменты работы с выделением (индикатор «Выделено: N [типы]», 6 кнопок выравнивания, 2 кнопки распределения, «🔗 Группа», «🔓 Разгрупп.», «📋 Дублировать», «🗑️ Удалить группу», «✖ Снять») объединены в единую цельную панель `Border` внизу слева с правым отступом от кнопки добавления виджетов `+`.
+    *   Использован контейнер `WrapPanel` с `Orientation="Horizontal"`. При стандартных и широких разрешениях (от 1200 px и выше) все элементы выстраиваются в одну аккуратную строку без наложений. При уменьшении ширины окна группы инструментов адаптивно переносятся на следующую строку без клиппинга и взаимного перекрытия кнопок.
+*   **Контекстная адаптивность:**
+    *   При отсутствии выделения панель инструментов сохраняет компактный вид (~400 px), отображая только элементы масштаба и переключатель мультивыбора.
+    *   При выделении двух и более виджетов (`HasMultiSelection = true`) справа от кнопки мультивыбора плавно появляется блок работы с группой с бейджем количества/типов и полным набором инструментов.
+*   **Сохранение команд:**
+    *   Сохранены и верифицированы все привязки команд: `AlignLeftCommand`, `AlignCenterHorizontalCommand`, `AlignRightCommand`, `AlignTopCommand`, `AlignCenterVerticalCommand`, `AlignBottomCommand`, `DistributeHorizontallyCommand`, `DistributeVerticallyCommand`, `GroupSelectedWidgetsCommand`, `UngroupSelectedWidgetsCommand`, `DuplicateSelectedWidgetsCommand`, `RemoveSelectedWidgetsCommand`, `ClearSelectionCommand`.
+*   **Верификация и тестирование:**
+    *   Сборка: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj` — **0 ошибок, 0 предупреждений**.
+    *   Тесты: `dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj` — **18/18 PASS**.
+    *   Headless-рендер: `scripts/render_ui.ps1 DashboardView` сгенерировал чистый снимок `artifacts/ui_preview.png` и `artifacts/ui_tree.json` без коллизий.
 
 

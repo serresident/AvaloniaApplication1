@@ -186,12 +186,19 @@ public static class Program
                 window = new MainWindow
                 {
                     DataContext = mainVm,
-                    Width = 1024,
+                    Width = 1400,
                     Height = 768
                 };
             }
             else if (string.Equals(targetView, "DashboardView", StringComparison.OrdinalIgnoreCase))
             {
+                mainVm.ProjectContext.IsDesignMode = true;
+                if (mainVm.Dashboard != null && mainVm.Dashboard.Widgets.Count >= 2)
+                {
+                    mainVm.Dashboard.Widgets[0].IsSelected = true;
+                    mainVm.Dashboard.Widgets[1].IsSelected = true;
+                    mainVm.Dashboard.UpdateSelectedWidgetsInfo();
+                }
                 window = new Window
                 {
                     Title = "DashboardView Preview",

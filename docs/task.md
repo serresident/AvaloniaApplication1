@@ -696,6 +696,26 @@
   - [x] 18/18 тестов пройдено успешно (100% PASS)
   - [x] Headless-рендер `DashboardView` и валидация UI в `artifacts/ui_preview.png`
 
+# Tasks: Unified Adaptive Bottom Toolbar (Сессия 42 — Выполнено)
+
+- [x] Консолидация нижней панели инструментов мнемосхемы (`DashboardView.axaml`):
+  - [x] Полная ликвидация отдельной центральной плавающей карточки мультивыбора (`HorizontalAlignment="Center" VerticalAlignment="Bottom"`)
+  - [x] Объединение постоянных элементов масштаба и контекстных инструментов работы с выделением в единый цельный `Border`
+  - [x] Использование адаптивного `WrapPanel` с `Orientation="Horizontal"` для предотвращения коллизий и переноса строк при сжатии
+- [x] Контекстная адаптивность:
+  - [x] Компактный вид панели (~400 px) при отсутствии выделения (`HasMultiSelection = false`)
+  - [x] Отображение индикатора «Выделено: N [типы виджетов]», кнопок выравнивания, распределения, группировки и действий строго при наличии выделения (`HasMultiSelection = true`)
+- [x] Сохранение полного набора команд:
+  - [x] Выравнивание: `AlignLeft`, `AlignCenterHorizontal`, `AlignRight`, `AlignTop`, `AlignCenterVertical`, `AlignBottom`
+  - [x] Распределение: `DistributeHorizontally`, `DistributeVertically`
+  - [x] Группировка: `GroupSelectedWidgets`, `UngroupSelectedWidgets`
+  - [x] Операции: `DuplicateSelectedWidgets`, `RemoveSelectedWidgets`, `ClearSelection`
+- [x] Верификация и тестирование:
+  - [x] Сборка: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj` (0 ошибок, 0 предупреждений)
+  - [x] Автоматизированные тесты: `AvaloniaApplication1.UIValidation` (18/18 PASS)
+  - [x] Headless-рендер: `scripts/render_ui.ps1 DashboardView` (чистый скриншот без перекрытий)
+
+
 
 
 
