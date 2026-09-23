@@ -72,6 +72,7 @@ namespace AvaloniaApplication1.Models.Config
         public bool ShowBorder { get; set; } = true;            // Background panel border
         public string LabelPosition { get; set; } = "Default";  // Default | Top | Bottom | Left | Right | Inside | Hidden
         public bool CompactMode { get; set; } = false;
+        public string? GroupId { get; set; }
     }
 
     // Generic fallback for unknown widgets

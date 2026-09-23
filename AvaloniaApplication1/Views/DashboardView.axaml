@@ -525,19 +525,21 @@
              </LayoutTransformControl>
          </ScrollViewer>
 
-         <!-- Floating Zoom Control Toolbar (Visible only in Design Mode) -->
+         <!-- Floating Zoom & Alignment Control Toolbar (Visible only in Design Mode) -->
          <Border IsVisible="{Binding ProjectContext.IsDesignMode}"
                  HorizontalAlignment="Left" VerticalAlignment="Bottom"
                  Margin="20" Padding="10,6"
                  Background="#2D2D30" BorderBrush="#3E3E42" BorderThickness="1"
                  CornerRadius="8" BoxShadow="0 4 12 0 #90000000" ZIndex="1000">
-             <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+             <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                 <!-- Zoom Controls -->
                  <TextBlock Text="Масштаб:" Foreground="Gray" VerticalAlignment="Center" FontSize="12" />
-                 <Slider Minimum="0.5" Maximum="3.0" Value="{Binding ZoomScale, Mode=TwoWay}" Width="120" VerticalAlignment="Center" />
-                 <TextBlock Text="{Binding ZoomScale, StringFormat=\{0:P0\}}" Foreground="White" Width="45" TextAlignment="Right" VerticalAlignment="Center" FontSize="12" />
-                 <Border Width="1" Background="#3E3E42" Height="16" Margin="5,0" />
+                 <Slider Minimum="0.5" Maximum="3.0" Value="{Binding ZoomScale, Mode=TwoWay}" Width="100" VerticalAlignment="Center" />
+                 <TextBlock Text="{Binding ZoomScale, StringFormat=\{0:P0\}}" Foreground="White" Width="40" TextAlignment="Right" VerticalAlignment="Center" FontSize="12" />
                  <Button Content="100%" Command="{Binding ResetZoomCommand}" FontSize="11" Padding="6,3" Background="#4A4A4D" Foreground="White" CornerRadius="4" VerticalAlignment="Center" />
-                 <Border Width="1" Background="#3E3E42" Height="16" Margin="5,0" />
+                 <Border Width="1" Background="#3E3E42" Height="16" Margin="4,0" />
+                 
+                 <!-- Multiselect toggle -->
                  <ToggleButton IsChecked="{Binding IsMultiSelectMode, Mode=TwoWay}"
                                ToolTip.Tip="Режим мультивыбора (для кликов без зажатия Ctrl)"
                                Padding="8,4" FontSize="11" CornerRadius="4">
@@ -546,6 +548,62 @@
                          <TextBlock Text="Мультивыбор" FontSize="11" VerticalAlignment="Center" />
                      </StackPanel>
                  </ToggleButton>
+
+                 <!-- Alignment & Distribution Section -->
+                 <Border Width="1" Background="#3E3E42" Height="16" Margin="4,0" />
+                 
+                 <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" IsEnabled="{Binding HasMultiSelection}">
+                     <Button Command="{Binding AlignLeftCommand}" ToolTip.Tip="Выровнять по левому краю" Padding="5,3" FontSize="11" Background="#3A3A3D" CornerRadius="3">
+                         <TextBlock Text="⇤" FontSize="13" Foreground="White" />
+                     </Button>
+                     <Button Command="{Binding AlignCenterHorizontalCommand}" ToolTip.Tip="Выровнять по горизонтальному центру" Padding="5,3" FontSize="11" Background="#3A3A3D" CornerRadius="3">
+                         <TextBlock Text="⬌" FontSize="11" Foreground="White" />
+                     </Button>
+                     <Button Command="{Binding AlignRightCommand}" ToolTip.Tip="Выровнять по правому краю" Padding="5,3" FontSize="11" Background="#3A3A3D" CornerRadius="3">
+                         <TextBlock Text="⇥" FontSize="13" Foreground="White" />
+                     </Button>
+                     <Button Command="{Binding AlignTopCommand}" ToolTip.Tip="Выровнять по верхнему краю" Padding="5,3" FontSize="11" Background="#3A3A3D" CornerRadius="3">
+                         <TextBlock Text="⇪" FontSize="13" Foreground="White" />
+                     </Button>
+                     <Button Command="{Binding AlignCenterVerticalCommand}" ToolTip.Tip="Выровнять по вертикальному центру" Padding="5,3" FontSize="11" Background="#3A3A3D" CornerRadius="3">
+                         <TextBlock Text="⬍" FontSize="11" Foreground="White" />
+                     </Button>
+                     <Button Command="{Binding AlignBottomCommand}" ToolTip.Tip="Выровнять по нижнему краю" Padding="5,3" FontSize="11" Background="#3A3A3D" CornerRadius="3">
+                         <TextBlock Text="⇩" FontSize="13" Foreground="White" />
+                     </Button>
+                 </StackPanel>
+
+                 <!-- Distribute -->
+                 <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" IsEnabled="{Binding HasMultiSelection}">
+                     <Button Command="{Binding DistributeHorizontallyCommand}" ToolTip.Tip="Распределить равномерно по горизонтали" Padding="5,3" FontSize="11" Background="#3A3A3D" CornerRadius="3">
+                         <TextBlock Text="↔️" FontSize="10" />
+                     </Button>
+                     <Button Command="{Binding DistributeVerticallyCommand}" ToolTip.Tip="Распределить равномерно по вертикали" Padding="5,3" FontSize="11" Background="#3A3A3D" CornerRadius="3">
+                         <TextBlock Text="↕️" FontSize="10" />
+                     </Button>
+                 </StackPanel>
+
+                 <!-- Group & Ungroup -->
+                 <Button Command="{Binding GroupSelectedWidgetsCommand}" 
+                         IsEnabled="{Binding CanGroup}"
+                         ToolTip.Tip="Сгруппировать выбранные объекты (единый узел)"
+                         Padding="6,3" FontSize="11" Background="#334D66" CornerRadius="3">
+                     <TextBlock Text="🔗 Группа" FontSize="11" Foreground="#00E5FF" />
+                 </Button>
+                 <Button Command="{Binding UngroupSelectedWidgetsCommand}" 
+                         IsEnabled="{Binding CanUngroup}"
+                         ToolTip.Tip="Разгруппировать объекты"
+                         Padding="6,3" FontSize="11" Background="#4D3333" CornerRadius="3">
+                     <TextBlock Text="🔓 Разгрупп." FontSize="11" Foreground="#FF8A80" />
+                 </Button>
+
+                 <!-- Duplicate Group -->
+                 <Button Command="{Binding DuplicateSelectedWidgetsCommand}" 
+                         IsEnabled="{Binding HasMultiSelection}"
+                         ToolTip.Tip="Дублировать группу (Ctrl+D)"
+                         Padding="6,3" FontSize="11" Background="#384A38" CornerRadius="3">
+                     <TextBlock Text="📋 Копия" FontSize="11" Foreground="#69F0AE" />
+                 </Button>
              </StackPanel>
          </Border>
 
@@ -555,7 +613,7 @@
                  Margin="0,0,0,20" Padding="12,8"
                  Background="#252528" BorderBrush="#007ACC" BorderThickness="1.5"
                  CornerRadius="8" BoxShadow="0 4 16 0 #B0000000" ZIndex="1001">
-             <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+             <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                  <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                      <TextBlock Text="🗂️" FontSize="14" VerticalAlignment="Center" />
                      <TextBlock Text="{Binding SelectedWidgetsCount, StringFormat='Выделено: {0}'}" 
@@ -563,7 +621,12 @@
                  </StackPanel>
 
                  <TextBlock Text="{Binding SelectedWidgetsSummary}" 
-                            Foreground="#CCCCCC" VerticalAlignment="Center" FontSize="11" MaxWidth="280" TextTrimming="CharacterEllipsis" />
+                            Foreground="#CCCCCC" VerticalAlignment="Center" FontSize="11" MaxWidth="260" TextTrimming="CharacterEllipsis" />
+
+                 <Button Content="📋 Дублировать" 
+                         Command="{Binding DuplicateSelectedWidgetsCommand}" 
+                         Background="#384A38" Foreground="#69F0AE"
+                         Padding="8,4" FontSize="11" CornerRadius="4" VerticalAlignment="Center" />
 
                  <Button Content="🗑️ Удалить группу" 
                          Command="{Binding RemoveSelectedWidgetsCommand}" 

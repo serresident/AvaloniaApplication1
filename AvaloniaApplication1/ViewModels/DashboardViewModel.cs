@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,6 +42,8 @@ namespace AvaloniaApplication1.ViewModels
         private bool _isMultiSelectMode;
 
         public bool HasMultiSelection => SelectedWidgetsCount > 1;
+        public bool CanGroup => SelectedWidgetsCount > 1;
+        public bool CanUngroup => Widgets.Any(w => w.IsSelected && !string.IsNullOrEmpty(w.GroupId));
 
         public event Action<double, double>? OnGridOrScaleChanged;
 
@@ -540,7 +543,215 @@ namespace AvaloniaApplication1.ViewModels
                     .Select(g => $"{g.Key}: {g.Count()}");
                 SelectedWidgetsSummary = string.Join(", ", groupSummary);
             }
+            OnPropertyChanged(nameof(CanGroup));
+            OnPropertyChanged(nameof(CanUngroup));
         }
+
+        #region Alignment, Distribution & Group Commands
+
+        [RelayCommand]
+        public void AlignLeft()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            if (selected.Count < 2) return;
+
+            double minCol = selected.Min(w => w.Col);
+            foreach (var w in selected)
+            {
+                w.Col = minCol;
+                w.OriginalConfig.Position.Col = minCol;
+            }
+            ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void AlignRight()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            if (selected.Count < 2) return;
+
+            double maxRight = selected.Max(w => w.Col + w.SizeX);
+            foreach (var w in selected)
+            {
+                double targetCol = Math.Max(0, maxRight - w.SizeX);
+                w.Col = targetCol;
+                w.OriginalConfig.Position.Col = targetCol;
+            }
+            ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void AlignCenterHorizontal()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            if (selected.Count < 2) return;
+
+            double minCol = selected.Min(w => w.Col);
+            double maxRight = selected.Max(w => w.Col + w.SizeX);
+            double groupCenter = (minCol + maxRight) / 2.0;
+
+            foreach (var w in selected)
+            {
+                double targetCol = Math.Max(0, Math.Round(groupCenter - w.SizeX / 2.0));
+                w.Col = targetCol;
+                w.OriginalConfig.Position.Col = targetCol;
+            }
+            ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void AlignTop()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            if (selected.Count < 2) return;
+
+            double minRow = selected.Min(w => w.Row);
+            foreach (var w in selected)
+            {
+                w.Row = minRow;
+                w.OriginalConfig.Position.Row = minRow;
+            }
+            ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void AlignBottom()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            if (selected.Count < 2) return;
+
+            double maxBottom = selected.Max(w => w.Row + w.SizeY);
+            foreach (var w in selected)
+            {
+                double targetRow = Math.Max(0, maxBottom - w.SizeY);
+                w.Row = targetRow;
+                w.OriginalConfig.Position.Row = targetRow;
+            }
+            ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void AlignCenterVertical()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            if (selected.Count < 2) return;
+
+            double minRow = selected.Min(w => w.Row);
+            double maxBottom = selected.Max(w => w.Row + w.SizeY);
+            double groupCenter = (minRow + maxBottom) / 2.0;
+
+            foreach (var w in selected)
+            {
+                double targetRow = Math.Max(0, Math.Round(groupCenter - w.SizeY / 2.0));
+                w.Row = targetRow;
+                w.OriginalConfig.Position.Row = targetRow;
+            }
+            ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void DistributeHorizontally()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).OrderBy(w => w.Col).ToList();
+            if (selected.Count < 3) return;
+
+            double firstLeft = selected.First().Col;
+            double lastLeft = selected.Last().Col;
+            double totalSpan = lastLeft - firstLeft;
+            double step = totalSpan / (selected.Count - 1);
+
+            for (int i = 0; i < selected.Count; i++)
+            {
+                double targetCol = Math.Max(0, Math.Round(firstLeft + i * step));
+                selected[i].Col = targetCol;
+                selected[i].OriginalConfig.Position.Col = targetCol;
+            }
+            ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void DistributeVertically()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).OrderBy(w => w.Row).ToList();
+            if (selected.Count < 3) return;
+
+            double firstTop = selected.First().Row;
+            double lastTop = selected.Last().Row;
+            double totalSpan = lastTop - firstTop;
+            double step = totalSpan / (selected.Count - 1);
+
+            for (int i = 0; i < selected.Count; i++)
+            {
+                double targetRow = Math.Max(0, Math.Round(firstTop + i * step));
+                selected[i].Row = targetRow;
+                selected[i].OriginalConfig.Position.Row = targetRow;
+            }
+            ResolvePipeConnections();
+        }
+
+        [RelayCommand]
+        public void GroupSelectedWidgets()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            if (selected.Count < 2) return;
+
+            string newGroupId = Guid.NewGuid().ToString("N")[..8];
+            foreach (var w in selected)
+            {
+                w.GroupId = newGroupId;
+            }
+            UpdateSelectedWidgetsInfo();
+        }
+
+        [RelayCommand]
+        public void UngroupSelectedWidgets()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            foreach (var w in selected)
+            {
+                w.GroupId = null;
+            }
+            UpdateSelectedWidgetsInfo();
+        }
+
+        [RelayCommand]
+        public void DuplicateSelectedWidgets()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            if (selected.Count == 0) return;
+
+            var newConfigs = new List<WidgetConfig>();
+            foreach (var w in selected)
+            {
+                var json = System.Text.Json.JsonSerializer.Serialize(w.OriginalConfig);
+                var clone = System.Text.Json.JsonSerializer.Deserialize<WidgetConfig>(json);
+                if (clone != null)
+                {
+                    clone.Position.Col += 2;
+                    clone.Position.Row += 2;
+                    newConfigs.Add(clone);
+                }
+            }
+
+            foreach (var w in Widgets) w.IsSelected = false;
+
+            foreach (var cfg in newConfigs)
+            {
+                _dashboardConfig.Widgets.Add(cfg);
+                var vm = CreateWidgetViewModel(cfg);
+                if (vm != null)
+                {
+                    vm.IsSelected = true;
+                    vm.PropertyChanged += OnWidgetPropertyChanged;
+                    Widgets.Add(vm);
+                }
+            }
+
+            UpdateSelectedWidgetsInfo();
+            ResolvePipeConnections();
+        }
+
+        #endregion
 
         private void ResolvePipeConnections()
         {

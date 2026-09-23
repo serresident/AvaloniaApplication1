@@ -1129,7 +1129,113 @@ public static class Program
             if (multiConfig.Widgets.Count != 1)
                 throw new Exception("RemoveSelectedWidgetsCommand failed to remove widgets from DashboardConfig.");
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (16/16) PASSED SUCCESSFULLY!");
+            // 17. Test CAD/SCADA Selection System, Alignment, Distribution, Nudge & Grouping (Test 17)
+            Console.WriteLine("[UIValidation] Testing CAD/SCADA Selection System, Alignment, Nudge & Grouping (Test 17)...");
+            {
+                var cadConfig = new DashboardConfig
+                {
+                    CellSize = 40,
+                    ZoomScale = 1.0,
+                    Widgets = new List<WidgetConfig>
+                    {
+                        new ValveConfig { Title = "V1", Position = new WidgetPosition { Col = 2, Row = 2, SizeX = 4, SizeY = 4 }, Type = "Valve" },
+                        new PumpConfig { Title = "P1", Position = new WidgetPosition { Col = 10, Row = 6, SizeX = 6, SizeY = 6 }, Type = "Pump" },
+                        new TankConfig { Title = "T1", Position = new WidgetPosition { Col = 20, Row = 14, SizeX = 6, SizeY = 10 }, Type = "Tank" },
+                        new PipeConfig { Title = "Pipe1", Position = new WidgetPosition { Col = 5, Row = 10, SizeX = 10, SizeY = 2 }, PipePoints = "0,0; 10,0", Type = "Pipe" }
+                    }
+                };
+
+                var cadDashboardVm = new DashboardViewModel(
+                    cadConfig,
+                    new MockDataCoreService(),
+                    mainVm.ProjectContext,
+                    new HmiConfiguration(),
+                    sp.GetRequiredService<IDialogService>(),
+                    sp.GetRequiredService<IWidgetFactory>());
+
+                var cadPanel = new DashboardPanel
+                {
+                    CellWidth = 40,
+                    CellHeight = 40,
+                    IsDesignMode = true
+                };
+
+                foreach (var w in cadDashboardVm.Widgets)
+                {
+                    var cc = new ContentControl { DataContext = w };
+                    DashboardPanel.SetCol(cc, w.Col);
+                    DashboardPanel.SetRow(cc, w.Row);
+                    DashboardPanel.SetSizeX(cc, w.SizeX);
+                    DashboardPanel.SetSizeY(cc, w.SizeY);
+                    cadPanel.Children.Add(cc);
+                }
+
+                var v1 = cadDashboardVm.Widgets[0];
+                var p1 = cadDashboardVm.Widgets[1];
+                var t1 = cadDashboardVm.Widgets[2];
+
+                // 17.1 CAD Window Selection (left-to-right): Only fully enclosed widgets selected
+                cadPanel.IsCrossingSelection = false;
+                var windowBox = new Rect(50, 50, 250, 250);
+                var v1Rect = new Rect(v1.Col * 40, v1.Row * 40, v1.SizeX * 40, v1.SizeY * 40);
+                if (!windowBox.Contains(v1Rect))
+                    throw new Exception("CAD Window box should fully contain V1 rect.");
+
+                // A partially overlapped rect: (100, 100, 350, 200) contains V1 fully, but P1 is only partially covered
+                var partialBox = new Rect(100, 100, 350, 200);
+                var p1Rect = new Rect(p1.Col * 40, p1.Row * 40, p1.SizeX * 40, p1.SizeY * 40);
+                if (partialBox.Contains(p1Rect))
+                    throw new Exception("CAD Window box should NOT fully contain P1.");
+                if (!partialBox.Intersects(p1Rect))
+                    throw new Exception("CAD Crossing box should intersect P1.");
+
+                // 17.2 Alignment Tests
+                v1.IsSelected = true;
+                p1.IsSelected = true;
+                t1.IsSelected = true;
+
+                // AlignLeft: all Col should become min(2, 10, 20) = 2
+                cadDashboardVm.AlignLeftCommand.Execute(null);
+                if (v1.Col != 2 || p1.Col != 2 || t1.Col != 2)
+                    throw new Exception($"AlignLeft failed: expected Col 2, got V1={v1.Col}, P1={p1.Col}, T1={t1.Col}");
+
+                // AlignTop: all Row should become min(2, 6, 14) = 2
+                cadDashboardVm.AlignTopCommand.Execute(null);
+                if (v1.Row != 2 || p1.Row != 2 || t1.Row != 2)
+                    throw new Exception($"AlignTop failed: expected Row 2, got V1={v1.Row}, P1={p1.Row}, T1={t1.Row}");
+
+                // AlignRight: max right = max(2+4, 2+6, 2+6) = 8.
+                // V1: 8 - 4 = 4. P1: 8 - 6 = 2. T1: 8 - 6 = 2.
+                cadDashboardVm.AlignRightCommand.Execute(null);
+                if (v1.Col != 4 || p1.Col != 2 || t1.Col != 2)
+                    throw new Exception($"AlignRight failed: expected V1=4, P1=2, T1=2; got V1={v1.Col}, P1={p1.Col}, T1={t1.Col}");
+
+                // 17.3 Group / Ungroup (SCADA Meta-group)
+                if (!cadDashboardVm.CanGroup)
+                    throw new Exception("CanGroup should be true for 3 selected widgets.");
+                
+                cadDashboardVm.GroupSelectedWidgetsCommand.Execute(null);
+                if (string.IsNullOrEmpty(v1.GroupId) || v1.GroupId != p1.GroupId || v1.GroupId != t1.GroupId)
+                    throw new Exception("GroupSelectedWidgetsCommand failed to assign matching GroupId.");
+                if (!cadDashboardVm.CanUngroup)
+                    throw new Exception("CanUngroup should be true when widgets have GroupId.");
+
+                cadDashboardVm.UngroupSelectedWidgetsCommand.Execute(null);
+                if (v1.GroupId != null || p1.GroupId != null || t1.GroupId != null)
+                    throw new Exception("UngroupSelectedWidgetsCommand failed to clear GroupId.");
+                if (cadDashboardVm.CanUngroup)
+                    throw new Exception("CanUngroup should be false after ungrouping.");
+
+                // 17.4 Group Duplication
+                int beforeCount = cadDashboardVm.Widgets.Count;
+                cadDashboardVm.DuplicateSelectedWidgetsCommand.Execute(null);
+                if (cadDashboardVm.Widgets.Count != beforeCount + 3)
+                    throw new Exception($"DuplicateSelectedWidgetsCommand failed: expected {beforeCount + 3} widgets, got {cadDashboardVm.Widgets.Count}.");
+                if (cadDashboardVm.SelectedWidgetsCount != 3)
+                    throw new Exception("DuplicateSelectedWidgetsCommand should select the 3 new duplicated widgets.");
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (17/17) PASSED SUCCESSFULLY!");
         }
     }
 

@@ -60,6 +60,15 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private bool _compactMode;
 
+        [ObservableProperty]
+        private string? _groupId;
+
+        partial void OnGroupIdChanged(string? value)
+        {
+            if (OriginalConfig != null)
+                OriginalConfig.GroupId = value;
+        }
+
         public IProjectContextService ProjectContext { get; }
 
         /// <summary>
@@ -86,6 +95,7 @@ namespace AvaloniaApplication1.ViewModels
             ShowBorder = config.ShowBorder;
             LabelPosition = config.LabelPosition;
             CompactMode = config.CompactMode;
+            GroupId = config.GroupId;
 
             // --- Rx.NET Data Routing (Phase 1) ---
             if (Source != null && !string.IsNullOrEmpty(Source.ConnId) && !string.IsNullOrEmpty(Source.Address))

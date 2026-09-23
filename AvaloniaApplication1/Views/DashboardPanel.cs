@@ -101,6 +101,7 @@ namespace AvaloniaApplication1.Views
         }
 
         public Rect? SelectionBoxRect { get; set; }
+        public bool IsCrossingSelection { get; set; }
 
         public List<WidgetViewModelBase> GetSelectedWidgets()
         {
@@ -761,7 +762,25 @@ namespace AvaloniaApplication1.Views
                 bool wasSelected = clickedVm.IsSelected;
                 _wasAlreadySelectedOnPressed = wasSelected;
 
-                if (isMultiSelectModifier)
+                if (!string.IsNullOrEmpty(clickedVm.GroupId))
+                {
+                    var groupMembers = Children
+                        .Select(c => c.DataContext as WidgetViewModelBase)
+                        .Where(w => w != null && w.GroupId == clickedVm.GroupId)
+                        .ToList();
+
+                    if (!isMultiSelectModifier && !wasSelected)
+                    {
+                        ClearAllSelection();
+                    }
+
+                    foreach (var member in groupMembers)
+                    {
+                        if (member != null) member.IsSelected = true;
+                    }
+                    _selectedVm = clickedVm;
+                }
+                else if (isMultiSelectModifier)
                 {
                     if (!wasSelected)
                     {
@@ -1304,6 +1323,9 @@ namespace AvaloniaApplication1.Views
                 var boxRect = new Rect(minX, minY, Math.Max(1, maxX - minX), Math.Max(1, maxY - minY));
                 SelectionBoxRect = boxRect;
 
+                bool isCrossing = point.X < _boxSelectStartPoint.X;
+                IsCrossingSelection = isCrossing;
+
                 var dashboardVm = GetDashboardViewModel();
                 bool isMultiSelectModifier = e.KeyModifiers.HasFlag(KeyModifiers.Control) || 
                                              e.KeyModifiers.HasFlag(KeyModifiers.Shift) || 
@@ -1313,14 +1335,57 @@ namespace AvaloniaApplication1.Views
                 {
                     if (child.DataContext is WidgetViewModelBase vm)
                     {
-                        var widgetRect = new Rect(
-                            vm.Col * CellWidth,
-                            vm.Row * CellHeight,
-                            Math.Max(1, vm.SizeX) * CellWidth,
-                            Math.Max(1, vm.SizeY) * CellHeight);
+                        bool isSelectedByBox = false;
 
-                        bool intersects = boxRect.Intersects(widgetRect);
-                        if (intersects)
+                        if (vm is PipeWidgetViewModel pipeVm)
+                        {
+                            var gridPoints = pipeVm.GetAbsoluteGridPoints();
+                            if (gridPoints.Count >= 2)
+                            {
+                                var pxPoints = gridPoints.Select(gp => new Point(gp.X * CellWidth, gp.Y * CellHeight)).ToList();
+
+                                if (isCrossing)
+                                {
+                                    // Crossing: either any point is inside, or any segment intersects box
+                                    isSelectedByBox = pxPoints.Any(p => boxRect.Contains(p));
+                                    if (!isSelectedByBox)
+                                    {
+                                        for (int seg = 0; seg < pxPoints.Count - 1; seg++)
+                                        {
+                                            if (LineIntersectsRect(pxPoints[seg], pxPoints[seg + 1], boxRect))
+                                            {
+                                                isSelectedByBox = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // Window: ALL points must be inside boxRect
+                                    isSelectedByBox = pxPoints.All(p => boxRect.Contains(p));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var widgetRect = new Rect(
+                                vm.Col * CellWidth,
+                                vm.Row * CellHeight,
+                                Math.Max(1, vm.SizeX) * CellWidth,
+                                Math.Max(1, vm.SizeY) * CellHeight);
+
+                            if (isCrossing)
+                            {
+                                isSelectedByBox = boxRect.Intersects(widgetRect);
+                            }
+                            else
+                            {
+                                isSelectedByBox = boxRect.Contains(widgetRect);
+                            }
+                        }
+
+                        if (isSelectedByBox)
                         {
                             vm.IsSelected = true;
                         }
@@ -1795,9 +1860,10 @@ namespace AvaloniaApplication1.Views
 
             if (!IsDesignMode) return;
 
+            var dashboardVm = GetDashboardViewModel();
+
             if (e.KeyModifiers.HasFlag(Avalonia.Input.KeyModifiers.Control))
             {
-                var dashboardVm = GetDashboardViewModel();
                 if (dashboardVm != null)
                 {
                     if (e.Key == Avalonia.Input.Key.C && SelectedVm != null)
@@ -1812,17 +1878,27 @@ namespace AvaloniaApplication1.Views
                         e.Handled = true;
                         return;
                     }
+                    if (e.Key == Avalonia.Input.Key.D)
+                    {
+                        dashboardVm.DuplicateSelectedWidgetsCommand.Execute(null);
+                        e.Handled = true;
+                        return;
+                    }
                 }
             }
 
-            if (SelectedVm == null) return;
+            var selectedWidgets = GetSelectedWidgets();
+            if (selectedWidgets.Count == 0 && SelectedVm != null)
+            {
+                selectedWidgets = new List<WidgetViewModelBase> { SelectedVm };
+            }
+
+            if (selectedWidgets.Count == 0) return;
 
             if (e.Key == Avalonia.Input.Key.Delete)
             {
-                var dashboardVm = GetDashboardViewModel();
                 if (dashboardVm != null)
                 {
-                    var selectedWidgets = GetSelectedWidgets();
                     if (selectedWidgets.Count > 1)
                     {
                         dashboardVm.RemoveSelectedWidgetsCommand.Execute(null);
@@ -1840,43 +1916,80 @@ namespace AvaloniaApplication1.Views
                 }
             }
 
+            // Keyboard Nudge: 1 cell without Shift, 5 cells with Shift
             bool isShiftPressed = e.KeyModifiers.HasFlag(Avalonia.Input.KeyModifiers.Shift);
-            double stepX = isShiftPressed ? 1.0 : (1.0 / CellWidth);
-            double stepY = isShiftPressed ? 1.0 : (1.0 / CellHeight);
+            double step = isShiftPressed ? 5.0 : 1.0;
+            double deltaCol = 0;
+            double deltaRow = 0;
 
-            bool moved = false;
-            if (e.Key == Avalonia.Input.Key.Left)
-            {
-                SelectedVm.Col -= stepX;
-                SelectedVm.OriginalConfig.Position.Col = SelectedVm.Col;
-                moved = true;
-            }
-            else if (e.Key == Avalonia.Input.Key.Right)
-            {
-                SelectedVm.Col += stepX;
-                SelectedVm.OriginalConfig.Position.Col = SelectedVm.Col;
-                moved = true;
-            }
-            else if (e.Key == Avalonia.Input.Key.Up)
-            {
-                SelectedVm.Row -= stepY;
-                SelectedVm.OriginalConfig.Position.Row = SelectedVm.Row;
-                moved = true;
-            }
-            else if (e.Key == Avalonia.Input.Key.Down)
-            {
-                SelectedVm.Row += stepY;
-                SelectedVm.OriginalConfig.Position.Row = SelectedVm.Row;
-                moved = true;
-            }
+            if (e.Key == Avalonia.Input.Key.Left) deltaCol = -step;
+            else if (e.Key == Avalonia.Input.Key.Right) deltaCol = step;
+            else if (e.Key == Avalonia.Input.Key.Up) deltaRow = -step;
+            else if (e.Key == Avalonia.Input.Key.Down) deltaRow = step;
 
-            if (moved)
+            if (deltaCol != 0 || deltaRow != 0)
             {
-                e.Handled = true;
-                InvalidateMeasure();
-                InvalidateArrange();
-                _selectionOverlay?.InvalidateVisual();
+                if (deltaCol < 0)
+                {
+                    double minCol = selectedWidgets.Min(w => w.Col);
+                    if (minCol + deltaCol < 0) deltaCol = -minCol;
+                }
+                if (deltaRow < 0)
+                {
+                    double minRow = selectedWidgets.Min(w => w.Row);
+                    if (minRow + deltaRow < 0) deltaRow = -minRow;
+                }
+
+                if (deltaCol != 0 || deltaRow != 0)
+                {
+                    foreach (var w in selectedWidgets)
+                    {
+                        w.Col = Math.Max(0, w.Col + deltaCol);
+                        w.Row = Math.Max(0, w.Row + deltaRow);
+                        w.OriginalConfig.Position.Col = w.Col;
+                        w.OriginalConfig.Position.Row = w.Row;
+
+                        var child = FindChildForVm(w);
+                        if (child != null)
+                        {
+                            SetCol(child, w.Col);
+                            SetRow(child, w.Row);
+                        }
+                    }
+
+                    e.Handled = true;
+                    InvalidateMeasure();
+                    InvalidateArrange();
+                    _selectionOverlay?.InvalidateVisual();
+                    return;
+                }
             }
+        }
+
+        private static bool LineIntersectsRect(Point p1, Point p2, Rect rect)
+        {
+            if (rect.Contains(p1) || rect.Contains(p2)) return true;
+
+            Point rTL = new Point(rect.Left, rect.Top);
+            Point rTR = new Point(rect.Right, rect.Top);
+            Point rBL = new Point(rect.Left, rect.Bottom);
+            Point rBR = new Point(rect.Right, rect.Bottom);
+
+            return LineSegmentsIntersect(p1, p2, rTL, rTR) ||
+                   LineSegmentsIntersect(p1, p2, rTR, rBR) ||
+                   LineSegmentsIntersect(p1, p2, rBR, rBL) ||
+                   LineSegmentsIntersect(p1, p2, rBL, rTL);
+        }
+
+        private static bool LineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4)
+        {
+            double d = (p2.X - p1.X) * (p4.Y - p3.Y) - (p2.Y - p1.Y) * (p4.X - p3.X);
+            if (Math.Abs(d) < 1e-9) return false;
+
+            double u = ((p3.X - p1.X) * (p4.Y - p3.Y) - (p3.Y - p1.Y) * (p4.X - p3.X)) / d;
+            double v = ((p3.X - p1.X) * (p2.Y - p1.Y) - (p3.Y - p1.Y) * (p2.X - p1.X)) / d;
+
+            return (u >= 0 && u <= 1) && (v >= 0 && v <= 1);
         }
 
         private bool IsPointNearSegment(Point p, Point s1, Point s2, double maxDistance)

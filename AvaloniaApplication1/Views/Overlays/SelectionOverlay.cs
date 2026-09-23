@@ -15,19 +15,30 @@ namespace AvaloniaApplication1.Views
         private DashboardPanel? _panel;
 
         // Cached brushes and pens for zero-allocation rendering in Render()
+        private static readonly IBrush WindowFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(35, 0, 120, 215));
+        private static readonly IPen WindowBorderPen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 120, 215)), 1.5);
+
+        private static readonly IBrush CrossingFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(35, 40, 167, 69));
+        private static readonly IPen CrossingBorderPen = new ImmutablePen(
+            new ImmutableSolidColorBrush(Color.FromRgb(40, 167, 69)),
+            1.5,
+            new ImmutableDashStyle(new double[] { 4, 3 }, 0));
+
         private static readonly IBrush SelectionFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(30, 0, 122, 255));
         private static readonly IPen SelectionBorderPen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 122, 255)), 2.0);
+        private static readonly IBrush ItemLightBrush = new ImmutableSolidColorBrush(Color.FromArgb(15, 0, 120, 215));
+        private static readonly IPen ItemLightPen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromArgb(140, 0, 120, 215)), 1.0);
+
+        private static readonly IPen GroupBoundingPen = new ImmutablePen(
+            new ImmutableSolidColorBrush(Color.FromRgb(0, 120, 215)),
+            1.5,
+            new ImmutableDashStyle(new double[] { 5, 3 }, 0));
+
         private static readonly IBrush HandleBrush = Brushes.White;
         private static readonly IPen HandlePen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 122, 255)), 1.5);
 
         private static readonly IPen SnapRingPen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 230, 118)), 2.5);
         private static readonly IBrush SnapFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(70, 0, 230, 118));
-
-        private static readonly IBrush RubberBandFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(35, 0, 122, 255));
-        private static readonly IPen RubberBandBorderPen = new ImmutablePen(
-            new ImmutableSolidColorBrush(Color.FromRgb(0, 122, 255)),
-            1.5,
-            new ImmutableDashStyle(new double[] { 4, 3 }, 0));
 
         public SelectionOverlay()
         {
@@ -74,18 +85,34 @@ namespace AvaloniaApplication1.Views
 
             if (_panel == null || !_panel.IsDesignMode) return;
 
-            // 1. Render Rubber-band Selection Box if currently dragging
+            // 1. Render CAD Rubber-band Selection Box (Window = Blue / Crossing = Green Dash)
             if (_panel.SelectionBoxRect.HasValue)
             {
                 var box = _panel.SelectionBoxRect.Value;
                 if (box.Width > 1 && box.Height > 1)
                 {
-                    context.DrawRectangle(RubberBandFillBrush, RubberBandBorderPen, box, 2, 2);
+                    if (_panel.IsCrossingSelection)
+                    {
+                        context.DrawRectangle(CrossingFillBrush, CrossingBorderPen, box, 2, 2);
+                    }
+                    else
+                    {
+                        context.DrawRectangle(WindowFillBrush, WindowBorderPen, box, 2, 2);
+                    }
                 }
             }
 
-            // 2. Render Selection Borders and Handles for ALL Selected Widgets
+            // 2. Render Selection Borders and Handles
             var selectedWidgets = _panel.GetSelectedWidgets();
+            if (selectedWidgets.Count == 0) return;
+
+            bool isGroup = selectedWidgets.Count > 1;
+
+            double groupMinX = double.MaxValue;
+            double groupMinY = double.MaxValue;
+            double groupMaxX = double.MinValue;
+            double groupMaxY = double.MinValue;
+
             foreach (var widgetVm in selectedWidgets)
             {
                 double col, row;
@@ -127,16 +154,54 @@ namespace AvaloniaApplication1.Views
                 double w = sizeX * _panel.CellWidth;
                 double h = sizeY * _panel.CellHeight;
 
-                context.DrawRectangle(SelectionFillBrush, SelectionBorderPen, new Rect(x, y, w, h), 4, 4);
+                if (x < groupMinX) groupMinX = x;
+                if (y < groupMinY) groupMinY = y;
+                if (x + w > groupMaxX) groupMaxX = x + w;
+                if (y + h > groupMaxY) groupMaxY = y + h;
 
-                // Draw corner handles
-                context.DrawEllipse(HandleBrush, HandlePen, new Point(x, y), 4, 4);
-                context.DrawEllipse(HandleBrush, HandlePen, new Point(x + w, y), 4, 4);
-                context.DrawEllipse(HandleBrush, HandlePen, new Point(x, y + h), 4, 4);
-                context.DrawEllipse(HandleBrush, HandlePen, new Point(x + w, y + h), 4, 4);
+                if (isGroup)
+                {
+                    // Light highlight for individual group members
+                    context.DrawRectangle(ItemLightBrush, ItemLightPen, new Rect(x, y, w, h), 3, 3);
+                }
+                else
+                {
+                    // Full selection border & handles for single selected element
+                    context.DrawRectangle(SelectionFillBrush, SelectionBorderPen, new Rect(x, y, w, h), 4, 4);
+
+                    context.DrawEllipse(HandleBrush, HandlePen, new Point(x, y), 4, 4);
+                    context.DrawEllipse(HandleBrush, HandlePen, new Point(x + w, y), 4, 4);
+                    context.DrawEllipse(HandleBrush, HandlePen, new Point(x, y + h), 4, 4);
+                    context.DrawEllipse(HandleBrush, HandlePen, new Point(x + w, y + h), 4, 4);
+                }
             }
 
-            // 3. Render Snap Target Marker
+            // 3. Render Group Bounding Box with 8 Transformation Markers
+            if (isGroup && groupMaxX > groupMinX && groupMaxY > groupMinY)
+            {
+                var groupRect = new Rect(groupMinX - 3, groupMinY - 3, (groupMaxX - groupMinX) + 6, (groupMaxY - groupMinY) + 6);
+                context.DrawRectangle(null, GroupBoundingPen, groupRect, 3, 3);
+
+                // 8 Group Handles (4 corners + 4 midpoints)
+                Point[] groupHandles = new[]
+                {
+                    new Point(groupRect.Left, groupRect.Top),
+                    new Point((groupRect.Left + groupRect.Right) / 2.0, groupRect.Top),
+                    new Point(groupRect.Right, groupRect.Top),
+                    new Point(groupRect.Right, (groupRect.Top + groupRect.Bottom) / 2.0),
+                    new Point(groupRect.Right, groupRect.Bottom),
+                    new Point((groupRect.Left + groupRect.Right) / 2.0, groupRect.Bottom),
+                    new Point(groupRect.Left, groupRect.Bottom),
+                    new Point(groupRect.Left, (groupRect.Top + groupRect.Bottom) / 2.0)
+                };
+
+                foreach (var pt in groupHandles)
+                {
+                    context.DrawRectangle(HandleBrush, HandlePen, new Rect(pt.X - 3.5, pt.Y - 3.5, 7, 7));
+                }
+            }
+
+            // 4. Render Snap Target Marker
             if (_panel.ActiveSnapTarget.HasValue)
             {
                 var snapPt = _panel.ActiveSnapTarget.Value;
