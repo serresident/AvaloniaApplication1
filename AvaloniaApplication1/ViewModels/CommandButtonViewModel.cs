@@ -75,6 +75,17 @@ namespace AvaloniaApplication1.ViewModels
             // Safety & Operator Override check when communication quality is degraded
             if (IsStale || HasCommError)
             {
+                if (DialogService != null)
+                {
+                    bool confirmed = await DialogService.ShowConfirmAsync(
+                        "Подтверждение переопределения команды",
+                        $"Качество связи нарушено ({Quality}). Вы уверены, что хотите принудительно отправить команду на {Source.ConnId}:{Source.Address}?");
+                    if (!confirmed)
+                    {
+                        return;
+                    }
+                }
+
                 IsOverridden = true;
                 Quality = TagQuality.Overridden;
                 DataService.ForceOverride(tagId, true);

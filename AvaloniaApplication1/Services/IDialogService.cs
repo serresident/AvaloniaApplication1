@@ -19,6 +19,9 @@ namespace AvaloniaApplication1.Services
         Task<bool> PromptPasswordAsync(string expectedPassword, string title = "Вход в режим редактирования");
         Task ShowSettingsAsync(HmiConfiguration config, IConfigurationService configService);
 
+        // Confirmation & Operator Safety Overrides
+        Task<bool> ShowConfirmAsync(string title, string message);
+
         // Project File dialogs
         Task<string?> ShowOpenProjectDialogAsync();
         Task<string?> ShowSaveProjectAsDialogAsync(string? defaultFileName = null);

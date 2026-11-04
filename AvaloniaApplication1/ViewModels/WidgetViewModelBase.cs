@@ -271,6 +271,11 @@ namespace AvaloniaApplication1.ViewModels
             object? overrideVal = null;
             if (DialogService != null)
             {
+                bool confirmed = await DialogService.ShowConfirmAsync(
+                    "Подтверждение переопределения тега",
+                    $"Вы действительно хотите принудительно задать значение для тега '{tagId}'?");
+                if (!confirmed) return;
+
                 var input = await DialogService.ShowNumpadAsync($"Ручное переопределение: {Title}", "1");
                 if (string.IsNullOrEmpty(input)) return;
 

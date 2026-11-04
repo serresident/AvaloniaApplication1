@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using AvaloniaApplication1.Models;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -33,13 +34,31 @@ namespace AvaloniaApplication1.ViewModels
 
         protected override void OnTagValueUpdated(object newValue)
         {
-            UpdateDisplayValue();
+            UpdateDisplayValue(newValue);
         }
 
-        private void UpdateDisplayValue()
+        protected override void OnTagSnapshotUpdated(TagSnapshot snapshot)
         {
+            if (HasCommError)
+            {
+                DisplayValue = "---";
+            }
+            else if (snapshot.Value != null)
+            {
+                UpdateDisplayValue(snapshot.Value);
+            }
+        }
+
+        private void UpdateDisplayValue(object? val = null)
+        {
+            if (HasCommError)
+            {
+                DisplayValue = "---";
+                return;
+            }
+
             if (Source == null) return;
-            var val = DataService.GetCurrentValue(Source.ConnId, Source.Address);
+            val ??= DataService.GetCurrentValue(Source.ConnId, Source.Address);
             if (val != null && TryConvertDouble(val, out double dVal))
             {
                 RawValue = dVal;

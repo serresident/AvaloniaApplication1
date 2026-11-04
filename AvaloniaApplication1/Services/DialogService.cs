@@ -260,6 +260,58 @@ namespace AvaloniaApplication1.Services
             return false;
         }
 
+        public async Task<bool> ShowConfirmAsync(string title, string message)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var vm = new ConfirmPromptViewModel
+            {
+                Title = title,
+                Message = message
+            };
+
+            if (MainWindow != null)
+            {
+                var window = new ConfirmPromptWindow
+                {
+                    DataContext = vm
+                };
+                vm.OnResult = (success) =>
+                {
+                    tcs.TrySetResult(success);
+                    window.Close();
+                };
+                window.Closed += (s, e) =>
+                {
+                    tcs.TrySetResult(false);
+                };
+                await window.ShowDialog(MainWindow);
+                return await tcs.Task;
+            }
+            else if (ChildWindowService != null)
+            {
+                var childWindow = ChildWindowService.OpenChildWindow(title, vm);
+                if (childWindow != null)
+                {
+                    childWindow.Width = 420;
+                    childWindow.Height = 220;
+                    vm.OnResult = (success) =>
+                    {
+                        tcs.TrySetResult(success);
+                        childWindow.CloseCommand.Execute(null);
+                    };
+                    var originalClose = childWindow.CloseAction;
+                    childWindow.CloseAction = () =>
+                    {
+                        tcs.TrySetResult(false);
+                        originalClose?.Invoke();
+                    };
+                    return await tcs.Task;
+                }
+            }
+
+            return true; // Fallback for headless/unit testing environments where no window manager is present
+        }
+
         public async Task ShowSettingsAsync(HmiConfiguration config, IConfigurationService configService)
         {
             if (MainWindow == null) return;

@@ -756,3 +756,30 @@
 
 
 
+
+# Tasks: Review Hardening & Safety Overrides (Сессия 44)
+
+- [x] Диалог подтверждения безопасности оператора:
+  - [x] Создан `ConfirmPromptViewModel.cs` и окно `ConfirmPromptWindow.axaml` в промышленной теме
+  - [x] Добавлен `ShowConfirmAsync` в `IDialogService.cs` и `DialogService.cs`
+  - [x] Внедрен обязательный запрос подтверждения в `CommandButtonViewModel.cs` при деградировавшей связи (`IsStale || HasCommError`)
+  - [x] Добавлен запрос подтверждения перед ручным переопределением тега в `WidgetViewModelBase.cs`
+- [x] Сохранение физической телеметрии и Deadband:
+  - [x] Реализован словарь `_lastTelemetry` в `TagManagerService.cs` для сохранения реальных физических данных в режиме `[M]`
+  - [x] Метод `ClearOverride` корректно восстанавливает последнее физическое измерение и качество датчика
+  - [x] Реализована фильтрация зоны нечувствительности `Deadband` с поддержанием актуальности таймстампа для сторожевого таймера
+  - [x] Защита от скачков системных часов назад (NTP / leap second) в `CheckStaleTags`
+- [x] Упрочнение Modbus:
+  - [x] Исправлен парсинг 1-4-значных адресов в `ParseModbusAddress` и `GetModbusOffset`
+  - [x] Поддержка 64-битного типа `Double` при чтении и записи
+  - [x] Перевод `PublishBlockRegisters` на `ReadOnlySpan<ushort>` с нулевыми аллокациями
+  - [x] Изоляция `SlaveException` без сброса постоянного TCP-сокета
+- [x] Синхронизация и HMI:
+  - [x] Ликвидация дублирующих событий в `DataCoreService._unifiedTagStream`
+  - [x] Расширение `ExtractAllTags` на `config.Tags`, `BridgeRules` и вторичные источники виджетов
+  - [x] Вывод `---` в `SetValueViewModel.cs` при ошибках связи
+  - [x] Угловые бейджи глифов `[M]`, `⏳`, `⚠️` в `Slider` и `SetValue` в `DashboardView.axaml`
+- [x] Тестирование:
+  - [x] Расширен тест №19 в `UIValidation/Program.cs` подтестами 19.9, 19.10, 19.11
+  - [x] 19/19 PASS, 0 предупреждений, 0 ошибок сборки
+  - [x] Успешная генерация артефактов headless-рендеринга

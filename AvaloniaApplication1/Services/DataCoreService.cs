@@ -114,7 +114,6 @@ namespace AvaloniaApplication1.Services
             }
 
             _tagManager.UpdateTagValue(tag.ConnId, tag.Address, tag.Value ?? GetCurrentValue(tag.ConnId, tag.Address) ?? 0, tag.Quality);
-            _unifiedTagStream.OnNext(tag);
         }
 
         public async Task StopAsync()
@@ -204,28 +203,95 @@ namespace AvaloniaApplication1.Services
         private IEnumerable<DataSourceConfig> ExtractAllTags(HmiConfiguration config)
         {
             var list = new List<DataSourceConfig>();
+            var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            void AddSource(DataSourceConfig? src)
+            {
+                if (src == null) return;
+                string conn = src.ConnId;
+                string addr = src.Address;
+
+                // If address is empty but TagId is specified, look up in config.Tags
+                if (string.IsNullOrEmpty(addr) && !string.IsNullOrEmpty(src.TagId) && config.Tags != null)
+                {
+                    var found = config.Tags.FirstOrDefault(t => string.Equals(t.TagId, src.TagId, StringComparison.OrdinalIgnoreCase));
+                    if (found != null)
+                    {
+                        conn = found.ConnId;
+                        addr = found.Address;
+                        src.ConnId = conn;
+                        src.Address = addr;
+                        if (string.IsNullOrEmpty(src.DataType)) src.DataType = found.DataType;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(conn) || string.IsNullOrEmpty(addr)) return;
+
+                var key = $"{conn}:{addr}";
+                if (seenKeys.Add(key))
+                {
+                    list.Add(src);
+                }
+            }
 
             void Scan(IEnumerable<WidgetConfig>? widgets)
             {
                 if (widgets == null) return;
                 foreach (var w in widgets)
                 {
-                    if (w.Source != null) list.Add(w.Source);
+                    AddSource(w.Source);
 
                     if (w is ValveConfig vc)
                     {
-                        if (vc.FeedbackSource != null) list.Add(vc.FeedbackSource);
-                        if (vc.ClosedFeedbackSource != null) list.Add(vc.ClosedFeedbackSource);
-                        if (vc.ModeSource != null) list.Add(vc.ModeSource);
+                        AddSource(vc.FeedbackSource);
+                        AddSource(vc.ClosedFeedbackSource);
+                        AddSource(vc.ModeSource);
+                    }
+                    else if (w is HeatExchangerConfig he)
+                    {
+                        AddSource(he.SecondarySource);
+                    }
+                    else if (w is ReactorConfig rc)
+                    {
+                        AddSource(rc.AgitatorSource);
+                        AddSource(rc.TempSource);
                     }
 
                     if (w is ContainerButtonConfig cb && cb.Children != null) Scan(cb.Children);
                 }
             }
 
+            // 1. Scan Widgets in Dashboard & Mimic
             Scan(config.Dashboard?.Widgets);
             Scan(config.Mimic?.Widgets);
-            
+
+            // 2. Scan Centralized Tags in config.Tags
+            if (config.Tags != null)
+            {
+                foreach (var tag in config.Tags)
+                {
+                    AddSource(new DataSourceConfig
+                    {
+                        TagId = tag.TagId,
+                        ConnId = tag.ConnId,
+                        Address = tag.Address,
+                        DataType = tag.DataType
+                    });
+                }
+            }
+
+            // 3. Scan Bridge Rules
+            if (config.BridgeRules != null)
+            {
+                foreach (var br in config.BridgeRules)
+                {
+                    if (br.Source != null)
+                        AddSource(new DataSourceConfig { TagId = br.Source.TagId, ConnId = br.Source.ConnId, Address = br.Source.Address });
+                    if (br.Destination != null)
+                        AddSource(new DataSourceConfig { TagId = br.Destination.TagId, ConnId = br.Destination.ConnId, Address = br.Destination.Address });
+                }
+            }
+
             return list;
         }
     }

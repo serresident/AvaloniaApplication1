@@ -63,6 +63,29 @@ public class MockSimulationService : ISimulationService
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
+public class MockTestDialogService : IDialogService
+{
+    public bool ConfirmResult { get; set; } = true;
+    public bool ShowConfirmCalled { get; set; }
+
+    public Task<bool> ShowConfirmAsync(string title, string message)
+    {
+        ShowConfirmCalled = true;
+        return Task.FromResult(ConfirmResult);
+    }
+
+    public Task<string?> ShowNumpadAsync(string title, string initialValue, double? x = null, double? y = null) => Task.FromResult<string?>("100");
+    public Task ShowContainerDashboardAsync(string title, DashboardConfig config) => Task.CompletedTask;
+    public Task<WidgetConfig?> ShowWidgetEditorAsync(WidgetConfig? existingConfig, List<ConnectionConfig> connections, WidgetPosition? initialPosition = null) => Task.FromResult<WidgetConfig?>(null);
+    public Task<(double CellSize, double ZoomScale)?> ShowDashboardPropertiesAsync(double currentCellSize, double currentZoomScale) => Task.FromResult<(double, double)?>(null);
+    public Task<ConnectionConfig?> ShowConnectionEditorAsync(ConnectionConfig? existingConfig) => Task.FromResult<ConnectionConfig?>(null);
+    public Task ShowConnectionManagerAsync(HmiConfiguration config) => Task.CompletedTask;
+    public Task<bool> PromptPasswordAsync(string expectedPassword, string title = "Вход в режим редактирования") => Task.FromResult(true);
+    public Task ShowSettingsAsync(HmiConfiguration config, IConfigurationService configService) => Task.CompletedTask;
+    public Task<string?> ShowOpenProjectDialogAsync() => Task.FromResult<string?>(null);
+    public Task<string?> ShowSaveProjectAsDialogAsync(string? defaultFileName = null) => Task.FromResult<string?>(null);
+}
+
 public class BoundsDto
 {
     public double X { get; set; }
@@ -1404,6 +1427,24 @@ public static class Program
                 var clearedSnap = tagManager.GetSnapshot("tag_plc1_40001");
                 if (clearedSnap.IsOverridden)
                     throw new Exception("ClearOverride failed to remove override flag.");
+                if (Math.Abs((float)clearedSnap.Value! - 111.0f) > 0.001 || clearedSnap.Quality != TagQuality.Good)
+                    throw new Exception("ClearOverride failed to restore real physical telemetry.");
+
+                // Deadband suppression & emission
+                testDef.Deadband = 5.0;
+                tagManager.UpdateTagValue("plc1", "40001", 113.0f, TagQuality.Good); // delta = 2.0 < 5.0
+                var deadbandSnap = tagManager.GetSnapshot("tag_plc1_40001");
+                if (Math.Abs((float)deadbandSnap.Value! - 111.0f) > 0.001)
+                    throw new Exception("Deadband failed to suppress noise below threshold.");
+                tagManager.UpdateTagValue("plc1", "40001", 120.0f, TagQuality.Good); // delta = 9.0 >= 5.0
+                var deadbandPassedSnap = tagManager.GetSnapshot("tag_plc1_40001");
+                if (Math.Abs((float)deadbandPassedSnap.Value! - 120.0f) > 0.001)
+                    throw new Exception("Deadband failed to emit update above threshold.");
+                testDef.Deadband = 0.0;
+
+                // Clock jump backwards handling
+                tagManager.UpdateTagValue("plc1", "40001", 125.0f, TagQuality.Good);
+                tagManager.CheckStaleTags(); // Ensures normalization without crash
 
                 // 19.6 Modbus Bulk Coalescing & PDU Splitting (MaxGap <= 5, <= 120 registers)
                 var modbusConfig = new ConnectionConfig
@@ -1499,6 +1540,58 @@ public static class Program
                 vdVm.ApplySnapshot(new TagSnapshot("tag_t101", 88.0f, TagQuality.Overridden, DateTime.UtcNow, null, true));
                 if (!vdVm.IsOverridden || vdVm.QualityOpacity != 1.0 || vdVm.QualityGlyph != "[M]")
                     throw new Exception($"Overridden state visual feedback failed: Opacity={vdVm.QualityOpacity}, Glyph={vdVm.QualityGlyph}");
+
+                // 19.9 Modbus Address Parsing Edge Cases
+                if (!AvaloniaApplication1.Services.Protocols.ModbusProtocolDriver.ParseModbusAddress("10", out var fc1, out var off1) || fc1 != 3 || off1 != 10)
+                    throw new Exception("ParseModbusAddress failed for direct offset 10.");
+                if (!AvaloniaApplication1.Services.Protocols.ModbusProtocolDriver.ParseModbusAddress("4000", out var fc2, out var off2) || fc2 != 3 || off2 != 4000)
+                    throw new Exception("ParseModbusAddress failed for 4-digit address 4000.");
+                if (!AvaloniaApplication1.Services.Protocols.ModbusProtocolDriver.ParseModbusAddress("00001", out var fc3, out var off3) || fc3 != 1 || off3 != 1)
+                    throw new Exception("ParseModbusAddress failed for 5-digit coil 00001.");
+                if (!AvaloniaApplication1.Services.Protocols.ModbusProtocolDriver.ParseModbusAddress("30005", out var fc4, out var off4) || fc4 != 4 || off4 != 30005)
+                    throw new Exception("ParseModbusAddress failed for 5-digit input register 30005.");
+                if (!AvaloniaApplication1.Services.Protocols.ModbusProtocolDriver.ParseModbusAddress("40012", out var fc5, out var off5) || fc5 != 3 || off5 != 40012)
+                    throw new Exception("ParseModbusAddress failed for 5-digit holding register 40012.");
+
+                // 19.10 Safety & Operator Confirmation on Degraded Communication
+                var testDialog = new MockTestDialogService { ConfirmResult = false };
+                var cmdConfig = new CommandButtonConfig
+                {
+                    Title = "Пуск R-101",
+                    ButtonMode = "Toggle",
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "40001", TagId = "tag_plc1_40001" }
+                };
+                var cmdVm = new CommandButtonViewModel(cmdConfig, mockCore, mainVm.ProjectContext) { DialogService = testDialog };
+                cmdVm.ApplySnapshot(new TagSnapshot("tag_plc1_40001", 0, TagQuality.Stale, DateTime.UtcNow.AddMinutes(-5)));
+
+                // Test operator cancel: must NOT force override
+                cmdVm.ExecuteCommandCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (!testDialog.ShowConfirmCalled)
+                    throw new Exception("CommandButton did not prompt operator confirmation on degraded communications.");
+                if (cmdVm.IsOverridden)
+                    throw new Exception("CommandButton force-overrode despite operator cancelling confirmation.");
+
+                // Test operator confirm: must force override and set [M]
+                testDialog.ConfirmResult = true;
+                testDialog.ShowConfirmCalled = false;
+                cmdVm.ExecuteCommandCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (!testDialog.ShowConfirmCalled || !cmdVm.IsOverridden)
+                    throw new Exception("CommandButton failed to execute and set Overridden after operator confirmation.");
+
+                // 19.11 SetValueViewModel Comm Failure Handling
+                var svConfig = new SetValueConfig
+                {
+                    Title = "Уставка давления",
+                    Format = "{0:F1}",
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "40001", TagId = "tag_plc1_40001" }
+                };
+                var svVm = new SetValueViewModel(svConfig, mockCore, mainVm.ProjectContext);
+                svVm.ApplySnapshot(new TagSnapshot("tag_plc1_40001", 50.0f, TagQuality.Good, DateTime.UtcNow));
+                if (svVm.DisplayValue.Replace(',', '.') != "50.0")
+                    throw new Exception($"SetValueViewModel expected 50.0, got: {svVm.DisplayValue}");
+                svVm.ApplySnapshot(new TagSnapshot("tag_plc1_40001", null, TagQuality.CommFailure, DateTime.UtcNow));
+                if (svVm.DisplayValue != "---" || svVm.QualityOpacity != 0.55)
+                    throw new Exception($"SetValueViewModel failed to display '---' on comm error. Got: {svVm.DisplayValue}");
             }
 
             Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (19/19) PASSED SUCCESSFULLY!");

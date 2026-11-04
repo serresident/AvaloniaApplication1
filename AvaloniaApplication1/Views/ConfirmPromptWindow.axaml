@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="220"
+        x:Class="AvaloniaApplication1.Views.ConfirmPromptWindow"
+        x:DataType="vm:ConfirmPromptViewModel"
+        x:CompileBindings="True"
+        Title="{Binding Title}"
+        Width="420" Height="220"
+        MinWidth="380" MinHeight="180"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Background="#1E1E1E">
+
+    <Border Padding="20" Background="#252526" CornerRadius="8" Margin="10" BorderBrush="#3E3E42" BorderThickness="1">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,12">
+                <TextBlock Text="⚠️" FontSize="26" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <TextBlock Grid.Row="1" Text="{Binding Message}" Foreground="#D4D4D4" FontSize="13" TextWrapping="Wrap" VerticalAlignment="Center" Margin="4,0,4,12" />
+
+            <Grid Grid.Row="2" ColumnDefinitions="*,12,*">
+                <Button Grid.Column="0" Content="Отмена" Command="{Binding CancelCommand}"
+                        Background="#3E3E42" Foreground="White" CornerRadius="4" Height="36"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                <Button Grid.Column="2" Content="Подтвердить" Command="{Binding ConfirmCommand}"
+                        Background="#D32F2F" Foreground="White" FontWeight="Bold" CornerRadius="4" Height="36"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

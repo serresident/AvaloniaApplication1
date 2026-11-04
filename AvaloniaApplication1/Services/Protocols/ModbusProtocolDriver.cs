@@ -215,7 +215,24 @@ namespace AvaloniaApplication1.Services.Protocols
                         var tag = _tagsToPoll.FirstOrDefault(t => t.Address == req.Address);
                         string dataType = tag?.DataType ?? "Float32";
 
-                        if (dataType == "Float32" || dataType == "Float" || dataType == "Int32" || dataType == "UInt32")
+                        if (dataType == "Double")
+                        {
+                            ulong bits = BitConverter.DoubleToUInt64Bits(dVal);
+                            ushort w0 = (ushort)(bits >> 48);
+                            ushort w1 = (ushort)((bits >> 32) & 0xFFFF);
+                            ushort w2 = (ushort)((bits >> 16) & 0xFFFF);
+                            ushort w3 = (ushort)(bits & 0xFFFF);
+
+                            ushort[] words = _config.ByteOrder switch
+                            {
+                                "ABCD" => new[] { w0, w1, w2, w3 },
+                                "CDAB" => new[] { w1, w0, w3, w2 },
+                                "BADC" => new[] { SwapBytes(w0), SwapBytes(w1), SwapBytes(w2), SwapBytes(w3) },
+                                _ => new[] { SwapBytes(w3), SwapBytes(w2), SwapBytes(w1), SwapBytes(w0) }
+                            };
+                            await master.WriteMultipleRegistersAsync(slaveId, offset, words);
+                        }
+                        else if (dataType == "Float32" || dataType == "Float" || dataType == "Int32" || dataType == "UInt32")
                         {
                             uint bits = 0;
                             if (dataType == "Float32" || dataType == "Float")
@@ -295,27 +312,35 @@ namespace AvaloniaApplication1.Services.Protocols
                     PublishBlockBits(block, inputs);
                 }
             }
+            catch (SlaveException sex)
+            {
+                Console.WriteLine($"[Modbus] Slave Exception FC={block.FunctionCode} start={block.StartOffset} count={block.RegCount} Code={sex.SlaveExceptionCode}");
+                foreach (var tag in block.Tags)
+                {
+                    _tagUpdates.OnNext(new TagData(ConnectionId, tag.Tag.Address, null!, TagQuality.Bad, DateTime.UtcNow));
+                }
+                // Do NOT throw: Modbus exception response means TCP socket is alive and healthy!
+            }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Modbus] Read error FC={block.FunctionCode} start={block.StartOffset} count={block.RegCount}: {ex.Message}");
+                Console.WriteLine($"[Modbus] Read comm error FC={block.FunctionCode} start={block.StartOffset} count={block.RegCount}: {ex.Message}");
                 foreach (var tag in block.Tags)
                 {
                     _tagUpdates.OnNext(new TagData(ConnectionId, tag.Tag.Address, null!, TagQuality.CommFailure, DateTime.UtcNow));
                 }
-                throw; // propagate to communication loop for reconnect
+                throw; // propagate network transport errors to communication loop for reconnect
             }
         }
 
         private void PublishBlockRegisters(ModbusPollBlock block, ushort[] rawRegs)
         {
+            var rawSpan = rawRegs.AsSpan();
             foreach (var tagMapping in block.Tags)
             {
                 int offsetIndex = tagMapping.Offset - block.StartOffset;
                 if (offsetIndex < 0 || offsetIndex + tagMapping.RegCount > rawRegs.Length) continue;
 
-                var slice = new ushort[tagMapping.RegCount];
-                Array.Copy(rawRegs, offsetIndex, slice, 0, tagMapping.RegCount);
-
+                var slice = rawSpan.Slice(offsetIndex, tagMapping.RegCount);
                 var val = ParseRegisters(slice, tagMapping.Tag.DataType, _config.ByteOrder);
                 if (val != null)
                 {
@@ -441,53 +466,92 @@ namespace AvaloniaApplication1.Services.Protocols
             functionCode = 3;
             startAddress = 0;
 
-            if (string.IsNullOrEmpty(address)) return false;
+            if (string.IsNullOrWhiteSpace(address)) return false;
 
-            if (address.StartsWith("0"))
+            address = address.Trim();
+
+            // 5-digit Modbus convention (0xxxx = coils, 1xxxx = discrete inputs, 3xxxx = input regs, 4xxxx = holding regs)
+            if (address.Length >= 5 && uint.TryParse(address, out uint fullAddr))
+            {
+                if (fullAddr >= 40001 && fullAddr <= 49999)
+                {
+                    functionCode = 3;
+                    startAddress = (ushort)fullAddr;
+                    return true;
+                }
+                if (fullAddr >= 30001 && fullAddr <= 39999)
+                {
+                    functionCode = 4;
+                    startAddress = (ushort)fullAddr;
+                    return true;
+                }
+                if (fullAddr >= 10001 && fullAddr <= 19999)
+                {
+                    functionCode = 2;
+                    startAddress = (ushort)fullAddr;
+                    return true;
+                }
+                if (address.StartsWith("0") && fullAddr >= 1 && fullAddr <= 9999)
+                {
+                    functionCode = 1;
+                    startAddress = (ushort)fullAddr;
+                    return true;
+                }
+            }
+
+            // Direct coil address (e.g. "0", "00", "00001")
+            if (address.StartsWith("0") && ushort.TryParse(address, out ushort coilAddr))
             {
                 functionCode = 1;
-                return ushort.TryParse(address, out startAddress) && startAddress >= 1;
-            }
-            if (address.StartsWith("1"))
-            {
-                functionCode = 2;
-                return ushort.TryParse(address, out startAddress) && startAddress >= 10001;
-            }
-            if (address.StartsWith("3"))
-            {
-                functionCode = 4;
-                return ushort.TryParse(address, out startAddress) && startAddress >= 30001;
-            }
-            if (address.StartsWith("4"))
-            {
-                functionCode = 3;
-                return ushort.TryParse(address, out startAddress) && startAddress >= 40001;
+                startAddress = coilAddr;
+                return true;
             }
 
-            return ushort.TryParse(address, out startAddress);
+            // Direct offset (default Holding Register FC 3)
+            if (ushort.TryParse(address, out ushort directAddr))
+            {
+                functionCode = 3;
+                startAddress = directAddr;
+                return true;
+            }
+
+            return false;
         }
 
         public static ushort GetModbusOffset(byte functionCode, ushort address)
         {
             switch (functionCode)
             {
-                case 1: return (ushort)(address - 1);
-                case 2: return (ushort)(address - 10001);
-                case 3: return (ushort)(address - 40001);
-                case 4: return (ushort)(address - 30001);
+                case 1: return (ushort)(address >= 1 ? address - 1 : address);
+                case 2: return (ushort)(address >= 10001 ? address - 10001 : address);
+                case 3: return (ushort)(address >= 40001 ? address - 40001 : address);
+                case 4: return (ushort)(address >= 30001 ? address - 30001 : address);
                 default: return address;
             }
         }
 
         private static ushort SwapBytes(ushort value) => (ushort)((value >> 8) | (value << 8));
 
-        private static object ParseRegisters(ushort[] regs, string dataType, string byteOrder)
+        private static object ParseRegisters(ReadOnlySpan<ushort> regs, string dataType, string byteOrder)
         {
             if (regs.Length == 1)
             {
                 if (dataType == "Int16") return (short)regs[0];
                 if (dataType == "Bool") return regs[0] > 0;
                 return regs[0];
+            }
+
+            if (regs.Length >= 4 && dataType == "Double")
+            {
+                ushort r0 = regs[0], r1 = regs[1], r2 = regs[2], r3 = regs[3];
+                ulong val = byteOrder switch
+                {
+                    "ABCD" => ((ulong)r0 << 48) | ((ulong)r1 << 32) | ((ulong)r2 << 16) | r3,
+                    "CDAB" => ((ulong)r1 << 48) | ((ulong)r0 << 32) | ((ulong)r3 << 16) | r2,
+                    "BADC" => ((ulong)SwapBytes(r0) << 48) | ((ulong)SwapBytes(r1) << 32) | ((ulong)SwapBytes(r2) << 16) | SwapBytes(r3),
+                    _ => ((ulong)SwapBytes(r3) << 48) | ((ulong)SwapBytes(r2) << 32) | ((ulong)SwapBytes(r1) << 16) | SwapBytes(r0) // DCBA
+                };
+                return BitConverter.UInt64BitsToDouble(val);
             }
 
             if (regs.Length >= 2)
