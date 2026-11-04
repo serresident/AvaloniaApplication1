@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        xmlns:models="clr-namespace:AvaloniaApplication1.Models"
         xmlns:controls="clr-namespace:AvaloniaApplication1.Views.Controls"
         mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="700"
         x:Class="AvaloniaApplication1.Views.WidgetEditorWindow"
@@ -94,6 +95,18 @@
                     <StackPanel Spacing="8">
                         <TextBlock Text="Источник данных (Связь с ПЛК / Тэг)" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
                         
+                        <TextBlock Text="Тег из базы TagManager (Rapid SCADA)" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableTags}" 
+                                  SelectedItem="{Binding SelectedTag}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="-- Выберите тег из базы --">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:TagDefinition">
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
                         <TextBlock Text="Подключение (Драйвер)" Foreground="#AAAAAA" FontSize="11" />
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
                                   SelectedItem="{Binding SelectedConnectionId}"

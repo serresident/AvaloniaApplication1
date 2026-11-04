@@ -1219,4 +1219,41 @@
     *   Тесты: `dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj` — **18/18 PASS**.
     *   Headless-рендер: `scripts/render_ui.ps1 DashboardView` сгенерировал чистый снимок `artifacts/ui_preview.png` и `artifacts/ui_tree.json` без коллизий.
 
+---
+
+## 📅 03.11.2026 (Сессия 43 — Реализация промышленной архитектуры TagManager по стандартам Rapid SCADA v6, Watchdog и упрочнение Modbus /boost)
+
+### 📌 Достижение: Полная интеграция архитектуры Rapid SCADA v6 (ScadaCommon / ScadaData / ScadaComm), ликвидация дефектов сокетов Modbus, Watchdog-таймер устаревания, ручное переопределение и миграция схемы v1 -> v2
+
+*   **Доменный слой (Domain Layer):**
+    *   `TagQuality.cs`: Создан промышленный перечислитель флагов достоверности телеметрии OPC-уровня (`Good`, `Bad`, `CommFailure`, `Timeout`, `Stale`, `OutOfRange`, `Overridden`, `Uninitialized`).
+    *   `TagSnapshot.cs`: Создана легковесная структура `readonly record struct TagSnapshot` с нулевыми аллокациями памяти для передачи точки-в-времени состояния тега.
+    *   `TagDefinition.cs`: Описан класс метаданных тега (уникальный `TagId`, человекопонятное имя, привязка `ConnId`/`Address`, тип данных, зона нечувствительности `Deadband` и допустимый интервал `StaleTimeout`).
+    *   `TagData.cs`: Расширен для обратной совместимости опциональными полями `Quality` и `Timestamp`.
+
+*   **Сервисный слой TagManager и сторожевой таймер (Watchdog):**
+    *   `TagManagerService.cs` и `ITagManagerService.cs`: Разработан движок тегов с быстрым поиском через `ConcurrentDictionary`, прозрачным кэшем снимков и реактивным потоком `SnapshotUpdates`.
+    *   **Stale Watchdog:** Внедрен фоновый опрос (шаг 500 мс). Если сигнал от ПЛК задерживается на время $> \text{StaleTimeout}$, статус автоматически деградирует в `TagQuality.Stale`. Если задержка превышает $> 2 \times \text{StaleTimeout}$, статус переходит в `TagQuality.Timeout`. Это исключает «невидимое зависание» (Silent Freeze) технологических мнемосхем.
+    *   **Operator Override & Safety:** Оператор может принудительно задавать технологические значения (`ForceOverride`) и снимать фиксацию (`ClearOverride`). Установленный оператором флаг `[M]` защищен от стирания приходящими с сети пакетами телеметрии.
+
+*   **Упрочнение сетевого драйвера Modbus (`ModbusProtocolDriver.cs`):**
+    *   **Устранение дефекта сокетов:** Ликвидирован критический архитектурный дефект создания `new TcpClient()` на каждую команду записи. Внедрен единый постоянный сокет на подключение, управляемый через приоритетную очередь команд `Channel<ModbusWriteRequest>`.
+    *   **Приоритет команд:** Любые команды записи от оператора выполняются немедленно, прерывая или упреждая цикл фонового опроса.
+    *   **Пакетный опрос (Coalescing & PDU Splitting):** Реализована автоматическая сортировка и объединение смежных регистров с зазором `MaxGap <= 5` в единые bulk-кадры функций FC1, FC2, FC3, FC4, с дроблением блоков при достижении 120 регистров (`<= 120`).
+
+*   **Однократная миграция конфигурации (Schema v1 -> v2):**
+    *   `ConfigMigrationService.cs`: Автоматически проверяет версию схемы при загрузке `config.json`. При `SchemaVersion < 2` создает резервную копию `config.v1.backup.json`, рекурсивно собирает все встроенные адреса виджетов и мнемосхем, генерирует централизованный словарь `Tags: [ ... ]`, привязывает `Source.TagId` и перезаписывает конфигурацию в формате Schema v2.
+    *   Предусмотрен прозрачный рантайм-фолбэк для любых неизвестных или динамических тегов с автосинтезом на лету.
+
+*   **Человеко-машинный интерфейс (High-Performance HMI / ISA-101):**
+    *   `WidgetViewModelBase.cs`: Реактивная подписка на `SnapshotUpdates`, обновление `QualityOpacity` (0.55 при деградации, 1.0 в норме), диагностический `QualityToolTip`, визуальные глифы (`[M]` для Overridden, `⏳` для Stale, `⚠️` для CommFailure).
+    *   `DashboardView.axaml`: Стилизация `ContentPresenter` со сквозным диммингом и тултипами, аккуратные угловые бейджи глифов качества в виджетах.
+    *   `DashboardPanel.cs`: Добавлены пункты контекстного меню для ручного переопределения («⚡ Принудительно задать значение (Override)...») и снятия фиксации («Снять ручное переопределение [M]»).
+    *   `WidgetEditorWindow.axaml` & `WidgetEditorViewModel.cs`: Встроен выпадающий селектор тегов из базы `TagManager` с автозаполнением адреса, подключения и типа данных.
+
+*   **Верификация и тестирование:**
+    *   Сборка: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj` — **0 ошибок, 0 предупреждений**.
+    *   Тесты: `dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj` — **19/19 PASS** (100% прохождение, включая комплексный тест №19).
+    *   Рендеринг: Headless-скриншот `artifacts/ui_preview.png` и `artifacts/ui_tree.json` успешно обновлены.
+
 

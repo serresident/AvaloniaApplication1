@@ -1,7 +1,9 @@
 {
+  "SchemaVersion": 2,
   "Project": {
-    "Name": "Аппарат 511 - Отделение азосочетания (Цех 15)",
-    "Version": "1.0.0"
+    "Name": "\u0410\u043F\u043F\u0430\u0440\u0430\u0442 511 - \u041E\u0442\u0434\u0435\u043B\u0435\u043D\u0438\u0435 \u0430\u0437\u043E\u0441\u043E\u0447\u0435\u0442\u0430\u043D\u0438\u044F (\u0426\u0435\u0445 15)",
+    "Version": "1.0.0",
+    "IsCompactMode": false
   },
   "Security": {
     "RequirePasswordForDesignMode": false,
@@ -17,14 +19,450 @@
       "ByteOrder": "CDAB"
     }
   ],
+  "Tags": [
+    {
+      "TagId": "tag_plc_511_30017",
+      "Name": "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 R-511",
+      "ConnId": "plc_511",
+      "Address": "30017",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30015",
+      "Name": "pH \u0441\u0440\u0435\u0434\u044B R-511",
+      "ConnId": "plc_511",
+      "Address": "30015",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30035",
+      "Name": "\u0420\u0430\u0441\u0445\u043E\u0434 \u0434\u0438\u0430\u0437\u043E\u0441\u043E\u0435\u0434\u0438\u043D\u0435\u043D\u0438\u044F",
+      "ConnId": "plc_511",
+      "Address": "30035",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30023",
+      "Name": "\u0420\u0430\u0441\u0445\u043E\u0434 \u0441\u043E\u0434\u044B 14%",
+      "ConnId": "plc_511",
+      "Address": "30023",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40121",
+      "Name": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0422 \u043D\u0430\u0433\u0440\u0435\u0432\u0430",
+      "ConnId": "plc_511",
+      "Address": "40121",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40119",
+      "Name": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0434\u043E\u0437\u044B \u0432\u043E\u0434\u044B",
+      "ConnId": "plc_511",
+      "Address": "40119",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40123",
+      "Name": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0434\u0438\u0430\u0437\u043E",
+      "ConnId": "plc_511",
+      "Address": "40123",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40153",
+      "Name": "\u0426\u0435\u043B\u0435\u0432\u043E\u0439 pH",
+      "ConnId": "plc_511",
+      "Address": "40153",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40133",
+      "Name": "\u041F\u0418\u0414 \u043F\u0430\u0440\u0430: Kp",
+      "ConnId": "plc_511",
+      "Address": "40133",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40135",
+      "Name": "\u041F\u0418\u0414 \u043F\u0430\u0440\u0430: Tn",
+      "ConnId": "plc_511",
+      "Address": "40135",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40149",
+      "Name": "pH \u041C\u0438\u043D",
+      "ConnId": "plc_511",
+      "Address": "40149",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40151",
+      "Name": "pH \u041C\u0430\u043A\u0441",
+      "ConnId": "plc_511",
+      "Address": "40151",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30019",
+      "Name": "\u0410\u043F\u043F\u0430\u0440\u0430\u0442 511",
+      "ConnId": "plc_511",
+      "Address": "30019",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00005",
+      "Name": "YV1 (\u0412\u043E\u0434\u0430)",
+      "ConnId": "plc_511",
+      "Address": "00005",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_10500",
+      "Name": "YV1 (\u0412\u043E\u0434\u0430)_Feedback",
+      "ConnId": "plc_511",
+      "Address": "10500",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00004",
+      "Name": "YV1 (\u0412\u043E\u0434\u0430)_Mode",
+      "ConnId": "plc_511",
+      "Address": "00004",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30027",
+      "Name": "\u0420\u0430\u0441\u0445\u043E\u0434 \u0432\u043E\u0434\u044B",
+      "ConnId": "plc_511",
+      "Address": "30027",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30031",
+      "Name": "\u041D\u0430\u043B\u0438\u0442\u043E \u0432\u043E\u0434\u044B",
+      "ConnId": "plc_511",
+      "Address": "30031",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00007",
+      "Name": "\u041F\u0443\u0441\u043A \u0434\u043E\u0437\u044B",
+      "ConnId": "plc_511",
+      "Address": "00007",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40107",
+      "Name": "FCV1 (\u0414\u0438\u0430\u0437\u043E)",
+      "ConnId": "plc_511",
+      "Address": "40107",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30009",
+      "Name": "FCV1 (\u0414\u0438\u0430\u0437\u043E)_Feedback",
+      "ConnId": "plc_511",
+      "Address": "30009",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00001",
+      "Name": "FCV1 (\u0414\u0438\u0430\u0437\u043E)_Mode",
+      "ConnId": "plc_511",
+      "Address": "00001",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30037",
+      "Name": "\u041E\u0431\u044A\u0435\u043C \u0434\u0438\u0430\u0437\u043E",
+      "ConnId": "plc_511",
+      "Address": "30037",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40109",
+      "Name": "FCV2 (\u0421\u043E\u0434\u0430)",
+      "ConnId": "plc_511",
+      "Address": "40109",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30011",
+      "Name": "FCV2 (\u0421\u043E\u0434\u0430)_Feedback",
+      "ConnId": "plc_511",
+      "Address": "30011",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00002",
+      "Name": "FCV2 (\u0421\u043E\u0434\u0430)_Mode",
+      "ConnId": "plc_511",
+      "Address": "00002",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30025",
+      "Name": "\u041E\u0431\u044A\u0435\u043C \u0441\u043E\u0434\u044B",
+      "ConnId": "plc_511",
+      "Address": "30025",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_40111",
+      "Name": "TCV1 (\u041F\u0430\u0440)",
+      "ConnId": "plc_511",
+      "Address": "40111",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30013",
+      "Name": "TCV1 (\u041F\u0430\u0440)_Feedback",
+      "ConnId": "plc_511",
+      "Address": "30013",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00003",
+      "Name": "TCV1 (\u041F\u0430\u0440)_Mode",
+      "ConnId": "plc_511",
+      "Address": "00003",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00008",
+      "Name": "\u041F\u0443\u0441\u043A \u043D\u0430\u0433\u0440\u0435\u0432\u0430",
+      "ConnId": "plc_511",
+      "Address": "00008",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00013",
+      "Name": "\u0423\u0434\u0435\u0440\u0436\u0430\u043D\u0438\u0435",
+      "ConnId": "plc_511",
+      "Address": "00013",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30021",
+      "Name": "\u0412\u0435\u0441\u044B WE-2",
+      "ConnId": "plc_511",
+      "Address": "30021",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00009",
+      "Name": "\u041F\u0443\u0441\u043A \u0441\u0442\u0430\u0434\u0438\u0438",
+      "ConnId": "plc_511",
+      "Address": "00009",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00012",
+      "Name": "\u041F\u0430\u0443\u0437\u0430 \u0441\u0442\u0430\u0434\u0438\u0438",
+      "ConnId": "plc_511",
+      "Address": "00012",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00010",
+      "Name": "\u0418\u0434\u0435\u0442 \u0441\u043E\u0447\u0435\u0442\u0430\u043D\u0438\u0435",
+      "ConnId": "plc_511",
+      "Address": "00010",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_00011",
+      "Name": "\u0421\u0442\u0430\u0434\u0438\u044F \u0433\u043E\u0442\u043E\u0432\u0430",
+      "ConnId": "plc_511",
+      "Address": "00011",
+      "DataType": "Bool",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30043",
+      "Name": "\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C \u0432\u0440\u0435\u043C\u0435\u043D\u0438",
+      "ConnId": "plc_511",
+      "Address": "30043",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_plc_511_30045",
+      "Name": "\u042D\u0442\u0430\u043F \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0430",
+      "ConnId": "plc_511",
+      "Address": "30045",
+      "DataType": "Float32",
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    }
+  ],
   "BridgeRules": [],
   "Dashboard": {
     "CellSize": 160,
+    "ZoomScale": 1,
     "Widgets": [
       {
+        "Format": "{0:F1} \u00B0C",
+        "MinValue": 0,
+        "MaxValue": 100,
         "Type": "RealTimeTrend",
-        "Title": "Температура R-511",
+        "Title": "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 R-511",
         "Source": {
+          "TagId": "tag_plc_511_30017",
           "ConnId": "plc_511",
           "Address": "30017",
           "DataType": "Float32"
@@ -35,14 +473,22 @@
           "SizeX": 2,
           "SizeY": 2
         },
-        "MinValue": 0,
-        "MaxValue": 100,
-        "Format": "{0:F1} °C"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F2} pH",
+        "MinValue": 7,
+        "MaxValue": 13,
         "Type": "RealTimeTrend",
-        "Title": "pH среды R-511",
+        "Title": "pH \u0441\u0440\u0435\u0434\u044B R-511",
         "Source": {
+          "TagId": "tag_plc_511_30015",
           "ConnId": "plc_511",
           "Address": "30015",
           "DataType": "Float32"
@@ -53,14 +499,22 @@
           "SizeX": 2,
           "SizeY": 2
         },
-        "MinValue": 7,
-        "MaxValue": 13,
-        "Format": "{0:F2} pH"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u043C\u00B3/\u0447",
+        "MinValue": 0,
+        "MaxValue": 25,
         "Type": "RealTimeTrend",
-        "Title": "Расход диазосоединения",
+        "Title": "\u0420\u0430\u0441\u0445\u043E\u0434 \u0434\u0438\u0430\u0437\u043E\u0441\u043E\u0435\u0434\u0438\u043D\u0435\u043D\u0438\u044F",
         "Source": {
+          "TagId": "tag_plc_511_30035",
           "ConnId": "plc_511",
           "Address": "30035",
           "DataType": "Float32"
@@ -71,14 +525,22 @@
           "SizeX": 2,
           "SizeY": 2
         },
-        "MinValue": 0,
-        "MaxValue": 25,
-        "Format": "{0:F1} м³/ч"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u043C\u00B3/\u0447",
+        "MinValue": 0,
+        "MaxValue": 10,
         "Type": "RealTimeTrend",
-        "Title": "Расход соды 14%",
+        "Title": "\u0420\u0430\u0441\u0445\u043E\u0434 \u0441\u043E\u0434\u044B 14%",
         "Source": {
+          "TagId": "tag_plc_511_30023",
           "ConnId": "plc_511",
           "Address": "30023",
           "DataType": "Float32"
@@ -89,26 +551,30 @@
           "SizeX": 2,
           "SizeY": 2
         },
-        "MinValue": 0,
-        "MaxValue": 10,
-        "Format": "{0:F1} м³/ч"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
-        "Type": "ContainerButton",
-        "Title": "🎛️ Уставки дозирования и нагрева",
-        "Position": {
-          "Row": 0,
-          "Col": 4,
-          "SizeX": 2,
-          "SizeY": 2
-        },
         "CellSize": 140,
-        "ZoomScale": 1.0,
+        "ZoomScale": 1,
         "Children": [
           {
+            "Format": "{0:F1} \u00B0C",
+            "MinValue": 0,
+            "MaxValue": 100,
+            "ValueColor": "",
+            "ValueFontSize": 0,
+            "Unit": "",
+            "LayoutMode": "Vertical",
             "Type": "SetValue",
-            "Title": "Уставка Т нагрева",
+            "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0422 \u043D\u0430\u0433\u0440\u0435\u0432\u0430",
             "Source": {
+              "TagId": "tag_plc_511_40121",
               "ConnId": "plc_511",
               "Address": "40121",
               "DataType": "Float32"
@@ -119,14 +585,26 @@
               "SizeX": 1,
               "SizeY": 1
             },
-            "MinValue": 0,
-            "MaxValue": 100,
-            "Format": "{0:F1} °C"
+            "FontSize": 0,
+            "AutoScaleText": true,
+            "ShowTitle": true,
+            "ShowBorder": true,
+            "LabelPosition": "Default",
+            "CompactMode": false,
+            "GroupId": null
           },
           {
+            "Format": "{0:F1} \u043C\u00B3",
+            "MinValue": 0,
+            "MaxValue": 20,
+            "ValueColor": "",
+            "ValueFontSize": 0,
+            "Unit": "",
+            "LayoutMode": "Vertical",
             "Type": "SetValue",
-            "Title": "Уставка дозы воды",
+            "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0434\u043E\u0437\u044B \u0432\u043E\u0434\u044B",
             "Source": {
+              "TagId": "tag_plc_511_40119",
               "ConnId": "plc_511",
               "Address": "40119",
               "DataType": "Float32"
@@ -137,14 +615,26 @@
               "SizeX": 1,
               "SizeY": 1
             },
-            "MinValue": 0,
-            "MaxValue": 20,
-            "Format": "{0:F1} м³"
+            "FontSize": 0,
+            "AutoScaleText": true,
+            "ShowTitle": true,
+            "ShowBorder": true,
+            "LabelPosition": "Default",
+            "CompactMode": false,
+            "GroupId": null
           },
           {
+            "Format": "{0:F1} \u043C\u00B3/\u0447",
+            "MinValue": 0,
+            "MaxValue": 25,
+            "ValueColor": "",
+            "ValueFontSize": 0,
+            "Unit": "",
+            "LayoutMode": "Vertical",
             "Type": "SetValue",
-            "Title": "Уставка диазо",
+            "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0434\u0438\u0430\u0437\u043E",
             "Source": {
+              "TagId": "tag_plc_511_40123",
               "ConnId": "plc_511",
               "Address": "40123",
               "DataType": "Float32"
@@ -155,14 +645,26 @@
               "SizeX": 1,
               "SizeY": 1
             },
-            "MinValue": 0,
-            "MaxValue": 25,
-            "Format": "{0:F1} м³/ч"
+            "FontSize": 0,
+            "AutoScaleText": true,
+            "ShowTitle": true,
+            "ShowBorder": true,
+            "LabelPosition": "Default",
+            "CompactMode": false,
+            "GroupId": null
           },
           {
+            "Format": "{0:F2} pH",
+            "MinValue": 7,
+            "MaxValue": 12,
+            "ValueColor": "",
+            "ValueFontSize": 0,
+            "Unit": "",
+            "LayoutMode": "Vertical",
             "Type": "SetValue",
-            "Title": "Целевой pH",
+            "Title": "\u0426\u0435\u043B\u0435\u0432\u043E\u0439 pH",
             "Source": {
+              "TagId": "tag_plc_511_40153",
               "ConnId": "plc_511",
               "Address": "40153",
               "DataType": "Float32"
@@ -173,28 +675,53 @@
               "SizeX": 1,
               "SizeY": 1
             },
-            "MinValue": 7,
-            "MaxValue": 12,
-            "Format": "{0:F2} pH"
+            "FontSize": 0,
+            "AutoScaleText": true,
+            "ShowTitle": true,
+            "ShowBorder": true,
+            "LabelPosition": "Default",
+            "CompactMode": false,
+            "GroupId": null
           }
-        ]
-      },
-      {
+        ],
         "Type": "ContainerButton",
-        "Title": "⚙️ Параметры ПИД и pH",
+        "Title": "\uD83C\uDF9B\uFE0F \u0423\u0441\u0442\u0430\u0432\u043A\u0438 \u0434\u043E\u0437\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F \u0438 \u043D\u0430\u0433\u0440\u0435\u0432\u0430",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
         "Position": {
-          "Row": 2,
+          "Row": 0,
           "Col": 4,
           "SizeX": 2,
           "SizeY": 2
         },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
         "CellSize": 140,
-        "ZoomScale": 1.0,
+        "ZoomScale": 1,
         "Children": [
           {
+            "Format": "{0:F1}",
+            "MinValue": 0,
+            "MaxValue": 50,
+            "ValueColor": "",
+            "ValueFontSize": 0,
+            "Unit": "",
+            "LayoutMode": "Vertical",
             "Type": "SetValue",
-            "Title": "ПИД пара: Kp",
+            "Title": "\u041F\u0418\u0414 \u043F\u0430\u0440\u0430: Kp",
             "Source": {
+              "TagId": "tag_plc_511_40133",
               "ConnId": "plc_511",
               "Address": "40133",
               "DataType": "Float32"
@@ -205,14 +732,26 @@
               "SizeX": 1,
               "SizeY": 1
             },
-            "MinValue": 0,
-            "MaxValue": 50,
-            "Format": "{0:F1}"
+            "FontSize": 0,
+            "AutoScaleText": true,
+            "ShowTitle": true,
+            "ShowBorder": true,
+            "LabelPosition": "Default",
+            "CompactMode": false,
+            "GroupId": null
           },
           {
+            "Format": "{0:F1} \u0441",
+            "MinValue": 0,
+            "MaxValue": 100,
+            "ValueColor": "",
+            "ValueFontSize": 0,
+            "Unit": "",
+            "LayoutMode": "Vertical",
             "Type": "SetValue",
-            "Title": "ПИД пара: Tn",
+            "Title": "\u041F\u0418\u0414 \u043F\u0430\u0440\u0430: Tn",
             "Source": {
+              "TagId": "tag_plc_511_40135",
               "ConnId": "plc_511",
               "Address": "40135",
               "DataType": "Float32"
@@ -223,14 +762,26 @@
               "SizeX": 1,
               "SizeY": 1
             },
-            "MinValue": 0,
-            "MaxValue": 100,
-            "Format": "{0:F1} с"
+            "FontSize": 0,
+            "AutoScaleText": true,
+            "ShowTitle": true,
+            "ShowBorder": true,
+            "LabelPosition": "Default",
+            "CompactMode": false,
+            "GroupId": null
           },
           {
+            "Format": "{0:F2} pH",
+            "MinValue": 7,
+            "MaxValue": 12,
+            "ValueColor": "",
+            "ValueFontSize": 0,
+            "Unit": "",
+            "LayoutMode": "Vertical",
             "Type": "SetValue",
-            "Title": "pH Мин",
+            "Title": "pH \u041C\u0438\u043D",
             "Source": {
+              "TagId": "tag_plc_511_40149",
               "ConnId": "plc_511",
               "Address": "40149",
               "DataType": "Float32"
@@ -241,14 +792,26 @@
               "SizeX": 1,
               "SizeY": 1
             },
-            "MinValue": 7,
-            "MaxValue": 12,
-            "Format": "{0:F2} pH"
+            "FontSize": 0,
+            "AutoScaleText": true,
+            "ShowTitle": true,
+            "ShowBorder": true,
+            "LabelPosition": "Default",
+            "CompactMode": false,
+            "GroupId": null
           },
           {
+            "Format": "{0:F2} pH",
+            "MinValue": 7,
+            "MaxValue": 14,
+            "ValueColor": "",
+            "ValueFontSize": 0,
+            "Unit": "",
+            "LayoutMode": "Vertical",
             "Type": "SetValue",
-            "Title": "pH Макс",
+            "Title": "pH \u041C\u0430\u043A\u0441",
             "Source": {
+              "TagId": "tag_plc_511_40151",
               "ConnId": "plc_511",
               "Address": "40151",
               "DataType": "Float32"
@@ -259,638 +822,1133 @@
               "SizeX": 1,
               "SizeY": 1
             },
-            "MinValue": 7,
-            "MaxValue": 14,
-            "Format": "{0:F2} pH"
+            "FontSize": 0,
+            "AutoScaleText": true,
+            "ShowTitle": true,
+            "ShowBorder": true,
+            "LabelPosition": "Default",
+            "CompactMode": false,
+            "GroupId": null
           }
-        ]
+        ],
+        "Type": "ContainerButton",
+        "Title": "\u2699\uFE0F \u041F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u044B \u041F\u0418\u0414 \u0438 pH",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 2,
+          "Col": 4,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       }
     ]
   },
   "Mimic": {
     "CellSize": 10,
+    "ZoomScale": 1,
     "Widgets": [
       {
+        "AgitatorSource": null,
+        "TempSource": {
+          "TagId": "tag_plc_511_30017",
+          "ConnId": "plc_511",
+          "Address": "30017",
+          "DataType": "Float32"
+        },
+        "MinValue": 0,
+        "MaxValue": 5000,
+        "Format": "{0:F0} \u043A\u0433",
+        "HasJacket": true,
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#455A64",
         "Type": "Reactor",
-        "Title": "Аппарат 511",
+        "Title": "\u0410\u043F\u043F\u0430\u0440\u0430\u0442 511",
+        "Source": {
+          "TagId": "tag_plc_511_30019",
+          "ConnId": "plc_511",
+          "Address": "30019",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 22,
           "Col": 56,
           "SizeX": 20,
           "SizeY": 26
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30019",
-          "DataType": "Float32"
-        },
-        "TempSource": {
-          "ConnId": "plc_511",
-          "Address": "30017",
-          "DataType": "Float32"
-        },
-        "HasJacket": true,
-        "Format": "{0:F0} кг",
-        "MinValue": 0,
-        "MaxValue": 5000,
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#455A64"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "PipePoints": "0,0;24,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
         "Type": "Pipe",
-        "Title": "Линия Воды к YV1",
+        "Title": "\u041B\u0438\u043D\u0438\u044F \u0412\u043E\u0434\u044B \u043A YV1",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
         "Position": {
           "Row": 6.5,
           "Col": 14.5,
           "SizeX": 25,
           "SizeY": 1
         },
-        "PipePoints": "0,0;24,0",
-        "Thickness": 12,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": {
+          "TagId": "tag_plc_511_10500",
+          "ConnId": "plc_511",
+          "Address": "10500",
+          "DataType": "Bool"
+        },
+        "ClosedFeedbackSource": null,
+        "IsVertical": false,
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": {
+          "TagId": "tag_plc_511_00004",
+          "ConnId": "plc_511",
+          "Address": "00004",
+          "DataType": "Bool"
+        },
+        "ShowStatusText": true,
+        "LabelOffset": 0,
         "Type": "Valve",
-        "Title": "YV1 (Вода)",
+        "Title": "YV1 (\u0412\u043E\u0434\u0430)",
+        "Source": {
+          "TagId": "tag_plc_511_00005",
+          "ConnId": "plc_511",
+          "Address": "00005",
+          "DataType": "Bool"
+        },
         "Position": {
           "Row": 4,
           "Col": 39,
           "SizeX": 6,
           "SizeY": 6
         },
-        "ValveType": "CutOff",
-        "ActuatorType": "Solenoid",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "00005",
-          "DataType": "Bool"
-        },
-        "ModeSource": {
-          "ConnId": "plc_511",
-          "Address": "00004",
-          "DataType": "Bool"
-        },
-        "FeedbackSource": {
-          "ConnId": "plc_511",
-          "Address": "10500",
-          "DataType": "Bool"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "PipePoints": "0,0;20,0;20,15",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
         "Type": "Pipe",
-        "Title": "Линия Воды от YV1 в R511",
+        "Title": "\u041B\u0438\u043D\u0438\u044F \u0412\u043E\u0434\u044B \u043E\u0442 YV1 \u0432 R511",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
         "Position": {
           "Row": 6.5,
           "Col": 45.5,
           "SizeX": 21,
           "SizeY": 16
         },
-        "PipePoints": "0,0;20,0;20,15",
-        "Thickness": 12,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u043C\u00B3/\u0447",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Расход воды",
-        "Position": {
-          "Row": 1,
-          "Col": 14,
-          "SizeX": 11,
-          "SizeY": 4
-        },
+        "Title": "\u0420\u0430\u0441\u0445\u043E\u0434 \u0432\u043E\u0434\u044B",
         "Source": {
+          "TagId": "tag_plc_511_30027",
           "ConnId": "plc_511",
           "Address": "30027",
           "DataType": "Float32"
         },
-        "Format": "{0:F1} м³/ч"
+        "Position": {
+          "Row": 1,
+          "Col": 14,
+          "SizeX": 11,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F2} \u043C\u00B3",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Налито воды",
+        "Title": "\u041D\u0430\u043B\u0438\u0442\u043E \u0432\u043E\u0434\u044B",
+        "Source": {
+          "TagId": "tag_plc_511_30031",
+          "ConnId": "plc_511",
+          "Address": "30031",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 1,
           "Col": 26,
           "SizeX": 11,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30031",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F2} м³"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u043C\u00B3",
+        "MinValue": 0,
+        "MaxValue": 20,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
         "Type": "SetValue",
-        "Title": "Уставка дозы",
+        "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0434\u043E\u0437\u044B",
+        "Source": {
+          "TagId": "tag_plc_511_40119",
+          "ConnId": "plc_511",
+          "Address": "40119",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 9,
           "Col": 14,
           "SizeX": 11,
           "SizeY": 5
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40119",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} м³",
-        "MinValue": 0,
-        "MaxValue": 20
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "ButtonMode": "Toggle",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
         "Type": "CommandButton",
-        "Title": "Пуск дозы",
+        "Title": "\u041F\u0443\u0441\u043A \u0434\u043E\u0437\u044B",
+        "Source": {
+          "TagId": "tag_plc_511_00007",
+          "ConnId": "plc_511",
+          "Address": "00007",
+          "DataType": "Bool"
+        },
         "Position": {
           "Row": 9,
           "Col": 26,
           "SizeX": 11,
           "SizeY": 5
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "00007",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Toggle"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "PipePoints": "0,0;19,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
         "Type": "Pipe",
-        "Title": "Линия Диазо к FCV1",
+        "Title": "\u041B\u0438\u043D\u0438\u044F \u0414\u0438\u0430\u0437\u043E \u043A FCV1",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
         "Position": {
           "Row": 24.5,
           "Col": 10.5,
           "SizeX": 20,
           "SizeY": 1
         },
-        "PipePoints": "0,0;19,0",
-        "Thickness": 12,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "ValveType": "Regulating",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": {
+          "TagId": "tag_plc_511_30009",
+          "ConnId": "plc_511",
+          "Address": "30009",
+          "DataType": "Float32"
+        },
+        "ClosedFeedbackSource": null,
+        "IsVertical": false,
+        "ActuatorType": "Pneumatic",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": {
+          "TagId": "tag_plc_511_00001",
+          "ConnId": "plc_511",
+          "Address": "00001",
+          "DataType": "Bool"
+        },
+        "ShowStatusText": true,
+        "LabelOffset": 0,
         "Type": "Valve",
-        "Title": "FCV1 (Диазо)",
+        "Title": "FCV1 (\u0414\u0438\u0430\u0437\u043E)",
+        "Source": {
+          "TagId": "tag_plc_511_40107",
+          "ConnId": "plc_511",
+          "Address": "40107",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 22,
           "Col": 30,
           "SizeX": 6,
           "SizeY": 6
         },
-        "ValveType": "Regulating",
-        "ActuatorType": "Pneumatic",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40107",
-          "DataType": "Float32"
-        },
-        "ModeSource": {
-          "ConnId": "plc_511",
-          "Address": "00001",
-          "DataType": "Bool"
-        },
-        "FeedbackSource": {
-          "ConnId": "plc_511",
-          "Address": "30009",
-          "DataType": "Float32"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "PipePoints": "0,0;19,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
         "Type": "Pipe",
-        "Title": "Линия Диазо от FCV1 в R511",
+        "Title": "\u041B\u0438\u043D\u0438\u044F \u0414\u0438\u0430\u0437\u043E \u043E\u0442 FCV1 \u0432 R511",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
         "Position": {
           "Row": 24.5,
           "Col": 36.5,
           "SizeX": 20,
           "SizeY": 1
         },
-        "PipePoints": "0,0;19,0",
-        "Thickness": 12,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u043C\u00B3/\u0447",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Расход диазо",
+        "Title": "\u0420\u0430\u0441\u0445\u043E\u0434 \u0434\u0438\u0430\u0437\u043E",
+        "Source": {
+          "TagId": "tag_plc_511_30035",
+          "ConnId": "plc_511",
+          "Address": "30035",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 17,
           "Col": 9,
           "SizeX": 10,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30035",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} м³/ч"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F2} \u043C\u00B3",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Объем диазо",
+        "Title": "\u041E\u0431\u044A\u0435\u043C \u0434\u0438\u0430\u0437\u043E",
+        "Source": {
+          "TagId": "tag_plc_511_30037",
+          "ConnId": "plc_511",
+          "Address": "30037",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 17,
           "Col": 20,
           "SizeX": 10,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30037",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F2} м³"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u043C\u00B3/\u0447",
+        "MinValue": 0,
+        "MaxValue": 25,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
         "Type": "SetValue",
-        "Title": "Уставка расхода",
+        "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0440\u0430\u0441\u0445\u043E\u0434\u0430",
+        "Source": {
+          "TagId": "tag_plc_511_40123",
+          "ConnId": "plc_511",
+          "Address": "40123",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 17,
           "Col": 31,
           "SizeX": 10,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40123",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} м³/ч",
-        "MinValue": 0,
-        "MaxValue": 25
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "PipePoints": "0,0;19,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
         "Type": "Pipe",
-        "Title": "Линия Соды к FCV2",
+        "Title": "\u041B\u0438\u043D\u0438\u044F \u0421\u043E\u0434\u044B \u043A FCV2",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
         "Position": {
           "Row": 38.5,
           "Col": 10.5,
           "SizeX": 20,
           "SizeY": 1
         },
-        "PipePoints": "0,0;19,0",
-        "Thickness": 12,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "ValveType": "Regulating",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": {
+          "TagId": "tag_plc_511_30011",
+          "ConnId": "plc_511",
+          "Address": "30011",
+          "DataType": "Float32"
+        },
+        "ClosedFeedbackSource": null,
+        "IsVertical": false,
+        "ActuatorType": "Pneumatic",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": {
+          "TagId": "tag_plc_511_00002",
+          "ConnId": "plc_511",
+          "Address": "00002",
+          "DataType": "Bool"
+        },
+        "ShowStatusText": true,
+        "LabelOffset": 0,
         "Type": "Valve",
-        "Title": "FCV2 (Сода)",
+        "Title": "FCV2 (\u0421\u043E\u0434\u0430)",
+        "Source": {
+          "TagId": "tag_plc_511_40109",
+          "ConnId": "plc_511",
+          "Address": "40109",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 36,
           "Col": 30,
           "SizeX": 6,
           "SizeY": 6
         },
-        "ValveType": "Regulating",
-        "ActuatorType": "Pneumatic",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40109",
-          "DataType": "Float32"
-        },
-        "ModeSource": {
-          "ConnId": "plc_511",
-          "Address": "00002",
-          "DataType": "Bool"
-        },
-        "FeedbackSource": {
-          "ConnId": "plc_511",
-          "Address": "30011",
-          "DataType": "Float32"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "PipePoints": "0,0;19,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
         "Type": "Pipe",
-        "Title": "Линия Соды от FCV2 в R511",
+        "Title": "\u041B\u0438\u043D\u0438\u044F \u0421\u043E\u0434\u044B \u043E\u0442 FCV2 \u0432 R511",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
         "Position": {
           "Row": 38.5,
           "Col": 36.5,
           "SizeX": 20,
           "SizeY": 1
         },
-        "PipePoints": "0,0;19,0",
-        "Thickness": 12,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u043C\u00B3/\u0447",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Расход соды",
+        "Title": "\u0420\u0430\u0441\u0445\u043E\u0434 \u0441\u043E\u0434\u044B",
+        "Source": {
+          "TagId": "tag_plc_511_30023",
+          "ConnId": "plc_511",
+          "Address": "30023",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 41,
           "Col": 9,
           "SizeX": 10,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30023",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} м³/ч"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F2} \u043C\u00B3",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Объем соды",
+        "Title": "\u041E\u0431\u044A\u0435\u043C \u0441\u043E\u0434\u044B",
+        "Source": {
+          "TagId": "tag_plc_511_30025",
+          "ConnId": "plc_511",
+          "Address": "30025",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 41,
           "Col": 19.5,
           "SizeX": 10,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30025",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F2} м³"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "PipePoints": "0,0;16,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
         "Type": "Pipe",
-        "Title": "Линия Пара к TCV1",
+        "Title": "\u041B\u0438\u043D\u0438\u044F \u041F\u0430\u0440\u0430 \u043A TCV1",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
         "Position": {
           "Row": 56.5,
           "Col": 24.5,
           "SizeX": 17,
           "SizeY": 1
         },
-        "PipePoints": "0,0;16,0",
-        "Thickness": 12,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "ValveType": "Regulating",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": {
+          "TagId": "tag_plc_511_30013",
+          "ConnId": "plc_511",
+          "Address": "30013",
+          "DataType": "Float32"
+        },
+        "ClosedFeedbackSource": null,
+        "IsVertical": false,
+        "ActuatorType": "Pneumatic",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": {
+          "TagId": "tag_plc_511_00003",
+          "ConnId": "plc_511",
+          "Address": "00003",
+          "DataType": "Bool"
+        },
+        "ShowStatusText": true,
+        "LabelOffset": 0,
         "Type": "Valve",
-        "Title": "TCV1 (Пар)",
+        "Title": "TCV1 (\u041F\u0430\u0440)",
+        "Source": {
+          "TagId": "tag_plc_511_40111",
+          "ConnId": "plc_511",
+          "Address": "40111",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 54,
           "Col": 41,
           "SizeX": 6,
           "SizeY": 6
         },
-        "ValveType": "Regulating",
-        "ActuatorType": "Pneumatic",
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40111",
-          "DataType": "Float32"
-        },
-        "ModeSource": {
-          "ConnId": "plc_511",
-          "Address": "00003",
-          "DataType": "Bool"
-        },
-        "FeedbackSource": {
-          "ConnId": "plc_511",
-          "Address": "30013",
-          "DataType": "Float32"
-        },
-        "ActiveColor": "#00E676",
-        "InactiveColor": "#D50000"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "PipePoints": "0,9;18,9;18,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
         "Type": "Pipe",
-        "Title": "Линия Пара от TCV1 в рубашку R511",
+        "Title": "\u041B\u0438\u043D\u0438\u044F \u041F\u0430\u0440\u0430 \u043E\u0442 TCV1 \u0432 \u0440\u0443\u0431\u0430\u0448\u043A\u0443 R511",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
         "Position": {
           "Row": 47.5,
           "Col": 47.5,
           "SizeX": 20,
           "SizeY": 10
         },
-        "PipePoints": "0,9;18,9;18,0",
-        "Thickness": 12,
-        "StartFitting": "Flange",
-        "EndFitting": "Flange",
-        "ShowFlanges": true
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u00B0C",
+        "MinValue": 0,
+        "MaxValue": 100,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
         "Type": "SetValue",
-        "Title": "Уставка Т",
+        "Title": "\u0423\u0441\u0442\u0430\u0432\u043A\u0430 \u0422",
+        "Source": {
+          "TagId": "tag_plc_511_40121",
+          "ConnId": "plc_511",
+          "Address": "40121",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 62,
           "Col": 28,
           "SizeX": 11,
           "SizeY": 5
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "40121",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} °C",
-        "MinValue": 0,
-        "MaxValue": 100
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "ButtonMode": "Toggle",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
         "Type": "CommandButton",
-        "Title": "Пуск нагрева",
+        "Title": "\u041F\u0443\u0441\u043A \u043D\u0430\u0433\u0440\u0435\u0432\u0430",
+        "Source": {
+          "TagId": "tag_plc_511_00008",
+          "ConnId": "plc_511",
+          "Address": "00008",
+          "DataType": "Bool"
+        },
         "Position": {
           "Row": 62,
           "Col": 40,
           "SizeX": 11,
           "SizeY": 5
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "00008",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Toggle"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "ButtonMode": "Toggle",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
         "Type": "CommandButton",
-        "Title": "Удержание",
+        "Title": "\u0423\u0434\u0435\u0440\u0436\u0430\u043D\u0438\u0435",
+        "Source": {
+          "TagId": "tag_plc_511_00013",
+          "ConnId": "plc_511",
+          "Address": "00013",
+          "DataType": "Bool"
+        },
         "Position": {
           "Row": 62,
           "Col": 52,
           "SizeX": 13,
           "SizeY": 5
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "00013",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Toggle"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u00B0C",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Температура R-511",
-        "Position": {
-          "Row": 8,
-          "Col": 80,
-          "SizeX": 15,
-          "SizeY": 4
-        },
+        "Title": "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 R-511",
         "Source": {
+          "TagId": "tag_plc_511_30017",
           "ConnId": "plc_511",
           "Address": "30017",
           "DataType": "Float32"
         },
-        "Format": "{0:F1} °C"
+        "Position": {
+          "Row": 8,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F2} pH",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "pH среды R-511",
+        "Title": "pH \u0441\u0440\u0435\u0434\u044B R-511",
+        "Source": {
+          "TagId": "tag_plc_511_30015",
+          "ConnId": "plc_511",
+          "Address": "30015",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 8,
           "Col": 97,
           "SizeX": 15,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30015",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F2} pH"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u043A\u0433",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Весы WE-1",
-        "Position": {
-          "Row": 14,
-          "Col": 80,
-          "SizeX": 15,
-          "SizeY": 4
-        },
+        "Title": "\u0412\u0435\u0441\u044B WE-1",
         "Source": {
+          "TagId": "tag_plc_511_30019",
           "ConnId": "plc_511",
           "Address": "30019",
           "DataType": "Float32"
         },
-        "Format": "{0:F1} кг"
+        "Position": {
+          "Row": 14,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F1} \u043A\u0433",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Весы WE-2",
+        "Title": "\u0412\u0435\u0441\u044B WE-2",
+        "Source": {
+          "TagId": "tag_plc_511_30021",
+          "ConnId": "plc_511",
+          "Address": "30021",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 14,
           "Col": 97,
           "SizeX": 15,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30021",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F1} кг"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "ButtonMode": "Toggle",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
         "Type": "CommandButton",
-        "Title": "Пуск стадии",
-        "Position": {
-          "Row": 22,
-          "Col": 80,
-          "SizeX": 15,
-          "SizeY": 5
-        },
+        "Title": "\u041F\u0443\u0441\u043A \u0441\u0442\u0430\u0434\u0438\u0438",
         "Source": {
+          "TagId": "tag_plc_511_00009",
           "ConnId": "plc_511",
           "Address": "00009",
           "DataType": "Bool"
         },
-        "ButtonMode": "Toggle"
+        "Position": {
+          "Row": 22,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "ButtonMode": "Toggle",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
         "Type": "CommandButton",
-        "Title": "Пауза стадии",
+        "Title": "\u041F\u0430\u0443\u0437\u0430 \u0441\u0442\u0430\u0434\u0438\u0438",
+        "Source": {
+          "TagId": "tag_plc_511_00012",
+          "ConnId": "plc_511",
+          "Address": "00012",
+          "DataType": "Bool"
+        },
         "Position": {
           "Row": 22,
           "Col": 97,
           "SizeX": 15,
           "SizeY": 5
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "00012",
-          "DataType": "Bool"
-        },
-        "ButtonMode": "Toggle"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "TrueColor": "#00E676",
+        "FalseColor": "#37474F",
         "Type": "PilotLight",
-        "Title": "Идет сочетание",
-        "Position": {
-          "Row": 29,
-          "Col": 80,
-          "SizeX": 15,
-          "SizeY": 5
-        },
+        "Title": "\u0418\u0434\u0435\u0442 \u0441\u043E\u0447\u0435\u0442\u0430\u043D\u0438\u0435",
         "Source": {
+          "TagId": "tag_plc_511_00010",
           "ConnId": "plc_511",
           "Address": "00010",
           "DataType": "Bool"
         },
-        "TrueColor": "#00E676",
-        "FalseColor": "#37474F"
+        "Position": {
+          "Row": 29,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "TrueColor": "#00E676",
+        "FalseColor": "#37474F",
         "Type": "PilotLight",
-        "Title": "Стадия готова",
+        "Title": "\u0421\u0442\u0430\u0434\u0438\u044F \u0433\u043E\u0442\u043E\u0432\u0430",
+        "Source": {
+          "TagId": "tag_plc_511_00011",
+          "ConnId": "plc_511",
+          "Address": "00011",
+          "DataType": "Bool"
+        },
         "Position": {
           "Row": 29,
           "Col": 97,
           "SizeX": 15,
           "SizeY": 5
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "00011",
-          "DataType": "Bool"
-        },
-        "TrueColor": "#00E676",
-        "FalseColor": "#37474F"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "{0:F0} \u0441\u0435\u043A",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Осталось времени",
+        "Title": "\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C \u0432\u0440\u0435\u043C\u0435\u043D\u0438",
+        "Source": {
+          "TagId": "tag_plc_511_30043",
+          "ConnId": "plc_511",
+          "Address": "30043",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 36,
           "Col": 80,
           "SizeX": 15,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30043",
-          "DataType": "Float32"
-        },
-        "Format": "{0:F0} сек"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       },
       {
+        "Format": "\u0428\u0430\u0433 {0:F0}",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
         "Type": "ValueDisplay",
-        "Title": "Этап автомата",
+        "Title": "\u042D\u0442\u0430\u043F \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0430",
+        "Source": {
+          "TagId": "tag_plc_511_30045",
+          "ConnId": "plc_511",
+          "Address": "30045",
+          "DataType": "Float32"
+        },
         "Position": {
           "Row": 36,
           "Col": 97,
           "SizeX": 15,
           "SizeY": 4
         },
-        "Source": {
-          "ConnId": "plc_511",
-          "Address": "30045",
-          "DataType": "Float32"
-        },
-        "Format": "Шаг {0:F0}"
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
       }
     ]
   }

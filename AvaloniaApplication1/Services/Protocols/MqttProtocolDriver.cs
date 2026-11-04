@@ -29,7 +29,7 @@ namespace AvaloniaApplication1.Services.Protocols
             _topicsToSubscribe = topicsToSubscribe.Distinct().ToList();
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             var factory = new MqttFactory();
             _mqttClient = factory.CreateMqttClient();
@@ -88,6 +88,8 @@ namespace AvaloniaApplication1.Services.Protocols
                     await Task.Delay(5000, cancellationToken);
                 }
             }, cancellationToken).FireAndForget(context: "MqttProtocolDriver");
+
+            return Task.CompletedTask;
         }
 
         public async Task WriteAsync(string address, object value, CancellationToken cancellationToken)

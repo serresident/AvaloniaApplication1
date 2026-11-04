@@ -147,7 +147,7 @@ namespace AvaloniaApplication1.Services
             var targetWindow = MainWindow;
             if (targetWindow == null) return null;
 
-            var vm = new WidgetEditorViewModel(existingConfig, connections, initialPosition);
+            var vm = new WidgetEditorViewModel(existingConfig, connections, initialPosition, _dataCoreService.TagManager?.AllTags);
             var window = new WidgetEditorWindow
             {
                 DataContext = vm

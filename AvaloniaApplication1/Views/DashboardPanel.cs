@@ -1146,6 +1146,23 @@ namespace AvaloniaApplication1.Views
             };
             menu.Items.Add(removeItem);
 
+            if (targetVm.Source != null && (!string.IsNullOrEmpty(targetVm.Source.TagId) || !string.IsNullOrEmpty(targetVm.Source.Address)))
+            {
+                menu.Items.Add(new Separator());
+                if (targetVm.IsOverridden)
+                {
+                    var clearOverrideItem = new MenuItem { Header = "Снять ручное переопределение [M]" };
+                    clearOverrideItem.Click += (s, ev) => targetVm.ClearOverrideCommand.Execute(null);
+                    menu.Items.Add(clearOverrideItem);
+                }
+                else
+                {
+                    var forceOverrideItem = new MenuItem { Header = "⚡ Принудительно задать значение (Override)..." };
+                    forceOverrideItem.Click += async (s, ev) => await targetVm.ForceOverrideCommand.ExecuteAsync(null);
+                    menu.Items.Add(forceOverrideItem);
+                }
+            }
+
             if (targetVm is PipeWidgetViewModel pipeVm)
             {
                 menu.Items.Add(new Separator());

@@ -5,9 +5,11 @@ namespace AvaloniaApplication1.Models.Config
 {
     public class HmiConfiguration
     {
+        public int SchemaVersion { get; set; } = 1;
         public ProjectConfig Project { get; set; } = new();
         public SecurityConfig Security { get; set; } = new();
         public List<ConnectionConfig> Connections { get; set; } = new();
+        public List<TagDefinition> Tags { get; set; } = new();
         public List<BridgeRuleConfig> BridgeRules { get; set; } = new();
         public DashboardConfig Dashboard { get; set; } = new();
         public DashboardConfig Mimic { get; set; } = new();
@@ -46,6 +48,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class BridgeEndpoint
     {
+        public string? TagId { get; set; }
         public string ConnId { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
     }
@@ -223,6 +226,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class DataSourceConfig
     {
+        public string? TagId { get; set; }
         public string ConnId { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public string DataType { get; set; } = string.Empty;

@@ -715,6 +715,40 @@
   - [x] Автоматизированные тесты: `AvaloniaApplication1.UIValidation` (18/18 PASS)
   - [x] Headless-рендер: `scripts/render_ui.ps1 DashboardView` (чистый скриншот без перекрытий)
 
+# Tasks: Rapid SCADA v6 TagManager, Modbus Hardening & Watchdog /boost (Сессия 43 — Выполнено)
+
+- [x] Промышленный доменный слой (Domain Layer):
+  - [x] Создан enum `TagQuality` (Good, Bad, CommFailure, Timeout, Stale, OutOfRange, Overridden, Uninitialized)
+  - [x] Создан `readonly record struct TagSnapshot` с нулевыми аллокациями и меткой времени
+  - [x] Создан класс `TagDefinition` с параметрами deadband, периода устаревания и типизацией
+  - [x] Обновлен `TagData` для обратной совместимости с поддержкой `TagQuality`
+- [x] Движок тегов (Tag Engine / ITagManagerService):
+  - [x] Разработан `TagManagerService` с потокобезопасными индексами (`ConcurrentDictionary`)
+  - [x] Внедрен централизованный сторожевой таймер (Stale Watchdog, цикл 500 мс) с автоматическим переводом зависших тегов в `Stale` и `Timeout`
+  - [x] Поддержка операторского ручного переопределения (Force/Override) с защитой от перезаписи телеметрией и снятия фиксации (Clear Override)
+  - [x] Прозрачный фолбэк с автосинтезом виртуальных тегов для неизвестных адресов
+- [x] Упрочнение сетевого драйвера Modbus (ScadaComm / DrvModbus):
+  - [x] Устранен критический дефект повторного создания `TcpClient` на каждую операцию записи
+  - [x] Внедрен единый постоянный сокет на подключение с приоритетной очередью команд записи `Channel<ModbusWriteRequest>`
+  - [x] Реализована алгоритмическая группировка смежных регистров (`MaxGap <= 5`) в единые bulk-кадры
+  - [x] Реализовано PDU-дробление пакетов при превышении лимита 120 регистров (`<= 120`)
+  - [x] Поддержка функций FC1 (Coils), FC2 (Discrete Inputs), FC3 (Holding Registers), FC4 (Input Registers)
+- [x] Однократная миграция конфигурации (Schema v1 -> v2):
+  - [x] Реализован `ConfigMigrationService` с автоматическим созданием резервной копии `config.v1.backup.json`
+  - [x] Рекурсивное извлечение адресов из дашбордов, мнемосхем и контейнеров в централизованную таблицу `Tags`
+  - [x] Привязка виджетов к тегам через `TagId`
+- [x] Человеко-машинный интерфейс (High-Performance HMI / ISA-101):
+  - [x] Добавлена индикация качества в `WidgetViewModelBase` (`QualityOpacity = 0.55`, `QualityGlyph`, `QualityToolTip`)
+  - [x] Визуальные глифы: `[M]` для Overridden, `⏳` для Stale/Timeout, `⚠️` для CommFailure
+  - [x] Вывод перечеркивания (`---`) в `ValueDisplay` при ошибках связи
+  - [x] Контекстное меню виджетов для ручного переопределения и снятия фиксации
+  - [x] Браузер тегов в диалоге свойств виджета `WidgetEditorWindow`
+- [x] Тестирование и верификация:
+  - [x] Разработан автоматический тест №19 в `AvaloniaApplication1.UIValidation/Program.cs`
+  - [x] Успешное выполнение всех 19 тестов (19/19 PASS, 100%)
+  - [x] Headless-рендеринг `DashboardView` и `MainWindow`
+  - [x] Чистая сборка: 0 ошибок, 0 предупреждений
+
 
 
 

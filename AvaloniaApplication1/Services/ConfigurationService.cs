@@ -34,8 +34,12 @@ namespace AvaloniaApplication1.Services
             {
                 try
                 {
-                    using var stream = File.OpenRead(CurrentFilePath);
-                    var config = await JsonSerializer.DeserializeAsync<HmiConfiguration>(stream, _jsonOptions);
+                    HmiConfiguration? config = null;
+                    using (var stream = File.OpenRead(CurrentFilePath))
+                    {
+                        config = await JsonSerializer.DeserializeAsync<HmiConfiguration>(stream, _jsonOptions);
+                    }
+
                     if (config != null)
                     {
                         if (config.Mimic == null || config.Mimic.Widgets == null || config.Mimic.Widgets.Count == 0 || config.Mimic.CellSize == 20)
@@ -44,6 +48,14 @@ namespace AvaloniaApplication1.Services
                             config.Mimic = def.Mimic;
                             await SaveConfigurationAsync(config, CurrentFilePath);
                         }
+
+                        if (ConfigMigrationService.NeedsMigration(config))
+                        {
+                            Console.WriteLine($"[ConfigurationService] Migrating {CurrentFilePath} to Schema v2...");
+                            config = ConfigMigrationService.Migrate(config, CurrentFilePath);
+                            await SaveConfigurationAsync(config, CurrentFilePath);
+                        }
+
                         return config;
                     }
                 }
@@ -92,7 +104,11 @@ namespace AvaloniaApplication1.Services
                 var uri = new Uri("avares://AvaloniaApplication1/Assets/default_config.json");
                 using var stream = AssetLoader.Open(uri);
                 var config = await JsonSerializer.DeserializeAsync<HmiConfiguration>(stream, _jsonOptions);
-                return config ?? new HmiConfiguration();
+                if (config != null && ConfigMigrationService.NeedsMigration(config))
+                {
+                    config = ConfigMigrationService.Migrate(config, null);
+                }
+                return config ?? new HmiConfiguration { SchemaVersion = ConfigMigrationService.CurrentSchemaVersion };
             }
             catch (Exception ex)
             {

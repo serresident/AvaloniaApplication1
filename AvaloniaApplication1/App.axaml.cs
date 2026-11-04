@@ -54,6 +54,7 @@ namespace AvaloniaApplication1
                 return factory;
             });
 
+            services.AddSingleton<ITagManagerService, TagManagerService>();
             services.AddSingleton<DataCoreService>();
             services.AddSingleton<IDataCoreService>(sp => sp.GetRequiredService<DataCoreService>());
             

@@ -26,15 +26,19 @@ public class MockDataCoreService : IDataCoreService
 {
     private readonly Subject<TagData> _subject = new();
     private readonly Dictionary<string, object> _values = new();
+    public ITagManagerService TagManager { get; } = new TagManagerService();
 
     public Task StartAsync() => Task.CompletedTask;
     public Task StopAsync() => Task.CompletedTask;
     public void PublishTag(TagData tag) 
     {
         _values[$"{tag.ConnId}:{tag.Address}"] = tag.Value;
+        TagManager.UpdateTagValue(tag.ConnId, tag.Address, tag.Value, tag.Quality);
         _subject.OnNext(tag);
     }
     public IObservable<TagData> TagUpdates => _subject;
+    public IObservable<TagSnapshot> SnapshotUpdates => TagManager.SnapshotUpdates;
+
     public void WriteCommand(string connId, string address, object value) 
     {
         _values[$"{connId}:{address}"] = value;
@@ -44,6 +48,10 @@ public class MockDataCoreService : IDataCoreService
     {
         return _values.TryGetValue($"{connId}:{address}", out var v) ? v : null;
     }
+    public TagSnapshot GetTagSnapshot(string tagId) => TagManager.GetSnapshot(tagId);
+    public TagSnapshot GetTagSnapshot(string connId, string address) => TagManager.GetSnapshotByAddress(connId, address);
+    public void ForceOverride(string tagId, object value) => TagManager.ForceOverride(tagId, value);
+    public void ClearOverride(string tagId) => TagManager.ClearOverride(tagId);
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
@@ -1325,7 +1333,175 @@ public static class Program
                     throw new Exception("ActiveSmartGuides or DragCurrentBadge failed to clear.");
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (18/18) PASSED SUCCESSFULLY!");
+            // =========================================================================
+            // TEST 19: Enterprise TagManager, Modbus Coalescing & Stale Watchdog
+            // =========================================================================
+            Console.WriteLine("[UIValidation] Testing Enterprise TagManager, Modbus Coalescing & Stale Watchdog (Test 19)...");
+            {
+                // 19.1 Domain Models
+                var now = DateTime.UtcNow;
+                var snapshot = new TagSnapshot("test_tag", 42.5f, TagQuality.Good, now, null, false);
+                if (snapshot.TagId != "test_tag" || (float)(snapshot.Value!) != 42.5f || snapshot.Quality != TagQuality.Good)
+                    throw new Exception("TagSnapshot struct values not preserved.");
+
+                // 19.2 TagManagerService Registration, Updates & Lookup
+                var tagManager = new TagManagerService(startWatchdogLoop: false);
+                var testDef = new TagDefinition
+                {
+                    TagId = "tag_plc1_40001",
+                    Name = "Давление в ресивере",
+                    ConnId = "plc1",
+                    Address = "40001",
+                    DataType = "Float32",
+                    StaleTimeout = TimeSpan.FromMilliseconds(50)
+                };
+                tagManager.RegisterTag(testDef);
+
+                var retrieved = tagManager.GetTagDefinition("tag_plc1_40001");
+                if (retrieved == null || retrieved.Address != "40001")
+                    throw new Exception("TagManager failed to retrieve registered tag definition by TagId.");
+
+                var retrievedByAddr = tagManager.FindTagByAddress("plc1", "40001");
+                if (retrievedByAddr == null || retrievedByAddr.TagId != "tag_plc1_40001")
+                    throw new Exception("TagManager failed to lookup tag definition by connection and address.");
+
+                var initialSnap = tagManager.GetSnapshot("tag_plc1_40001");
+                if (initialSnap.Quality != TagQuality.Uninitialized)
+                    throw new Exception($"Initial snapshot should be Uninitialized, got: {initialSnap.Quality}");
+
+                // 19.3 Telemetry Update
+                tagManager.UpdateTagValue("plc1", "40001", 123.4f, TagQuality.Good);
+                var goodSnap = tagManager.GetSnapshot("tag_plc1_40001");
+                if (goodSnap.Quality != TagQuality.Good || Math.Abs((float)goodSnap.Value! - 123.4f) > 0.001)
+                    throw new Exception("TagManager failed to update value and quality.");
+
+                // 19.4 Watchdog Stale & Timeout Detection
+                Thread.Sleep(60);
+                tagManager.CheckStaleTags();
+                var staleSnap = tagManager.GetSnapshot("tag_plc1_40001");
+                if (staleSnap.Quality != TagQuality.Stale)
+                    throw new Exception($"Watchdog failed to downgrade unrefreshed tag to Stale. Got: {staleSnap.Quality}");
+
+                Thread.Sleep(60);
+                tagManager.CheckStaleTags();
+                var timeoutSnap = tagManager.GetSnapshot("tag_plc1_40001");
+                if (timeoutSnap.Quality != TagQuality.Timeout)
+                    throw new Exception($"Watchdog failed to downgrade unrefreshed tag to Timeout. Got: {timeoutSnap.Quality}");
+
+                // 19.5 Manual Override & Safety
+                tagManager.ForceOverride("tag_plc1_40001", 999.0f);
+                var overrideSnap = tagManager.GetSnapshot("tag_plc1_40001");
+                if (!overrideSnap.IsOverridden || overrideSnap.Quality != TagQuality.Overridden || Math.Abs((float)overrideSnap.Value! - 999.0f) > 0.001)
+                    throw new Exception("ForceOverride failed to apply override flag and value.");
+
+                // Incoming telemetry should not overwrite operator manual override
+                tagManager.UpdateTagValue("plc1", "40001", 111.0f, TagQuality.Good);
+                var guardedSnap = tagManager.GetSnapshot("tag_plc1_40001");
+                if (!guardedSnap.IsOverridden || Math.Abs((float)guardedSnap.Value! - 999.0f) > 0.001)
+                    throw new Exception("Telemetry erroneously overwrote operator manual override.");
+
+                tagManager.ClearOverride("tag_plc1_40001");
+                var clearedSnap = tagManager.GetSnapshot("tag_plc1_40001");
+                if (clearedSnap.IsOverridden)
+                    throw new Exception("ClearOverride failed to remove override flag.");
+
+                // 19.6 Modbus Bulk Coalescing & PDU Splitting (MaxGap <= 5, <= 120 registers)
+                var modbusConfig = new ConnectionConfig
+                {
+                    Id = "mb_test",
+                    Type = "ModbusTCP",
+                    Host = "127.0.0.1",
+                    Port = 502,
+                    PollIntervalMs = 200,
+                    ByteOrder = "CDAB"
+                };
+
+                // Create tags: 40001, 40003 (Float32, gap 0), 40007 (gap 2), 40020 (gap 11 -> new block)
+                var tagsToPoll = new List<DataSourceConfig>
+                {
+                    new() { ConnId = "mb_test", Address = "40001", DataType = "Float32" },
+                    new() { ConnId = "mb_test", Address = "40003", DataType = "Float32" },
+                    new() { ConnId = "mb_test", Address = "40007", DataType = "Float32" },
+                    new() { ConnId = "mb_test", Address = "40020", DataType = "Float32" }
+                };
+
+                var modbusDriver = new AvaloniaApplication1.Services.Protocols.ModbusProtocolDriver(modbusConfig, tagsToPoll);
+                if (modbusDriver.CoalescedBlocks.Count != 2)
+                    throw new Exception($"Modbus Coalescing expected 2 blocks, got: {modbusDriver.CoalescedBlocks.Count}");
+
+                var firstBlock = modbusDriver.CoalescedBlocks[0];
+                if (firstBlock.StartOffset != 0 || firstBlock.Tags.Count != 3)
+                    throw new Exception($"First coalesced block has unexpected start {firstBlock.StartOffset} or tags count {firstBlock.Tags.Count}");
+
+                var secondBlock = modbusDriver.CoalescedBlocks[1];
+                if (secondBlock.StartOffset != 19 || secondBlock.Tags.Count != 1)
+                    throw new Exception($"Second coalesced block has unexpected start {secondBlock.StartOffset} or tags count {secondBlock.Tags.Count}");
+
+                // 19.7 Configuration Migration (Schema v1 -> v2)
+                var v1Config = new HmiConfiguration
+                {
+                    SchemaVersion = 1,
+                    Dashboard = new DashboardConfig
+                    {
+                        Widgets = new List<WidgetConfig>
+                        {
+                            new ValueDisplayConfig
+                            {
+                                Title = "Датчик давления",
+                                Source = new DataSourceConfig { ConnId = "plc_511", Address = "40001", DataType = "Float32" }
+                            },
+                            new PilotLightConfig
+                            {
+                                Title = "Авария насоса",
+                                Source = new DataSourceConfig { ConnId = "plc_511", Address = "00001", DataType = "Bool" }
+                            }
+                        }
+                    }
+                };
+
+                if (!ConfigMigrationService.NeedsMigration(v1Config))
+                    throw new Exception("NeedsMigration returned false for Schema v1 config.");
+
+                var migrated = ConfigMigrationService.Migrate(v1Config);
+                if (migrated.SchemaVersion != 2)
+                    throw new Exception($"Migration failed: expected SchemaVersion 2, got {migrated.SchemaVersion}");
+                if (migrated.Tags.Count != 2)
+                    throw new Exception($"Migration failed: expected 2 tags in centralized dictionary, got {migrated.Tags.Count}");
+                if (string.IsNullOrEmpty(migrated.Dashboard.Widgets[0].Source.TagId))
+                    throw new Exception("Migration failed: widget Source.TagId was not populated.");
+
+                // 19.8 Widget ViewModel Quality Feedback
+                var mockCore = new MockDataCoreService();
+                var vdConfig = new ValueDisplayConfig
+                {
+                    Title = "Температура T-101",
+                    Format = "{0:F1} °C",
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "40010", TagId = "tag_t101" }
+                };
+                var vdVm = new ValueDisplayViewModel(vdConfig, mockCore, mainVm.ProjectContext);
+
+                // Normal state
+                vdVm.ApplySnapshot(new TagSnapshot("tag_t101", 75.3f, TagQuality.Good, DateTime.UtcNow));
+                if (vdVm.Quality != TagQuality.Good || vdVm.QualityOpacity != 1.0 || vdVm.DisplayValue.Replace(',', '.') != "75.3 °C" || vdVm.QualityGlyph != "")
+                    throw new Exception($"Normal state visual feedback failed: {vdVm.DisplayValue}, Opacity={vdVm.QualityOpacity}");
+
+                // Stale state
+                vdVm.ApplySnapshot(new TagSnapshot("tag_t101", 75.3f, TagQuality.Stale, DateTime.UtcNow.AddSeconds(-10)));
+                if (!vdVm.IsStale || vdVm.QualityOpacity != 0.55 || vdVm.QualityGlyph != "⏳")
+                    throw new Exception($"Stale state visual feedback failed: Opacity={vdVm.QualityOpacity}, Glyph={vdVm.QualityGlyph}");
+
+                // CommFailure state
+                vdVm.ApplySnapshot(new TagSnapshot("tag_t101", null, TagQuality.CommFailure, DateTime.UtcNow, "Connection timeout"));
+                if (!vdVm.HasCommError || vdVm.DisplayValue != "---" || vdVm.QualityOpacity != 0.55 || vdVm.QualityGlyph != "⚠️")
+                    throw new Exception($"CommFailure state visual feedback failed: Display={vdVm.DisplayValue}, Opacity={vdVm.QualityOpacity}, Glyph={vdVm.QualityGlyph}");
+
+                // Overridden state
+                vdVm.ApplySnapshot(new TagSnapshot("tag_t101", 88.0f, TagQuality.Overridden, DateTime.UtcNow, null, true));
+                if (!vdVm.IsOverridden || vdVm.QualityOpacity != 1.0 || vdVm.QualityGlyph != "[M]")
+                    throw new Exception($"Overridden state visual feedback failed: Opacity={vdVm.QualityOpacity}, Glyph={vdVm.QualityGlyph}");
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (19/19) PASSED SUCCESSFULLY!");
         }
     }
 

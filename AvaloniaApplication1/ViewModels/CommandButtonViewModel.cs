@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using AvaloniaApplication1.Models;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
 using Avalonia.Media;
@@ -63,11 +65,21 @@ namespace AvaloniaApplication1.ViewModels
         }
 
         [RelayCommand]
-        private void ExecuteCommand()
+        private async Task ExecuteCommandAsync()
         {
             if (ProjectContext.IsDesignMode || Source == null) return;
 
             var cfg = TypedConfig;
+            string tagId = Source.TagId ?? ConfigMigrationService.GenerateTagId(Source.ConnId, Source.Address);
+
+            // Safety & Operator Override check when communication quality is degraded
+            if (IsStale || HasCommError)
+            {
+                IsOverridden = true;
+                Quality = TagQuality.Overridden;
+                DataService.ForceOverride(tagId, true);
+            }
+
             switch (cfg.ButtonMode)
             {
                 case "Latching":
@@ -97,6 +109,7 @@ namespace AvaloniaApplication1.ViewModels
                     DataService.WriteCommand(Source.ConnId, Source.Address, newState);
                     break;
             }
+            await Task.CompletedTask;
         }
     }
 }

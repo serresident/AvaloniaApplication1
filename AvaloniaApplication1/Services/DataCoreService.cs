@@ -17,20 +17,30 @@ namespace AvaloniaApplication1.Services
     {
         private readonly IConfigurationService _configService;
         private readonly IProtocolDriverFactory _driverFactory;
+        private readonly ITagManagerService _tagManager;
         private readonly ConcurrentDictionary<string, IProtocolDriver> _drivers = new();
         private readonly ConcurrentDictionary<string, object> _currentValuesCache = new();
         
-        // The unified event aggregator stream for all widgets
+        public ITagManagerService TagManager => _tagManager;
+
+        // The unified event aggregator stream for raw tag data
         private readonly Subject<TagData> _unifiedTagStream = new();
         public IObservable<TagData> TagUpdates => _unifiedTagStream;
+
+        // High-level snapshot updates from TagManager (with Quality & Overridden flags)
+        public IObservable<TagSnapshot> SnapshotUpdates => _tagManager.SnapshotUpdates;
 
         private CancellationTokenSource? _cts;
         private CompositeDisposable _disposables = new();
 
-        public DataCoreService(IConfigurationService configService, IProtocolDriverFactory driverFactory)
+        public DataCoreService(
+            IConfigurationService configService, 
+            IProtocolDriverFactory driverFactory,
+            ITagManagerService? tagManager = null)
         {
             _configService = configService;
             _driverFactory = driverFactory;
+            _tagManager = tagManager ?? new TagManagerService();
         }
 
         public async Task StartAsync()
@@ -42,7 +52,28 @@ namespace AvaloniaApplication1.Services
             try
             {
                 var config = await _configService.LoadConfigurationAsync();
-                if (config?.Connections == null) return;
+                if (config == null) return;
+
+                // Initialize TagManager with config tags
+                if (config.Tags != null && config.Tags.Count > 0)
+                {
+                    _tagManager.Initialize(config.Tags);
+                }
+
+                // Bridge TagManager snapshot quality changes back into the raw TagUpdates stream for backward compatibility
+                _tagManager.SnapshotUpdates
+                    .Subscribe(snapshot =>
+                    {
+                        var tagDef = _tagManager.GetTagDefinition(snapshot.TagId);
+                        if (tagDef != null && !string.IsNullOrEmpty(tagDef.ConnId) && !string.IsNullOrEmpty(tagDef.Address))
+                        {
+                            var currentVal = snapshot.Value ?? GetCurrentValue(tagDef.ConnId, tagDef.Address) ?? 0;
+                            _unifiedTagStream.OnNext(new TagData(tagDef.ConnId, tagDef.Address, currentVal, snapshot.Quality, snapshot.Timestamp));
+                        }
+                    })
+                    .DisposeWith(_disposables);
+
+                if (config.Connections == null) return;
 
                 var allTags = ExtractAllTags(config).ToList();
 
@@ -59,7 +90,7 @@ namespace AvaloniaApplication1.Services
 
                     _drivers[conn.Id] = driver;
 
-                    // Route all driver events into the unified stream safely
+                    // Route all driver events into the unified stream and TagManager safely
                     driver.TagUpdates
                         .Subscribe(tag => PublishTag(tag))
                         .DisposeWith(_disposables);
@@ -77,7 +108,12 @@ namespace AvaloniaApplication1.Services
         public void PublishTag(TagData tag)
         {
             var key = $"{tag.ConnId}_{tag.Address}";
-            _currentValuesCache[key] = tag.Value;
+            if (tag.Value != null)
+            {
+                _currentValuesCache[key] = tag.Value;
+            }
+
+            _tagManager.UpdateTagValue(tag.ConnId, tag.Address, tag.Value ?? GetCurrentValue(tag.ConnId, tag.Address) ?? 0, tag.Quality);
             _unifiedTagStream.OnNext(tag);
         }
 
@@ -119,9 +155,33 @@ namespace AvaloniaApplication1.Services
             return _currentValuesCache.TryGetValue(key, out var val) ? val : null;
         }
 
+        public TagSnapshot GetTagSnapshot(string tagId)
+        {
+            return _tagManager.GetSnapshot(tagId);
+        }
+
+        public TagSnapshot GetTagSnapshot(string connId, string address)
+        {
+            return _tagManager.GetSnapshotByAddress(connId, address);
+        }
+
+        public void ForceOverride(string tagId, object value)
+        {
+            _tagManager.ForceOverride(tagId, value);
+            var tag = _tagManager.GetTagDefinition(tagId);
+            if (tag != null && !string.IsNullOrEmpty(tag.ConnId) && !string.IsNullOrEmpty(tag.Address))
+            {
+                WriteCommand(tag.ConnId, tag.Address, value);
+            }
+        }
+
+        public void ClearOverride(string tagId)
+        {
+            _tagManager.ClearOverride(tagId);
+        }
+
         public void Dispose()
         {
-            // Синхронная версия — безопасна только из non-async контекста (финализатор, тесты)
             _cts?.Cancel();
             _disposables.Dispose();
             foreach (var driver in _drivers.Values)
@@ -130,12 +190,14 @@ namespace AvaloniaApplication1.Services
             }
             _drivers.Clear();
             _currentValuesCache.Clear();
+            _tagManager.Dispose();
             _unifiedTagStream.Dispose();
         }
 
         public async ValueTask DisposeAsync()
         {
             await StopAsync();
+            _tagManager.Dispose();
             _unifiedTagStream.Dispose();
         }
 
@@ -153,6 +215,7 @@ namespace AvaloniaApplication1.Services
                     if (w is ValveConfig vc)
                     {
                         if (vc.FeedbackSource != null) list.Add(vc.FeedbackSource);
+                        if (vc.ClosedFeedbackSource != null) list.Add(vc.ClosedFeedbackSource);
                         if (vc.ModeSource != null) list.Add(vc.ModeSource);
                     }
 

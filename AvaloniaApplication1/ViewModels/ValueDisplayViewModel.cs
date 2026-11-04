@@ -1,4 +1,5 @@
 using System;
+using AvaloniaApplication1.Models;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -28,8 +29,26 @@ namespace AvaloniaApplication1.ViewModels
         public string ValueColor => string.IsNullOrEmpty(TypedConfig.ValueColor) ? "#00FF00" : TypedConfig.ValueColor;
         public double ValueFontSize => TypedConfig.ValueFontSize <= 0 ? 28 : TypedConfig.ValueFontSize;
 
+        protected override void OnTagSnapshotUpdated(TagSnapshot snapshot)
+        {
+            if (HasCommError)
+            {
+                DisplayValue = "---";
+            }
+            else if (snapshot.Value != null)
+            {
+                UpdateDisplayValue(snapshot.Value);
+            }
+        }
+
         private void UpdateDisplayValue(object? val = null)
         {
+            if (HasCommError)
+            {
+                DisplayValue = "---";
+                return;
+            }
+
             if (Source == null) return;
             val ??= DataService.GetCurrentValue(Source.ConnId, Source.Address);
 

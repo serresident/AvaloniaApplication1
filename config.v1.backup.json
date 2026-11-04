@@ -1,0 +1,897 @@
+{
+  "Project": {
+    "Name": "Аппарат 511 - Отделение азосочетания (Цех 15)",
+    "Version": "1.0.0"
+  },
+  "Security": {
+    "RequirePasswordForDesignMode": false,
+    "DesignModePassword": "1234"
+  },
+  "Connections": [
+    {
+      "Id": "plc_511",
+      "Type": "ModbusTCP",
+      "Host": "127.0.0.1",
+      "Port": 502,
+      "PollIntervalMs": 200,
+      "ByteOrder": "CDAB"
+    }
+  ],
+  "BridgeRules": [],
+  "Dashboard": {
+    "CellSize": 160,
+    "Widgets": [
+      {
+        "Type": "RealTimeTrend",
+        "Title": "Температура R-511",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30017",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 0,
+          "Col": 0,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "MinValue": 0,
+        "MaxValue": 100,
+        "Format": "{0:F1} °C"
+      },
+      {
+        "Type": "RealTimeTrend",
+        "Title": "pH среды R-511",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30015",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 0,
+          "Col": 2,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "MinValue": 7,
+        "MaxValue": 13,
+        "Format": "{0:F2} pH"
+      },
+      {
+        "Type": "RealTimeTrend",
+        "Title": "Расход диазосоединения",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30035",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 2,
+          "Col": 0,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "MinValue": 0,
+        "MaxValue": 25,
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "RealTimeTrend",
+        "Title": "Расход соды 14%",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30023",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 2,
+          "Col": 2,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "MinValue": 0,
+        "MaxValue": 10,
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "ContainerButton",
+        "Title": "🎛️ Уставки дозирования и нагрева",
+        "Position": {
+          "Row": 0,
+          "Col": 4,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "CellSize": 140,
+        "ZoomScale": 1.0,
+        "Children": [
+          {
+            "Type": "SetValue",
+            "Title": "Уставка Т нагрева",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40121",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 0,
+              "Col": 0,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 100,
+            "Format": "{0:F1} °C"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "Уставка дозы воды",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40119",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 0,
+              "Col": 1,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 20,
+            "Format": "{0:F1} м³"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "Уставка диазо",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40123",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 1,
+              "Col": 0,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 25,
+            "Format": "{0:F1} м³/ч"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "Целевой pH",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40153",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 1,
+              "Col": 1,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 7,
+            "MaxValue": 12,
+            "Format": "{0:F2} pH"
+          }
+        ]
+      },
+      {
+        "Type": "ContainerButton",
+        "Title": "⚙️ Параметры ПИД и pH",
+        "Position": {
+          "Row": 2,
+          "Col": 4,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "CellSize": 140,
+        "ZoomScale": 1.0,
+        "Children": [
+          {
+            "Type": "SetValue",
+            "Title": "ПИД пара: Kp",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40133",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 0,
+              "Col": 0,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 50,
+            "Format": "{0:F1}"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "ПИД пара: Tn",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40135",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 0,
+              "Col": 1,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 0,
+            "MaxValue": 100,
+            "Format": "{0:F1} с"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "pH Мин",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40149",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 1,
+              "Col": 0,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 7,
+            "MaxValue": 12,
+            "Format": "{0:F2} pH"
+          },
+          {
+            "Type": "SetValue",
+            "Title": "pH Макс",
+            "Source": {
+              "ConnId": "plc_511",
+              "Address": "40151",
+              "DataType": "Float32"
+            },
+            "Position": {
+              "Row": 1,
+              "Col": 1,
+              "SizeX": 1,
+              "SizeY": 1
+            },
+            "MinValue": 7,
+            "MaxValue": 14,
+            "Format": "{0:F2} pH"
+          }
+        ]
+      }
+    ]
+  },
+  "Mimic": {
+    "CellSize": 10,
+    "Widgets": [
+      {
+        "Type": "Reactor",
+        "Title": "Аппарат 511",
+        "Position": {
+          "Row": 22,
+          "Col": 56,
+          "SizeX": 20,
+          "SizeY": 26
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30019",
+          "DataType": "Float32"
+        },
+        "TempSource": {
+          "ConnId": "plc_511",
+          "Address": "30017",
+          "DataType": "Float32"
+        },
+        "HasJacket": true,
+        "Format": "{0:F0} кг",
+        "MinValue": 0,
+        "MaxValue": 5000,
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#455A64"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Воды к YV1",
+        "Position": {
+          "Row": 6.5,
+          "Col": 14.5,
+          "SizeX": 25,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;24,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Valve",
+        "Title": "YV1 (Вода)",
+        "Position": {
+          "Row": 4,
+          "Col": 39,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "ValveType": "CutOff",
+        "ActuatorType": "Solenoid",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00005",
+          "DataType": "Bool"
+        },
+        "ModeSource": {
+          "ConnId": "plc_511",
+          "Address": "00004",
+          "DataType": "Bool"
+        },
+        "FeedbackSource": {
+          "ConnId": "plc_511",
+          "Address": "10500",
+          "DataType": "Bool"
+        },
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Воды от YV1 в R511",
+        "Position": {
+          "Row": 6.5,
+          "Col": 45.5,
+          "SizeX": 21,
+          "SizeY": 16
+        },
+        "PipePoints": "0,0;20,0;20,15",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Расход воды",
+        "Position": {
+          "Row": 1,
+          "Col": 14,
+          "SizeX": 11,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30027",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Налито воды",
+        "Position": {
+          "Row": 1,
+          "Col": 26,
+          "SizeX": 11,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30031",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F2} м³"
+      },
+      {
+        "Type": "SetValue",
+        "Title": "Уставка дозы",
+        "Position": {
+          "Row": 9,
+          "Col": 14,
+          "SizeX": 11,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40119",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} м³",
+        "MinValue": 0,
+        "MaxValue": 20
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Пуск дозы",
+        "Position": {
+          "Row": 9,
+          "Col": 26,
+          "SizeX": 11,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00007",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Диазо к FCV1",
+        "Position": {
+          "Row": 24.5,
+          "Col": 10.5,
+          "SizeX": 20,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;19,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Valve",
+        "Title": "FCV1 (Диазо)",
+        "Position": {
+          "Row": 22,
+          "Col": 30,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "ValveType": "Regulating",
+        "ActuatorType": "Pneumatic",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40107",
+          "DataType": "Float32"
+        },
+        "ModeSource": {
+          "ConnId": "plc_511",
+          "Address": "00001",
+          "DataType": "Bool"
+        },
+        "FeedbackSource": {
+          "ConnId": "plc_511",
+          "Address": "30009",
+          "DataType": "Float32"
+        },
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Диазо от FCV1 в R511",
+        "Position": {
+          "Row": 24.5,
+          "Col": 36.5,
+          "SizeX": 20,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;19,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Расход диазо",
+        "Position": {
+          "Row": 17,
+          "Col": 9,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30035",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Объем диазо",
+        "Position": {
+          "Row": 17,
+          "Col": 20,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30037",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F2} м³"
+      },
+      {
+        "Type": "SetValue",
+        "Title": "Уставка расхода",
+        "Position": {
+          "Row": 17,
+          "Col": 31,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40123",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} м³/ч",
+        "MinValue": 0,
+        "MaxValue": 25
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Соды к FCV2",
+        "Position": {
+          "Row": 38.5,
+          "Col": 10.5,
+          "SizeX": 20,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;19,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Valve",
+        "Title": "FCV2 (Сода)",
+        "Position": {
+          "Row": 36,
+          "Col": 30,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "ValveType": "Regulating",
+        "ActuatorType": "Pneumatic",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40109",
+          "DataType": "Float32"
+        },
+        "ModeSource": {
+          "ConnId": "plc_511",
+          "Address": "00002",
+          "DataType": "Bool"
+        },
+        "FeedbackSource": {
+          "ConnId": "plc_511",
+          "Address": "30011",
+          "DataType": "Float32"
+        },
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Соды от FCV2 в R511",
+        "Position": {
+          "Row": 38.5,
+          "Col": 36.5,
+          "SizeX": 20,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;19,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Расход соды",
+        "Position": {
+          "Row": 41,
+          "Col": 9,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30023",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} м³/ч"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Объем соды",
+        "Position": {
+          "Row": 41,
+          "Col": 19.5,
+          "SizeX": 10,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30025",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F2} м³"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Пара к TCV1",
+        "Position": {
+          "Row": 56.5,
+          "Col": 24.5,
+          "SizeX": 17,
+          "SizeY": 1
+        },
+        "PipePoints": "0,0;16,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Valve",
+        "Title": "TCV1 (Пар)",
+        "Position": {
+          "Row": 54,
+          "Col": 41,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "ValveType": "Regulating",
+        "ActuatorType": "Pneumatic",
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40111",
+          "DataType": "Float32"
+        },
+        "ModeSource": {
+          "ConnId": "plc_511",
+          "Address": "00003",
+          "DataType": "Bool"
+        },
+        "FeedbackSource": {
+          "ConnId": "plc_511",
+          "Address": "30013",
+          "DataType": "Float32"
+        },
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Линия Пара от TCV1 в рубашку R511",
+        "Position": {
+          "Row": 47.5,
+          "Col": 47.5,
+          "SizeX": 20,
+          "SizeY": 10
+        },
+        "PipePoints": "0,9;18,9;18,0",
+        "Thickness": 12,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "ShowFlanges": true
+      },
+      {
+        "Type": "SetValue",
+        "Title": "Уставка Т",
+        "Position": {
+          "Row": 62,
+          "Col": 28,
+          "SizeX": 11,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "40121",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} °C",
+        "MinValue": 0,
+        "MaxValue": 100
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Пуск нагрева",
+        "Position": {
+          "Row": 62,
+          "Col": 40,
+          "SizeX": 11,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00008",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Удержание",
+        "Position": {
+          "Row": 62,
+          "Col": 52,
+          "SizeX": 13,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00013",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Температура R-511",
+        "Position": {
+          "Row": 8,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30017",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} °C"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "pH среды R-511",
+        "Position": {
+          "Row": 8,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30015",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F2} pH"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Весы WE-1",
+        "Position": {
+          "Row": 14,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30019",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} кг"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Весы WE-2",
+        "Position": {
+          "Row": 14,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30021",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F1} кг"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Пуск стадии",
+        "Position": {
+          "Row": 22,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00009",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Пауза стадии",
+        "Position": {
+          "Row": 22,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00012",
+          "DataType": "Bool"
+        },
+        "ButtonMode": "Toggle"
+      },
+      {
+        "Type": "PilotLight",
+        "Title": "Идет сочетание",
+        "Position": {
+          "Row": 29,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00010",
+          "DataType": "Bool"
+        },
+        "TrueColor": "#00E676",
+        "FalseColor": "#37474F"
+      },
+      {
+        "Type": "PilotLight",
+        "Title": "Стадия готова",
+        "Position": {
+          "Row": 29,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 5
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "00011",
+          "DataType": "Bool"
+        },
+        "TrueColor": "#00E676",
+        "FalseColor": "#37474F"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Осталось времени",
+        "Position": {
+          "Row": 36,
+          "Col": 80,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30043",
+          "DataType": "Float32"
+        },
+        "Format": "{0:F0} сек"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Этап автомата",
+        "Position": {
+          "Row": 36,
+          "Col": 97,
+          "SizeX": 15,
+          "SizeY": 4
+        },
+        "Source": {
+          "ConnId": "plc_511",
+          "Address": "30045",
+          "DataType": "Float32"
+        },
+        "Format": "Шаг {0:F0}"
+      }
+    ]
+  }
+}

@@ -33,6 +33,24 @@ namespace AvaloniaApplication1.ViewModels
 
         // --- Data Source ---
         public List<string> AvailableConnections { get; }
+        public List<AvaloniaApplication1.Models.TagDefinition> AvailableTags { get; } = new();
+
+        [ObservableProperty]
+        private AvaloniaApplication1.Models.TagDefinition? _selectedTag;
+
+        [ObservableProperty]
+        private string? _selectedTagId;
+
+        partial void OnSelectedTagChanged(AvaloniaApplication1.Models.TagDefinition? value)
+        {
+            if (value != null)
+            {
+                SelectedTagId = value.TagId;
+                if (!string.IsNullOrEmpty(value.ConnId)) SelectedConnectionId = value.ConnId;
+                if (!string.IsNullOrEmpty(value.Address)) Address = value.Address;
+                if (!string.IsNullOrEmpty(value.DataType)) SelectedDataType = value.DataType;
+            }
+        }
 
         [ObservableProperty]
         private string? _selectedConnectionId;
@@ -226,10 +244,14 @@ namespace AvaloniaApplication1.ViewModels
         public bool IsConfirmed { get; private set; }
         public Action? CloseAction { get; set; }
 
-        public WidgetEditorViewModel(WidgetConfig? existingConfig, List<ConnectionConfig> connections, WidgetPosition? initialPosition = null)
+        public WidgetEditorViewModel(WidgetConfig? existingConfig, List<ConnectionConfig> connections, WidgetPosition? initialPosition = null, IEnumerable<AvaloniaApplication1.Models.TagDefinition>? tags = null)
         {
             _existingConfig = existingConfig;
             AvailableConnections = connections.Select(c => c.Id).ToList();
+            if (tags != null)
+            {
+                AvailableTags.AddRange(tags);
+            }
 
             if (existingConfig != null)
             {
@@ -248,6 +270,11 @@ namespace AvaloniaApplication1.ViewModels
                 SizeY = existingConfig.Position.SizeY;
                 SelectedConnectionId = existingConfig.Source.ConnId;
                 Address = existingConfig.Source.Address;
+                SelectedTagId = existingConfig.Source.TagId;
+                if (!string.IsNullOrEmpty(SelectedTagId))
+                {
+                    SelectedTag = AvailableTags.FirstOrDefault(t => string.Equals(t.TagId, SelectedTagId, StringComparison.OrdinalIgnoreCase));
+                }
                 SelectedDataType = string.IsNullOrEmpty(existingConfig.Source.DataType) 
                     ? DataTypes.All[0] 
                     : existingConfig.Source.DataType;
@@ -455,7 +482,7 @@ namespace AvaloniaApplication1.ViewModels
             config.LabelPosition = SelectedLabelPosition;
             config.CompactMode = CompactMode;
             config.Position = new WidgetPosition { Row = Row, Col = Col, SizeX = SizeX, SizeY = SizeY };
-            config.Source = new DataSourceConfig { ConnId = SelectedConnectionId ?? string.Empty, Address = Address, DataType = SelectedDataType };
+            config.Source = new DataSourceConfig { TagId = SelectedTagId, ConnId = SelectedConnectionId ?? string.Empty, Address = Address, DataType = SelectedDataType };
 
             return config;
         }
