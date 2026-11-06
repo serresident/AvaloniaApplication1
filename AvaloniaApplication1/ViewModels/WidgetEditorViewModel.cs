@@ -41,14 +41,51 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string? _selectedTagId;
 
+        public Services.IDialogService? DialogService { get; set; }
+
         partial void OnSelectedTagChanged(AvaloniaApplication1.Models.TagDefinition? value)
+        {
+            ApplyTag(value);
+        }
+
+        public void ApplyTag(AvaloniaApplication1.Models.TagDefinition? value)
         {
             if (value != null)
             {
+                if (SelectedTag != value)
+                {
+                    SelectedTag = value;
+                }
                 SelectedTagId = value.TagId;
                 if (!string.IsNullOrEmpty(value.ConnId)) SelectedConnectionId = value.ConnId;
                 if (!string.IsNullOrEmpty(value.Address)) Address = value.Address;
                 if (!string.IsNullOrEmpty(value.DataType)) SelectedDataType = value.DataType;
+
+                // Auto-populate Title if empty or default
+                if (string.IsNullOrWhiteSpace(Title) || Title == "Новый виджет")
+                {
+                    Title = value.Name;
+                }
+
+                // Auto-populate Unit / Format
+                if (!string.IsNullOrWhiteSpace(value.Unit))
+                {
+                    if (string.IsNullOrWhiteSpace(Format) || Format == "{0}")
+                    {
+                        Format = $"{{0:F1}} {value.Unit}";
+                    }
+                }
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseTagsAsync()
+        {
+            if (DialogService == null) return;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, SelectedTagId);
+            if (picked != null)
+            {
+                ApplyTag(picked);
             }
         }
 
@@ -244,8 +281,14 @@ namespace AvaloniaApplication1.ViewModels
         public bool IsConfirmed { get; private set; }
         public Action? CloseAction { get; set; }
 
-        public WidgetEditorViewModel(WidgetConfig? existingConfig, List<ConnectionConfig> connections, WidgetPosition? initialPosition = null, IEnumerable<AvaloniaApplication1.Models.TagDefinition>? tags = null)
+        public WidgetEditorViewModel(
+            WidgetConfig? existingConfig, 
+            List<ConnectionConfig> connections, 
+            WidgetPosition? initialPosition = null, 
+            IEnumerable<AvaloniaApplication1.Models.TagDefinition>? tags = null,
+            Services.IDialogService? dialogService = null)
         {
+            DialogService = dialogService;
             _existingConfig = existingConfig;
             AvailableConnections = connections.Select(c => c.Id).ToList();
             if (tags != null)

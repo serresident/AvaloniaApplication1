@@ -8,6 +8,8 @@ namespace AvaloniaApplication1.Services
     {
         void Initialize(IEnumerable<TagDefinition> tags);
         void RegisterTag(TagDefinition tag);
+        void UpdateTag(TagDefinition tag);
+        bool RemoveTag(string tagId);
         TagDefinition? GetTagDefinition(string tagId);
         TagDefinition? FindTagByAddress(string connId, string address);
         

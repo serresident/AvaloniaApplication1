@@ -51,6 +51,16 @@ namespace AvaloniaApplication1.Services
         {
             if (tag == null || string.IsNullOrWhiteSpace(tag.TagId)) return;
 
+            // Clean up old address mapping if updating existing tag
+            if (_tags.TryGetValue(tag.TagId, out var oldTag))
+            {
+                if (!string.IsNullOrWhiteSpace(oldTag.ConnId) && !string.IsNullOrWhiteSpace(oldTag.Address))
+                {
+                    var oldKey = ConfigMigrationService.BuildAddressKey(oldTag.ConnId, oldTag.Address);
+                    _addressToTagId.TryRemove(oldKey, out _);
+                }
+            }
+
             _tags[tag.TagId] = tag;
             if (!string.IsNullOrWhiteSpace(tag.ConnId) && !string.IsNullOrWhiteSpace(tag.Address))
             {
@@ -62,6 +72,30 @@ namespace AvaloniaApplication1.Services
             {
                 _snapshots[tag.TagId] = new TagSnapshot(tag.TagId, null, TagQuality.Uninitialized, DateTime.UtcNow);
             }
+        }
+
+        public void UpdateTag(TagDefinition tag)
+        {
+            RegisterTag(tag);
+        }
+
+        public bool RemoveTag(string tagId)
+        {
+            if (string.IsNullOrWhiteSpace(tagId)) return false;
+
+            if (_tags.TryRemove(tagId, out var def))
+            {
+                if (!string.IsNullOrWhiteSpace(def.ConnId) && !string.IsNullOrWhiteSpace(def.Address))
+                {
+                    var key = ConfigMigrationService.BuildAddressKey(def.ConnId, def.Address);
+                    _addressToTagId.TryRemove(key, out _);
+                }
+                _snapshots.TryRemove(tagId, out _);
+                _overrides.TryRemove(tagId, out _);
+                _lastTelemetry.TryRemove(tagId, out _);
+                return true;
+            }
+            return false;
         }
 
         public TagDefinition? GetTagDefinition(string tagId)
@@ -142,12 +176,24 @@ namespace AvaloniaApplication1.Services
                 return;
             }
 
-            // 3. Deadband check: suppress high-frequency noise when value change is below configured threshold
-            if (_tags.TryGetValue(tagId, out var tagDef) && tagDef.Deadband > 0 && quality == TagQuality.Good)
+            _tags.TryGetValue(tagId, out var tagDef);
+
+            // 3. Scaling: Apply linear engineering transform Y = A * X + B for numeric telemetry
+            object processedValue = value;
+            if (tagDef != null && quality == TagQuality.Good)
+            {
+                if ((Math.Abs(tagDef.ScaleA - 1.0) > 0.0001 || Math.Abs(tagDef.ScaleB) > 0.0001) && TryGetDouble(value, out double rawNum))
+                {
+                    processedValue = rawNum * tagDef.ScaleA + tagDef.ScaleB;
+                }
+            }
+
+            // 4. Deadband check: suppress high-frequency noise when value change is below configured threshold
+            if (tagDef != null && tagDef.Deadband > 0 && quality == TagQuality.Good)
             {
                 if (_snapshots.TryGetValue(tagId, out var existing) && existing.Quality == TagQuality.Good && existing.Value != null)
                 {
-                    if (TryGetDouble(value, out double newVal) && TryGetDouble(existing.Value, out double oldVal))
+                    if (TryGetDouble(processedValue, out double newVal) && TryGetDouble(existing.Value, out double oldVal))
                     {
                         if (Math.Abs(newVal - oldVal) < tagDef.Deadband)
                         {
@@ -159,7 +205,7 @@ namespace AvaloniaApplication1.Services
                 }
             }
 
-            var snapshot = new TagSnapshot(tagId, value, quality, now, errorMessage, false);
+            var snapshot = new TagSnapshot(tagId, processedValue, quality, now, errorMessage, false);
             _snapshots[tagId] = snapshot;
             _snapshotSubject.OnNext(snapshot);
         }

@@ -353,6 +353,13 @@ namespace AvaloniaApplication1.ViewModels
             await _dialogService.ShowConnectionManagerAsync(_currentConfig);
         }
 
+        [RelayCommand]
+        private async Task OpenTagManagerAsync()
+        {
+            if (_currentConfig == null) return;
+            await _dialogService.ShowTagManagerAsync(_currentConfig);
+        }
+
         public ChildWindowViewModel? OpenChildWindow(string title, object content)
         {
             if (content == null) return null;

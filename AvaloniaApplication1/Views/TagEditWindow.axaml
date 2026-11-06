@@ -1,0 +1,157 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="700"
+        x:Class="AvaloniaApplication1.Views.TagEditWindow"
+        x:DataType="vm:TagEditViewModel"
+        x:CompileBindings="True"
+        Title="{Binding WindowTitle}"
+        Width="560" Height="700"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E"
+        CanResize="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="{Binding WindowTitle}"
+                   Foreground="White" FontSize="18" FontWeight="Bold" Margin="0,0,0,14" />
+
+        <!-- Form Body in ScrollViewer -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="12" Margin="0,0,8,0">
+
+                <!-- Error Message Banner -->
+                <Border Background="#4A1212" BorderBrush="#FF5252" BorderThickness="1" CornerRadius="4" Padding="10,6"
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="#FF5252" FontWeight="SemiBold" TextWrapping="Wrap" />
+                </Border>
+
+                <!-- Section 1: Identification -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Идентификация тега" Foreground="#00AAFF" FontSize="13" FontWeight="SemiBold" />
+
+                        <TextBlock Text="Идентификатор тега (TagId, уникальный)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding TagId}" IsEnabled="{Binding IsNewTag}"
+                                 PlaceholderText="напр. tag_plc1_40001 или tag_r101_temp"
+                                 FontFamily="Consolas, monospace" />
+
+                        <TextBlock Text="Наименование (технологическое обозначение)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding Name}" PlaceholderText="напр. Температура в реакторе R-101" />
+
+                        <TextBlock Text="Описание / Примечание" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding Description}" AcceptsReturn="True" Height="50"
+                                 PlaceholderText="Дополнительные сведения о датчике или контуре регулирования..." />
+                    </StackPanel>
+                </Border>
+
+                <!-- Section 2: Connection & Addressing -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Связь и адресация (Modbus / MQTT)" Foreground="#00AAFF" FontSize="13" FontWeight="SemiBold" />
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Драйвер / Подключение" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableConnections}"
+                                          SelectedItem="{Binding ConnId}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Тип данных" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableDataTypes}"
+                                          SelectedItem="{Binding DataType}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Адрес регистра или топик MQTT" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding Address}"
+                                 PlaceholderText="напр. 40001, 10001 или /devices/wb-mwac/controls/K1"
+                                 FontFamily="Consolas, monospace" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Section 3: Engineering Units & Linear Scaling Y = A*X + B -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Единицы измерения и масштабирование Y = A * X + B" Foreground="#00AAFF" FontSize="13" FontWeight="SemiBold" />
+
+                        <TextBlock Text="Единицы измерения (Units)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding Unit}" PlaceholderText="напр. °C, бар, м³/ч, %, кВт" />
+
+                        <!-- Fast Unit Preset Chips -->
+                        <WrapPanel Orientation="Horizontal" Margin="0,2">
+                            <Button Content="°C" Command="{Binding ApplyUnitPresetCommand}" CommandParameter="°C"
+                                    Background="#3E3E42" Foreground="#00E5FF" CornerRadius="3" Padding="6,2" Margin="2" FontSize="11" />
+                            <Button Content="бар" Command="{Binding ApplyUnitPresetCommand}" CommandParameter="бар"
+                                    Background="#3E3E42" Foreground="#00E5FF" CornerRadius="3" Padding="6,2" Margin="2" FontSize="11" />
+                            <Button Content="м³/ч" Command="{Binding ApplyUnitPresetCommand}" CommandParameter="м³/ч"
+                                    Background="#3E3E42" Foreground="#00E5FF" CornerRadius="3" Padding="6,2" Margin="2" FontSize="11" />
+                            <Button Content="%" Command="{Binding ApplyUnitPresetCommand}" CommandParameter="%"
+                                    Background="#3E3E42" Foreground="#00E5FF" CornerRadius="3" Padding="6,2" Margin="2" FontSize="11" />
+                            <Button Content="мм" Command="{Binding ApplyUnitPresetCommand}" CommandParameter="мм"
+                                    Background="#3E3E42" Foreground="#00E5FF" CornerRadius="3" Padding="6,2" Margin="2" FontSize="11" />
+                            <Button Content="об/мин" Command="{Binding ApplyUnitPresetCommand}" CommandParameter="об/мин"
+                                    Background="#3E3E42" Foreground="#00E5FF" CornerRadius="3" Padding="6,2" Margin="2" FontSize="11" />
+                            <Button Content="кВт" Command="{Binding ApplyUnitPresetCommand}" CommandParameter="кВт"
+                                    Background="#3E3E42" Foreground="#00E5FF" CornerRadius="3" Padding="6,2" Margin="2" FontSize="11" />
+                            <Button Content="кг/ч" Command="{Binding ApplyUnitPresetCommand}" CommandParameter="кг/ч"
+                                    Background="#3E3E42" Foreground="#00E5FF" CornerRadius="3" Padding="6,2" Margin="2" FontSize="11" />
+                        </WrapPanel>
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Коэффициент A (Множитель)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ScaleA}" FormatString="0.####" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Смещение B (Offset)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ScaleB}" FormatString="0.####" />
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Text="* Применяется к физическому значению из ПЛК: Y = A * Raw + B" Foreground="#858585" FontSize="10" FontStyle="Italic" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Section 4: Telemetry Quality & Watchdog -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Надежность и контроль достоверности" Foreground="#00AAFF" FontSize="13" FontWeight="SemiBold" />
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Апертура (Deadband)" Foreground="#AAAAAA" FontSize="11" ToolTip.Tip="Подавление шума при малых изменениях" />
+                                <NumericUpDown Value="{Binding Deadband}" Minimum="0" FormatString="0.####" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Таймаут устаревания (сек)" Foreground="#AAAAAA" FontSize="11" ToolTip.Tip="Время перехода в статус Stale" />
+                                <NumericUpDown Value="{Binding StaleTimeoutSec}" Minimum="0.5" Maximum="3600" FormatString="0.#" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer Action Buttons -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,14,0,0">
+            <Button Grid.Column="0" Content="Отмена"
+                    Command="{Binding CancelCommand}"
+                    Background="#3E3E42" Foreground="White"
+                    CornerRadius="6" Padding="16,8" FontSize="13"
+                    HorizontalAlignment="Left" />
+
+            <Button Grid.Column="1" Content="💾 Сохранить"
+                    Command="{Binding SaveCommand}"
+                    Background="#008A00" Foreground="White"
+                    CornerRadius="6" Padding="20,8" FontSize="13" FontWeight="SemiBold"
+                    HorizontalAlignment="Right" />
+        </Grid>
+
+    </Grid>
+</Window>

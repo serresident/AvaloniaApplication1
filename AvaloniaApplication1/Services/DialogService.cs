@@ -20,19 +20,22 @@ namespace AvaloniaApplication1.Services
         private readonly IWidgetFactory _widgetFactory;
         private readonly ISimulationService? _simulationService;
         private readonly IHmiClipboardService? _hmiClipboardService;
+        private readonly IConfigurationService? _configurationService;
 
         public DialogService(
             IDataCoreService dataCoreService, 
             IProjectContextService projectContext, 
             IWidgetFactory widgetFactory,
             ISimulationService? simulationService = null,
-            IHmiClipboardService? hmiClipboardService = null)
+            IHmiClipboardService? hmiClipboardService = null,
+            IConfigurationService? configurationService = null)
         {
             _dataCoreService = dataCoreService;
             _projectContext = projectContext;
             _widgetFactory = widgetFactory;
             _simulationService = simulationService;
             _hmiClipboardService = hmiClipboardService;
+            _configurationService = configurationService;
         }
 
         public IChildWindowService? ChildWindowService { get; set; }
@@ -147,7 +150,7 @@ namespace AvaloniaApplication1.Services
             var targetWindow = MainWindow;
             if (targetWindow == null) return null;
 
-            var vm = new WidgetEditorViewModel(existingConfig, connections, initialPosition, _dataCoreService.TagManager?.AllTags);
+            var vm = new WidgetEditorViewModel(existingConfig, connections, initialPosition, _dataCoreService.TagManager?.AllTags, this);
             var window = new WidgetEditorWindow
             {
                 DataContext = vm
@@ -206,6 +209,91 @@ namespace AvaloniaApplication1.Services
             };
 
             await window.ShowDialog(MainWindow);
+        }
+
+        public async Task ShowTagManagerAsync(HmiConfiguration config)
+        {
+            var vm = new TagManagerViewModel(config, _dataCoreService.TagManager, this, _configurationService, _hmiClipboardService);
+
+            if (MainWindow != null)
+            {
+                var window = new TagManagerWindow
+                {
+                    DataContext = vm
+                };
+                vm.CloseAction = () => window.Close();
+                await window.ShowDialog(MainWindow);
+            }
+            else if (ChildWindowService != null)
+            {
+                var childWindow = ChildWindowService.OpenChildWindow("🏷️ Менеджер тегов", vm);
+                if (childWindow != null)
+                {
+                    childWindow.Width = 1100;
+                    childWindow.Height = 650;
+                    vm.CloseAction = () => childWindow.CloseCommand.Execute(null);
+                }
+            }
+        }
+
+        public async Task<Models.TagDefinition?> ShowTagEditorAsync(Models.TagDefinition? existingTag, IEnumerable<ConnectionConfig> connections, IEnumerable<Models.TagDefinition> existingTags)
+        {
+            if (MainWindow == null) return null;
+
+            var vm = new TagEditViewModel(existingTag, connections, existingTags);
+            var window = new TagEditWindow
+            {
+                DataContext = vm
+            };
+            vm.CloseAction = () => window.Close();
+
+            await window.ShowDialog(MainWindow);
+            return vm.IsConfirmed ? vm.ResultTag : null;
+        }
+
+        public async Task<Models.TagDefinition?> ShowTagPickerAsync(IEnumerable<Models.TagDefinition> availableTags, string? initialTagId = null)
+        {
+            if (MainWindow == null) return null;
+
+            var vm = new TagPickerViewModel(availableTags, initialTagId);
+            var window = new TagPickerWindow
+            {
+                DataContext = vm
+            };
+            vm.CloseAction = () => window.Close();
+
+            await window.ShowDialog(MainWindow);
+            return vm.IsConfirmed ? vm.SelectedTag : null;
+        }
+
+        public async Task<(bool Confirmed, object? Value)> ShowTagForceDialogAsync(Models.TagDefinition tag, object? currentValue)
+        {
+            if (MainWindow == null) return (true, currentValue ?? 100);
+
+            var vm = new TagForceViewModel(tag, currentValue);
+            var window = new TagForceWindow
+            {
+                DataContext = vm
+            };
+            vm.CloseAction = () => window.Close();
+
+            await window.ShowDialog(MainWindow);
+            return (vm.IsConfirmed, vm.ResultValue);
+        }
+
+        public async Task<List<Models.TagDefinition>?> ShowTagImportExportAsync(bool isImportMode, IEnumerable<Models.TagDefinition> currentTags, IHmiClipboardService? clipboard = null)
+        {
+            if (MainWindow == null) return null;
+
+            var vm = new TagImportExportViewModel(isImportMode, currentTags, clipboard ?? _hmiClipboardService);
+            var window = new TagImportExportWindow
+            {
+                DataContext = vm
+            };
+            vm.CloseAction = () => window.Close();
+
+            await window.ShowDialog(MainWindow);
+            return vm.IsConfirmed ? vm.ResultTags : null;
         }
 
         public async Task<bool> PromptPasswordAsync(string expectedPassword, string title = "Вход в режим редактирования")

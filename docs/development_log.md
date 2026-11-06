@@ -1293,3 +1293,38 @@
     *   Сборка: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj` — **0 ошибок, 0 предупреждений**.
     *   Тесты: `dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj` — **19/19 PASS** (включая расширенные подтесты 19.9, 19.10, 19.11).
     *   Headless-рендер: Сгенерирован снимок `artifacts/ui_preview.png`.
+
+---
+
+## 📅 06.11.2026 (Сессия 45 — Визуальный интерфейс Менеджера тегов SCADA, Tag Picker, линейное масштабирование сигналов и импорт/экспорт CSV/JSON)
+
+### 📌 Достижение: Полнофункциональная визуальная подсистема управления тегами (Tag Manager), модальный выбор тегов в виджетах (Tag Browser), математическое масштабирование $Y = A \cdot X + B$, импорт/экспорт таблиц сигналов Codesys/TIA Portal/Excel и персистентность
+
+*   **Окно Менеджера тегов (`Views/TagManagerWindow.axaml` & `ViewModels/TagManagerViewModel.cs`):**
+    *   Разработан промышленный табличный интерфейс в темной теме SCADA.
+    *   Таблица с 12 колонками: `TagId`, `Наименование`, `Подключение`, `Адрес`, `Тип данных`, `Ед. изм.`, `Масштаб`, `Deadband`, `Значение`, `Качество`, `Время`, `Действия`.
+    *   Реактивное буферизованное обновление телеметрии (`Buffer(50ms, 20)`) с маршалингом в UI-поток `Dispatcher.UIThread`, устраняющее фризы при сотнях обновлений в секунду.
+    *   Счетчики качества в верхней панели (`Total`, `Good`, `Stale`, `Bad`, `Overridden`).
+    *   Многокритериальная фильтрация в реальном времени: текстовый поиск по `TagId`, `Name`, `Address`, `ConnId` и фильтрация по статусу качества.
+    *   CRUD: Добавление нового тега, редактирование по двойному клику или кнопке, дублирование и удаление. Все изменения синхронизируются с `ITagManagerService` и сохраняются в `config.json`.
+    *   Оперативное управление: Принудительное задание значения («⚡ Force») с подтверждением и снятие фиксации («🔄 Clear Override»).
+
+*   **Интеграция с редактором виджетов (`Views/TagPickerWindow.axaml` & `ViewModels/TagPickerViewModel.cs`):**
+    *   В `WidgetEditorWindow.axaml` добавлена кнопка «🏷️ Выбрать из базы...» рядом с полем адреса/тега.
+    *   Модальное окно выбора тега с мгновенным поиском и выбором по двойному клику.
+    *   Автоматическое заполнение параметров виджета из выбранного `TagDefinition`: `TagId`, `ConnId`, `Address`, `DataType`, `Title`, `Unit`, `Format`.
+
+*   **Импорт и экспорт базы сигналов (`Services/TagExportImportService.cs`, `TagImportExportWindow.axaml`):**
+    *   Поддержка форматов CSV и JSON.
+    *   Автоопределение разделителей колонок (`;`, `,`, `\t`), поддержка кавычек RFC 4180.
+    *   Нормализация русских и английских заголовков из таблиц сигналов Codesys, TIA Portal, Excel (включая учет латинских и кириллических символов `А`/`B`).
+    *   Интеграция с буфером обмена HMI (`IHmiClipboardService`).
+
+*   **Линейное масштабирование ($Y = A \cdot X + B$):**
+    *   В `TagDefinition.cs` добавлены параметры `ScaleA` (множитель) и `ScaleB` (смещение) с форматированием `ScalingDisplay` (`CultureInfo.InvariantCulture`).
+    *   В `TagManagerService.UpdateTagValue` интегрировано автоматическое преобразование входной физической величины по формуле $Y = A \cdot X + B$ для всех числовых типов перед проверкой зоны нечувствительности `Deadband`.
+
+*   **Верификация:**
+    *   Сборка: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj` — **0 ошибок, 0 предупреждений**.
+    *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation` — **20/20 PASS** (включая комплексный тест №20).
+    *   Headless-рендер: Сгенерированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json` для `TagManagerWindow`.

@@ -15,6 +15,13 @@ namespace AvaloniaApplication1.Services
         Task<ConnectionConfig?> ShowConnectionEditorAsync(ConnectionConfig? existingConfig);
         Task ShowConnectionManagerAsync(HmiConfiguration config);
 
+        // Tag Manager & Signal Database dialogs
+        Task ShowTagManagerAsync(HmiConfiguration config);
+        Task<Models.TagDefinition?> ShowTagEditorAsync(Models.TagDefinition? existingTag, IEnumerable<ConnectionConfig> connections, IEnumerable<Models.TagDefinition> existingTags);
+        Task<Models.TagDefinition?> ShowTagPickerAsync(IEnumerable<Models.TagDefinition> availableTags, string? initialTagId = null);
+        Task<(bool Confirmed, object? Value)> ShowTagForceDialogAsync(Models.TagDefinition tag, object? currentValue);
+        Task<List<Models.TagDefinition>?> ShowTagImportExportAsync(bool isImportMode, IEnumerable<Models.TagDefinition> currentTags, IHmiClipboardService? clipboard = null);
+
         // Security & Settings
         Task<bool> PromptPasswordAsync(string expectedPassword, string title = "Вход в режим редактирования");
         Task ShowSettingsAsync(HmiConfiguration config, IConfigurationService configService);

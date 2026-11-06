@@ -783,3 +783,33 @@
   - [x] Расширен тест №19 в `UIValidation/Program.cs` подтестами 19.9, 19.10, 19.11
   - [x] 19/19 PASS, 0 предупреждений, 0 ошибок сборки
   - [x] Успешная генерация артефактов headless-рендеринга
+
+# Tasks: Visual Tag Manager Subsystem, Tag Picker & Signal Table Import/Export (Сессия 45 — Выполнено)
+
+- [x] Полнофункциональное окно Менеджера тегов (`TagManagerWindow.axaml` & `TagManagerViewModel.cs`):
+  - [x] Таблица тегов с 12 промышленными колонками: `TagId`, `Наименование`, `Подключение`, `Адрес`, `Тип данных`, `Ед. изм.`, `Масштаб` ($Y = A \cdot X + B$), `Deadband`, `Значение`, `Качество`, `Время`, `Действия`
+  - [x] Быстрый поиск и фильтрация по подстроке (TagId, Имя, Адрес, Подключение) и по качеству тега (Все, Good, Stale, Bad, [M] Overridden)
+  - [x] Статистические счетчики в тулбаре: Всего, Достоверных, Устаревших, С ошибками, С фиксацией
+  - [x] Буферизованный прием телеметрии (`Buffer(50ms, 20)`) с маршалингом в UI-поток без лагов
+  - [x] CRUD операции: Добавить (`TagEditWindow.axaml`), Редактировать, Дублировать, Удалить с сохранением в `ITagManagerService` и `config.json`
+  - [x] Runtime управление: Принудительное задание значения (Force Override) через `TagForceWindow.axaml` с предупреждением оператора и снятие фиксации (Clear Override)
+- [x] Импорт и экспорт базы сигналов (`TagExportImportService.cs`, `TagImportExportWindow.axaml` & `TagImportExportViewModel.cs`):
+  - [x] Поддержка форматов CSV и JSON
+  - [x] Автоопределение разделителей (`;`, `,`, `\t`)
+  - [x] Поддержка русских и английских заголовков из таблиц сигналов Codesys, TIA Portal, Excel
+  - [x] Двусторонний буфер обмена (Копировать в буфер / Вставить из буфера)
+- [x] Интеграция с редактором виджетов (`WidgetEditorWindow.axaml` & `WidgetEditorViewModel.cs`):
+  - [x] Модальный браузер тегов `TagPickerWindow.axaml` с быстрым поиском и выбором в 1 клик
+  - [x] Автоматическое заполнение `TagId`, `ConnId`, `Address`, `DataType`, `Title`, `Unit`, `Format`
+- [x] Интеграция с главным окном (`MainWindow.axaml` & `MainViewModel.cs`):
+  - [x] Кнопка «🏷️ Теги» в тулбаре режима редактирования
+  - [x] Горячая клавиша `Ctrl+T` для быстрого открытия
+- [x] Масштабирование сигналов ($Y = A \cdot X + B$):
+  - [x] Поля `ScaleA`, `ScaleB` в `TagDefinition.cs`
+  - [x] Интеграция линейного преобразования в `TagManagerService.UpdateTagValue` с культуронезависимым парсингом
+- [x] Тестирование и верификация:
+  - [x] Разработан комплексный автоматический тест №20 в `AvaloniaApplication1.UIValidation/Program.cs`
+  - [x] Успешное прохождение всех 20 тестов (20/20 PASS, 100%)
+  - [x] Headless-рендеринг `TagManagerWindow` в `artifacts/ui_preview.png` и `artifacts/ui_tree.json`
+  - [x] Чистая сборка: 0 ошибок, 0 предупреждений
+

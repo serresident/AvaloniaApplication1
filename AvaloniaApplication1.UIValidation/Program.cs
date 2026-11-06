@@ -84,6 +84,13 @@ public class MockTestDialogService : IDialogService
     public Task ShowSettingsAsync(HmiConfiguration config, IConfigurationService configService) => Task.CompletedTask;
     public Task<string?> ShowOpenProjectDialogAsync() => Task.FromResult<string?>(null);
     public Task<string?> ShowSaveProjectAsDialogAsync(string? defaultFileName = null) => Task.FromResult<string?>(null);
+
+    // Tag Manager Dialog mocks
+    public Task ShowTagManagerAsync(HmiConfiguration config) => Task.CompletedTask;
+    public Task<TagDefinition?> ShowTagEditorAsync(TagDefinition? existingTag, IEnumerable<ConnectionConfig> connections, IEnumerable<TagDefinition> existingTags) => Task.FromResult<TagDefinition?>(null);
+    public Task<TagDefinition?> ShowTagPickerAsync(IEnumerable<TagDefinition> availableTags, string? initialTagId = null) => Task.FromResult<TagDefinition?>(null);
+    public Task<(bool Confirmed, object? Value)> ShowTagForceDialogAsync(TagDefinition tag, object? currentValue) => Task.FromResult<(bool Confirmed, object? Value)>((true, currentValue ?? (object)100));
+    public Task<List<TagDefinition>?> ShowTagImportExportAsync(bool isImportMode, IEnumerable<TagDefinition> currentTags, IHmiClipboardService? clipboard = null) => Task.FromResult<List<TagDefinition>?>(null);
 }
 
 public class BoundsDto
@@ -247,6 +254,48 @@ public static class Program
                 {
                     Width = 800,
                     Height = 600
+                };
+            }
+            else if (string.Equals(targetView, "TagManagerWindow", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(targetView, "TagManager", StringComparison.OrdinalIgnoreCase))
+            {
+                var testConfig = new HmiConfiguration
+                {
+                    Connections = new List<ConnectionConfig>
+                    {
+                        new() { Id = "plc_511", Type = "ModbusTCP", Host = "127.0.0.1", Port = 502 },
+                        new() { Id = "mqtt_wb", Type = "MQTT", Host = "10.10.10.234", Port = 1883 }
+                    },
+                    Tags = new List<TagDefinition>
+                    {
+                        new() { TagId = "tag_p101_press", Name = "Давление в напорном коллекторе", ConnId = "plc_511", Address = "40001", DataType = "Float32", Unit = "бар", ScaleA = 0.1, ScaleB = 0.0, Deadband = 0.05 },
+                        new() { TagId = "tag_t101_temp", Name = "Температура продукта в реакторе R-101", ConnId = "plc_511", Address = "40003", DataType = "Float32", Unit = "°C", ScaleA = 1.0, ScaleB = 0.0 },
+                        new() { TagId = "tag_pump1_run", Name = "Состояние насоса H-1 (Пуск)", ConnId = "plc_511", Address = "00001", DataType = "Bool" },
+                        new() { TagId = "tag_level_lt101", Name = "Уровень в емкости E-1", ConnId = "mqtt_wb", Address = "/devices/wb-mwac/controls/K1", DataType = "Float32", Unit = "%" },
+                        new() { TagId = "tag_valve_xv101", Name = "Отсечной клапан XV-101", ConnId = "plc_511", Address = "00012", DataType = "Bool" }
+                    }
+                };
+
+                var testTagManager = new TagManagerService(startWatchdogLoop: false);
+                testTagManager.Initialize(testConfig.Tags);
+                testTagManager.UpdateTagValue("tag_p101_press", 42.5f, TagQuality.Good);
+                testTagManager.UpdateTagValue("tag_t101_temp", 85.0f, TagQuality.Stale);
+                testTagManager.UpdateTagValue("tag_pump1_run", true, TagQuality.Good);
+                testTagManager.ForceOverride("tag_level_lt101", 95.0f);
+                testTagManager.UpdateTagValue("tag_valve_xv101", 0, TagQuality.CommFailure, "Timeout");
+
+                var tagManagerVm = new TagManagerViewModel(
+                    testConfig, 
+                    testTagManager, 
+                    sp.GetRequiredService<IDialogService>(), 
+                    sp.GetRequiredService<IConfigurationService>(), 
+                    sp.GetRequiredService<IHmiClipboardService>());
+
+                window = new TagManagerWindow
+                {
+                    DataContext = tagManagerVm,
+                    Width = 1320,
+                    Height = 750
                 };
             }
             else if (string.Equals(targetView, "WidgetEditorWindow", StringComparison.OrdinalIgnoreCase))
@@ -1561,7 +1610,7 @@ public static class Program
                     ButtonMode = "Toggle",
                     Source = new DataSourceConfig { ConnId = "plc1", Address = "40001", TagId = "tag_plc1_40001" }
                 };
-                var cmdVm = new CommandButtonViewModel(cmdConfig, mockCore, mainVm.ProjectContext) { DialogService = testDialog };
+                var cmdVm = new CommandButtonViewModel(cmdConfig, mockCore, new ProjectContextService { IsDesignMode = false }) { DialogService = testDialog };
                 cmdVm.ApplySnapshot(new TagSnapshot("tag_plc1_40001", 0, TagQuality.Stale, DateTime.UtcNow.AddMinutes(-5)));
 
                 // Test operator cancel: must NOT force override
@@ -1594,7 +1643,189 @@ public static class Program
                     throw new Exception($"SetValueViewModel failed to display '---' on comm error. Got: {svVm.DisplayValue}");
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (19/19) PASSED SUCCESSFULLY!");
+            // =========================================================================
+            // TEST 20: Industrial Tag Manager UI, CRUD, Live Telemetry, Scaling, Override & CSV/JSON
+            // =========================================================================
+            Console.WriteLine("[UIValidation] Testing Industrial Tag Manager UI, CRUD, Scaling & Import/Export (Test 20)...");
+            {
+                // 20.1 TagDefinition Scaling Y = A * X + B
+                var scaledDef = new TagDefinition
+                {
+                    TagId = "tag_scale_test",
+                    Name = "Давление пара",
+                    ConnId = "plc1",
+                    Address = "40050",
+                    DataType = "Float32",
+                    Unit = "бар",
+                    ScaleA = 0.1,
+                    ScaleB = 5.0,
+                    Deadband = 0.05
+                };
+                if (!scaledDef.ScalingDisplay.Contains("0.1") || !scaledDef.ScalingDisplay.Contains("5"))
+                    throw new Exception($"TagDefinition.ScalingDisplay expected '0.1*X + 5', got '{scaledDef.ScalingDisplay}'");
+
+                var tMgr = new TagManagerService(startWatchdogLoop: false);
+                tMgr.RegisterTag(scaledDef);
+                tMgr.UpdateTagValue("tag_scale_test", 100.0f, TagQuality.Good);
+                var snap = tMgr.GetSnapshot("tag_scale_test");
+                if (Math.Abs((double)snap.Value! - 15.0) > 0.001)
+                    throw new Exception($"Scaling Y = A * X + B failed: expected 15.0, got {snap.Value}");
+
+                // 20.2 TagManagerService RemoveTag & UpdateTag
+                scaledDef.Name = "Давление пара (Обновлено)";
+                tMgr.UpdateTag(scaledDef);
+                if (tMgr.GetTagDefinition("tag_scale_test")?.Name != "Давление пара (Обновлено)")
+                    throw new Exception("TagManagerService.UpdateTag failed to update name.");
+
+                bool removed = tMgr.RemoveTag("tag_scale_test");
+                if (!removed || tMgr.GetTagDefinition("tag_scale_test") != null)
+                    throw new Exception("TagManagerService.RemoveTag failed to delete tag.");
+
+                // 20.3 TagItemViewModel Presentation & Quality Glyphs
+                var itemDef = new TagDefinition
+                {
+                    TagId = "tag_ui_row",
+                    Name = "Температура T-200",
+                    ConnId = "modbus_main",
+                    Address = "40010",
+                    DataType = "Float32",
+                    Unit = "°C"
+                };
+                var rowVm = new TagItemViewModel(itemDef);
+                if (rowVm.Quality != TagQuality.Uninitialized || rowVm.LiveValue != "---")
+                    throw new Exception("TagItemViewModel initial state should be Uninitialized and '---'.");
+
+                // Good state
+                rowVm.ApplySnapshot(new TagSnapshot("tag_ui_row", 78.4f, TagQuality.Good, DateTime.UtcNow));
+                if (rowVm.Quality != TagQuality.Good || !rowVm.LiveValue.Contains("78.4") || rowVm.QualityGlyph != "✓")
+                    throw new Exception($"TagItemViewModel Good state failed: Value='{rowVm.LiveValue}', Glyph='{rowVm.QualityGlyph}'");
+
+                // Stale state
+                rowVm.ApplySnapshot(new TagSnapshot("tag_ui_row", 78.4f, TagQuality.Stale, DateTime.UtcNow.AddMinutes(-1)));
+                if (rowVm.Quality != TagQuality.Stale || rowVm.QualityGlyph != "⏳")
+                    throw new Exception($"TagItemViewModel Stale state failed: Glyph='{rowVm.QualityGlyph}'");
+
+                // Overridden state
+                rowVm.ApplySnapshot(new TagSnapshot("tag_ui_row", 99.0f, TagQuality.Overridden, DateTime.UtcNow, null, true));
+                if (!rowVm.IsOverridden || rowVm.QualityGlyph != "⚡" || !rowVm.QualityText.Contains("Overridden"))
+                    throw new Exception($"TagItemViewModel Overridden state failed: IsOverridden={rowVm.IsOverridden}, Glyph='{rowVm.QualityGlyph}'");
+
+                // 20.4 TagManagerViewModel CRUD, Search & Filtering
+                var tmConfig = new HmiConfiguration
+                {
+                    Connections = new List<ConnectionConfig>
+                    {
+                        new() { Id = "plc_511", Type = "ModbusTCP" },
+                        new() { Id = "wb_mqtt", Type = "MQTT" }
+                    },
+                    Tags = new List<TagDefinition>
+                    {
+                        new() { TagId = "tag_t1", Name = "Температура R-101", ConnId = "plc_511", Address = "40001", DataType = "Float32", Unit = "°C" },
+                        new() { TagId = "tag_p1", Name = "Давление в линии", ConnId = "plc_511", Address = "40002", DataType = "Float32", Unit = "бар" },
+                        new() { TagId = "tag_l1", Name = "Уровень в емкости", ConnId = "wb_mqtt", Address = "level/tank", DataType = "Float32", Unit = "%" }
+                    }
+                };
+
+                var tagEngine = new TagManagerService(startWatchdogLoop: false);
+                tagEngine.Initialize(tmConfig.Tags);
+                tagEngine.UpdateTagValue("tag_t1", 85.5f, TagQuality.Good);
+                tagEngine.UpdateTagValue("tag_p1", 6.2f, TagQuality.Stale);
+                tagEngine.ForceOverride("tag_l1", 99.0f);
+
+                var mockDialog = new MockTestDialogService();
+                var tmVm = new TagManagerViewModel(tmConfig, tagEngine, mockDialog, sp.GetRequiredService<IConfigurationService>(), sp.GetRequiredService<IHmiClipboardService>());
+
+                if (tmVm.Tags.Count != 3 || tmVm.FilteredTags.Count != 3)
+                    throw new Exception($"TagManagerViewModel expected 3 tags, got {tmVm.Tags.Count}");
+                if (tmVm.GoodCount != 1 || tmVm.StaleCount != 1 || tmVm.OverriddenCount != 1)
+                    throw new Exception($"TagManagerViewModel statistics mismatch: Good={tmVm.GoodCount}, Stale={tmVm.StaleCount}, Overridden={tmVm.OverriddenCount}");
+
+                // Filter by search query
+                tmVm.SearchText = "линии";
+                if (tmVm.FilteredTags.Count != 1 || tmVm.FilteredTags[0].TagId != "tag_p1")
+                    throw new Exception($"TagManagerViewModel SearchText 'линии' failed: found {tmVm.FilteredTags.Count} tags");
+
+                // Filter by connection
+                tmVm.SearchText = "";
+                tmVm.SelectedConnectionFilter = "wb_mqtt";
+                if (tmVm.FilteredTags.Count != 1 || tmVm.FilteredTags[0].TagId != "tag_l1")
+                    throw new Exception($"TagManagerViewModel ConnectionFilter 'wb_mqtt' failed: found {tmVm.FilteredTags.Count} tags");
+
+                // Filter by quality
+                tmVm.SelectedConnectionFilter = "Все подключения";
+                tmVm.SelectedQualityFilter = "⚡ [M] Overridden (Фиксация)";
+                if (tmVm.FilteredTags.Count != 1 || tmVm.FilteredTags[0].TagId != "tag_l1")
+                    throw new Exception($"TagManagerViewModel QualityFilter 'Overridden' failed: found {tmVm.FilteredTags.Count} tags");
+
+                tmVm.SelectedQualityFilter = "Все качества";
+
+                // Force override & Clear override from VM
+                var targetRow = tmVm.Tags.First(t => t.TagId == "tag_t1");
+                tmVm.ForceOverrideCommand.Execute(targetRow);
+                if (!targetRow.IsOverridden || targetRow.Quality != TagQuality.Overridden)
+                    throw new Exception("TagManagerViewModel.ForceOverrideCommand failed to set Overridden quality.");
+
+                tmVm.ClearOverrideCommand.Execute(targetRow);
+                if (targetRow.IsOverridden)
+                    throw new Exception("TagManagerViewModel.ClearOverrideCommand failed to remove override.");
+
+                // 20.5 CSV Export & Import Service
+                var csvOut = TagExportImportService.ExportCsv(tmConfig.Tags);
+                if (!csvOut.Contains("TagId") || !csvOut.Contains("tag_t1") || !csvOut.Contains("tag_p1"))
+                    throw new Exception("TagExportImportService.ExportCsv failed to output CSV header or tags.");
+
+                var importedFromCsv = TagExportImportService.ImportCsv(csvOut);
+                if (importedFromCsv.Count != 3 || importedFromCsv[0].TagId != "tag_t1" || importedFromCsv[0].Unit != "°C")
+                    throw new Exception($"TagExportImportService.ImportCsv failed: expected 3 tags, got {importedFromCsv.Count}");
+
+                // Test CSV import with custom Excel semicolon delimited columns
+                var customCsv = "ID;Наименование;Драйвер;Регистр;Тип;ЕдИзм;МасштабA;МасштабB;Апертура\n" +
+                                "tag_gas_flow;Расход газа;plc_511;40020;Float32;м³/ч;1.5;0.0;0.1\n";
+                var customParsed = TagExportImportService.ImportCsv(customCsv);
+                if (customParsed.Count != 1 || customParsed[0].TagId != "tag_gas_flow" || customParsed[0].Unit != "м³/ч" || Math.Abs(customParsed[0].ScaleA - 1.5) > 0.001)
+                    throw new Exception("TagExportImportService failed to parse Russian Excel signal table.");
+
+                // 20.6 JSON Export & Import Service
+                var jsonOut = TagExportImportService.ExportJson(tmConfig.Tags);
+                if (!jsonOut.Contains("\"TagId\": \"tag_t1\""))
+                    throw new Exception("TagExportImportService.ExportJson failed.");
+
+                var importedFromJson = TagExportImportService.ImportJson(jsonOut);
+                if (importedFromJson.Count != 3 || importedFromJson[1].TagId != "tag_p1")
+                    throw new Exception("TagExportImportService.ImportJson failed.");
+
+                // 20.7 TagPickerViewModel & WidgetEditorViewModel 1-Click Integration
+                var pickerVm = new TagPickerViewModel(tmConfig.Tags);
+                pickerVm.SearchText = "R-101";
+                if (pickerVm.FilteredTags.Count != 1 || pickerVm.FilteredTags[0].TagId != "tag_t1")
+                    throw new Exception("TagPickerViewModel SearchText failed.");
+
+                pickerVm.SelectedTag = pickerVm.FilteredTags[0];
+                pickerVm.ConfirmCommand.Execute(null);
+                if (!pickerVm.IsConfirmed)
+                    throw new Exception("TagPickerViewModel ConfirmCommand failed.");
+
+                var widgetCfgToEdit = new ValueDisplayConfig
+                {
+                    Type = "ValueDisplay",
+                    Title = "Новый виджет",
+                    Format = "{0}"
+                };
+                var widgetEditVm = new WidgetEditorViewModel(widgetCfgToEdit, tmConfig.Connections, tags: tmConfig.Tags);
+                widgetEditVm.ApplyTag(pickerVm.SelectedTag);
+
+                if (widgetEditVm.SelectedTagId != "tag_t1" ||
+                    widgetEditVm.SelectedConnectionId != "plc_511" ||
+                    widgetEditVm.Address != "40001" ||
+                    widgetEditVm.SelectedDataType != "Float32" ||
+                    widgetEditVm.Title != "Температура R-101" ||
+                    widgetEditVm.Format != "{0:F1} °C")
+                {
+                    throw new Exception($"WidgetEditorViewModel.ApplyTag failed to auto-fill properties: Title='{widgetEditVm.Title}', Format='{widgetEditVm.Format}', TagId='{widgetEditVm.SelectedTagId}'");
+                }
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (20/20) PASSED SUCCESSFULLY!");
         }
     }
 

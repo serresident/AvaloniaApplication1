@@ -1,0 +1,290 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels"
+        xmlns:models="clr-namespace:AvaloniaApplication1.Models"
+        mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="750"
+        x:Class="AvaloniaApplication1.Views.TagManagerWindow"
+        x:DataType="vm:TagManagerViewModel"
+        x:CompileBindings="True"
+        Title="🏷️ Менеджер тегов и база сигналов (Tag Manager)"
+        Width="1320" Height="750"
+        MinWidth="1050" MinHeight="550"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+
+        <!-- Row 0: Top Header & Statistics Badges -->
+        <Border Grid.Row="0" Background="#252526" Padding="14,10" BorderBrush="#3F3F46" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- Title & Subtitle -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Border Background="#D97706" CornerRadius="6" Padding="8,4" VerticalAlignment="Center">
+                        <TextBlock Text="🏷️" FontSize="16" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Менеджер тегов SCADA" Foreground="White" FontSize="16" FontWeight="Bold" />
+                        <TextBlock Text="Централизованный диспетчер сигналов, масштабирование Y=A*X+B и ручные фиксации [M]" Foreground="#888888" FontSize="11" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Statistics Badges -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <!-- Total Count -->
+                    <Border Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="8,4"
+                            ToolTip.Tip="Всего зарегистрированных тегов проекта">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="Теги:" Foreground="#888888" FontSize="11" />
+                            <TextBlock Text="{Binding TotalCount}" Foreground="White" FontSize="12" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Good Quality -->
+                    <Border Background="#153E1B" BorderBrush="#00E676" BorderThickness="1" CornerRadius="4" Padding="8,4"
+                            ToolTip.Tip="Достоверные сигналы на связи">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="🟢 Good:" Foreground="#A5D6A7" FontSize="11" />
+                            <TextBlock Text="{Binding GoodCount}" Foreground="#00E676" FontSize="12" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Stale Quality -->
+                    <Border Background="#4D2C00" BorderBrush="#FFB300" BorderThickness="1" CornerRadius="4" Padding="8,4"
+                            ToolTip.Tip="Устаревшие сигналы (Watchdog Stale)">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="⏳ Stale:" Foreground="#FFE082" FontSize="11" />
+                            <TextBlock Text="{Binding StaleCount}" Foreground="#FFB300" FontSize="12" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Bad / Timeout Quality -->
+                    <Border Background="#4A1212" BorderBrush="#FF5252" BorderThickness="1" CornerRadius="4" Padding="8,4"
+                            ToolTip.Tip="Таймаут или ошибка связи (Timeout / CommFailure)">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="⚠️ Ошибка:" Foreground="#FFCDD2" FontSize="11" />
+                            <TextBlock Text="{Binding BadCount}" Foreground="#FF5252" FontSize="12" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Overridden Quality -->
+                    <Border Background="#381E48" BorderBrush="#E040FB" BorderThickness="1" CornerRadius="4" Padding="8,4"
+                            ToolTip.Tip="Теги с ручной операторской фиксацией [M]">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="⚡ [M] Force:" Foreground="#EA80FC" FontSize="11" />
+                            <TextBlock Text="{Binding OverriddenCount}" Foreground="#E040FB" FontSize="12" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Row 1: Action Toolbar & Search Filters -->
+        <Border Grid.Row="1" Background="#2D2D30" Padding="12,8" BorderBrush="#3F3F46" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto">
+                <!-- Search Box -->
+                <TextBox Grid.Column="0" Width="220"
+                         Text="{Binding SearchText}"
+                         PlaceholderText="🔍 Поиск по ID, имени, адресу..."
+                         Background="#1E1E1E" Foreground="White"
+                         CornerRadius="4" Padding="6,5" FontSize="12" />
+
+                <!-- Connection Filter -->
+                <ComboBox Grid.Column="2" Width="140"
+                          ItemsSource="{Binding ConnectionFilterOptions}"
+                          SelectedItem="{Binding SelectedConnectionFilter}"
+                          Background="#1E1E1E" Foreground="White"
+                          CornerRadius="4" FontSize="12" />
+
+                <!-- Quality Filter -->
+                <ComboBox Grid.Column="4" Width="155"
+                          ItemsSource="{Binding QualityFilterOptions}"
+                          SelectedItem="{Binding SelectedQualityFilter}"
+                          Background="#1E1E1E" Foreground="White"
+                          CornerRadius="4" FontSize="12" />
+
+                <!-- Action CRUD & Import/Export Buttons -->
+                <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="4">
+                    <Button Command="{Binding AddTagCommand}"
+                            Content="➕ Добавить"
+                            Background="#008A00" Foreground="White"
+                            CornerRadius="4" Padding="8,5" FontSize="12" FontWeight="SemiBold"
+                            ToolTip.Tip="Зарегистрировать новый тег" />
+
+                    <Button Command="{Binding EditTagCommand}"
+                            Content="✏️ Изменить"
+                            Background="#007ACC" Foreground="White"
+                            CornerRadius="4" Padding="8,5" FontSize="12" FontWeight="SemiBold"
+                            ToolTip.Tip="Редактировать параметры выбранного тега" />
+
+                    <Button Command="{Binding DuplicateTagCommand}"
+                            Content="📋 Копия"
+                            Background="#6A1B9A" Foreground="White"
+                            CornerRadius="4" Padding="8,5" FontSize="12" FontWeight="SemiBold"
+                            ToolTip.Tip="Дублировать выбранный тег" />
+
+                    <Button Command="{Binding DeleteTagCommand}"
+                            Content="🗑️ Удалить"
+                            Background="#C62828" Foreground="White"
+                            CornerRadius="4" Padding="8,5" FontSize="12" FontWeight="SemiBold"
+                            ToolTip.Tip="Удалить выбранный тег из проекта" />
+
+                    <Border Width="1" Background="#4A4A4F" Margin="2,2" />
+
+                    <Button Command="{Binding ImportTagsCommand}"
+                            Content="📥 Импорт..."
+                            Background="#3E3E42" Foreground="White"
+                            CornerRadius="4" Padding="8,5" FontSize="12"
+                            ToolTip.Tip="Импорт таблицы сигналов из CSV или JSON (Excel, Codesys, TIA Portal)" />
+
+                    <Button Command="{Binding ExportTagsCommand}"
+                            Content="📤 Экспорт..."
+                            Background="#3E3E42" Foreground="White"
+                            CornerRadius="4" Padding="8,5" FontSize="12"
+                            ToolTip.Tip="Экспорт базы тегов в CSV или JSON" />
+
+                    <Button Command="{Binding SaveConfigCommand}"
+                            Content="💾 Сохранить"
+                            Background="#00796B" Foreground="White"
+                            CornerRadius="4" Padding="9,5" FontSize="12" FontWeight="SemiBold"
+                            ToolTip.Tip="Сохранить базу тегов в файл проекта config.json" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Row 2: Table Column Headers -->
+        <Border Grid.Row="2" Background="#18181A" BorderBrush="#3F3F46" BorderThickness="0,0,0,1" Padding="8,8">
+            <Grid ColumnDefinitions="140,170,90,95,75,55,95,70,110,125,90,140">
+                <TextBlock Grid.Column="0" Text="Идентификатор (TagId)" Foreground="#9CDCFE" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <TextBlock Grid.Column="1" Text="Наименование" Foreground="#CCCCCC" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <TextBlock Grid.Column="2" Text="Драйвер" Foreground="#4EC9B0" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <TextBlock Grid.Column="3" Text="Адрес / Топик" Foreground="#DCDCAA" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <TextBlock Grid.Column="4" Text="Тип данных" Foreground="#C586C0" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <TextBlock Grid.Column="5" Text="Ед. изм." Foreground="#CCCCCC" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <TextBlock Grid.Column="6" Text="Масштаб (Y)" Foreground="#B5CEA8" FontSize="11" FontWeight="Bold" Margin="4,0" ToolTip.Tip="Формула линейного пересчёта Y = A*X + B" />
+                <TextBlock Grid.Column="7" Text="Апертура" Foreground="#858585" FontSize="11" FontWeight="Bold" Margin="4,0" ToolTip.Tip="Deadband: фильтрация шума" />
+                <TextBlock Grid.Column="8" Text="Текущее (Live)" Foreground="#00E5FF" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <TextBlock Grid.Column="9" Text="Качество" Foreground="#CCCCCC" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <TextBlock Grid.Column="10" Text="Время" Foreground="#858585" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <TextBlock Grid.Column="11" Text="Управление (Force)" Foreground="#E040FB" FontSize="11" FontWeight="Bold" Margin="4,0" />
+            </Grid>
+        </Border>
+
+        <!-- Row 3: Interactive Virtualized Tag List -->
+        <Border Grid.Row="3" Background="#1E1E1E">
+            <ListBox ItemsSource="{Binding FilteredTags}"
+                     SelectedItem="{Binding SelectedTag}"
+                     Background="Transparent"
+                     DoubleTapped="OnRowDoubleTapped">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:TagItemViewModel">
+                        <Grid ColumnDefinitions="140,170,90,95,75,55,95,70,110,125,90,140" Margin="0,3">
+                            <!-- Col 0: TagId -->
+                            <TextBlock Grid.Column="0" Text="{Binding TagId}"
+                                       FontFamily="Consolas, monospace" Foreground="#9CDCFE" FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding TagId}"
+                                       VerticalAlignment="Center" Margin="4,0" />
+
+                            <!-- Col 1: Name -->
+                            <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                       Foreground="White"
+                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}"
+                                       VerticalAlignment="Center" Margin="4,0" />
+
+                            <!-- Col 2: ConnId Badge -->
+                            <Border Grid.Column="2" Background="#2A3344" CornerRadius="3" Padding="5,1"
+                                    HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0">
+                                <TextBlock Text="{Binding ConnId}" Foreground="#4EC9B0" FontSize="11" />
+                            </Border>
+
+                            <!-- Col 3: Address -->
+                            <TextBlock Grid.Column="3" Text="{Binding Address}"
+                                       FontFamily="Consolas, monospace" Foreground="#DCDCAA"
+                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Address}"
+                                       VerticalAlignment="Center" Margin="4,0" />
+
+                            <!-- Col 4: DataType -->
+                            <TextBlock Grid.Column="4" Text="{Binding DataType}"
+                                       Foreground="#C586C0" FontSize="11"
+                                       VerticalAlignment="Center" Margin="4,0" />
+
+                            <!-- Col 5: Unit -->
+                            <TextBlock Grid.Column="5" Text="{Binding Unit}"
+                                       Foreground="#CCCCCC" FontSize="11"
+                                       VerticalAlignment="Center" Margin="4,0" />
+
+                            <!-- Col 6: ScalingDisplay -->
+                            <TextBlock Grid.Column="6" Text="{Binding ScalingDisplay}"
+                                       FontFamily="Consolas, monospace" Foreground="#B5CEA8" FontSize="11"
+                                       VerticalAlignment="Center" Margin="4,0" ToolTip.Tip="{Binding ScalingDisplay}" />
+
+                            <!-- Col 7: Deadband -->
+                            <TextBlock Grid.Column="7" Text="{Binding Deadband, StringFormat='{}{0:0.##}'}"
+                                       Foreground="#858585" FontSize="11"
+                                       VerticalAlignment="Center" Margin="4,0" />
+
+                            <!-- Col 8: Live Value -->
+                            <TextBlock Grid.Column="8" Text="{Binding LiveValue}"
+                                       FontFamily="Consolas, monospace" FontWeight="Bold" FontSize="13"
+                                       Foreground="{Binding ValueBrush}"
+                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding LiveValue}"
+                                       VerticalAlignment="Center" Margin="4,0" />
+
+                            <!-- Col 9: Quality Badge -->
+                            <Border Grid.Column="9" Background="{Binding QualityBadgeBackground}"
+                                    CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBlock Text="{Binding QualityGlyph}" FontWeight="Bold" FontSize="11" Foreground="{Binding QualityForeground}" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding QualityText}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding QualityForeground}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Col 10: Timestamp -->
+                            <TextBlock Grid.Column="10" Text="{Binding TimestampText}"
+                                       FontFamily="Consolas, monospace" Foreground="#858585" FontSize="11"
+                                       VerticalAlignment="Center" Margin="4,0" />
+
+                            <!-- Col 11: Runtime Action Controls -->
+                            <StackPanel Grid.Column="11" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="4,0">
+                                <Button Command="{Binding ForceOverrideCommand}"
+                                        Background="#381E48" Foreground="#E040FB"
+                                        CornerRadius="4" Padding="6,2" FontSize="11"
+                                        ToolTip.Tip="Принудительно задать значение (Force override)">
+                                    <TextBlock Text="⚡ Force" FontSize="11" />
+                                </Button>
+                                <Button Command="{Binding ClearOverrideCommand}"
+                                        Background="#4A1212" Foreground="#FF8A80"
+                                        CornerRadius="4" Padding="6,2" FontSize="11"
+                                        IsVisible="{Binding IsOverridden}"
+                                        ToolTip.Tip="Снять ручную фиксацию (Clear Override)">
+                                    <TextBlock Text="🔄 Снять" FontSize="11" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <!-- Row 4: Status Footer -->
+        <Border Grid.Row="4" Background="#252526" Padding="14,8" BorderBrush="#3F3F46" BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- Status Summary -->
+                <TextBlock Grid.Column="0" Text="{Binding StatusSummaryText}" Foreground="#AAAAAA" FontSize="12" VerticalAlignment="Center" />
+
+                <!-- Selected Tag Description Note -->
+                <TextBlock Grid.Column="1" Text="{Binding SelectedTag.Description, StringFormat='Примечание: {0}'}"
+                           Foreground="#858585" FontSize="11" FontStyle="Italic" TextTrimming="CharacterEllipsis"
+                           Margin="24,0" VerticalAlignment="Center" />
+
+                <!-- Close Button -->
+                <Button Grid.Column="2" Content="Закрыть"
+                        Background="#3E3E42" Foreground="White"
+                        CornerRadius="4" Padding="16,6" FontSize="13"
+                        Click="OnCloseClick" />
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>

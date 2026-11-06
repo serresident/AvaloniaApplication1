@@ -29,6 +29,7 @@
         <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenProjectCommand}" />
         <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveConfigCommand}" />
         <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveConfigAsCommand}" />
+        <KeyBinding Gesture="Ctrl+T" Command="{Binding OpenTagManagerCommand}" />
         <KeyBinding Gesture="Ctrl+OemComma" Command="{Binding OpenSettingsCommand}" />
     </Window.KeyBindings>
 
@@ -135,6 +136,14 @@
                             Background="#6A1B9A"
                             Foreground="White" CornerRadius="4" Padding="7,4"
                             ToolTip.Tip="Менеджер подключений (Modbus, MQTT)"
+                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
+
+                    <!-- Tag Manager Button -->
+                    <Button Command="{Binding OpenTagManagerCommand}"
+                            Content="🏷️ Теги"
+                            Background="#D97706"
+                            Foreground="White" CornerRadius="4" Padding="7,4"
+                            ToolTip.Tip="Менеджер тегов и база сигналов (Ctrl+T)"
                             IsVisible="{Binding ProjectContext.IsDesignMode}"/>
 
                     <!-- Mode Toggle Button (ALWAYS VISIBLE) -->
