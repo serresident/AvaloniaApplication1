@@ -2,5 +2,7 @@
 [Oo]bj/
 .vs/
 *.user
-.agents/
+/.agents/*
+!/.agents/skills/
+!/.agents/rules/
 
