@@ -1328,3 +1328,18 @@
     *   Сборка: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj` — **0 ошибок, 0 предупреждений**.
     *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation` — **20/20 PASS** (включая комплексный тест №20).
     *   Headless-рендер: Сгенерированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json` для `TagManagerWindow`.
+
+
+---
+
+## 📅 14.11.2026 (Сессия 46 — Технический дизайн-документ: Вынос библиотеки контролов и иерархическая реорганизация проекта)
+
+### 📌 Достижение: Утвержден и зафиксирован исчерпывающий дизайн-документ `docs/designs/controls_library_extraction_and_restructuring.md`
+
+*   **Концепция и архитектурные решения:**
+    *   Создание обособленной библиотеки классов `AvaloniaApplication1.Controls.csproj` (.NET 8 / Avalonia 12.0.4) для чистых аппаратно-визуальных контролов (`ValveControl`, `ReactorControl`, `HeatExchangerControl`, `LevelSensorControl`, `PipeControl`, `TrendLineControl`, `ColorPickerBox`, `FormatEditorBox`).
+    *   Предотвращение циклической зависимости (`Controls <--> App`): холст мнемосхемы `DashboardPanel.cs` и его хелперы остаются внутри хост-приложения в `Views/Canvas/`. Контрол трубы `PipeControl` декаплируется от прямого приведения `PipeWidgetViewModel` через StyledProperty `Points`.
+    *   Единое пространство имен XAML через `[assembly: XmlnsDefinition("https://github.com/avaloniaapplication1/controls", ...)]` в `AssemblyInfo.cs` с префиксом `<scada:ControlName>`.
+    *   Иерархическая раскладка `Views/` и `ViewModels/` по 7 функциональным подсистемам со строгим соблюдением C# namespace parity.
+    *   Сохранение всех инвариантов рендеринга (нулевые аллокации в `Render(DrawingContext)`, скомпилированные привязки `x:CompileBindings="True"`).
+    *   Разработан пошаговый план миграции (Phased Runbook) из 6 фаз с критерием 20/20 PASS тестов и 0 предупреждений компилятора.

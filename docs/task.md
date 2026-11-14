@@ -813,3 +813,42 @@
   - [x] Headless-рендеринг `TagManagerWindow` в `artifacts/ui_preview.png` и `artifacts/ui_tree.json`
   - [x] Чистая сборка: 0 ошибок, 0 предупреждений
 
+
+# Tasks: Industrial SCADA Controls Library Extraction & Hierarchical Reorganization (Сессия 46 — Текущая)
+
+- [/] Архитектурное проектирование и дизайн-документ:
+  - [x] Завершить концептуальный бриф (`concepts_brief.md`)
+  - [x] Подготовить, согласовать и утвердить технический дизайн-документ в `docs/designs/controls_library_extraction_and_restructuring.md`
+- [ ] Фаза 1: Создание проекта `AvaloniaApplication1.Controls.csproj` и связка в `.sln`:
+  - [ ] Создать проект `AvaloniaApplication1.Controls/AvaloniaApplication1.Controls.csproj` (.NET 8, Avalonia 12.0.4)
+  - [ ] Создать `AvaloniaApplication1.Controls/Properties/AssemblyInfo.cs` с регистрацией `[XmlnsDefinition]`
+  - [ ] Добавить проект в решение `AvaloniaApplication1.sln`
+  - [ ] Добавить `<ProjectReference>` в `AvaloniaApplication1.csproj` и `AvaloniaApplication1.UIValidation.csproj`
+- [ ] Фаза 2: Миграция чистых визуальных контролов в `AvaloniaApplication1.Controls`:
+  - [ ] Перенести `ValveControl.cs` -> `Controls/Equipment/`
+  - [ ] Перенести `ReactorControl.cs` -> `Controls/Equipment/`
+  - [ ] Перенести `HeatExchangerControl.cs` -> `Controls/Equipment/`
+  - [ ] Перенести `LevelSensorControl.cs` -> `Controls/Equipment/`
+  - [ ] Перенести `PipeControl.cs` -> `Controls/Piping/` с декаплингом от прямого каста `PipeWidgetViewModel`
+  - [ ] Перенести `TrendLineControl.cs` -> `Controls/Charting/`
+  - [ ] Перенести `ColorPickerBox.axaml[.cs]` -> `Controls/Common/`
+  - [ ] Перенести `FormatEditorBox.axaml[.cs]` -> `Controls/Common/`
+  - [ ] Верифицировать сборку библиотеки `AvaloniaApplication1.Controls.csproj` (0 ошибок, 0 предупреждений)
+- [ ] Фаза 3: Иерархическая реорганизация `ViewModels/`:
+  - [ ] Разложить 37 ViewModels по 7 подсистемам: `Core/`, `Widgets/`, `Windows/Common`, `Windows/Connections`, `Windows/Tags`, `Popups/`, `Panels/`
+  - [ ] Обновить пространства имен C# строго по подпапкам
+- [ ] Фаза 4: Иерархическая реорганизация `Views/`:
+  - [ ] Сгруппировать `Views/Canvas/` (`DashboardPanel.cs`, helpers, overlays)
+  - [ ] Сгруппировать `Views/Panels/` (`DashboardView.axaml[.cs]`)
+  - [ ] Сгруппировать `Views/Popups/` (`ValveControlPopupView`, `CalculatorView`, `NumpadView`)
+  - [ ] Сгруппировать `Views/Windows/` (`Common/`, `Connections/`, `Tags/`)
+- [ ] Фаза 5: Синхронизация XAML, DI и диалогов:
+  - [ ] Подключить `xmlns:scada="https://github.com/avaloniaapplication1/controls"` в `DashboardView.axaml` и окнах
+  - [ ] Обновить `x:DataType` и `DataTemplate` на `vmWidgets:` и `vmCore:`
+  - [ ] Обновить `App.axaml.cs` и `DialogService.cs` с новыми `using`
+- [ ] Фаза 6: Верификация и тестирование:
+  - [ ] Обновить пространства имен в `AvaloniaApplication1.UIValidation/Program.cs`
+  - [ ] Собрать всё решение `dotnet build AvaloniaApplication1.sln -c Debug --nologo` (0 ошибок, 0 предупреждений)
+  - [ ] Запустить полный тест-раннер `dotnet run --project AvaloniaApplication1.UIValidation` (20/20 PASS)
+  - [ ] Запустить headless-рендер `render_ui.ps1 MainWindow`
+  - [ ] Зафиксировать коммит в git
