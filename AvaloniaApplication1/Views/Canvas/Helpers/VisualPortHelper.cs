@@ -9,7 +9,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.VisualTree;
-using AvaloniaApplication1.ViewModels;
 
 namespace AvaloniaApplication1.Views.Canvas.Helpers
 {

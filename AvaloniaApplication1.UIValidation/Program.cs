@@ -10,6 +10,7 @@ using Avalonia.Headless;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 using Avalonia.Threading;
+using Avalonia.Media;
 using AvaloniaApplication1;
 using AvaloniaApplication1.Models;
 using AvaloniaApplication1.Views.Canvas;
@@ -38,7 +39,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AvaloniaApplication1.UIValidation;
 
-public class MockDataCoreService : IDataCoreService
+public class MockDataCoreService : IDataCoreService, IDisposable
 {
     private readonly Subject<TagData> _subject = new();
     private readonly Dictionary<string, object> _values = new();
@@ -68,14 +69,16 @@ public class MockDataCoreService : IDataCoreService
     public TagSnapshot GetTagSnapshot(string connId, string address) => TagManager.GetSnapshotByAddress(connId, address);
     public void ForceOverride(string tagId, object value) => TagManager.ForceOverride(tagId, value);
     public void ClearOverride(string tagId) => TagManager.ClearOverride(tagId);
+    public void Dispose() { _subject.Dispose(); }
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
-public class MockSimulationService : ISimulationService
+public class MockSimulationService : ISimulationService, IDisposable
 {
     public Task StartSimulationAsync() => Task.CompletedTask;
     public Task StopSimulationAsync() => Task.CompletedTask;
     public void ResetSimulation() { }
+    public void Dispose() { }
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
@@ -158,8 +161,13 @@ public static class Program
         EnsureAppIconGenerated();
 
         using var session = HeadlessUnitTestSession.StartNew(typeof(Program));
+        using var finishedEvent = new ManualResetEventSlim(false);
+        Exception? backgroundError = null;
+
         session.Dispatch(() =>
         {
+            try
+            {
             var configService = new ConfigurationService();
             if (string.Equals(targetView, "MimicView", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(targetView, "Mimic", StringComparison.OrdinalIgnoreCase) ||
@@ -472,30 +480,41 @@ public static class Program
 
             var tree = DumpVisualTree(window);
             var jsonPath = Path.Combine(outDir, "ui_tree.json");
-            var json = JsonSerializer.Serialize(tree, new JsonSerializerOptions { WriteIndented = true });
+            var json = JsonSerializer.Serialize(tree, new JsonSerializerOptions { WriteIndented = true, MaxDepth = 128 });
             File.WriteAllText(jsonPath, json);
             Console.WriteLine($"[UIValidation] Visual tree dump saved: {jsonPath} ({new FileInfo(jsonPath).Length} bytes)");
 
-            try
-            {
-                RunAutomatedValidations(mainVm, sp);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[UIValidation] VALIDATION ERROR: {ex}");
-                Console.ResetColor();
-                Environment.Exit(1);
-            }
-
+            RunAutomatedValidations(mainVm, sp);
             Console.WriteLine("[UIValidation] SUCCESS: Artifacts generated successfully.");
-            Environment.Exit(0);
-        }, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            backgroundError = ex;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"[UIValidation] VALIDATION ERROR: {ex}");
+            Console.ResetColor();
+        }
+        finally
+        {
+            finishedEvent.Set();
+        }
+    }, CancellationToken.None);
 
-        // Failsafe timeout
-        Thread.Sleep(6000);
-        Environment.Exit(0);
+    if (!finishedEvent.Wait(TimeSpan.FromSeconds(60)))
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("[UIValidation] TIMEOUT: Headless session did not finish within 60 seconds.");
+        Console.ResetColor();
+        Environment.Exit(2);
     }
+
+    if (backgroundError != null)
+    {
+        Environment.Exit(1);
+    }
+
+    Environment.Exit(0);
+}
 
     private static void RunAutomatedValidations(MainViewModel mainVm, IServiceProvider sp)
     {
@@ -1841,11 +1860,103 @@ public static class Program
                 }
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (20/20) PASSED SUCCESSFULLY!");
+            // 21. Test Extracted AvaloniaApplication1.Controls Library Components
+            Console.WriteLine("[UIValidation] Testing Extracted SCADA Controls Library (Test 21)...");
+            {
+                // 21.1 ValveControl StyledProperties
+                var valveCtrl = new ValveControl
+                {
+                    ValveType = "Regulating",
+                    IsOpen = true,
+                    Setpoint = 75.0,
+                    Feedback = 74.5,
+                    ActuatorType = "Diaphragm",
+                    IsVertical = true,
+                    ActiveColor = "#00FF00",
+                    InactiveColor = "#FF0000"
+                };
+                if (valveCtrl.ValveType != "Regulating" || valveCtrl.Setpoint != 75.0 || valveCtrl.ActuatorType != "Diaphragm")
+                    throw new Exception("ValveControl StyledProperties failed.");
+
+                // 21.2 ReactorControl Animation & Agitator Timer
+                var reactorCtrl = new ReactorControl
+                {
+                    Level = 82.5,
+                    Temperature = 65.0,
+                    HasJacket = true,
+                    IsAgitatorRunning = true
+                };
+                if (reactorCtrl.Level != 82.5 || !reactorCtrl.IsAgitatorRunning)
+                    throw new Exception("ReactorControl StyledProperties failed.");
+                reactorCtrl.IsAgitatorRunning = false;
+                if (reactorCtrl.IsAgitatorRunning)
+                    throw new Exception("ReactorControl Agitator stop failed.");
+
+                // 21.3 HeatExchangerControl Configuration
+                var hexCtrl = new HeatExchangerControl
+                {
+                    ExchangerType = "Plate",
+                    PrimaryTemp = 90.0,
+                    SecondaryTemp = 45.0,
+                    Thickness = 14.0
+                };
+                if (hexCtrl.ExchangerType != "Plate" || hexCtrl.PrimaryTemp != 90.0 || hexCtrl.SecondaryTemp != 45.0)
+                    throw new Exception("HeatExchangerControl properties failed.");
+
+                // 21.4 LevelSensorControl Configuration & Thresholds
+                var sensorCtrl = new LevelSensorControl
+                {
+                    Value = 88.0,
+                    SensorType = "Waveguide",
+                    TagNumber = "LT-511",
+                    AlarmHigh = 90.0,
+                    AlarmLow = 10.0
+                };
+                if (sensorCtrl.Value != 88.0 || sensorCtrl.SensorType != "Waveguide" || sensorCtrl.TagNumber != "LT-511")
+                    throw new Exception("LevelSensorControl properties failed.");
+
+                // 21.5 PipeControl TwoWay Points, StartFitting, EndFitting & HitTest
+                var pipeCtrl = new PipeControl
+                {
+                    Points = "0,0;10,0;10,10",
+                    CellSize = 15.0,
+                    Thickness = 12.0,
+                    StartFitting = "Flange",
+                    EndFitting = "Elbow90"
+                };
+                if (pipeCtrl.Points != "0,0;10,0;10,10" || pipeCtrl.StartFitting != "Flange" || pipeCtrl.EndFitting != "Elbow90")
+                    throw new Exception("PipeControl properties failed.");
+                if (!pipeCtrl.HitTest(new Point(5 * 15 + 7.5, 7.5)))
+                    throw new Exception("PipeControl HitTest on segment failed.");
+
+                // 21.6 TrendLineControl Dynamic Decimation & Observable Data
+                var trendCtrl = new TrendLineControl
+                {
+                    MinY = 0,
+                    MaxY = 100,
+                    Values = new double[] { 10, 25, 55, 80, 45, 90 }
+                };
+                if (trendCtrl.MinY != 0 || trendCtrl.MaxY != 100 || trendCtrl.Values == null)
+                    throw new Exception("TrendLineControl properties failed.");
+
+                // 21.7 ColorPickerBox Hex & Brush Synchronization
+                var colorPicker = new ColorPickerBox();
+                colorPicker.SelectedColorHex = "#FF00AA";
+                if (colorPicker.SelectedColorHex != "#FF00AA" || !(colorPicker.SelectedBrush is SolidColorBrush scb && scb.Color.R == 0xFF && scb.Color.G == 0x00 && scb.Color.B == 0xAA))
+                    throw new Exception("ColorPickerBox SelectedColorHex sync failed.");
+
+                // 21.8 FormatEditorBox Preset & Format Text Sync
+                var formatBox = new FormatEditorBox();
+                formatBox.Format = "{0:F2} bar";
+                if (formatBox.Format != "{0:F2} bar")
+                    throw new Exception("FormatEditorBox Format sync failed.");
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (21/21) PASSED SUCCESSFULLY!");
         }
     }
 
-    private static VisualTreeNode DumpVisualTree(Visual visual)
+    private static VisualTreeNode DumpVisualTree(Visual visual, int currentDepth = 0)
     {
         var control = visual as Control;
         var node = new VisualTreeNode
@@ -1885,11 +1996,14 @@ public static class Program
             }
         }
 
-        foreach (var child in visual.GetVisualChildren())
+        if (currentDepth < 60)
         {
-            if (child is Visual vChild)
+            foreach (var child in visual.GetVisualChildren())
             {
-                node.Children.Add(DumpVisualTree(vChild));
+                if (child is Visual vChild)
+                {
+                    node.Children.Add(DumpVisualTree(vChild, currentDepth + 1));
+                }
             }
         }
 

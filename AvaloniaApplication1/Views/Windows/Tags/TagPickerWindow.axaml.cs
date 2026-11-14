@@ -2,7 +2,6 @@ using AvaloniaApplication1.ViewModels.Windows.Tags;
 using AvaloniaApplication1.ViewModels.Core;
 using Avalonia.Controls;
 using Avalonia.Input;
-using AvaloniaApplication1.ViewModels;
 
 namespace AvaloniaApplication1.Views.Windows.Tags
 {

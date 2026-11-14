@@ -9,7 +9,8 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $rootDir = Split-Path -Parent $scriptDir
 
 Set-Location $rootDir
-dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj -- $ViewName
+dotnet build AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj -c Debug --nologo
+dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj --no-build -- $ViewName
 
 Write-Host "[render_ui] Artifacts ready:" -ForegroundColor Green
 Write-Host " - Screenshot: artifacts/ui_preview.png"

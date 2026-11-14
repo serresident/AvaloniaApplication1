@@ -1383,3 +1383,26 @@
     *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
     *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation` — **20/20 PASS (100%)**.
     *   Headless-рендер: Сгенерированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json` через `scripts/render_ui.ps1 MainWindow`.
+
+---
+
+## 📅 14.11.2026 (Сессия 47 — Hardening: Устранение скрытых багов, добавление теста №21 и надежность UIValidation)
+
+### 📌 Достижение: Комплексный аудит реализации Сессии 46. Выявлены и устранены скрытые дефекты тест-раннера (гонка таймаута 6с, падение DI container dispose, переполнение глубины дерева при сериализации JsonException), обеспечена двусторонняя привязка фитингов труб в Controls, удалены устаревшие using и пространства имен, внедрен автоматический тест №21 (21/21 PASS).
+
+*   **Надежность и устранение ложноположительных выходов в `AvaloniaApplication1.UIValidation`:**
+    *   **Устранение гонки таймаута:** Конструкция `Thread.Sleep(6000); Environment.Exit(0);` в основном потоке маскировала сбои тестов и принудительно обрывала сериализацию visual tree при тяжелых окнах. Заменена на детерминированный `ManualResetEventSlim` с таймаутом ожидания 60с и кодами возврата 1 (ошибка валидации) и 2 (таймаут).
+    *   **Исправление DI-диспоза:** Классы `MockDataCoreService` и `MockSimulationService` дополнены интерфейсом `IDisposable`, что устранило исключение `InvalidOperationException: MockSimulationService only implements IAsyncDisposable` при закрытии ServiceProvider scope.
+    *   **Исправление сериализации UI Tree:** В методе `DumpVisualTree` добавлено ограничение глубины рекурсии (`currentDepth < 60`), а для `JsonSerializerOptions` выставлен `MaxDepth = 128`. Это ликвидировало критическую ошибку `JsonException: A possible object cycle was detected / depth > 64` при формировании отчетов для сложных окон (`WidgetEditorWindow`).
+    *   **Автоматический тест №21:** Разработан блок тестов, напрямую верифицирующий поведение всех 8 экспортированных контролов библиотеки `AvaloniaApplication1.Controls`: `ValveControl`, `ReactorControl`, `HeatExchangerControl`, `LevelSensorControl`, `PipeControl`, `TrendLineControl`, `ColorPickerBox`, `FormatEditorBox`.
+
+*   **Доработка библиотеки `AvaloniaApplication1.Controls` и XAML-привязок:**
+    *   В `AssemblyInfo.cs` зарегистрирован атрибут `[assembly: XmlnsPrefix("https://github.com/avaloniaapplication1/controls", "scada")]`.
+    *   В `PipeControl.cs` свойства `PointsProperty`, `StartFittingProperty` и `EndFittingProperty` зарегистрированы с `defaultBindingMode: BindingMode.TwoWay`. В `DashboardView.axaml` для `StartFitting` и `EndFitting` явно указан `Mode=TwoWay`. Это предотвращает потерю выбора фитингов при редактировании задвижек и отводов в контекстном меню.
+    *   Очищены устаревшие директивы `using AvaloniaApplication1.ViewModels;` в `VisualPortHelper.cs`, `CalculatorView.axaml.cs`, `NumpadView.axaml.cs`, `ValveControlPopupView.axaml.cs`, `TagManagerWindow.axaml.cs`, `TagPickerWindow.axaml.cs`.
+    *   Удалены неиспользуемые объявления `xmlns:v` из `DashboardView.axaml` и `xmlns:canvas` из `MainWindow.axaml`.
+
+*   **Верификация:**
+    *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
+    *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj --no-build`: **21/21 PASS (100%)**.
+    *   Headless-рендер `MainWindow` и `WidgetEditorWindow`: успешно формируются `ui_preview.png` и `ui_tree.json` без исключений.

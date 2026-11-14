@@ -8,7 +8,6 @@
         xmlns:vmPopups="clr-namespace:AvaloniaApplication1.ViewModels.Popups"
         xmlns:vPanels="clr-namespace:AvaloniaApplication1.Views.Panels"
         xmlns:vPopups="clr-namespace:AvaloniaApplication1.Views.Popups"
-        xmlns:canvas="clr-namespace:AvaloniaApplication1.Views.Canvas"
         xmlns:c="clr-namespace:AvaloniaApplication1.Converters"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AvaloniaApplication1.Views.Windows.Common.MainWindow"

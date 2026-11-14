@@ -13,7 +13,7 @@ namespace AvaloniaApplication1.Controls.Piping
     public class PipeControl : Control, ICustomHitTest
     {
         public static readonly StyledProperty<string> PointsProperty =
-            AvaloniaProperty.Register<PipeControl, string>(nameof(Points), string.Empty);
+            AvaloniaProperty.Register<PipeControl, string>(nameof(Points), string.Empty, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
         public static readonly StyledProperty<IBrush?> PipeColorProperty =
             AvaloniaProperty.Register<PipeControl, IBrush?>(nameof(PipeColor));
@@ -25,10 +25,10 @@ namespace AvaloniaApplication1.Controls.Piping
             AvaloniaProperty.Register<PipeControl, double>(nameof(CellSize), 10.0);
 
         public static readonly StyledProperty<string> StartFittingProperty =
-            AvaloniaProperty.Register<PipeControl, string>(nameof(StartFitting), "None");
+            AvaloniaProperty.Register<PipeControl, string>(nameof(StartFitting), "None", defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
         public static readonly StyledProperty<string> EndFittingProperty =
-            AvaloniaProperty.Register<PipeControl, string>(nameof(EndFitting), "None");
+            AvaloniaProperty.Register<PipeControl, string>(nameof(EndFitting), "None", defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
         public static readonly StyledProperty<bool> IsDesignModeProperty =
             AvaloniaProperty.Register<PipeControl, bool>(nameof(IsDesignMode), false);

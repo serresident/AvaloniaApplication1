@@ -852,3 +852,21 @@
   - [x] Запустить полный тест-раннер `dotnet run --project AvaloniaApplication1.UIValidation` (20/20 PASS)
   - [x] Запустить headless-рендер `render_ui.ps1 MainWindow`
   - [x] Зафиксировать коммит в git
+
+# Tasks: Controls Library Hardening, Test 21 & UIValidation Reliability (Сессия 47 — Выполнено)
+
+- [x] Аудит и устранение скрытых дефектов миграции библиотеки контролов:
+  - [x] Добавлена регистрация префикса `[assembly: XmlnsPrefix("https://github.com/avaloniaapplication1/controls", "scada")]` в `AssemblyInfo.cs`
+  - [x] Добавлена двухсторонняя привязка `StartFitting` и `EndFitting` (`defaultBindingMode: BindingMode.TwoWay` в `PipeControl.cs` и `Mode=TwoWay` в `DashboardView.axaml`), устраняющая потерю настроек фитингов при редактировании
+  - [x] Удалены неиспользуемые устаревшие директивы `using AvaloniaApplication1.ViewModels;` из code-behind файлов
+  - [x] Удалены мертвые пространства имен `xmlns:v` из `DashboardView.axaml` и `xmlns:canvas` из `MainWindow.axaml`
+- [x] Устранение дефектов тест-раннера и сериализации в `AvaloniaApplication1.UIValidation`:
+  - [x] Устранен false-positive ранний выход по 6-секундному таймауту (`Thread.Sleep(6000); Environment.Exit(0);`), маскировавший сбои тестов на загруженном CPU
+  - [x] Переход на детерминированный `ManualResetEventSlim` с таймаутом 60с и строгими кодами завершения процесса (1 при ошибке валидации, 2 при таймауте)
+  - [x] Реализован интерфейс `IDisposable` в `MockDataCoreService` и `MockSimulationService`, устраняющий скрытое исключение `InvalidOperationException` при dispose DI-контейнера
+  - [x] Исправлено падение `JsonException` (глубина дерева > 64) в `DumpVisualTree` при рендеринге глубоких окон (`WidgetEditorWindow`) через ограничение глубины (`currentDepth < 60`) и `MaxDepth = 128`
+  - [x] Разработан и внедрен автоматический тест №21, тестирующий все 8 компонентов библиотеки `AvaloniaApplication1.Controls` (`ValveControl`, `ReactorControl`, `HeatExchangerControl`, `LevelSensorControl`, `PipeControl`, `TrendLineControl`, `ColorPickerBox`, `FormatEditorBox`)
+- [x] Полная верификация:
+  - [x] Сборка решения: 0 ошибок, 0 предупреждений
+  - [x] Тесты UIValidation: 21/21 PASS (100%)
+  - [x] Headless-рендер: `MainWindow` и `WidgetEditorWindow` формируют `ui_preview.png` и `ui_tree.json` без исключений

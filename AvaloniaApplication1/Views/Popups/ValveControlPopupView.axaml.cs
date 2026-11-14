@@ -2,7 +2,6 @@ using AvaloniaApplication1.ViewModels.Popups;
 using AvaloniaApplication1.ViewModels.Core;
 using Avalonia.Controls;
 using Avalonia.Input;
-using AvaloniaApplication1.ViewModels;
 using System;
 
 namespace AvaloniaApplication1.Views.Popups
