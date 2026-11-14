@@ -1,0 +1,158 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:AvaloniaApplication1.Controls.Common"
+             mc:Ignorable="d" d:DesignWidth="320" d:DesignHeight="36"
+             x:Class="AvaloniaApplication1.Controls.Common.ColorPickerBox"
+             x:CompileBindings="False">
+
+    <Grid ColumnDefinitions="32,*,Auto" VerticalAlignment="Center">
+
+        <!-- Color Preview Swatch Button — opens Flyout -->
+        <Button x:Name="SwatchButton"
+                Grid.Column="0"
+                Width="28" Height="28"
+                Padding="0" Margin="0,0,4,0"
+                CornerRadius="4"
+                BorderBrush="#555555" BorderThickness="1.5"
+                Background="{Binding SelectedBrush}"
+                ToolTip.Tip="Нажмите для открытия палитры цветов">
+            <Button.Flyout>
+                <Flyout Placement="BottomEdgeAlignedLeft">
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1"
+                            CornerRadius="8" Padding="12" Width="340">
+                        <StackPanel Spacing="10">
+
+                            <!-- Header: preview + hex -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <Border Width="34" Height="26" CornerRadius="4"
+                                            BorderBrush="#666666" BorderThickness="1.5"
+                                            Background="{Binding SelectedBrush}" />
+                                    <TextBlock Text="{Binding SelectedColorHex}"
+                                               Foreground="White" FontSize="14" FontWeight="Bold"
+                                               FontFamily="Consolas,monospace" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="✕" Click="CloseFlyout_Click"
+                                        Background="Transparent" Foreground="#888888" Padding="6,2" FontSize="12" />
+                            </Grid>
+
+                            <Separator Background="#3E3E42" Height="1" Margin="0,2" />
+
+                            <!-- HMI/SCADA Palette Swatches -->
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Базовые цвета HMI / SCADA:" Foreground="#AAAAAA" FontSize="11" FontWeight="SemiBold" />
+                                <ItemsControl x:Name="SwatchesItemsControl">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="6" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Width="44" Height="26" Margin="2" Padding="0"
+                                                    CornerRadius="4" BorderThickness="1" BorderBrush="#444444"
+                                                    Background="{Binding Brush}"
+                                                    ToolTip.Tip="{Binding Name}"
+                                                    Click="Swatch_Click"
+                                                    Tag="{Binding Hex}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+
+                            <Separator Background="#3E3E42" Height="1" Margin="0,4" />
+
+                            <!-- Hue Spectrum + RGB Sliders -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Настройка оттенка (Спектр и RGB):" Foreground="#AAAAAA" FontSize="11" FontWeight="SemiBold" />
+
+                                <!-- Hue -->
+                                <Grid ColumnDefinitions="28,*,44">
+                                    <TextBlock Grid.Column="0" Text="Тон" Foreground="#DDDDDD" FontSize="11" VerticalAlignment="Center" />
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="360"
+                                            Value="{Binding Hue}"
+                                            Margin="4,0" VerticalAlignment="Center">
+                                        <Slider.Background>
+                                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                                <GradientStop Color="#FF0000" Offset="0.0" />
+                                                <GradientStop Color="#FFFF00" Offset="0.17" />
+                                                <GradientStop Color="#00FF00" Offset="0.33" />
+                                                <GradientStop Color="#00FFFF" Offset="0.50" />
+                                                <GradientStop Color="#0000FF" Offset="0.67" />
+                                                <GradientStop Color="#FF00FF" Offset="0.83" />
+                                                <GradientStop Color="#FF0000" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Slider.Background>
+                                    </Slider>
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding HueText}"
+                                               Foreground="#AAAAAA" FontSize="11"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <!-- Red -->
+                                <Grid ColumnDefinitions="28,*,44">
+                                    <TextBlock Grid.Column="0" Text="R" Foreground="#FF5252" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="255"
+                                            Value="{Binding RedDouble}"
+                                            Margin="4,0" VerticalAlignment="Center" />
+                                    <NumericUpDown Grid.Column="2"
+                                                   Value="{Binding RedDouble}"
+                                                   Minimum="0" Maximum="255"
+                                                   FormatString="0" ShowButtonSpinner="False"
+                                                   Padding="4,2" FontSize="11" HorizontalAlignment="Stretch" />
+                                </Grid>
+
+                                <!-- Green -->
+                                <Grid ColumnDefinitions="28,*,44">
+                                    <TextBlock Grid.Column="0" Text="G" Foreground="#00E676" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="255"
+                                            Value="{Binding GreenDouble}"
+                                            Margin="4,0" VerticalAlignment="Center" />
+                                    <NumericUpDown Grid.Column="2"
+                                                   Value="{Binding GreenDouble}"
+                                                   Minimum="0" Maximum="255"
+                                                   FormatString="0" ShowButtonSpinner="False"
+                                                   Padding="4,2" FontSize="11" HorizontalAlignment="Stretch" />
+                                </Grid>
+
+                                <!-- Blue -->
+                                <Grid ColumnDefinitions="28,*,44">
+                                    <TextBlock Grid.Column="0" Text="B" Foreground="#448AFF" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="255"
+                                            Value="{Binding BlueDouble}"
+                                            Margin="4,0" VerticalAlignment="Center" />
+                                    <NumericUpDown Grid.Column="2"
+                                                   Value="{Binding BlueDouble}"
+                                                   Minimum="0" Maximum="255"
+                                                   FormatString="0" ShowButtonSpinner="False"
+                                                   Padding="4,2" FontSize="11" HorizontalAlignment="Stretch" />
+                                </Grid>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Border>
+                </Flyout>
+            </Button.Flyout>
+        </Button>
+
+        <!-- Hex TextBox for direct editing -->
+        <TextBox Grid.Column="1"
+                 Text="{Binding SelectedColorHex, Mode=TwoWay}"
+                 PlaceholderText="#00FF00"
+                 FontFamily="Consolas,monospace"
+                 VerticalAlignment="Center"
+                 LostFocus="HexBox_LostFocus" />
+
+        <!-- Open Flyout button -->
+        <Button Grid.Column="2"
+                Content="🎨"
+                Click="PaletteButton_Click"
+                Padding="8,5" Margin="4,0,0,0"
+                Background="#3E3E42" Foreground="White" CornerRadius="4"
+                ToolTip.Tip="Открыть палитру цветов" />
+    </Grid>
+
+</UserControl>

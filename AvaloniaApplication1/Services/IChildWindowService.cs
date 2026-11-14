@@ -1,4 +1,4 @@
-using AvaloniaApplication1.ViewModels;
+using AvaloniaApplication1.ViewModels.Core;
 
 namespace AvaloniaApplication1.Services
 {

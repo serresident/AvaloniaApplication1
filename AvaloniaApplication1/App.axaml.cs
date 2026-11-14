@@ -6,7 +6,10 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using AvaloniaApplication1.Services;
 using AvaloniaApplication1.Services.Protocols;
-using AvaloniaApplication1.ViewModels;
+using AvaloniaApplication1.ViewModels.Core;
+using AvaloniaApplication1.ViewModels.Widgets;
+using AvaloniaApplication1.ViewModels.Windows.Common;
+using AvaloniaApplication1.Views.Windows.Common;
 
 namespace AvaloniaApplication1
 {

@@ -1,0 +1,407 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels.Windows.Common"
+        xmlns:models="clr-namespace:AvaloniaApplication1.Models"
+        xmlns:scada="https://github.com/avaloniaapplication1/controls"
+        mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="700"
+        x:Class="AvaloniaApplication1.Views.Windows.Common.WidgetEditorWindow"
+        x:DataType="vm:WidgetEditorViewModel"
+        Title="Свойства контрола"
+        Icon="{x:Null}"
+        Width="440" Height="600"
+        MinWidth="400" MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E"
+        CanResize="True">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Scrollable content area -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" ClipToBounds="True" Padding="20,20,20,80">
+            <StackPanel Spacing="12">
+
+                <!-- Header -->
+                <TextBlock Text="Свойства виджета мнемосхемы" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,8" />
+
+                <!-- Widget Type -->
+                <TextBlock Text="Тип виджета" Foreground="#AAAAAA" FontSize="12" />
+                <ComboBox ItemsSource="{Binding AvailableWidgetTypes}" 
+                          SelectedItem="{Binding SelectedWidgetType}"
+                          HorizontalAlignment="Stretch" />
+
+                <!-- Title -->
+                <TextBlock Text="Наименование / Заголовок" Foreground="#AAAAAA" FontSize="12" />
+                <TextBox Text="{Binding Title}" PlaceholderText="Заголовок или тег виджета..." />
+
+                <!-- Typography & Display Section -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Отображение и типографика" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <Grid ColumnDefinitions="*,10,*">
+                            <CheckBox Grid.Column="0" Content="Показывать заголовок" IsChecked="{Binding ShowTitle}" Foreground="White" />
+                            <CheckBox Grid.Column="2" Content="Показывать рамку" IsChecked="{Binding ShowBorder}" Foreground="White" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <CheckBox Grid.Column="0" Content="Автомасштаб текста" IsChecked="{Binding AutoScaleText}" Foreground="White" />
+                            <CheckBox Grid.Column="2" Content="Компактный режим" IsChecked="{Binding CompactMode}" Foreground="White" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Размер шрифта (0 = авто)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding CustomFontSize}" Minimum="0" Maximum="72" FormatString="0 px" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Положение подписи" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableLabelPositions}"
+                                          SelectedItem="{Binding SelectedLabelPosition}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Position Section -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Позиция и размеры (сетка)" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,8,Auto">
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <TextBlock Text="Строка (Row / Y)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding Row}" Minimum="0" Maximum="100" FormatString="0" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="2">
+                                <TextBlock Text="Колонка (Col / X)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding Col}" Minimum="0" Maximum="100" FormatString="0" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="0">
+                                <TextBlock Text="Ширина (ячеек)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding SizeX}" Minimum="1" Maximum="100" FormatString="0" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="2">
+                                <TextBlock Text="Высота (ячеек)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding SizeY}" Minimum="1" Maximum="100" FormatString="0" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Data Source Section -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Источник данных (Связь с ПЛК / Тэг)" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Тег из базы TagManager (Rapid SCADA)" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="🏷️ Выбрать из базы..." Command="{Binding BrowseTagsCommand}"
+                                    Background="#0E639C" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11" FontWeight="SemiBold"
+                                    ToolTip.Tip="Открыть браузер тегов для выбора сигнала в 1 клик с автоподтягиванием единиц и формата" />
+                        </Grid>
+                        <ComboBox ItemsSource="{Binding AvailableTags}" 
+                                  SelectedItem="{Binding SelectedTag}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="-- Выберите тег из базы --">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:TagDefinition">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="{Binding TagId}" FontFamily="Consolas, monospace" Foreground="#9CDCFE" FontWeight="SemiBold" />
+                                        <TextBlock Text="—" Foreground="#666666" />
+                                        <TextBlock Text="{Binding Name}" Foreground="White" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Text="Подключение (Драйвер)" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableConnections}" 
+                                  SelectedItem="{Binding SelectedConnectionId}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Выберите подключение..." />
+
+                        <TextBlock Text="Адрес тэга (регистр / топик MQTT)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding Address}" PlaceholderText="напр. 40001, 10001 или /devices/wb-mwac/controls/K1" />
+
+                        <TextBlock Text="Тип данных тэга" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableDataTypes}" 
+                                  SelectedItem="{Binding SelectedDataType}"
+                                  HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ValueDisplay Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowValueDisplaySettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Настройки отображения значения" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Формат вывода числа / строки" Foreground="#AAAAAA" FontSize="11" />
+                        <scada:FormatEditorBox Format="{Binding Format}" />
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Цвет текста значения" Foreground="#AAAAAA" FontSize="11" />
+                                <scada:ColorPickerBox SelectedColorHex="{Binding ValueColor}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Размер шрифта значения" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ValueFontSize}" Minimum="8" Maximum="120" FormatString="F0" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- PilotLight Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowPilotLightSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Настройки индикатора (Pilot Light)" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Цвет «ИСТИНА / ВКЛ»" Foreground="#AAAAAA" FontSize="11" />
+                                <scada:ColorPickerBox SelectedColorHex="{Binding TrueColor}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Цвет «ЛОЖЬ / ВЫКЛ»" Foreground="#AAAAAA" FontSize="11" />
+                                <scada:ColorPickerBox SelectedColorHex="{Binding FalseColor}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- CommandButton Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowCommandButtonSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Настройки кнопки управления" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Text="Режим кнопки" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableButtonModes}"
+                                  SelectedItem="{Binding SelectedButtonMode}"
+                                  HorizontalAlignment="Stretch" />
+
+                        <!-- Mode description -->
+                        <Border Background="#1A1A1A" CornerRadius="4" Padding="8,4">
+                            <TextBlock Foreground="#888888" FontSize="10" TextWrapping="Wrap">
+                                Toggle — обычный тумблер (ВКЛ/ВЫКЛ). Momentary — импульс пока нажата. Latching — кнопка с фиксацией (Пуск/Стоп). ToggleSwitch — визуальный переключатель.
+                            </TextBlock>
+                        </Border>
+
+                        <Separator Background="#3E3E42" Height="1" Margin="0,4" />
+
+                        <!-- Labels -->
+                        <TextBlock Text="Надпись ВКЛ / Активно" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Надпись активного состояния" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding LabelOn}" PlaceholderText="ВКЛ / ПУСК" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Надпись неактивного состояния" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding LabelOff}" PlaceholderText="ВЫКЛ / СТОП" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Separator Background="#3E3E42" Height="1" Margin="0,4" />
+
+                        <!-- Colors -->
+                        <TextBlock Text="Цвета состояний" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Цвет ВКЛ / Активно" Foreground="#AAAAAA" FontSize="11" />
+                                <scada:ColorPickerBox SelectedColorHex="{Binding ColorOn}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Цвет ВЫКЛ / Неактивно" Foreground="#AAAAAA" FontSize="11" />
+                                <scada:ColorPickerBox SelectedColorHex="{Binding ColorOff}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Slider Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowSliderSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Настройки шкалы и диапазона" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Мин. значение" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding MinValue}" FormatString="F1" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Макс. значение" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding MaxValue}" FormatString="F1" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Pipe Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowPipeSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Параметры трубопровода" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <TextBlock Text="Узловые точки сетки (напр. 0,0;5,0;5,3)" Foreground="#AAAAAA" FontSize="11" />
+                        <TextBox Text="{Binding PipePoints}" PlaceholderText="0,0;5,0;5,3" />
+
+                        <TextBlock Text="Толщина трубы (px)" Foreground="#AAAAAA" FontSize="11" />
+                        <NumericUpDown Value="{Binding Thickness}" Minimum="4" Maximum="32" FormatString="0 px" />
+
+                        <TextBlock Text="Фитинг начала" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableFittings}" 
+                                  SelectedItem="{Binding SelectedStartFitting}"
+                                  HorizontalAlignment="Stretch" />
+
+                        <TextBlock Text="Фитинг окончания" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableFittings}" 
+                                  SelectedItem="{Binding SelectedEndFitting}"
+                                  HorizontalAlignment="Stretch" />
+                        
+                        <CheckBox Content="Отображать соединительные фланцы" IsChecked="{Binding ShowFlanges}" Foreground="White" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Valve Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowValveSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Параметры задвижки / клапана" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <TextBlock Text="Тип клапана (Отсечной / Регулирующий)" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableValveTypes}" 
+                                  SelectedItem="{Binding SelectedValveType}"
+                                  HorizontalAlignment="Stretch" />
+
+                        <TextBlock Text="Тип привода" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableActuatorTypes}" 
+                                  SelectedItem="{Binding SelectedActuatorType}"
+                                  HorizontalAlignment="Stretch" />
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <CheckBox Grid.Column="0" Content="Вертикальная ориентация" IsChecked="{Binding IsVertical}" Foreground="White" />
+                            <CheckBox Grid.Column="2" Content="Показ текста статуса" IsChecked="{Binding ShowStatusText}" Foreground="White" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Угол поворота (°)" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableRotations}" 
+                                          SelectedItem="{Binding SelectedRotation}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Смещение подписи (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding LabelOffset}" Minimum="-50" Maximum="50" FormatString="0 px" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Valve Feedback & Limit Switches Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowRegulatingSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Обратная связь и концевые выключатели" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        
+                        <TextBlock Text="Концевик «Открыт» / Положение (SQH / FB)" Foreground="#AAAAAA" FontSize="11" />
+                        <ComboBox ItemsSource="{Binding AvailableConnections}" 
+                                  SelectedItem="{Binding FeedbackConnectionId}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Как у основного или выберите..." />
+                        <TextBox Text="{Binding FeedbackAddress}" PlaceholderText="напр. 10016 или 40002" />
+
+                        <TextBlock Text="Концевик «Закрыт» (SQL / Closed Feedback)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <ComboBox ItemsSource="{Binding AvailableConnections}" 
+                                  SelectedItem="{Binding ClosedFeedbackConnectionId}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Как у основного или выберите..." />
+                        <TextBox Text="{Binding ClosedFeedbackAddress}" PlaceholderText="напр. 10017" />
+
+                        <TextBlock Text="Допустимое рассогласование (%)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <NumericUpDown Value="{Binding Tolerance}" Minimum="0" Maximum="100" FormatString="0.0 '%'" />
+
+                        <TextBlock Text="Тэг режима управления (Ручной / Авто)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <ComboBox ItemsSource="{Binding AvailableConnections}" 
+                                  SelectedItem="{Binding ModeConnectionId}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Как у основного или выберите..." />
+                        <TextBox Text="{Binding ModeAddress}" PlaceholderText="напр. 40003 или valve/mode" />
+
+                        <TextBlock Text="Размеры диалогового окна управления" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" Margin="0,4,0,0" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Ширина (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ControlWindowWidth}" Minimum="200" Maximum="800" FormatString="0 px" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Высота (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ControlWindowHeight}" Minimum="200" Maximum="600" FormatString="0 px" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Industrial Color Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowIndustrialSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Цветовое кодирование мнемосхемы" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Цвет «Активно / Открыто / Поток»" Foreground="#AAAAAA" FontSize="11" />
+                                <scada:ColorPickerBox SelectedColorHex="{Binding ActiveColor}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Цвет «Неактивно / Закрыто / Стоп»" Foreground="#AAAAAA" FontSize="11" />
+                                <scada:ColorPickerBox SelectedColorHex="{Binding InactiveColor}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Container Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowContainerSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Параметры контейнера подэкрана" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Размер сетки контейнера (px)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ContainerCellSize}" Minimum="10" Maximum="500" Increment="5" FormatString="0 px" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Масштаб контейнера (%)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ContainerZoomPercent}" Minimum="20" Maximum="300" Increment="5" FormatString="0 '%'" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Fixed bottom button bar -->
+        <Border Grid.Row="1" Background="#252526" BorderBrush="#3E3E42" BorderThickness="0,1,0,0" Padding="20,14">
+            <Grid ColumnDefinitions="*,12,*">
+                <Button Grid.Column="0" 
+                        Content="❌  Отмена" 
+                        IsCancel="True"
+                        Command="{Binding CancelCommand}"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                        Background="#3E3E42" Foreground="White" CornerRadius="6" 
+                        Padding="12,10" FontSize="14" />
+                <Button Grid.Column="2" 
+                        Content="💾  Применить" 
+                        Command="{Binding SaveCommand}"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                        Background="#007ACC" Foreground="White" CornerRadius="6" 
+                        Padding="12,10" FontSize="14" FontWeight="SemiBold" />
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>

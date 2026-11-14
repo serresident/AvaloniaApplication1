@@ -1332,14 +1332,54 @@
 
 ---
 
-## 📅 14.11.2026 (Сессия 46 — Технический дизайн-документ: Вынос библиотеки контролов и иерархическая реорганизация проекта)
+## 📅 14.11.2026 (Сессия 46 — Реализация: Вынос библиотеки SCADA-контролов AvaloniaApplication1.Controls и иерархическая реструктуризация проекта)
 
-### 📌 Достижение: Утвержден и зафиксирован исчерпывающий дизайн-документ `docs/designs/controls_library_extraction_and_restructuring.md`
+### 📌 Достижение: Полная реализация технического регламента `docs/designs/controls_library_extraction_and_restructuring.md`. Выделена независимая переиспользуемая библиотека `AvaloniaApplication1.Controls`, иерархически структурированы все ViewModels (37 файлов) и Views по функциональным подсистемам, достигнута 100% компиляция (0 ошибок, 0 предупреждений) и 20/20 PASS тестов.
 
-*   **Концепция и архитектурные решения:**
-    *   Создание обособленной библиотеки классов `AvaloniaApplication1.Controls.csproj` (.NET 8 / Avalonia 12.0.4) для чистых аппаратно-визуальных контролов (`ValveControl`, `ReactorControl`, `HeatExchangerControl`, `LevelSensorControl`, `PipeControl`, `TrendLineControl`, `ColorPickerBox`, `FormatEditorBox`).
-    *   Предотвращение циклической зависимости (`Controls <--> App`): холст мнемосхемы `DashboardPanel.cs` и его хелперы остаются внутри хост-приложения в `Views/Canvas/`. Контрол трубы `PipeControl` декаплируется от прямого приведения `PipeWidgetViewModel` через StyledProperty `Points`.
-    *   Единое пространство имен XAML через `[assembly: XmlnsDefinition("https://github.com/avaloniaapplication1/controls", ...)]` в `AssemblyInfo.cs` с префиксом `<scada:ControlName>`.
-    *   Иерархическая раскладка `Views/` и `ViewModels/` по 7 функциональным подсистемам со строгим соблюдением C# namespace parity.
-    *   Сохранение всех инвариантов рендеринга (нулевые аллокации в `Render(DrawingContext)`, скомпилированные привязки `x:CompileBindings="True"`).
-    *   Разработан пошаговый план миграции (Phased Runbook) из 6 фаз с критерием 20/20 PASS тестов и 0 предупреждений компилятора.
+*   **Библиотека визуальных SCADA-контролов `AvaloniaApplication1.Controls.csproj`:**
+    *   Создан независимый проект Class Library (.NET 8.0, Avalonia 12.0.4) без ссылок на инфраструктурные сервисы, ViewModel или хост-приложение.
+    *   В `Properties/AssemblyInfo.cs` зарегистрировано унифицированное XMLNS-пространство имен:
+        `[assembly: XmlnsDefinition("https://github.com/avaloniaapplication1/controls", "AvaloniaApplication1.Controls.Equipment")]`
+        `[assembly: XmlnsDefinition("https://github.com/avaloniaapplication1/controls", "AvaloniaApplication1.Controls.Piping")]`
+        `[assembly: XmlnsDefinition("https://github.com/avaloniaapplication1/controls", "AvaloniaApplication1.Controls.Charting")]`
+        `[assembly: XmlnsDefinition("https://github.com/avaloniaapplication1/controls", "AvaloniaApplication1.Controls.Common")]`
+    *   В библиотеку перенесены и изолированы аппаратные компоненты:
+        - `Equipment/ValveControl.cs` (запорная и регулирующая арматура, поворот, типы приводов)
+        - `Equipment/ReactorControl.cs` (реактор с анимацией вращения мешалки через нативный Avalonia ClassHandler)
+        - `Equipment/HeatExchangerControl.cs` (кожухотрубный теплообменник)
+        - `Equipment/LevelSensorControl.cs` (индикатор уровня)
+        - `Piping/PipeControl.cs` (трубопровод с адаптивной толщиной и фланцами, декаплирован от `PipeWidgetViewModel` через чистый StyledProperty `Points`)
+        - `Charting/TrendLineControl.cs` (график реального времени)
+        - `Common/ColorPickerBox.axaml[.cs]` (палитра SCADA)
+        - `Common/FormatEditorBox.axaml[.cs]` (редактор формата вывода)
+    *   Сохранены все требования нулевых аллокаций в `Render(DrawingContext)`: кисти и перья кэшируются, перерисовка управляется через `AffectsRender`.
+
+*   **Иерархическая реорганизация `ViewModels/` (37 файлов):**
+    *   `Core/`: `ViewModelBase.cs`, `WidgetViewModelBase.cs`, `ChildWindowViewModel.cs`, `IWidgetFactory.cs`
+    *   `Widgets/`: `WidgetFactory.cs`, `ValveWidgetViewModel.cs`, `PumpWidgetViewModel.cs`, `PipeWidgetViewModel.cs`, `ReactorWidgetViewModel.cs`, `HeatExchangerWidgetViewModel.cs`, `LevelSensorWidgetViewModel.cs`, `TankWidgetViewModel.cs`, `ValueDisplayViewModel.cs`, `CommandButtonViewModel.cs`, `SetValueViewModel.cs`, `RealTimeTrendViewModel.cs`, `ContainerButtonViewModel.cs`, `PilotLightViewModel.cs`, `SliderViewModel.cs`
+    *   `Windows/Common/`: `MainViewModel.cs`, `SettingsViewModel.cs`, `DashboardPropertiesViewModel.cs`, `WidgetEditorViewModel.cs`, `ConfirmPromptViewModel.cs`, `PasswordPromptViewModel.cs`
+    *   `Windows/Connections/`: `ConnectionManagerViewModel.cs`, `ConnectionEditorViewModel.cs`
+    *   `Windows/Tags/`: `TagManagerViewModel.cs`, `TagEditViewModel.cs`, `TagForceViewModel.cs`, `TagPickerViewModel.cs`, `TagImportExportViewModel.cs`, `TagItemViewModel.cs`
+    *   `Popups/`: `ValveControlPopupViewModel.cs`, `CalculatorViewModel.cs`, `NumpadViewModel.cs`
+    *   `Panels/`: `DashboardViewModel.cs`
+    *   Во всех файлах пространства имен C# приведены в строгое соответствие с новой структурой каталогов.
+
+*   **Иерархическая реорганизация `Views/`:**
+    *   `Canvas/`: `DashboardPanel.cs`, `Helpers/VisualPortHelper.cs`, `Helpers/GridMathHelper.cs`, `Overlays/GridOverlay.cs`, `Overlays/SelectionOverlay.cs`
+    *   `Panels/`: `DashboardView.axaml[.cs]`
+    *   `Popups/`: `ValveControlPopupView.axaml[.cs]`, `CalculatorView.axaml[.cs]`, `NumpadView.axaml[.cs]`
+    *   `Windows/Common/`: `MainWindow.axaml[.cs]`, `SettingsWindow.axaml[.cs]`, `DashboardPropertiesWindow.axaml[.cs]`, `WidgetEditorWindow.axaml[.cs]`, `ConfirmPromptWindow.axaml[.cs]`, `PasswordPromptWindow.axaml[.cs]`
+    *   `Windows/Connections/`: `ConnectionManagerWindow.axaml[.cs]`, `ConnectionEditorWindow.axaml[.cs]`
+    *   `Windows/Tags/`: `TagManagerWindow.axaml[.cs]`, `TagEditWindow.axaml[.cs]`, `TagForceWindow.axaml[.cs]`, `TagPickerWindow.axaml[.cs]`, `TagImportExportWindow.axaml[.cs]`
+    *   Старые плоские каталоги очищены.
+
+*   **Синхронизация XAML, DI и сервисов:**
+    *   В `DashboardView.axaml` подключено пространство имен `xmlns:scada="https://github.com/avaloniaapplication1/controls"` и переписаны шаблоны виджетов на `<scada:ValveControl>`, `<scada:ReactorControl>`, `<scada:HeatExchangerControl>`, `<scada:LevelSensorControl>`, `<scada:TrendLineControl>`, `<scada:PipeControl>`.
+    *   В окнах редактора и настроек подключены контролы через `<scada:ColorPickerBox>` и `<scada:FormatEditorBox>`.
+    *   В `App.axaml.cs` и `DialogService.cs` актуализированы все `using` и фабричные сопоставления окон.
+    *   Устранено затенение типа `Avalonia.Controls.Canvas` субнеймспейсом `AvaloniaApplication1.Views.Canvas` в `MainWindow.axaml.cs`.
+
+*   **Верификация:**
+    *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
+    *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation` — **20/20 PASS (100%)**.
+    *   Headless-рендер: Сгенерированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json` через `scripts/render_ui.ps1 MainWindow`.

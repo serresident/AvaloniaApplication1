@@ -5,8 +5,19 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using AvaloniaApplication1.Models.Config;
-using AvaloniaApplication1.ViewModels;
-using AvaloniaApplication1.Views;
+using AvaloniaApplication1.ViewModels.Core;
+using AvaloniaApplication1.ViewModels.Widgets;
+using AvaloniaApplication1.ViewModels.Panels;
+using AvaloniaApplication1.ViewModels.Popups;
+using AvaloniaApplication1.ViewModels.Windows.Common;
+using AvaloniaApplication1.ViewModels.Windows.Connections;
+using AvaloniaApplication1.ViewModels.Windows.Tags;
+using AvaloniaApplication1.Views.Canvas;
+using AvaloniaApplication1.Views.Panels;
+using AvaloniaApplication1.Views.Popups;
+using AvaloniaApplication1.Views.Windows.Common;
+using AvaloniaApplication1.Views.Windows.Connections;
+using AvaloniaApplication1.Views.Windows.Tags;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AvaloniaApplication1.Services
