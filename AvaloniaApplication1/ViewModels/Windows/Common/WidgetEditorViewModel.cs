@@ -34,6 +34,22 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         [ObservableProperty]
         private int _sizeY = 1;
 
+        partial void OnSizeXChanged(int value)
+        {
+            if (SelectedWidgetType == "Valve" && SizeY != value)
+            {
+                SizeY = value;
+            }
+        }
+
+        partial void OnSizeYChanged(int value)
+        {
+            if (SelectedWidgetType == "Valve" && SizeX != value)
+            {
+                SizeX = value;
+            }
+        }
+
         // --- Data Source ---
         public List<string> AvailableConnections { get; }
         public List<AvaloniaApplication1.Models.TagDefinition> AvailableTags { get; } = new();

@@ -967,3 +967,30 @@
   - [x] Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: 0 ошибок, 0 предупреждений
   - [x] Экспорт стенограммы сессии через `powershell -ExecutionPolicy Bypass -File scripts/export_chat.ps1`
   - [x] Фиксация в `docs/development_log.md` и коммит в git-репозиторий
+
+# Tasks: Pipe-Valve Assembly, Inline Auto-Split, Aspect Ratio Lock & Presets (Сессия 52 — Выполнено)
+
+- [x] Сервисы чистой геометрии трубопроводов (`Services/Piping/`):
+  - [x] Реализован `PipeAutoSplitter.cs`: поиск сегмента трубы под клапаном (`FindSplitCandidate`), разбиение трубы на два отрезка (`SplitPipe`, `TryFindAndSplitPipe`) с фланцами на стыках, пересчет локальных координат и клонирование источников данных/стилей.
+  - [x] Реализован `CollinearAssemblyService.cs`: валидация соосности 2 труб и 1 клапана (`CanAssemble`), сборка соосного узла (`AssembleCollinear`) по горизонтали и вертикали без зазоров, генерация двух труб для фланцев клапана (`CreatePipesForValveFlanges`).
+- [x] Пресеты проекта и обратная совместимость:
+  - [x] В `HmiConfiguration.cs` добавлены `PipingPresetsConfig`, `DefaultPipeThickness = 12.0`, `DefaultValveSize = 4` и списки стандартных калибров/размеров.
+  - [x] Обеспечена 100% обратная совместимость со старыми конфигурациями проектов.
+- [x] Aspect Ratio Lock для клапанов:
+  - [x] В `DashboardPanel.cs` зафиксирована пропорция 1:1 (`SizeX = SizeY`) при ресайзе клапана за угол с выравниванием по шагу сетки.
+  - [x] В `WidgetEditorViewModel.cs` синхронизированы свойства `SizeX` и `SizeY` для клапанов.
+- [x] Управляемый Rubber-Banding и горячая клавиша Alt:
+  - [x] В `DashboardViewModel.cs` добавлено реактивное свойство `IsRubberBandingEnabled` (по умолчанию `true`) и команда `ToggleRubberBandingCommand`.
+  - [x] В `DashboardView.axaml` в плавающий тулбар добавлена кнопка-тумблер `🔗 Связи`.
+  - [x] В `DashboardPanel.cs` добавлена временная инверсия резинки при зажатой клавише Alt во время перетаскивания: `isRubberBandingActive = IsRubberBandingEnabled ^ isAltPressed`.
+- [x] Быстрая компоновка и контекстные меню:
+  - [x] В тулбар мнемосхемы добавлена кнопка `🔗 Собрать узел`, активная при выделении 2 труб и 1 клапана.
+  - [x] В контекстное меню добавлено действие «🔗 Собрать соосный узел».
+  - [x] В контекстное меню клапана добавлено действие «➕ Присоединить две трубы (к фланцам)».
+- [x] Inline Drop & Auto-Split:
+  - [x] При перетаскивании клапана на существующий сегмент трубы отображается индикация прилипания, а при отпускании труба автоматически разрезается на 2 отрезка с фланцами, стыкующимися с клапаном.
+- [x] Автоматическое и визуальное тестирование:
+  - [x] В `AvaloniaApplication1.UIValidation/Program.cs` добавлен всесторонний Test 23 (пресеты, резка по горизонтали/вертикали, отсечение коротких сегментов, соосная сборка, генерация труб к фланцам, блокировка пропорций, формула инверсии резинки).
+  - [x] Успешная сборка `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: 0 ошибок, 0 предупреждений.
+  - [x] Пройдены все 23 теста (23/23 PASS, 100%).
+  - [x] Headless-рендеринг `MimicView` и `MainWindowDesign` через `render_ui.ps1`: обновлены `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.

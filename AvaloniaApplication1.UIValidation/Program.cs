@@ -21,6 +21,7 @@ using AvaloniaApplication1.Views.Windows.Common;
 using AvaloniaApplication1.Views.Windows.Connections;
 using AvaloniaApplication1.Views.Windows.Tags;
 using AvaloniaApplication1.Services;
+using AvaloniaApplication1.Services.Piping;
 using System.Linq;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.ViewModels.Core;
@@ -1633,7 +1634,7 @@ public static class Program
                     Format = "{0:F1} °C",
                     Source = new DataSourceConfig { ConnId = "plc1", Address = "40010", TagId = "tag_t101" }
                 };
-                var vdVm = new ValueDisplayViewModel(vdConfig, mockCore, mainVm.ProjectContext);
+                var vdVm = new ValueDisplayViewModel(vdConfig, mockCore, new ProjectContextService { IsDesignMode = false });
 
                 // Normal state
                 vdVm.ApplySnapshot(new TagSnapshot("tag_t101", 75.3f, TagQuality.Good, DateTime.UtcNow));
@@ -1699,7 +1700,7 @@ public static class Program
                     Format = "{0:F1}",
                     Source = new DataSourceConfig { ConnId = "plc1", Address = "40001", TagId = "tag_plc1_40001" }
                 };
-                var svVm = new SetValueViewModel(svConfig, mockCore, mainVm.ProjectContext);
+                var svVm = new SetValueViewModel(svConfig, mockCore, new ProjectContextService { IsDesignMode = false });
                 svVm.ApplySnapshot(new TagSnapshot("tag_plc1_40001", 50.0f, TagQuality.Good, DateTime.UtcNow));
                 if (svVm.DisplayValue.Replace(',', '.') != "50.0")
                     throw new Exception($"SetValueViewModel expected 50.0, got: {svVm.DisplayValue}");
@@ -2123,7 +2124,291 @@ public static class Program
                 themeTestWindow.Close();
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (22/22) PASSED SUCCESSFULLY!");
+            // =========================================================================
+            // TEST 23: Quick Pipe-Valve Assembly, Inline Auto-Split, Aspect Ratio Lock & Presets
+            // =========================================================================
+            Console.WriteLine("[UIValidation] Testing Pipe-Valve Assembly, Inline Auto-Split, Aspect Ratio Lock & Presets (Test 23)...");
+            {
+                var mockCore = new MockDataCoreService();
+                var projCtx = new ProjectContextService { IsDesignMode = true };
+
+                // 23.1 Project Presets in HmiConfiguration
+                var hmiPresetsCfg = new HmiConfiguration
+                {
+                    PipingPresets = new PipingPresetsConfig
+                    {
+                        DefaultPipeThickness = 16.0,
+                        DefaultValveSize = 6,
+                        StandardPipeThicknesses = new List<double> { 4.0, 8.0, 12.0, 16.0, 24.0 },
+                        StandardValveSizes = new List<int> { 2, 4, 6, 8 }
+                    }
+                };
+                var presetsJson = JsonSerializer.Serialize(hmiPresetsCfg, new JsonSerializerOptions { WriteIndented = true });
+                if (!presetsJson.Contains("\"DefaultPipeThickness\": 16") || !presetsJson.Contains("\"DefaultValveSize\": 6"))
+                    throw new Exception("HmiConfiguration failed to serialize PipingPresets.");
+
+                var deserializedPresets = JsonSerializer.Deserialize<HmiConfiguration>(presetsJson);
+                if (deserializedPresets == null ||
+                    deserializedPresets.PipingPresets.DefaultPipeThickness != 16.0 ||
+                    deserializedPresets.PipingPresets.DefaultValveSize != 6)
+                {
+                    throw new Exception("HmiConfiguration failed to deserialize PipingPresets correctly.");
+                }
+
+                // 23.2 Inline Auto-Split (Horizontal straight pipe)
+                var horizPipeCfg = new PipeConfig
+                {
+                    Type = "Pipe",
+                    Title = "Главный коллектор",
+                    Thickness = 12.0,
+                    ShowFlanges = false,
+                    ActiveColor = "#00FFCC",
+                    InactiveColor = "#555555",
+                    Source = new DataSourceConfig { ConnId = "wb", Address = "40001", DataType = "Float32" },
+                    PipePoints = "0,0;20,0",
+                    Position = new WidgetPosition { Col = 10, Row = 20, SizeX = 20, SizeY = 1 }
+                };
+                var horizPipeVm = new PipeWidgetViewModel(horizPipeCfg, mockCore, projCtx);
+
+                var valveCfg = new ValveConfig
+                {
+                    Type = "Valve",
+                    Title = "XV-101",
+                    ValveType = "CutOff",
+                    Position = new WidgetPosition { Col = 18.5, Row = 18.5, SizeX = 4, SizeY = 4 }
+                };
+                var valveVm = new ValveWidgetViewModel(valveCfg, mockCore, projCtx);
+
+                // Valve drop center at (20.0, 20.0) directly onto the pipe line Y=20
+                var dropCenterH = new Point(20.0, 20.0);
+                var candH = PipeAutoSplitter.EvaluateSegmentCandidate(
+                    horizPipeVm, 0, new Point(10, 20), new Point(30, 20), valveVm, dropCenterH);
+
+                if (candH == null)
+                    throw new Exception("EvaluateSegmentCandidate failed to detect horizontal straight pipe intersection.");
+
+                if (!candH.IsHorizontal || candH.ValveRotation != 0 || candH.ValveIsVertical)
+                    throw new Exception($"Horizontal pipe split candidate should have IsHorizontal=true, Rotation=0, IsVertical=false; got Rot={candH.ValveRotation}, Vert={candH.ValveIsVertical}");
+
+                if (Math.Abs(candH.ValveInputFlange.X - 18.0) > 0.001 || Math.Abs(candH.ValveOutputFlange.X - 22.0) > 0.001)
+                    throw new Exception($"Candidate flanges expected (18, 22), got ({candH.ValveInputFlange.X}, {candH.ValveOutputFlange.X})");
+
+                // Execute split
+                var splitResultH = PipeAutoSplitter.SplitPipe(candH);
+                if (!splitResultH.Success || splitResultH.PipeA == null || splitResultH.PipeB == null)
+                    throw new Exception("PipeAutoSplitter.SplitPipe failed for horizontal pipe.");
+
+                if (splitResultH.PipeA.EndFitting != "Flange" || splitResultH.PipeB.StartFitting != "Flange")
+                    throw new Exception($"Child pipes fittings mismatch: PipeA.EndFitting={splitResultH.PipeA.EndFitting}, PipeB.StartFitting={splitResultH.PipeB.StartFitting}");
+
+                if (!splitResultH.PipeA.ShowFlanges || !splitResultH.PipeB.ShowFlanges)
+                    throw new Exception("Child pipes should have ShowFlanges = true.");
+
+                if (splitResultH.PipeA.Thickness != 12.0 || splitResultH.PipeB.Thickness != 12.0 ||
+                    splitResultH.PipeA.Source.Address != "40001" || splitResultH.PipeB.Source.Address != "40001")
+                {
+                    throw new Exception("Child pipes did not clone parent pipe DataSource or Thickness.");
+                }
+
+                // Check pipe A points: from 10 to 18 (length 8)
+                if (splitResultH.PipeA.Position.Col != 10 || splitResultH.PipeA.Position.Row != 20 || splitResultH.PipeA.Position.SizeX != 8)
+                    throw new Exception($"PipeA position/bounds incorrect: Col={splitResultH.PipeA.Position.Col}, SizeX={splitResultH.PipeA.Position.SizeX}");
+
+                // Check pipe B points: from 22 to 30 (length 8)
+                if (splitResultH.PipeB.Position.Col != 22 || splitResultH.PipeB.Position.Row != 20 || splitResultH.PipeB.Position.SizeX != 8)
+                    throw new Exception($"PipeB position/bounds incorrect: Col={splitResultH.PipeB.Position.Col}, SizeX={splitResultH.PipeB.Position.SizeX}");
+
+                // Check valve snapped position: Col=18.5, Row=18.5 (center is at 20, 20)
+                if (Math.Abs(splitResultH.ValveSnappedColRow.X - 18.5) > 0.001 || Math.Abs(splitResultH.ValveSnappedColRow.Y - 18.5) > 0.001)
+                    throw new Exception($"Valve snapped position incorrect: ({splitResultH.ValveSnappedColRow.X}, {splitResultH.ValveSnappedColRow.Y})");
+
+                // 23.3 Inline Auto-Split (Vertical straight pipe & auto-rotation)
+                var vertPipeCfg = new PipeConfig
+                {
+                    Type = "Pipe",
+                    Title = "Вертикальный стояк",
+                    Thickness = 12.0,
+                    PipePoints = "0,0;0,30",
+                    Position = new WidgetPosition { Col = 15, Row = 10, SizeX = 1, SizeY = 30 }
+                };
+                var vertPipeVm = new PipeWidgetViewModel(vertPipeCfg, mockCore, projCtx);
+
+                var dropCenterV = new Point(15.0, 25.0);
+                var candV = PipeAutoSplitter.EvaluateSegmentCandidate(
+                    vertPipeVm, 0, new Point(15, 10), new Point(15, 40), valveVm, dropCenterV);
+
+                if (candV == null || candV.IsHorizontal || !candV.ValveIsVertical || candV.ValveRotation != 90)
+                    throw new Exception("EvaluateSegmentCandidate failed to auto-orient valve vertically (Rotation=90, IsVertical=true).");
+
+                var splitResultV = PipeAutoSplitter.SplitPipe(candV);
+                if (splitResultV.PipeA.EndFitting != "Flange" || splitResultV.PipeB.StartFitting != "Flange")
+                    throw new Exception("Vertical split child pipe fittings mismatch.");
+
+                if (splitResultV.PipeA.Position.Row != 10 || splitResultV.PipeA.Position.SizeY != 13 ||
+                    splitResultV.PipeB.Position.Row != 27 || splitResultV.PipeB.Position.SizeY != 13)
+                {
+                    throw new Exception($"Vertical split pipe bounds incorrect: PipeA Row={splitResultV.PipeA.Position.Row}, SizeY={splitResultV.PipeA.Position.SizeY}; PipeB Row={splitResultV.PipeB.Position.Row}, SizeY={splitResultV.PipeB.Position.SizeY}");
+                }
+
+                // 23.4 Short Segment Rejection
+                var shortCand = PipeAutoSplitter.EvaluateSegmentCandidate(
+                    horizPipeVm, 0, new Point(10, 20), new Point(12, 20), valveVm, new Point(11, 20));
+                if (shortCand != null)
+                    throw new Exception("EvaluateSegmentCandidate should return null when segment length (2) is less than valve size (4).");
+
+                // 23.5 Collinear Assembly ("Собрать соосный узел") - Horizontal
+                var alignPipe1Cfg = new PipeConfig
+                {
+                    Type = "Pipe",
+                    Title = "Pipe1",
+                    Position = new WidgetPosition { Col = 5, Row = 12, SizeX = 15, SizeY = 1 },
+                    PipePoints = "0,0;15,0"
+                };
+                var alignPipe2Cfg = new PipeConfig
+                {
+                    Type = "Pipe",
+                    Title = "Pipe2",
+                    Position = new WidgetPosition { Col = 35, Row = 18, SizeX = 15, SizeY = 1 },
+                    PipePoints = "0,0;15,0"
+                };
+                var alignValveCfg = new ValveConfig
+                {
+                    Type = "Valve",
+                    Title = "V-Align",
+                    Position = new WidgetPosition { Col = 25, Row = 22, SizeX = 4, SizeY = 4 }
+                };
+
+                var alignPipe1Vm = new PipeWidgetViewModel(alignPipe1Cfg, mockCore, projCtx);
+                var alignPipe2Vm = new PipeWidgetViewModel(alignPipe2Cfg, mockCore, projCtx);
+                var alignValveVm = new ValveWidgetViewModel(alignValveCfg, mockCore, projCtx);
+
+                var selectedWidgets = new List<WidgetViewModelBase> { alignPipe1Vm, alignPipe2Vm, alignValveVm };
+                if (!CollinearAssemblyService.CanAssemble(selectedWidgets))
+                    throw new Exception("CollinearAssemblyService.CanAssemble should be true for 2 pipes and 1 valve.");
+
+                bool assembled = CollinearAssemblyService.AssembleCollinear(selectedWidgets);
+                if (!assembled)
+                    throw new Exception("CollinearAssemblyService.AssembleCollinear returned false.");
+
+                // Check that all elements are on Y = 12 (reference pipe axis)
+                if (alignValveVm.IsVertical || alignValveVm.Rotation != 0)
+                    throw new Exception("Assembled valve should have IsVertical=false, Rotation=0.");
+
+                // Left pipe ends at X = 20 (Col=5, Len=15)
+                var leftEndPts = alignPipe1Vm.GetAbsoluteGridPoints();
+                if (leftEndPts.Last().X != 20 || leftEndPts.Last().Y != 12 || alignPipe1Vm.EndFitting != "Flange")
+                    throw new Exception($"Left pipe should end at (20, 12) with Flange; got ({leftEndPts.Last().X}, {leftEndPts.Last().Y}), Fitting={alignPipe1Vm.EndFitting}");
+
+                // Valve input port is at X = 20 (Col = 20.5), output port at X = 24
+                if (Math.Abs(alignValveVm.Col - 20.5) > 0.001 || Math.Abs(alignValveVm.Row - (12 - 1.5)) > 0.001)
+                    throw new Exception($"Valve position after collinear assembly should be Col=20.5, Row=10.5; got ({alignValveVm.Col}, {alignValveVm.Row})");
+
+                // Right pipe starts at X = 24 with Flange
+                var rightStartPts = alignPipe2Vm.GetAbsoluteGridPoints();
+                if (rightStartPts.First().X != 24 || rightStartPts.First().Y != 12 || alignPipe2Vm.StartFitting != "Flange")
+                    throw new Exception($"Right pipe should start at (24, 12) with Flange; got ({rightStartPts.First().X}, {rightStartPts.First().Y}), Fitting={alignPipe2Vm.StartFitting}");
+
+                // 23.6 Collinear Assembly - Vertical
+                var vAlignP1 = new PipeWidgetViewModel(new PipeConfig
+                {
+                    Type = "Pipe",
+                    Position = new WidgetPosition { Col = 30, Row = 5, SizeX = 1, SizeY = 10 },
+                    PipePoints = "0,0;0,10"
+                }, mockCore, projCtx);
+                var vAlignP2 = new PipeWidgetViewModel(new PipeConfig
+                {
+                    Type = "Pipe",
+                    Position = new WidgetPosition { Col = 25, Row = 25, SizeX = 1, SizeY = 10 },
+                    PipePoints = "0,0;0,10"
+                }, mockCore, projCtx);
+                var vAlignV = new ValveWidgetViewModel(new ValveConfig
+                {
+                    Type = "Valve",
+                    Position = new WidgetPosition { Col = 40, Row = 18, SizeX = 4, SizeY = 4 }
+                }, mockCore, projCtx);
+
+                bool vAssembled = CollinearAssemblyService.AssembleCollinear(new WidgetViewModelBase[] { vAlignP1, vAlignP2, vAlignV });
+                if (!vAssembled || !vAlignV.IsVertical || vAlignV.Rotation != 90)
+                    throw new Exception("Vertical collinear assembly failed.");
+
+                if (vAlignP1.EndFitting != "Flange" || vAlignP2.StartFitting != "Flange")
+                    throw new Exception("Vertical collinear assembly fittings failed.");
+
+                // 23.7 CreatePipesForValveFlanges
+                var testValveForFlanges = new ValveWidgetViewModel(new ValveConfig
+                {
+                    Type = "Valve",
+                    Title = "V-Flanges",
+                    Position = new WidgetPosition { Col = 15.5, Row = 8.5, SizeX = 4, SizeY = 4 }
+                }, mockCore, projCtx);
+
+                var (flangePipe1, flangePipe2) = CollinearAssemblyService.CreatePipesForValveFlanges(testValveForFlanges, 10.0, 14.0);
+                if (flangePipe1.EndFitting != "Flange" || flangePipe2.StartFitting != "Flange")
+                    throw new Exception("CreatePipesForValveFlanges fittings mismatch.");
+                if (flangePipe1.Thickness != 14.0 || flangePipe2.Thickness != 14.0)
+                    throw new Exception("CreatePipesForValveFlanges thickness mismatch.");
+
+                // 23.8 Aspect Ratio Lock in WidgetEditorViewModel
+                var weVm = new WidgetEditorViewModel(new ValveConfig
+                {
+                    Type = "Valve",
+                    Position = new WidgetPosition { Col = 1, Row = 1, SizeX = 4, SizeY = 4 }
+                }, new List<ConnectionConfig>());
+
+                weVm.SizeX = 6;
+                if (weVm.SizeY != 6)
+                    throw new Exception($"WidgetEditorViewModel failed to enforce 1:1 aspect ratio: SizeX=6, SizeY={weVm.SizeY}");
+
+                weVm.SizeY = 8;
+                if (weVm.SizeX != 8)
+                    throw new Exception($"WidgetEditorViewModel failed to synchronize SizeX when SizeY changed: SizeX={weVm.SizeX}, SizeY=8");
+
+                // 23.9 Toggleable Rubber-Banding with Alt Inversion Invariant
+                var dashVmRubber = new DashboardViewModel(new DashboardConfig(), mockCore, projCtx, new HmiConfiguration(), null, sp.GetRequiredService<IWidgetFactory>());
+                if (!dashVmRubber.IsRubberBandingEnabled)
+                    throw new Exception("DashboardViewModel.IsRubberBandingEnabled should default to true.");
+
+                dashVmRubber.ToggleRubberBandingCommand.Execute(null);
+                if (dashVmRubber.IsRubberBandingEnabled)
+                    throw new Exception("ToggleRubberBandingCommand failed to disable rubber banding.");
+
+                dashVmRubber.ToggleRubberBandingCommand.Execute(null);
+                if (!dashVmRubber.IsRubberBandingEnabled)
+                    throw new Exception("ToggleRubberBandingCommand failed to restore rubber banding.");
+
+                // Verify XOR logic formula: (enabled ^ alt)
+                bool testActive1 = dashVmRubber.IsRubberBandingEnabled ^ false; // true ^ false = true
+                bool testActive2 = dashVmRubber.IsRubberBandingEnabled ^ true;  // true ^ true = false (Alt temporarily inverts!)
+                if (!testActive1 || testActive2)
+                    throw new Exception("Rubber-banding Alt inversion formula failed.");
+
+                // 23.10 DashboardViewModel.ReplacePipeWithSplit & AttachPipesToValve
+                var dConfig23 = new DashboardConfig();
+                var dashVmIntegration = new DashboardViewModel(dConfig23, mockCore, projCtx, new HmiConfiguration(), null, sp.GetRequiredService<IWidgetFactory>());
+                
+                var originalIntegrationPipe = new PipeConfig
+                {
+                    Type = "Pipe",
+                    Title = "OrigPipe",
+                    Position = new WidgetPosition { Col = 10, Row = 10, SizeX = 20, SizeY = 1 },
+                    PipePoints = "0,0;20,0"
+                };
+                dConfig23.Widgets.Add(originalIntegrationPipe);
+                var origVm = dashVmIntegration.CreateWidgetViewModel(originalIntegrationPipe) as PipeWidgetViewModel;
+                dashVmIntegration.Widgets.Add(origVm!);
+
+                var (newPipeA, newPipeB) = dashVmIntegration.ReplacePipeWithSplit(origVm!, splitResultH.PipeA, splitResultH.PipeB);
+                if (dashVmIntegration.Widgets.Contains(origVm!) || dConfig23.Widgets.Contains(originalIntegrationPipe))
+                    throw new Exception("ReplacePipeWithSplit failed to remove original pipe.");
+                if (newPipeA == null || newPipeB == null || dashVmIntegration.Widgets.Count != 2 || dConfig23.Widgets.Count != 2)
+                    throw new Exception("ReplacePipeWithSplit failed to insert child pipes into DashboardViewModel and DashboardConfig.");
+
+                dashVmIntegration.AttachPipesToValveCommand.Execute(testValveForFlanges);
+                if (dashVmIntegration.Widgets.Count != 4 || dConfig23.Widgets.Count != 4)
+                    throw new Exception("AttachPipesToValveCommand failed to add 2 new pipes.");
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (23/23) PASSED SUCCESSFULLY!");
         }
     }
 

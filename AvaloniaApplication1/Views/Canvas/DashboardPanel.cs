@@ -19,6 +19,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using AvaloniaApplication1.Services;
+using AvaloniaApplication1.Services.Piping;
 
 namespace AvaloniaApplication1.Views.Canvas
 {
@@ -212,6 +213,7 @@ namespace AvaloniaApplication1.Views.Canvas
             public bool IsPort1;
         }
         private List<ConnectedPipePoint> _connectedPipePoints = new();
+        private readonly Dictionary<PipeWidgetViewModel, List<Point>> _dragOriginalConnectedPipes = new();
 
         // Overlay references (hosted outside Children to keep Children 1:1 with Widgets)
         private GridOverlay? _gridOverlay;
@@ -946,6 +948,15 @@ namespace AvaloniaApplication1.Views.Canvas
                         }
                     }
 
+                    _dragOriginalConnectedPipes.Clear();
+                    foreach (var cp in _connectedPipePoints)
+                    {
+                        if (!_dragOriginalConnectedPipes.ContainsKey(cp.PipeVm))
+                        {
+                            _dragOriginalConnectedPipes[cp.PipeVm] = cp.PipeVm.GetAbsoluteGridPoints().ToList();
+                        }
+                    }
+
                     e.Pointer.Capture(this);
                     e.Handled = true;
                     return;
@@ -1005,6 +1016,17 @@ namespace AvaloniaApplication1.Views.Canvas
 
             double col = Math.Max(0, Math.Floor(clickPoint.X / CellWidth));
             double row = Math.Max(0, Math.Floor(clickPoint.Y / CellHeight));
+
+            if (dashboardVm.CanAssembleCollinear)
+            {
+                var assembleCollinearItem = new MenuItem 
+                { 
+                    Header = "🔗  Собрать соосный узел" 
+                };
+                assembleCollinearItem.Click += (s, ev) => dashboardVm.AssembleCollinearNodeCommand.Execute(null);
+                menu.Items.Add(assembleCollinearItem);
+                menu.Items.Add(new Separator());
+            }
 
             // 1. Добавить элемент...
             var addEditorItem = new MenuItem 
@@ -1109,8 +1131,20 @@ namespace AvaloniaApplication1.Views.Canvas
 
             menu.Items.Add(new Separator());
 
+            if (dashboardVm.CanAssembleCollinear)
+            {
+                var assembleCollinearItem = new MenuItem { Header = "🔗 Собрать соосный узел" };
+                assembleCollinearItem.Click += (s, ev) => dashboardVm.AssembleCollinearNodeCommand.Execute(null);
+                menu.Items.Add(assembleCollinearItem);
+                menu.Items.Add(new Separator());
+            }
+
             if (targetVm is ValveWidgetViewModel valveVm)
             {
+                var attachPipesItem = new MenuItem { Header = "➕ Присоединить две трубы (к фланцам)" };
+                attachPipesItem.Click += (s, ev) => dashboardVm.AttachPipesToValveCommand.Execute(valveVm);
+                menu.Items.Add(attachPipesItem);
+
                 var rotateItem = new MenuItem { Header = "Повернуть" };
                 rotateItem.Click += (s, ev) => valveVm.RotateCommand.Execute(null);
                 menu.Items.Add(rotateItem);
@@ -1491,6 +1525,13 @@ namespace AvaloniaApplication1.Views.Canvas
                 int newSizeX = (int)Math.Max(1, Math.Round(newWidth / CellWidth));
                 int newSizeY = (int)Math.Max(1, Math.Round(newHeight / CellHeight));
 
+                if (string.Equals(_dragVm.Type, "Valve", StringComparison.OrdinalIgnoreCase))
+                {
+                    int maxSide = Math.Max(1, Math.Max(newSizeX, newSizeY));
+                    newSizeX = maxSide;
+                    newSizeY = maxSide;
+                }
+
                 if (_gridOverlay != null)
                 {
                     _gridOverlay.ShowHighlight = true;
@@ -1532,39 +1573,62 @@ namespace AvaloniaApplication1.Views.Canvas
                 }
 
                 // 1. Update connected external pipes for rubber-banding LIVE
+                bool isAltPressed = e.KeyModifiers.HasFlag(KeyModifiers.Alt);
+                var dashboardVm = GetDashboardViewModel();
+                bool isRubberBandingActive = (dashboardVm?.IsRubberBandingEnabled ?? true) ^ isAltPressed;
+
                 if (_connectedPipePoints.Count > 0)
                 {
-                    foreach (var conn in _connectedPipePoints)
+                    if (isRubberBandingActive)
                     {
-                        var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
-                        if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
+                        foreach (var conn in _connectedPipePoints)
                         {
-                            var oldPt = pipePoints[conn.PointIndex];
-                            double targetX = oldPt.X + deltaCol;
-                            double targetY = oldPt.Y + deltaRow;
-                            
-                            pipePoints[conn.PointIndex] = new Point(targetX, targetY);
-
-                            double pipeCol = conn.PipeVm.Col;
-                            double pipeRow = conn.PipeVm.Row;
-
-                            var relativePoints = pipePoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
-                            string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
-                            
-                            if (conn.PipeVm.PipePoints != newPointsStr)
+                            var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
+                            if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
                             {
-                                conn.PipeVm.PipePoints = newPointsStr;
+                                var oldPt = pipePoints[conn.PointIndex];
+                                double targetX = oldPt.X + deltaCol;
+                                double targetY = oldPt.Y + deltaRow;
+                                
+                                pipePoints[conn.PointIndex] = new Point(targetX, targetY);
+
+                                double pipeCol = conn.PipeVm.Col;
+                                double pipeRow = conn.PipeVm.Row;
+
+                                var relativePoints = pipePoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
+                                string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                                
+                                if (conn.PipeVm.PipePoints != newPointsStr)
+                                {
+                                    conn.PipeVm.PipePoints = newPointsStr;
+                                }
+
+                                var pipeChild = FindChildForVm(conn.PipeVm);
+                                if (pipeChild != null)
+                                {
+                                    SetCol(pipeChild, conn.PipeVm.Col);
+                                    SetRow(pipeChild, conn.PipeVm.Row);
+                                    SetSizeX(pipeChild, conn.PipeVm.SizeX);
+                                    SetSizeY(pipeChild, conn.PipeVm.SizeY);
+                                    pipeChild.InvalidateArrange();
+                                    pipeChild.InvalidateVisual();
+                                }
                             }
-
-                            var pipeChild = FindChildForVm(conn.PipeVm);
-                            if (pipeChild != null)
+                        }
+                    }
+                    else
+                    {
+                        // Restore connected pipes to original positions if rubber-banding is temporarily inverted/disabled
+                        foreach (var kvp in _dragOriginalConnectedPipes)
+                        {
+                            var origPts = kvp.Value;
+                            double pipeCol = kvp.Key.Col;
+                            double pipeRow = kvp.Key.Row;
+                            var relPts = origPts.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
+                            string ptsStr = string.Join(";", relPts.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                            if (kvp.Key.PipePoints != ptsStr)
                             {
-                                SetCol(pipeChild, conn.PipeVm.Col);
-                                SetRow(pipeChild, conn.PipeVm.Row);
-                                SetSizeX(pipeChild, conn.PipeVm.SizeX);
-                                SetSizeY(pipeChild, conn.PipeVm.SizeY);
-                                pipeChild.InvalidateArrange();
-                                pipeChild.InvalidateVisual();
+                                kvp.Key.PipePoints = ptsStr;
                             }
                         }
                     }
@@ -1611,6 +1675,28 @@ namespace AvaloniaApplication1.Views.Canvas
                 // 4. Update Smart Guides and Drag Coordinate Badge
                 UpdateSmartGuidesAndPosition(_dragVm.Col, _dragVm.Row, _dragVm.SizeX, _dragVm.SizeY);
                 DragCurrentBadge = (_dragVm.Col, _dragVm.Row, point);
+
+                if (_dragVm is ValveWidgetViewModel valveVm && _dragOriginalPositions.Count == 1)
+                {
+                    var candidatePipes = Children.Select(c => c.DataContext).OfType<PipeWidgetViewModel>()
+                        .Where(p => !_connectedPipePoints.Any(cp => cp.PipeVm == p));
+                    var splitCandidate = PipeAutoSplitter.FindSplitCandidate(
+                        candidatePipes,
+                        valveVm,
+                        new Point(_dragVm.Col + (_dragVm.SizeX - 1) / 2.0, _dragVm.Row + (_dragVm.SizeY - 1) / 2.0));
+
+                    if (splitCandidate != null)
+                    {
+                        Point snapPt = new Point(
+                            splitCandidate.ValveCenterOnAxis.X * CellWidth + CellWidth / 2.0,
+                            splitCandidate.ValveCenterOnAxis.Y * CellHeight + CellHeight / 2.0);
+                        if (ActiveSnapTarget != snapPt)
+                        {
+                            ActiveSnapTarget = snapPt;
+                            _selectionOverlay?.InvalidateVisual();
+                        }
+                    }
+                }
 
                 if (_gridOverlay != null)
                 {
@@ -1703,6 +1789,13 @@ namespace AvaloniaApplication1.Views.Canvas
                 int newSizeX = (int)Math.Max(1, Math.Round(newWidth / CellWidth));
                 int newSizeY = (int)Math.Max(1, Math.Round(newHeight / CellHeight));
 
+                if (string.Equals(_dragVm.Type, "Valve", StringComparison.OrdinalIgnoreCase))
+                {
+                    int maxSide = Math.Max(1, Math.Max(newSizeX, newSizeY));
+                    newSizeX = maxSide;
+                    newSizeY = maxSide;
+                }
+
                 _dragVm.SizeX = newSizeX;
                 _dragVm.SizeY = newSizeY;
 
@@ -1755,41 +1848,61 @@ namespace AvaloniaApplication1.Views.Canvas
                 }
 
                 // 1. Update connected external pipes for rubber-banding
+                bool isAltPressed = e.KeyModifiers.HasFlag(KeyModifiers.Alt);
+                var dashboardVm = GetDashboardViewModel();
+                bool isRubberBandingActive = (dashboardVm?.IsRubberBandingEnabled ?? true) ^ isAltPressed;
+
                 if (_connectedPipePoints.Count > 0)
                 {
-                    foreach (var conn in _connectedPipePoints)
+                    if (isRubberBandingActive)
                     {
-                        var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
-                        if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
+                        foreach (var conn in _connectedPipePoints)
                         {
-                            var oldPt = pipePoints[conn.PointIndex];
-                            double targetX = oldPt.X + deltaCol;
-                            double targetY = oldPt.Y + deltaRow;
-                            
-                            pipePoints[conn.PointIndex] = new Point(targetX, targetY);
-
-                            double pipeCol = conn.PipeVm.Col;
-                            double pipeRow = conn.PipeVm.Row;
-
-                            var relativePoints = pipePoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
-                            string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
-                            
-                            if (conn.PipeVm.PipePoints != newPointsStr)
+                            var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
+                            if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
                             {
-                                conn.PipeVm.PipePoints = newPointsStr;
-                            }
+                                var oldPt = pipePoints[conn.PointIndex];
+                                double targetX = oldPt.X + deltaCol;
+                                double targetY = oldPt.Y + deltaRow;
+                                
+                                pipePoints[conn.PointIndex] = new Point(targetX, targetY);
 
-                            var pipeChild = FindChildForVm(conn.PipeVm);
-                            if (pipeChild != null)
-                            {
-                                SetCol(pipeChild, conn.PipeVm.Col);
-                                SetRow(pipeChild, conn.PipeVm.Row);
-                                SetSizeX(pipeChild, conn.PipeVm.SizeX);
-                                SetSizeY(pipeChild, conn.PipeVm.SizeY);
-                                pipeChild.InvalidateMeasure();
-                                pipeChild.InvalidateArrange();
-                                pipeChild.InvalidateVisual();
+                                double pipeCol = conn.PipeVm.Col;
+                                double pipeRow = conn.PipeVm.Row;
+
+                                var relativePoints = pipePoints.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
+                                string newPointsStr = string.Join(";", relativePoints.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                                
+                                if (conn.PipeVm.PipePoints != newPointsStr)
+                                {
+                                    conn.PipeVm.PipePoints = newPointsStr;
+                                }
+
+                                var pipeChild = FindChildForVm(conn.PipeVm);
+                                if (pipeChild != null)
+                                {
+                                    SetCol(pipeChild, conn.PipeVm.Col);
+                                    SetRow(pipeChild, conn.PipeVm.Row);
+                                    SetSizeX(pipeChild, conn.PipeVm.SizeX);
+                                    SetSizeY(pipeChild, conn.PipeVm.SizeY);
+                                    pipeChild.InvalidateMeasure();
+                                    pipeChild.InvalidateArrange();
+                                    pipeChild.InvalidateVisual();
+                                }
                             }
+                        }
+                    }
+                    else
+                    {
+                        // Restore connected pipes to original positions
+                        foreach (var kvp in _dragOriginalConnectedPipes)
+                        {
+                            var origPts = kvp.Value;
+                            double pipeCol = kvp.Key.Col;
+                            double pipeRow = kvp.Key.Row;
+                            var relPts = origPts.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
+                            string ptsStr = string.Join(";", relPts.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                            kvp.Key.PipePoints = ptsStr;
                         }
                     }
                 }
@@ -1832,6 +1945,34 @@ namespace AvaloniaApplication1.Views.Canvas
                         child.InvalidateMeasure();
                         child.InvalidateArrange();
                         child.InvalidateVisual();
+                    }
+                }
+
+                // 4. Check for Inline Drop & Auto-Split on valve drop
+                if (_dragVm is ValveWidgetViewModel valveVm && _dragOriginalPositions.Count == 1)
+                {
+                    var candidatePipes = Children.Select(c => c.DataContext).OfType<PipeWidgetViewModel>()
+                        .Where(p => !_connectedPipePoints.Any(cp => cp.PipeVm == p));
+                    var splitResult = PipeAutoSplitter.TryFindAndSplitPipe(
+                        candidatePipes,
+                        valveVm,
+                        new Point(valveVm.Col + (valveVm.SizeX - 1) / 2.0, valveVm.Row + (valveVm.SizeY - 1) / 2.0));
+
+                    if (splitResult != null && splitResult.Success)
+                    {
+                        dashboardVm?.ReplacePipeWithSplit(splitResult.OriginalPipeVm, splitResult.PipeA, splitResult.PipeB);
+                        valveVm.Col = splitResult.ValveSnappedColRow.X;
+                        valveVm.Row = splitResult.ValveSnappedColRow.Y;
+                        valveVm.Rotation = splitResult.ValveRotation;
+                        valveVm.IsVertical = splitResult.ValveIsVertical;
+                        valveVm.OriginalConfig.Position.Col = valveVm.Col;
+                        valveVm.OriginalConfig.Position.Row = valveVm.Row;
+                        valveVm.TypedConfig.Rotation = valveVm.Rotation;
+                        valveVm.TypedConfig.IsVertical = valveVm.IsVertical;
+
+                        SetCol(_dragChild, valveVm.Col);
+                        SetRow(_dragChild, valveVm.Row);
+                        _dragChild.InvalidateArrange();
                     }
                 }
 

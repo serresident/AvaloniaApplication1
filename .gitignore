@@ -2,6 +2,7 @@
 [Oo]bj/
 .vs/
 *.user
+*.backup.json
 /.agents/*
 !/.agents/skills/
 !/.agents/rules/

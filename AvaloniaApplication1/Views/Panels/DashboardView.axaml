@@ -662,6 +662,50 @@
                     </StackPanel>
                 </ToggleButton>
 
+                <!-- Rubber-banding toggle (🔗 Связи) -->
+                <ToggleButton IsChecked="{Binding IsRubberBandingEnabled, Mode=TwoWay}"
+                              ToolTip.Tip="Отслеживание связей при перемещении (🔗 Связи). Зажатый Alt временно инвертирует привязку"
+                              Padding="8,4" FontSize="11" CornerRadius="4"
+                              Background="{DynamicResource ThemeSubtleBrush}" Foreground="{DynamicResource ThemeTextPrimaryBrush}"
+                              Margin="0,2,6,2" VerticalAlignment="Center">
+                    <ToggleButton.Styles>
+                        <Style Selector="ToggleButton:checked">
+                            <Setter Property="Background" Value="#0E4A8E" />
+                            <Setter Property="Foreground" Value="#00E5FF" />
+                        </Style>
+                        <Style Selector="ToggleButton:pointerover">
+                            <Setter Property="Background" Value="#4E4E52" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Style>
+                        <Style Selector="ToggleButton:checked:pointerover">
+                            <Setter Property="Background" Value="#1565C0" />
+                            <Setter Property="Foreground" Value="#80D8FF" />
+                        </Style>
+                    </ToggleButton.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <TextBlock Text="🔗" FontSize="12" VerticalAlignment="Center" />
+                        <TextBlock Text="Связи" FontSize="11" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ToggleButton>
+
+                <!-- Collinear Node Assembly Button -->
+                <Button Command="{Binding AssembleCollinearNodeCommand}"
+                        IsVisible="{Binding CanAssembleCollinear}"
+                        ToolTip.Tip="Собрать соосный узел (выровнять клапан и 2 трубы по оси опорной трубы и ликвидировать зазоры)"
+                        Padding="8,4" FontSize="11" Background="#1B5E20" Foreground="#A5D6A7" CornerRadius="4"
+                        Margin="0,2,8,2" VerticalAlignment="Center">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#2E7D32" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <TextBlock Text="🔗" FontSize="12" VerticalAlignment="Center" />
+                        <TextBlock Text="Собрать узел" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
                 <!-- Selection Context Tools (Visible only when multiple items are selected) -->
                 <!-- 1. Selection Info Badge -->
                 <Border IsVisible="{Binding HasMultiSelection}"

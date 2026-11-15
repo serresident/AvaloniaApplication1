@@ -14,6 +14,7 @@ namespace AvaloniaApplication1.Models.Config
         public List<BridgeRuleConfig> BridgeRules { get; set; } = new();
         public DashboardConfig Dashboard { get; set; } = new();
         public DashboardConfig Mimic { get; set; } = new();
+        public PipingPresetsConfig PipingPresets { get; set; } = new();
     }
 
     public class ProjectConfig
@@ -22,6 +23,15 @@ namespace AvaloniaApplication1.Models.Config
         public string Version { get; set; } = "1.0.0";
         public bool IsCompactMode { get; set; } = false;
         public string Theme { get; set; } = "Dark";
+        public PipingPresetsConfig PipingPresets { get; set; } = new();
+    }
+
+    public class PipingPresetsConfig
+    {
+        public double DefaultPipeThickness { get; set; } = 12.0;
+        public int DefaultValveSize { get; set; } = 4;
+        public List<double> StandardPipeThicknesses { get; set; } = new() { 4.0, 8.0, 12.0, 16.0 };
+        public List<int> StandardValveSizes { get; set; } = new() { 2, 3, 4, 6 };
     }
 
     public class SecurityConfig

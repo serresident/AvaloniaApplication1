@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
+using AvaloniaApplication1.Services.Piping;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -44,6 +45,12 @@ namespace AvaloniaApplication1.ViewModels.Panels
 
         [ObservableProperty]
         private bool _isMultiSelectMode;
+
+        [ObservableProperty]
+        private bool _isRubberBandingEnabled = true;
+
+        [ObservableProperty]
+        private bool _canAssembleCollinear;
 
         public bool HasMultiSelection => SelectedWidgetsCount > 1;
         public bool CanGroup => SelectedWidgetsCount > 1;
@@ -105,7 +112,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
             UpdateSelectedWidgetsInfo();
         }
 
-        private WidgetViewModelBase? CreateWidgetViewModel(WidgetConfig widgetConfig)
+        public WidgetViewModelBase? CreateWidgetViewModel(WidgetConfig widgetConfig)
         {
             return _widgetFactory.CreateWidgetViewModel(widgetConfig);
         }
@@ -230,12 +237,15 @@ namespace AvaloniaApplication1.ViewModels.Panels
 
         public void AddQuickWidgetAt(string type, double col, double row)
         {
+            int valveSize = _config?.PipingPresets?.DefaultValveSize ?? 4;
+            double pipeThickness = _config?.PipingPresets?.DefaultPipeThickness ?? 12.0;
+
             WidgetConfig config = type switch
             {
                 "Valve" => new ValveConfig
                 {
                     Title = "Клапан",
-                    Position = new WidgetPosition { Col = col, Row = row, SizeX = 4, SizeY = 4 },
+                    Position = new WidgetPosition { Col = col, Row = row, SizeX = valveSize, SizeY = valveSize },
                     ValveType = "CutOff",
                     ActiveColor = "#00FF00",
                     InactiveColor = "#FF0000"
@@ -252,7 +262,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                     Title = "Трубопровод",
                     Position = new WidgetPosition { Col = col, Row = row, SizeX = 10, SizeY = 2 },
                     PipePoints = "0,0;10,0",
-                    Thickness = 12,
+                    Thickness = pipeThickness,
                     ShowFlanges = true,
                     ActiveColor = "#00FF00",
                     InactiveColor = "#AAAAAA"
@@ -549,6 +559,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
             }
             OnPropertyChanged(nameof(CanGroup));
             OnPropertyChanged(nameof(CanUngroup));
+            CanAssembleCollinear = CollinearAssemblyService.CanAssemble(selectedList);
         }
 
         #region Alignment, Distribution & Group Commands
@@ -819,6 +830,86 @@ namespace AvaloniaApplication1.ViewModels.Panels
         private bool ArePointsClose(Avalonia.Point p1, Avalonia.Point p2)
         {
             return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2)) <= 1.1;
+        }
+
+        [RelayCommand]
+        public void ToggleRubberBanding()
+        {
+            IsRubberBandingEnabled = !IsRubberBandingEnabled;
+        }
+
+        [RelayCommand]
+        public void AssembleCollinearNode()
+        {
+            var selected = Widgets.Where(w => w.IsSelected).ToList();
+            if (CollinearAssemblyService.AssembleCollinear(selected))
+            {
+                ResolvePipeConnections();
+                UpdateSelectedWidgetsInfo();
+            }
+        }
+
+        [RelayCommand]
+        public void AttachPipesToValve(ValveWidgetViewModel? valve)
+        {
+            if (valve == null) return;
+            double thickness = _config?.PipingPresets?.DefaultPipeThickness ?? 12.0;
+            var (p1Cfg, p2Cfg) = CollinearAssemblyService.CreatePipesForValveFlanges(valve, pipeThickness: thickness);
+            _dashboardConfig.Widgets.Add(p1Cfg);
+            _dashboardConfig.Widgets.Add(p2Cfg);
+
+            var vm1 = CreateWidgetViewModel(p1Cfg);
+            var vm2 = CreateWidgetViewModel(p2Cfg);
+
+            if (vm1 != null)
+            {
+                vm1.PropertyChanged += OnWidgetPropertyChanged;
+                Widgets.Add(vm1);
+            }
+            if (vm2 != null)
+            {
+                vm2.PropertyChanged += OnWidgetPropertyChanged;
+                Widgets.Add(vm2);
+            }
+            ResolvePipeConnections();
+        }
+
+        public (PipeWidgetViewModel? PipeA, PipeWidgetViewModel? PipeB) ReplacePipeWithSplit(
+            PipeWidgetViewModel originalPipe, 
+            PipeConfig pipeACfg, 
+            PipeConfig pipeBCfg)
+        {
+            int origIndex = Widgets.IndexOf(originalPipe);
+            originalPipe.PropertyChanged -= OnWidgetPropertyChanged;
+            originalPipe.Dispose();
+            Widgets.Remove(originalPipe);
+            _dashboardConfig.Widgets.Remove(originalPipe.OriginalConfig);
+
+            _dashboardConfig.Widgets.Add(pipeACfg);
+            _dashboardConfig.Widgets.Add(pipeBCfg);
+
+            var vmA = CreateWidgetViewModel(pipeACfg) as PipeWidgetViewModel;
+            var vmB = CreateWidgetViewModel(pipeBCfg) as PipeWidgetViewModel;
+
+            if (vmA != null)
+            {
+                vmA.PropertyChanged += OnWidgetPropertyChanged;
+                if (origIndex >= 0 && origIndex <= Widgets.Count)
+                    Widgets.Insert(origIndex, vmA);
+                else
+                    Widgets.Add(vmA);
+            }
+            if (vmB != null)
+            {
+                vmB.PropertyChanged += OnWidgetPropertyChanged;
+                if (origIndex >= 0 && origIndex + 1 <= Widgets.Count)
+                    Widgets.Insert(origIndex + 1, vmB);
+                else
+                    Widgets.Add(vmB);
+            }
+
+            ResolvePipeConnections();
+            return (vmA, vmB);
         }
 
         public void Dispose()
