@@ -1,7 +1,7 @@
 # История диалога разработки (Chat History)
 
 * **ID сессии:** `fb44155f-1d11-4c8c-b777-9870b9e1d8ca`
-* **Дата выгрузки:** 2026-11-16 01:24:54
+* **Дата выгрузки:** 2026-11-16 02:40:35
 * **Исходный JSONL лог:** [transcript_full.jsonl](transcript_full.jsonl)
 
 ---
@@ -2907,3 +2907,69 @@ I will execute the **Delegation** routine using **DeepCoder** to implement the Q
 *⚡ Действие ассистента [2026-11-15T21:24:32Z]: запуск инструментов: `edit_file`*
 
 *⚡ Действие ассистента [2026-11-15T21:24:46Z]: запуск инструментов: `run_command`*
+
+*⚡ Действие ассистента [2026-11-15T21:24:54Z]: запуск инструментов: `run_command`*
+
+*⚡ Действие ассистента [2026-11-15T21:25:03Z]: запуск инструментов: `run_command`*
+
+*⚡ Действие ассистента [2026-11-15T21:25:25Z]: запуск инструментов: `run_command`*
+
+### 🤖 Ответ ассистента — 2026-11-15T21:25:34Z
+
+Архитектурный концепт подсистемы истории изменений успешно утвержден и опубликован как проектный RFC-документ:
+
+📄 **[docs/designs/history_and_time_travel_engine.md](file:///c:/Users/erch/Мой%20диск/1%20for%20ai/avalonia/avalonia%20_continue%20concept/AvaloniaApplication1/docs/designs/history_and_time_travel_engine.md)**  
+🗺️ **Реестр проектных спецификаций**: [docs/designs/SITEMAP.md](file:///c:/Users/erch/Мой%20диск/1%20for%20ai/avalonia/avalonia%20_continue%20concept/AvaloniaApplication1/docs/designs/SITEMAP.md)
+
+---
+
+### Основные положения опубликованного RFC
+
+1. **Кольцевой стек на 30 шагов**:
+   * Жесткое ограничение глубины истории кольцевым буфером (`Capacity = 30`) с нулевым риском утечек памяти при длительных сессиях редактирования.
+2. **Дифференциальное согласование ViewModels (Reconciliation по `Id`)**:
+   * Устранение критического блокера: добавление `public Guid Id { get; set; } = Guid.NewGuid();` в базовый `WidgetConfig`.
+   * При откате или переходе к шагу существующие ViewModels не пересоздаются с нуля, а обновляют свои параметры in-place, что **полностью сохраняет активные подписки на опрос тегов и исключает мерцание UI**.
+3. **Выдвижная боковая шторка (Drawer 280px)**:
+   * Компактный интерфейс таймлайна с прямым кликабельным переходом к любому шагу в один клик. Шторка не перекрывает рабочую область мнемосхемы постоянно.
+4. **20-минутный таймер удержания истории в Runtime**:
+   * Защита истории от случайного сброса при кратковременном переключении режимов оператора; авто-очистка памяти только при простое в Runtime более 20 минут.
+5. **Дросселирование Nudge (400 мс) и защита от реентерабельности (`_isReconciling`)**:
+   * Защита от исчерпания 30 слотов буфера при непрерывном удержании стрелок клавиатуры и подавление каскадной записи истории при программном накате снимка.
+
+---
+
+### Следующий шаг
+
+Документ зафиксирован в репозитории. Когда вы будете готовы перейти к этапу формального проектирования и реализации, вызовите:
+
+```text
+/egm-draft docs/designs/history_and_time_travel_engine.md
+```
+*(или передайте команду `/boost` для непосредственного перехода к реализации через DeepCoder)*.
+
+---
+
+## 👤 Запрос #39 — 2026-11-15T21:23:03Z
+
+/boost
+
+### 🤖 Ответ ассистента — 2026-11-15T21:25:47Z
+
+I will execute the **Delegation** routine using **DeepCoder** to implement the History, Undo/Redo, and Time-Travel Engine.
+
+---
+
+### 🤖 Ответ ассистента — 2026-11-15T21:26:14Z
+
+Запущен подагент **DeepCoder** для реализации подсистемы истории изменений, Undo/Redo и Time-Travel Engine согласно утверждённому RFC [docs/designs/history_and_time_travel_engine.md](file:///c:/Users/erch/Мой%20диск/1%20for%20ai/avalonia/avalonia%20_continue%20concept/AvaloniaApplication1/docs/designs/history_and_time_travel_engine.md):
+
+* **Domain**: добавление уникального `Guid Id` в `WidgetConfig` и проброс в `WidgetViewModelBase`;
+* **Application**: реализация `IHistoryService` и `HistoryService` с кольцевым буфером на 30 шагов, отсечением ветвей и 20-минутным таймером сброса в Runtime;
+* **Presentation**: дифференциальное согласование (Reconciliation) по `Id` в `DashboardViewModel` с защитой реентерабельности (`_isReconciling`) и дросселированием Nudge (400 мс);
+* **UI**: выдвижная боковая шторка `HistorySidePanel.axaml`, кнопки `Undo`/`Redo`/`История` в тулбаре и горячие клавиши `Ctrl+Z`, `Ctrl+Y`, `Ctrl+Shift+Z`;
+* **Верификация**: модульные тесты в `AvaloniaApplication1.UIValidation` и проверка рендера Tier 1.
+
+Ожидаем завершения работы подагента.
+
+---

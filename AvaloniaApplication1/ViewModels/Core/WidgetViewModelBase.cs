@@ -129,6 +129,8 @@ namespace AvaloniaApplication1.ViewModels.Core
         /// </summary>
         public WidgetConfig OriginalConfig { get; }
 
+        public Guid Id => OriginalConfig?.Id ?? Guid.Empty;
+
         public WidgetViewModelBase(WidgetConfig config, IDataCoreService dataService, IProjectContextService projectContext)
         {
             DataService = dataService;
@@ -289,6 +291,51 @@ namespace AvaloniaApplication1.ViewModels.Core
         /// <param name="newValue">The newly received value from the network/mock.</param>
         protected virtual void OnTagValueUpdated(object newValue)
         {
+        }
+
+        /// <summary>
+        /// Differential in-place reconciliation: updates ViewModel properties from snapshot config without dropping subscriptions.
+        /// </summary>
+        public virtual void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            if (newConfig == null) return;
+
+            Title = newConfig.Title;
+            Col = newConfig.Position.Col;
+            Row = newConfig.Position.Row;
+            SizeX = newConfig.Position.SizeX;
+            SizeY = newConfig.Position.SizeY;
+            FontSize = newConfig.FontSize;
+            AutoScaleText = newConfig.AutoScaleText;
+            ShowTitle = newConfig.ShowTitle;
+            ShowBorder = newConfig.ShowBorder;
+            LabelPosition = newConfig.LabelPosition;
+            CompactMode = newConfig.CompactMode;
+            GroupId = newConfig.GroupId;
+
+            if (OriginalConfig != null)
+            {
+                OriginalConfig.Title = newConfig.Title;
+                OriginalConfig.Position.Col = newConfig.Position.Col;
+                OriginalConfig.Position.Row = newConfig.Position.Row;
+                OriginalConfig.Position.SizeX = newConfig.Position.SizeX;
+                OriginalConfig.Position.SizeY = newConfig.Position.SizeY;
+                OriginalConfig.FontSize = newConfig.FontSize;
+                OriginalConfig.AutoScaleText = newConfig.AutoScaleText;
+                OriginalConfig.ShowTitle = newConfig.ShowTitle;
+                OriginalConfig.ShowBorder = newConfig.ShowBorder;
+                OriginalConfig.LabelPosition = newConfig.LabelPosition;
+                OriginalConfig.CompactMode = newConfig.CompactMode;
+                OriginalConfig.GroupId = newConfig.GroupId;
+            }
+
+            if (newConfig.Source != null && (Source == null || Source.TagId != newConfig.Source.TagId || Source.Address != newConfig.Source.Address || Source.ConnId != newConfig.Source.ConnId))
+            {
+                Source = newConfig.Source;
+                if (OriginalConfig != null) OriginalConfig.Source = newConfig.Source;
+                Disposables.Clear();
+                InitializeTagSubscriptions();
+            }
         }
 
         #region Operator Force / Manual Override Commands

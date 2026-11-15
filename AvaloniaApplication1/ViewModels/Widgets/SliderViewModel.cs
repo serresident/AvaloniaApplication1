@@ -52,6 +52,21 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             }
         }
 
+        public double MinValue => TypedConfig.MinValue;
+        public double MaxValue => TypedConfig.MaxValue == 0 ? 100 : TypedConfig.MaxValue;
+
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is SliderConfig sliderConfig)
+            {
+                TypedConfig.MinValue = sliderConfig.MinValue;
+                TypedConfig.MaxValue = sliderConfig.MaxValue;
+                OnPropertyChanged(nameof(MinValue));
+                OnPropertyChanged(nameof(MaxValue));
+            }
+        }
+
         public override void Dispose()
         {
             base.Dispose();

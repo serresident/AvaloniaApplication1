@@ -69,5 +69,20 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 DisplayValue = "---";
             }
         }
+
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is ValueDisplayConfig valConfig)
+            {
+                TypedConfig.Format = valConfig.Format;
+                TypedConfig.ValueColor = valConfig.ValueColor;
+                TypedConfig.ValueFontSize = valConfig.ValueFontSize;
+                OnPropertyChanged(nameof(Format));
+                OnPropertyChanged(nameof(ValueColor));
+                OnPropertyChanged(nameof(ValueFontSize));
+                UpdateDisplayValue();
+            }
+        }
     }
 }

@@ -1,1357 +1,3215 @@
 {
-    "Project":  {
-                    "Name":  "Парк хранения ММА (4 емкости) - Цех 21 ВС-108",
-                    "Version":  "1.0.0"
-                },
-    "Connections":  [
-                        {
-                            "Id":  "wb_mma_park",
-                            "Type":  "ModbusTCP",
-                            "Host":  "10.10.10.234",
-                            "Port":  502,
-                            "PollIntervalMs":  200,
-                            "ByteOrder":  "CDAB"
-                        },
-                        {
-                            "Id":  "mqtt_wb",
-                            "Type":  "MQTT",
-                            "Host":  "10.10.10.234",
-                            "Port":  1883
-                        }
-                    ],
-    "BridgeRules":  [
-
-                    ],
-    "Dashboard":  {
-                      "CellSize":  160,
-                      "Widgets":  [
-                                      {
-                                          "Type":  "RealTimeTrend",
-                                          "Title":  "Уровень Емк. 22 (LT-22)",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "30001",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  0,
-                                                           "Col":  0,
-                                                           "SizeX":  2,
-                                                           "SizeY":  2
-                                                       },
-                                          "MinValue":  0,
-                                          "MaxValue":  9250,
-                                          "Format":  "{0:F0} мм"
-                                      },
-                                      {
-                                          "Type":  "RealTimeTrend",
-                                          "Title":  "Уровень Емк. 23 (LT-23)",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "30003",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  0,
-                                                           "Col":  2,
-                                                           "SizeX":  2,
-                                                           "SizeY":  2
-                                                       },
-                                          "MinValue":  0,
-                                          "MaxValue":  9250,
-                                          "Format":  "{0:F0} мм"
-                                      },
-                                      {
-                                          "Type":  "RealTimeTrend",
-                                          "Title":  "Уровень Емк. 24 (LT-24)",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "30005",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  2,
-                                                           "Col":  0,
-                                                           "SizeX":  2,
-                                                           "SizeY":  2
-                                                       },
-                                          "MinValue":  0,
-                                          "MaxValue":  9250,
-                                          "Format":  "{0:F0} мм"
-                                      },
-                                      {
-                                          "Type":  "RealTimeTrend",
-                                          "Title":  "Уровень Емк. 25 (LT-25)",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "30007",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  2,
-                                                           "Col":  2,
-                                                           "SizeX":  2,
-                                                           "SizeY":  2
-                                                       },
-                                          "MinValue":  0,
-                                          "MaxValue":  9250,
-                                          "Format":  "{0:F0} мм"
-                                      },
-                                      {
-                                          "Type":  "SetValue",
-                                          "Title":  "Доза налива (FT2-1)",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "40027",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  0,
-                                                           "Col":  4,
-                                                           "SizeX":  1,
-                                                           "SizeY":  1
-                                                       },
-                                          "MinValue":  0,
-                                          "MaxValue":  60000,
-                                          "Format":  "{0:F0} кг"
-                                      },
-                                      {
-                                          "Type":  "SetValue",
-                                          "Title":  "Упреждение отсечки",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "40029",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  0,
-                                                           "Col":  5,
-                                                           "SizeX":  1,
-                                                           "SizeY":  1
-                                                       },
-                                          "MinValue":  0,
-                                          "MaxValue":  500,
-                                          "Format":  "{0:F0} кг"
-                                      },
-                                      {
-                                          "Type":  "SetValue",
-                                          "Title":  "Lmax Емк 22",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "40001",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  1,
-                                                           "Col":  4,
-                                                           "SizeX":  1,
-                                                           "SizeY":  1
-                                                       },
-                                          "MinValue":  5000,
-                                          "MaxValue":  9250,
-                                          "Format":  "{0:F0} мм"
-                                      },
-                                      {
-                                          "Type":  "SetValue",
-                                          "Title":  "Lmax Емк 23",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "40005",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  1,
-                                                           "Col":  5,
-                                                           "SizeX":  1,
-                                                           "SizeY":  1
-                                                       },
-                                          "MinValue":  5000,
-                                          "MaxValue":  9250,
-                                          "Format":  "{0:F0} мм"
-                                      },
-                                      {
-                                          "Type":  "SetValue",
-                                          "Title":  "Lmax Емк 24",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "40009",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  2,
-                                                           "Col":  4,
-                                                           "SizeX":  1,
-                                                           "SizeY":  1
-                                                       },
-                                          "MinValue":  5000,
-                                          "MaxValue":  9250,
-                                          "Format":  "{0:F0} мм"
-                                      },
-                                      {
-                                          "Type":  "SetValue",
-                                          "Title":  "Lmax Емк 25",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "40013",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  2,
-                                                           "Col":  5,
-                                                           "SizeX":  1,
-                                                           "SizeY":  1
-                                                       },
-                                          "MinValue":  5000,
-                                          "MaxValue":  9250,
-                                          "Format":  "{0:F0} мм"
-                                      },
-                                      {
-                                          "Type":  "SetValue",
-                                          "Title":  "Pmin Насос 502в",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "40017",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  3,
-                                                           "Col":  4,
-                                                           "SizeX":  1,
-                                                           "SizeY":  1
-                                                       },
-                                          "MinValue":  0,
-                                          "MaxValue":  5,
-                                          "Format":  "{0:F1} кгс"
-                                      },
-                                      {
-                                          "Type":  "SetValue",
-                                          "Title":  "Pmax Насос 502в",
-                                          "Source":  {
-                                                         "ConnId":  "wb_mma_park",
-                                                         "Address":  "40019",
-                                                         "DataType":  "Float32"
-                                                     },
-                                          "Position":  {
-                                                           "Row":  3,
-                                                           "Col":  5,
-                                                           "SizeX":  1,
-                                                           "SizeY":  1
-                                                       },
-                                          "MinValue":  1,
-                                          "MaxValue":  10,
-                                          "Format":  "{0:F1} кгс"
-                                      }
-                                  ]
-                  },
-    "Mimic":  {
-                  "CellSize":  10,
-                  "Widgets":  [
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Расход подачи FT1-1",
-                                      "Position":  {
-                                                       "Row":  1,
-                                                       "Col":  2,
-                                                       "SizeX":  14,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30027",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F0} кг/ч"
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Объем FT1-1",
-                                      "Position":  {
-                                                       "Row":  1,
-                                                       "Col":  17,
-                                                       "SizeX":  11,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30029",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F1} м³/ч"
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Плотность FT1-1",
-                                      "Position":  {
-                                                       "Row":  1,
-                                                       "Col":  29,
-                                                       "SizeX":  12,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30031",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F1} кг/м³"
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Давление азота (врезка)",
-                                      "Position":  {
-                                                       "Row":  1,
-                                                       "Col":  69,
-                                                       "SizeX":  14,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30023",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F2} кгс/см²"
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Давление азота (панель)",
-                                      "Position":  {
-                                                       "Row":  1,
-                                                       "Col":  84,
-                                                       "SizeX":  14,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30025",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F3} кгс/см²"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Магистраль приема ММА",
-                                      "Position":  {
-                                                       "Row":  6,
-                                                       "Col":  1,
-                                                       "SizeX":  64,
-                                                       "SizeY":  1
-                                                   },
-                                      "PipePoints":  "0,0;63,0",
-                                      "Thickness":  10,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Cap",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Отвод приема Емк 22",
-                                      "Position":  {
-                                                       "Row":  6,
-                                                       "Col":  10,
-                                                       "SizeX":  1,
-                                                       "SizeY":  4
-                                                   },
-                                      "PipePoints":  "0,0;0,3",
-                                      "Thickness":  8,
-                                      "StartFitting":  "None",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Valve",
-                                      "Title":  "LV 22 (Прием)",
-                                      "Position":  {
-                                                       "Row":  9,
-                                                       "Col":  7,
-                                                       "SizeX":  6,
-                                                       "SizeY":  6
-                                                   },
-                                      "ValveType":  "CutOff",
-                                      "ActuatorType":  "Solenoid",
-                                      "IsVertical":  true,
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00012",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "FeedbackSource":  {
-                                                             "ConnId":  "wb_mma_park",
-                                                             "Address":  "10016",
-                                                             "DataType":  "Bool"
-                                                         },
-                                      "ClosedFeedbackSource":  {
-                                                                   "ConnId":  "wb_mma_park",
-                                                                   "Address":  "10017",
-                                                                   "DataType":  "Bool"
-                                                               },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#D50000"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Впуск в Емк 22",
-                                      "Position":  {
-                                                       "Row":  14,
-                                                       "Col":  10,
-                                                       "SizeX":  1,
-                                                       "SizeY":  3
-                                                   },
-                                      "PipePoints":  "0,0;0,2",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Отвод приема Емк 23",
-                                      "Position":  {
-                                                       "Row":  6,
-                                                       "Col":  26,
-                                                       "SizeX":  1,
-                                                       "SizeY":  4
-                                                   },
-                                      "PipePoints":  "0,0;0,3",
-                                      "Thickness":  8,
-                                      "StartFitting":  "None",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Valve",
-                                      "Title":  "LV 23 (Прием)",
-                                      "Position":  {
-                                                       "Row":  9,
-                                                       "Col":  23,
-                                                       "SizeX":  6,
-                                                       "SizeY":  6
-                                                   },
-                                      "ValveType":  "CutOff",
-                                      "ActuatorType":  "Solenoid",
-                                      "IsVertical":  true,
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00013",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "FeedbackSource":  {
-                                                             "ConnId":  "wb_mma_park",
-                                                             "Address":  "10018",
-                                                             "DataType":  "Bool"
-                                                         },
-                                      "ClosedFeedbackSource":  {
-                                                                   "ConnId":  "wb_mma_park",
-                                                                   "Address":  "10019",
-                                                                   "DataType":  "Bool"
-                                                               },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#D50000"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Впуск в Емк 23",
-                                      "Position":  {
-                                                       "Row":  14,
-                                                       "Col":  26,
-                                                       "SizeX":  1,
-                                                       "SizeY":  3
-                                                   },
-                                      "PipePoints":  "0,0;0,2",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Отвод приема Емк 24",
-                                      "Position":  {
-                                                       "Row":  6,
-                                                       "Col":  42,
-                                                       "SizeX":  1,
-                                                       "SizeY":  4
-                                                   },
-                                      "PipePoints":  "0,0;0,3",
-                                      "Thickness":  8,
-                                      "StartFitting":  "None",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Valve",
-                                      "Title":  "LV 24 (Прием)",
-                                      "Position":  {
-                                                       "Row":  9,
-                                                       "Col":  39,
-                                                       "SizeX":  6,
-                                                       "SizeY":  6
-                                                   },
-                                      "ValveType":  "CutOff",
-                                      "ActuatorType":  "Solenoid",
-                                      "IsVertical":  true,
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00014",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "FeedbackSource":  {
-                                                             "ConnId":  "wb_mma_park",
-                                                             "Address":  "10020",
-                                                             "DataType":  "Bool"
-                                                         },
-                                      "ClosedFeedbackSource":  {
-                                                                   "ConnId":  "wb_mma_park",
-                                                                   "Address":  "10021",
-                                                                   "DataType":  "Bool"
-                                                               },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#D50000"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Впуск в Емк 24",
-                                      "Position":  {
-                                                       "Row":  14,
-                                                       "Col":  42,
-                                                       "SizeX":  1,
-                                                       "SizeY":  3
-                                                   },
-                                      "PipePoints":  "0,0;0,2",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Отвод приема Емк 25",
-                                      "Position":  {
-                                                       "Row":  6,
-                                                       "Col":  58,
-                                                       "SizeX":  1,
-                                                       "SizeY":  4
-                                                   },
-                                      "PipePoints":  "0,0;0,3",
-                                      "Thickness":  8,
-                                      "StartFitting":  "None",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Valve",
-                                      "Title":  "LV 25 (Прием)",
-                                      "Position":  {
-                                                       "Row":  9,
-                                                       "Col":  55,
-                                                       "SizeX":  6,
-                                                       "SizeY":  6
-                                                   },
-                                      "ValveType":  "CutOff",
-                                      "ActuatorType":  "Solenoid",
-                                      "IsVertical":  true,
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00015",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "FeedbackSource":  {
-                                                             "ConnId":  "wb_mma_park",
-                                                             "Address":  "10022",
-                                                             "DataType":  "Bool"
-                                                         },
-                                      "ClosedFeedbackSource":  {
-                                                                   "ConnId":  "wb_mma_park",
-                                                                   "Address":  "10023",
-                                                                   "DataType":  "Bool"
-                                                               },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#D50000"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Впуск в Емк 25",
-                                      "Position":  {
-                                                       "Row":  14,
-                                                       "Col":  58,
-                                                       "SizeX":  1,
-                                                       "SizeY":  3
-                                                   },
-                                      "PipePoints":  "0,0;0,2",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "PilotLight",
-                                      "Title":  "Lmax 22",
-                                      "Position":  {
-                                                       "Row":  14,
-                                                       "Col":  12,
-                                                       "SizeX":  4,
-                                                       "SizeY":  3
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10001",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "TrueColor":  "#FF1744",
-                                      "FalseColor":  "#263238"
-                                  },
-                                  {
-                                      "Type":  "Tank",
-                                      "Title":  "Емкость 22 (500 м³)",
-                                      "Position":  {
-                                                       "Row":  17,
-                                                       "Col":  3,
-                                                       "SizeX":  14,
-                                                       "SizeY":  17
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30001",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F0} мм",
-                                      "MinValue":  0,
-                                      "MaxValue":  9250
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Т 22",
-                                      "Position":  {
-                                                       "Row":  35,
-                                                       "Col":  12,
-                                                       "SizeX":  7,
-                                                       "SizeY":  3
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30009",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F1} °C"
-                                  },
-                                  {
-                                      "Type":  "PilotLight",
-                                      "Title":  "Lmax 23",
-                                      "Position":  {
-                                                       "Row":  14,
-                                                       "Col":  28,
-                                                       "SizeX":  4,
-                                                       "SizeY":  3
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10002",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "TrueColor":  "#FF1744",
-                                      "FalseColor":  "#263238"
-                                  },
-                                  {
-                                      "Type":  "Tank",
-                                      "Title":  "Емкость 23 (500 м³)",
-                                      "Position":  {
-                                                       "Row":  17,
-                                                       "Col":  19,
-                                                       "SizeX":  14,
-                                                       "SizeY":  17
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30003",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F0} мм",
-                                      "MinValue":  0,
-                                      "MaxValue":  9250
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Т 23",
-                                      "Position":  {
-                                                       "Row":  35,
-                                                       "Col":  28,
-                                                       "SizeX":  7,
-                                                       "SizeY":  3
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30011",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F1} °C"
-                                  },
-                                  {
-                                      "Type":  "PilotLight",
-                                      "Title":  "Lmax 24",
-                                      "Position":  {
-                                                       "Row":  14,
-                                                       "Col":  44,
-                                                       "SizeX":  4,
-                                                       "SizeY":  3
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10003",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "TrueColor":  "#FF1744",
-                                      "FalseColor":  "#263238"
-                                  },
-                                  {
-                                      "Type":  "Tank",
-                                      "Title":  "Емкость 24 (500 м³)",
-                                      "Position":  {
-                                                       "Row":  17,
-                                                       "Col":  35,
-                                                       "SizeX":  14,
-                                                       "SizeY":  17
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30005",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F0} мм",
-                                      "MinValue":  0,
-                                      "MaxValue":  9250
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Т 24",
-                                      "Position":  {
-                                                       "Row":  35,
-                                                       "Col":  44,
-                                                       "SizeX":  7,
-                                                       "SizeY":  3
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30013",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F1} °C"
-                                  },
-                                  {
-                                      "Type":  "PilotLight",
-                                      "Title":  "Lmax 25",
-                                      "Position":  {
-                                                       "Row":  14,
-                                                       "Col":  60,
-                                                       "SizeX":  4,
-                                                       "SizeY":  3
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10004",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "TrueColor":  "#FF1744",
-                                      "FalseColor":  "#263238"
-                                  },
-                                  {
-                                      "Type":  "Tank",
-                                      "Title":  "Емкость 25 (500 м³)",
-                                      "Position":  {
-                                                       "Row":  17,
-                                                       "Col":  51,
-                                                       "SizeX":  14,
-                                                       "SizeY":  17
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30007",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F0} мм",
-                                      "MinValue":  0,
-                                      "MaxValue":  9250
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Т 25",
-                                      "Position":  {
-                                                       "Row":  35,
-                                                       "Col":  60,
-                                                       "SizeX":  7,
-                                                       "SizeY":  3
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30015",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F1} °C"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Слив из Емк 22",
-                                      "Position":  {
-                                                       "Row":  34,
-                                                       "Col":  10,
-                                                       "SizeX":  1,
-                                                       "SizeY":  3
-                                                   },
-                                      "PipePoints":  "0,0;0,2",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Valve",
-                                      "Title":  "V 22 (Выход)",
-                                      "Position":  {
-                                                       "Row":  37,
-                                                       "Col":  7,
-                                                       "SizeX":  6,
-                                                       "SizeY":  6
-                                                   },
-                                      "ValveType":  "CutOff",
-                                      "ActuatorType":  "Manual",
-                                      "IsVertical":  true,
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10017",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#D50000"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Опуск 22 в коллектор",
-                                      "Position":  {
-                                                       "Row":  42,
-                                                       "Col":  10,
-                                                       "SizeX":  1,
-                                                       "SizeY":  4
-                                                   },
-                                      "PipePoints":  "0,0;0,3",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "None",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Слив из Емк 23",
-                                      "Position":  {
-                                                       "Row":  34,
-                                                       "Col":  26,
-                                                       "SizeX":  1,
-                                                       "SizeY":  3
-                                                   },
-                                      "PipePoints":  "0,0;0,2",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Valve",
-                                      "Title":  "V 23 (Выход)",
-                                      "Position":  {
-                                                       "Row":  37,
-                                                       "Col":  23,
-                                                       "SizeX":  6,
-                                                       "SizeY":  6
-                                                   },
-                                      "ValveType":  "CutOff",
-                                      "ActuatorType":  "Manual",
-                                      "IsVertical":  true,
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10019",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#D50000"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Опуск 23 в коллектор",
-                                      "Position":  {
-                                                       "Row":  42,
-                                                       "Col":  26,
-                                                       "SizeX":  1,
-                                                       "SizeY":  4
-                                                   },
-                                      "PipePoints":  "0,0;0,3",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "None",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Слив из Емк 24",
-                                      "Position":  {
-                                                       "Row":  34,
-                                                       "Col":  42,
-                                                       "SizeX":  1,
-                                                       "SizeY":  3
-                                                   },
-                                      "PipePoints":  "0,0;0,2",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Valve",
-                                      "Title":  "V 24 (Выход)",
-                                      "Position":  {
-                                                       "Row":  37,
-                                                       "Col":  39,
-                                                       "SizeX":  6,
-                                                       "SizeY":  6
-                                                   },
-                                      "ValveType":  "CutOff",
-                                      "ActuatorType":  "Manual",
-                                      "IsVertical":  true,
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10021",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#D50000"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Опуск 24 в коллектор",
-                                      "Position":  {
-                                                       "Row":  42,
-                                                       "Col":  42,
-                                                       "SizeX":  1,
-                                                       "SizeY":  4
-                                                   },
-                                      "PipePoints":  "0,0;0,3",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "None",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Слив из Емк 25",
-                                      "Position":  {
-                                                       "Row":  34,
-                                                       "Col":  58,
-                                                       "SizeX":  1,
-                                                       "SizeY":  3
-                                                   },
-                                      "PipePoints":  "0,0;0,2",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Valve",
-                                      "Title":  "V 25 (Выход)",
-                                      "Position":  {
-                                                       "Row":  37,
-                                                       "Col":  55,
-                                                       "SizeX":  6,
-                                                       "SizeY":  6
-                                                   },
-                                      "ValveType":  "CutOff",
-                                      "ActuatorType":  "Manual",
-                                      "IsVertical":  true,
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10023",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#D50000"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Опуск 25 в коллектор",
-                                      "Position":  {
-                                                       "Row":  42,
-                                                       "Col":  58,
-                                                       "SizeX":  1,
-                                                       "SizeY":  4
-                                                   },
-                                      "PipePoints":  "0,0;0,3",
-                                      "Thickness":  8,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "None",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Всасывающий коллектор насосов",
-                                      "Position":  {
-                                                       "Row":  45.5,
-                                                       "Col":  10,
-                                                       "SizeX":  50,
-                                                       "SizeY":  1
-                                                   },
-                                      "PipePoints":  "0,0;49,0",
-                                      "Thickness":  10,
-                                      "StartFitting":  "Cap",
-                                      "EndFitting":  "None",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "Pump",
-                                      "Title":  "Насос 502в (ГХН)",
-                                      "Position":  {
-                                                       "Row":  48,
-                                                       "Col":  8,
-                                                       "SizeX":  7,
-                                                       "SizeY":  7
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10013",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#455A64"
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Давление 502в",
-                                      "Position":  {
-                                                       "Row":  56,
-                                                       "Col":  6,
-                                                       "SizeX":  11,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30017",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F1} кгс"
-                                  },
-                                  {
-                                      "Type":  "CommandButton",
-                                      "Title":  "Пуск 502в",
-                                      "Position":  {
-                                                       "Row":  61,
-                                                       "Col":  6,
-                                                       "SizeX":  6,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00007",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ButtonMode":  "Momentary"
-                                  },
-                                  {
-                                      "Type":  "CommandButton",
-                                      "Title":  "Стоп 502в",
-                                      "Position":  {
-                                                       "Row":  61,
-                                                       "Col":  12,
-                                                       "SizeX":  6,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00008",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ButtonMode":  "Momentary"
-                                  },
-                                  {
-                                      "Type":  "Pump",
-                                      "Title":  "Насос 502г (ГХН)",
-                                      "Position":  {
-                                                       "Row":  48,
-                                                       "Col":  25,
-                                                       "SizeX":  7,
-                                                       "SizeY":  7
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10014",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#455A64"
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Давление 502г",
-                                      "Position":  {
-                                                       "Row":  56,
-                                                       "Col":  23,
-                                                       "SizeX":  11,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30019",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F1} кгс"
-                                  },
-                                  {
-                                      "Type":  "CommandButton",
-                                      "Title":  "Пуск 502г",
-                                      "Position":  {
-                                                       "Row":  61,
-                                                       "Col":  23,
-                                                       "SizeX":  6,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00010",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ButtonMode":  "Momentary"
-                                  },
-                                  {
-                                      "Type":  "CommandButton",
-                                      "Title":  "Стоп 502г",
-                                      "Position":  {
-                                                       "Row":  61,
-                                                       "Col":  29,
-                                                       "SizeX":  6,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00011",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ButtonMode":  "Momentary"
-                                  },
-                                  {
-                                      "Type":  "Pump",
-                                      "Title":  "Насос 502д (СВН)",
-                                      "Position":  {
-                                                       "Row":  48,
-                                                       "Col":  42,
-                                                       "SizeX":  7,
-                                                       "SizeY":  7
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "10015",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#455A64"
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Давление 502д",
-                                      "Position":  {
-                                                       "Row":  56,
-                                                       "Col":  40,
-                                                       "SizeX":  11,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30021",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F1} кгс"
-                                  },
-                                  {
-                                      "Type":  "CommandButton",
-                                      "Title":  "Пуск 502д",
-                                      "Position":  {
-                                                       "Row":  61,
-                                                       "Col":  40,
-                                                       "SizeX":  6,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00004",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ButtonMode":  "Momentary"
-                                  },
-                                  {
-                                      "Type":  "CommandButton",
-                                      "Title":  "Стоп 502д",
-                                      "Position":  {
-                                                       "Row":  61,
-                                                       "Col":  46,
-                                                       "SizeX":  6,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00005",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ButtonMode":  "Momentary"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Напорный коллектор отгрузки",
-                                      "Position":  {
-                                                       "Row":  51.5,
-                                                       "Col":  49,
-                                                       "SizeX":  23,
-                                                       "SizeY":  1
-                                                   },
-                                      "PipePoints":  "0,0;22,0",
-                                      "Thickness":  10,
-                                      "StartFitting":  "None",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Расход налива FT2-1",
-                                      "Position":  {
-                                                       "Row":  39,
-                                                       "Col":  70,
-                                                       "SizeX":  13,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30037",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F0} кг/ч"
-                                  },
-                                  {
-                                      "Type":  "ValueDisplay",
-                                      "Title":  "Остаток дозы",
-                                      "Position":  {
-                                                       "Row":  39,
-                                                       "Col":  84,
-                                                       "SizeX":  13,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "30047",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F0} кг"
-                                  },
-                                  {
-                                      "Type":  "Valve",
-                                      "Title":  "Отсечной кран налива",
-                                      "Position":  {
-                                                       "Row":  48.5,
-                                                       "Col":  72,
-                                                       "SizeX":  6,
-                                                       "SizeY":  6
-                                                   },
-                                      "ValveType":  "CutOff",
-                                      "ActuatorType":  "Pneumatic",
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00016",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "FeedbackSource":  {
-                                                             "ConnId":  "wb_mma_park",
-                                                             "Address":  "10024",
-                                                             "DataType":  "Bool"
-                                                         },
-                                      "ClosedFeedbackSource":  {
-                                                                   "ConnId":  "wb_mma_park",
-                                                                   "Address":  "10025",
-                                                                   "DataType":  "Bool"
-                                                               },
-                                      "ActiveColor":  "#00E676",
-                                      "InactiveColor":  "#D50000"
-                                  },
-                                  {
-                                      "Type":  "Pipe",
-                                      "Title":  "Линия налива в цистерну",
-                                      "Position":  {
-                                                       "Row":  51.5,
-                                                       "Col":  78,
-                                                       "SizeX":  20,
-                                                       "SizeY":  1
-                                                   },
-                                      "PipePoints":  "0,0;19,0",
-                                      "Thickness":  10,
-                                      "StartFitting":  "Flange",
-                                      "EndFitting":  "Flange",
-                                      "ShowFlanges":  true
-                                  },
-                                  {
-                                      "Type":  "SetValue",
-                                      "Title":  "Задать дозу",
-                                      "Position":  {
-                                                       "Row":  45,
-                                                       "Col":  84,
-                                                       "SizeX":  13,
-                                                       "SizeY":  5
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "40027",
-                                                     "DataType":  "Float32"
-                                                 },
-                                      "Format":  "{0:F0} кг",
-                                      "MinValue":  0,
-                                      "MaxValue":  60000
-                                  },
-                                  {
-                                      "Type":  "CommandButton",
-                                      "Title":  "Пуск налива",
-                                      "Position":  {
-                                                       "Row":  55,
-                                                       "Col":  70,
-                                                       "SizeX":  13,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00017",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ButtonMode":  "Toggle"
-                                  },
-                                  {
-                                      "Type":  "CommandButton",
-                                      "Title":  "Сброс дозы",
-                                      "Position":  {
-                                                       "Row":  55,
-                                                       "Col":  84,
-                                                       "SizeX":  13,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00018",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ButtonMode":  "Momentary"
-                                  },
-                                  {
-                                      "Type":  "CommandButton",
-                                      "Title":  "Квитировать аварии",
-                                      "Position":  {
-                                                       "Row":  61,
-                                                       "Col":  70,
-                                                       "SizeX":  27,
-                                                       "SizeY":  4
-                                                   },
-                                      "Source":  {
-                                                     "ConnId":  "wb_mma_park",
-                                                     "Address":  "00019",
-                                                     "DataType":  "Bool"
-                                                 },
-                                      "ButtonMode":  "Momentary"
-                                  }
-                              ]
-              }
+  "SchemaVersion": 2,
+  "Theme": "Dark",
+  "Project": {
+    "Name": "\u041F\u0430\u0440\u043A \u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u041C\u041C\u0410 (4 \u0435\u043C\u043A\u043E\u0441\u0442\u0438) - \u0426\u0435\u0445 21 \u0412\u0421-108",
+    "Version": "1.0.0",
+    "IsCompactMode": false,
+    "Theme": "Dark",
+    "PipingPresets": {
+      "DefaultPipeThickness": 12,
+      "DefaultValveSize": 4,
+      "StandardPipeThicknesses": [
+        4,
+        8,
+        12,
+        16
+      ],
+      "StandardValveSizes": [
+        2,
+        3,
+        4,
+        6
+      ]
+    }
+  },
+  "Security": {
+    "RequirePasswordForDesignMode": false,
+    "DesignModePassword": "1234"
+  },
+  "Connections": [
+    {
+      "Id": "wb_mma_park",
+      "Type": "ModbusTCP",
+      "Host": "10.10.10.234",
+      "Port": 502,
+      "PollIntervalMs": 200,
+      "ByteOrder": "CDAB"
+    },
+    {
+      "Id": "mqtt_wb",
+      "Type": "MQTT",
+      "Host": "10.10.10.234",
+      "Port": 1883,
+      "PollIntervalMs": 500,
+      "ByteOrder": "ABCD"
+    }
+  ],
+  "Tags": [
+    {
+      "TagId": "tag_wb_mma_park_30001",
+      "Name": "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0415\u043C\u043A. 22 (LT-22)",
+      "ConnId": "wb_mma_park",
+      "Address": "30001",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30003",
+      "Name": "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0415\u043C\u043A. 23 (LT-23)",
+      "ConnId": "wb_mma_park",
+      "Address": "30003",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30005",
+      "Name": "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0415\u043C\u043A. 24 (LT-24)",
+      "ConnId": "wb_mma_park",
+      "Address": "30005",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30007",
+      "Name": "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0415\u043C\u043A. 25 (LT-25)",
+      "ConnId": "wb_mma_park",
+      "Address": "30007",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_40027",
+      "Name": "\u0414\u043E\u0437\u0430 \u043D\u0430\u043B\u0438\u0432\u0430 (FT2-1)",
+      "ConnId": "wb_mma_park",
+      "Address": "40027",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_40029",
+      "Name": "\u0423\u043F\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435 \u043E\u0442\u0441\u0435\u0447\u043A\u0438",
+      "ConnId": "wb_mma_park",
+      "Address": "40029",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_40001",
+      "Name": "Lmax \u0415\u043C\u043A 22",
+      "ConnId": "wb_mma_park",
+      "Address": "40001",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_40005",
+      "Name": "Lmax \u0415\u043C\u043A 23",
+      "ConnId": "wb_mma_park",
+      "Address": "40005",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_40009",
+      "Name": "Lmax \u0415\u043C\u043A 24",
+      "ConnId": "wb_mma_park",
+      "Address": "40009",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_40013",
+      "Name": "Lmax \u0415\u043C\u043A 25",
+      "ConnId": "wb_mma_park",
+      "Address": "40013",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_40017",
+      "Name": "Pmin \u041D\u0430\u0441\u043E\u0441 502\u0432",
+      "ConnId": "wb_mma_park",
+      "Address": "40017",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_40019",
+      "Name": "Pmax \u041D\u0430\u0441\u043E\u0441 502\u0432",
+      "ConnId": "wb_mma_park",
+      "Address": "40019",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30027",
+      "Name": "\u0420\u0430\u0441\u0445\u043E\u0434 \u043F\u043E\u0434\u0430\u0447\u0438 FT1-1",
+      "ConnId": "wb_mma_park",
+      "Address": "30027",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30029",
+      "Name": "\u041E\u0431\u044A\u0435\u043C FT1-1",
+      "ConnId": "wb_mma_park",
+      "Address": "30029",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30031",
+      "Name": "\u041F\u043B\u043E\u0442\u043D\u043E\u0441\u0442\u044C FT1-1",
+      "ConnId": "wb_mma_park",
+      "Address": "30031",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30023",
+      "Name": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0430\u0437\u043E\u0442\u0430 (\u0432\u0440\u0435\u0437\u043A\u0430)",
+      "ConnId": "wb_mma_park",
+      "Address": "30023",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30025",
+      "Name": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0430\u0437\u043E\u0442\u0430 (\u043F\u0430\u043D\u0435\u043B\u044C)",
+      "ConnId": "wb_mma_park",
+      "Address": "30025",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00012",
+      "Name": "LV 22 (\u041F\u0440\u0438\u0435\u043C)",
+      "ConnId": "wb_mma_park",
+      "Address": "00012",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10016",
+      "Name": "LV 22 (\u041F\u0440\u0438\u0435\u043C)_Feedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10016",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10017",
+      "Name": "LV 22 (\u041F\u0440\u0438\u0435\u043C)_ClosedFeedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10017",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00013",
+      "Name": "LV 23 (\u041F\u0440\u0438\u0435\u043C)",
+      "ConnId": "wb_mma_park",
+      "Address": "00013",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10018",
+      "Name": "LV 23 (\u041F\u0440\u0438\u0435\u043C)_Feedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10018",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10019",
+      "Name": "LV 23 (\u041F\u0440\u0438\u0435\u043C)_ClosedFeedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10019",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00014",
+      "Name": "LV 24 (\u041F\u0440\u0438\u0435\u043C)",
+      "ConnId": "wb_mma_park",
+      "Address": "00014",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10020",
+      "Name": "LV 24 (\u041F\u0440\u0438\u0435\u043C)_Feedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10020",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10021",
+      "Name": "LV 24 (\u041F\u0440\u0438\u0435\u043C)_ClosedFeedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10021",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00015",
+      "Name": "LV 25 (\u041F\u0440\u0438\u0435\u043C)",
+      "ConnId": "wb_mma_park",
+      "Address": "00015",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10022",
+      "Name": "LV 25 (\u041F\u0440\u0438\u0435\u043C)_Feedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10022",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10023",
+      "Name": "LV 25 (\u041F\u0440\u0438\u0435\u043C)_ClosedFeedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10023",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10001",
+      "Name": "Lmax 22",
+      "ConnId": "wb_mma_park",
+      "Address": "10001",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30009",
+      "Name": "\u0422 22",
+      "ConnId": "wb_mma_park",
+      "Address": "30009",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10002",
+      "Name": "Lmax 23",
+      "ConnId": "wb_mma_park",
+      "Address": "10002",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30011",
+      "Name": "\u0422 23",
+      "ConnId": "wb_mma_park",
+      "Address": "30011",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10003",
+      "Name": "Lmax 24",
+      "ConnId": "wb_mma_park",
+      "Address": "10003",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30013",
+      "Name": "\u0422 24",
+      "ConnId": "wb_mma_park",
+      "Address": "30013",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10004",
+      "Name": "Lmax 25",
+      "ConnId": "wb_mma_park",
+      "Address": "10004",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30015",
+      "Name": "\u0422 25",
+      "ConnId": "wb_mma_park",
+      "Address": "30015",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10013",
+      "Name": "\u041D\u0430\u0441\u043E\u0441 502\u0432 (\u0413\u0425\u041D)",
+      "ConnId": "wb_mma_park",
+      "Address": "10013",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30017",
+      "Name": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 502\u0432",
+      "ConnId": "wb_mma_park",
+      "Address": "30017",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00007",
+      "Name": "\u041F\u0443\u0441\u043A 502\u0432",
+      "ConnId": "wb_mma_park",
+      "Address": "00007",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00008",
+      "Name": "\u0421\u0442\u043E\u043F 502\u0432",
+      "ConnId": "wb_mma_park",
+      "Address": "00008",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10014",
+      "Name": "\u041D\u0430\u0441\u043E\u0441 502\u0433 (\u0413\u0425\u041D)",
+      "ConnId": "wb_mma_park",
+      "Address": "10014",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30019",
+      "Name": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 502\u0433",
+      "ConnId": "wb_mma_park",
+      "Address": "30019",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00010",
+      "Name": "\u041F\u0443\u0441\u043A 502\u0433",
+      "ConnId": "wb_mma_park",
+      "Address": "00010",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00011",
+      "Name": "\u0421\u0442\u043E\u043F 502\u0433",
+      "ConnId": "wb_mma_park",
+      "Address": "00011",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10015",
+      "Name": "\u041D\u0430\u0441\u043E\u0441 502\u0434 (\u0421\u0412\u041D)",
+      "ConnId": "wb_mma_park",
+      "Address": "10015",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30021",
+      "Name": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 502\u0434",
+      "ConnId": "wb_mma_park",
+      "Address": "30021",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00004",
+      "Name": "\u041F\u0443\u0441\u043A 502\u0434",
+      "ConnId": "wb_mma_park",
+      "Address": "00004",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00005",
+      "Name": "\u0421\u0442\u043E\u043F 502\u0434",
+      "ConnId": "wb_mma_park",
+      "Address": "00005",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30037",
+      "Name": "\u0420\u0430\u0441\u0445\u043E\u0434 \u043D\u0430\u043B\u0438\u0432\u0430 FT2-1",
+      "ConnId": "wb_mma_park",
+      "Address": "30037",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_30047",
+      "Name": "\u041E\u0441\u0442\u0430\u0442\u043E\u043A \u0434\u043E\u0437\u044B",
+      "ConnId": "wb_mma_park",
+      "Address": "30047",
+      "DataType": "Float32",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00016",
+      "Name": "\u041E\u0442\u0441\u0435\u0447\u043D\u043E\u0439 \u043A\u0440\u0430\u043D \u043D\u0430\u043B\u0438\u0432\u0430",
+      "ConnId": "wb_mma_park",
+      "Address": "00016",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10024",
+      "Name": "\u041E\u0442\u0441\u0435\u0447\u043D\u043E\u0439 \u043A\u0440\u0430\u043D \u043D\u0430\u043B\u0438\u0432\u0430_Feedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10024",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_10025",
+      "Name": "\u041E\u0442\u0441\u0435\u0447\u043D\u043E\u0439 \u043A\u0440\u0430\u043D \u043D\u0430\u043B\u0438\u0432\u0430_ClosedFeedback",
+      "ConnId": "wb_mma_park",
+      "Address": "10025",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00017",
+      "Name": "\u041F\u0443\u0441\u043A \u043D\u0430\u043B\u0438\u0432\u0430",
+      "ConnId": "wb_mma_park",
+      "Address": "00017",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00018",
+      "Name": "\u0421\u0431\u0440\u043E\u0441 \u0434\u043E\u0437\u044B",
+      "ConnId": "wb_mma_park",
+      "Address": "00018",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    },
+    {
+      "TagId": "tag_wb_mma_park_00019",
+      "Name": "\u041A\u0432\u0438\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0430\u0432\u0430\u0440\u0438\u0438",
+      "ConnId": "wb_mma_park",
+      "Address": "00019",
+      "DataType": "Bool",
+      "ScaleA": 1,
+      "ScaleB": 0,
+      "Deadband": 0,
+      "StaleTimeout": "00:00:05",
+      "Description": null,
+      "Unit": null
+    }
+  ],
+  "BridgeRules": [],
+  "Dashboard": {
+    "CellSize": 160,
+    "ZoomScale": 1,
+    "Widgets": [
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 0,
+        "MaxValue": 9250,
+        "Id": "22b31585-96d3-495d-944a-3f289ffc8202",
+        "Type": "RealTimeTrend",
+        "Title": "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0415\u043C\u043A. 22 (LT-22)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30001",
+          "ConnId": "wb_mma_park",
+          "Address": "30001",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 0,
+          "Col": 0,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 0,
+        "MaxValue": 9250,
+        "Id": "5f169fe0-63cf-468f-b116-76bf8e83d537",
+        "Type": "RealTimeTrend",
+        "Title": "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0415\u043C\u043A. 23 (LT-23)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30003",
+          "ConnId": "wb_mma_park",
+          "Address": "30003",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 0,
+          "Col": 2,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 0,
+        "MaxValue": 9250,
+        "Id": "f1f9829d-155e-4b03-a64e-53f6a1876859",
+        "Type": "RealTimeTrend",
+        "Title": "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0415\u043C\u043A. 24 (LT-24)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30005",
+          "ConnId": "wb_mma_park",
+          "Address": "30005",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 2,
+          "Col": 0,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 0,
+        "MaxValue": 9250,
+        "Id": "c7365e04-53f6-49c0-985c-87f570b4d913",
+        "Type": "RealTimeTrend",
+        "Title": "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0415\u043C\u043A. 25 (LT-25)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30007",
+          "ConnId": "wb_mma_park",
+          "Address": "30007",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 2,
+          "Col": 2,
+          "SizeX": 2,
+          "SizeY": 2
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043A\u0433",
+        "MinValue": 0,
+        "MaxValue": 60000,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
+        "Id": "c3a00e24-71e0-4aa1-93bf-7b94d2d708cd",
+        "Type": "SetValue",
+        "Title": "\u0414\u043E\u0437\u0430 \u043D\u0430\u043B\u0438\u0432\u0430 (FT2-1)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_40027",
+          "ConnId": "wb_mma_park",
+          "Address": "40027",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 0,
+          "Col": 4,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043A\u0433",
+        "MinValue": 0,
+        "MaxValue": 500,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
+        "Id": "4e34f14c-eb08-41b6-809a-39bea66fe1fa",
+        "Type": "SetValue",
+        "Title": "\u0423\u043F\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435 \u043E\u0442\u0441\u0435\u0447\u043A\u0438",
+        "Source": {
+          "TagId": "tag_wb_mma_park_40029",
+          "ConnId": "wb_mma_park",
+          "Address": "40029",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 0,
+          "Col": 5,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 5000,
+        "MaxValue": 9250,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
+        "Id": "f7f862fa-4cdf-482b-8ae7-dcb8ce802d04",
+        "Type": "SetValue",
+        "Title": "Lmax \u0415\u043C\u043A 22",
+        "Source": {
+          "TagId": "tag_wb_mma_park_40001",
+          "ConnId": "wb_mma_park",
+          "Address": "40001",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 1,
+          "Col": 4,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 5000,
+        "MaxValue": 9250,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
+        "Id": "796dee87-8599-436d-aca9-83ff53d0a10e",
+        "Type": "SetValue",
+        "Title": "Lmax \u0415\u043C\u043A 23",
+        "Source": {
+          "TagId": "tag_wb_mma_park_40005",
+          "ConnId": "wb_mma_park",
+          "Address": "40005",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 1,
+          "Col": 5,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 5000,
+        "MaxValue": 9250,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
+        "Id": "604c5390-8a1f-4842-8366-c675165b61d6",
+        "Type": "SetValue",
+        "Title": "Lmax \u0415\u043C\u043A 24",
+        "Source": {
+          "TagId": "tag_wb_mma_park_40009",
+          "ConnId": "wb_mma_park",
+          "Address": "40009",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 2,
+          "Col": 4,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 5000,
+        "MaxValue": 9250,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
+        "Id": "abe41af1-a0d8-4f5c-8afd-fc244335d01b",
+        "Type": "SetValue",
+        "Title": "Lmax \u0415\u043C\u043A 25",
+        "Source": {
+          "TagId": "tag_wb_mma_park_40013",
+          "ConnId": "wb_mma_park",
+          "Address": "40013",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 2,
+          "Col": 5,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u043A\u0433\u0441",
+        "MinValue": 0,
+        "MaxValue": 5,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
+        "Id": "bdf6a513-892c-4610-9e4d-23ec5f85ce15",
+        "Type": "SetValue",
+        "Title": "Pmin \u041D\u0430\u0441\u043E\u0441 502\u0432",
+        "Source": {
+          "TagId": "tag_wb_mma_park_40017",
+          "ConnId": "wb_mma_park",
+          "Address": "40017",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 3,
+          "Col": 4,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u043A\u0433\u0441",
+        "MinValue": 1,
+        "MaxValue": 10,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
+        "Id": "0b6cece1-cb75-4a48-aaed-cd440fbd648d",
+        "Type": "SetValue",
+        "Title": "Pmax \u041D\u0430\u0441\u043E\u0441 502\u0432",
+        "Source": {
+          "TagId": "tag_wb_mma_park_40019",
+          "ConnId": "wb_mma_park",
+          "Address": "40019",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 3,
+          "Col": 5,
+          "SizeX": 1,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      }
+    ]
+  },
+  "Mimic": {
+    "CellSize": 10,
+    "ZoomScale": 1,
+    "Widgets": [
+      {
+        "Format": "{0:F0} \u043A\u0433/\u0447",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "5b1bc43d-2bba-466a-8de1-30d9ca6a1318",
+        "Type": "ValueDisplay",
+        "Title": "\u0420\u0430\u0441\u0445\u043E\u0434 \u043F\u043E\u0434\u0430\u0447\u0438 FT1-1",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30027",
+          "ConnId": "wb_mma_park",
+          "Address": "30027",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 1,
+          "Col": 2,
+          "SizeX": 14,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u043C\u00B3/\u0447",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "df8592d8-9115-4c6c-b309-92b3c10d10d9",
+        "Type": "ValueDisplay",
+        "Title": "\u041E\u0431\u044A\u0435\u043C FT1-1",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30029",
+          "ConnId": "wb_mma_park",
+          "Address": "30029",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 1,
+          "Col": 17,
+          "SizeX": 11,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u043A\u0433/\u043C\u00B3",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "21ed72f6-7715-403d-bc1c-5409ae9494bd",
+        "Type": "ValueDisplay",
+        "Title": "\u041F\u043B\u043E\u0442\u043D\u043E\u0441\u0442\u044C FT1-1",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30031",
+          "ConnId": "wb_mma_park",
+          "Address": "30031",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 1,
+          "Col": 29,
+          "SizeX": 12,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F2} \u043A\u0433\u0441/\u0441\u043C\u00B2",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "fb3927a8-5372-4aa7-9a09-ca01394e4727",
+        "Type": "ValueDisplay",
+        "Title": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0430\u0437\u043E\u0442\u0430 (\u0432\u0440\u0435\u0437\u043A\u0430)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30023",
+          "ConnId": "wb_mma_park",
+          "Address": "30023",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 1,
+          "Col": 69,
+          "SizeX": 14,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F3} \u043A\u0433\u0441/\u0441\u043C\u00B2",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "e9704180-44e4-4065-a8e5-f85799c3e841",
+        "Type": "ValueDisplay",
+        "Title": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0430\u0437\u043E\u0442\u0430 (\u043F\u0430\u043D\u0435\u043B\u044C)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30025",
+          "ConnId": "wb_mma_park",
+          "Address": "30025",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 1,
+          "Col": 84,
+          "SizeX": 14,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;63,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 10,
+        "StartFitting": "Flange",
+        "EndFitting": "Cap",
+        "Id": "07e6ff6a-ec86-4f72-ba1c-1f52a0f9b01c",
+        "Type": "Pipe",
+        "Title": "\u041C\u0430\u0433\u0438\u0441\u0442\u0440\u0430\u043B\u044C \u043F\u0440\u0438\u0435\u043C\u0430 \u041C\u041C\u0410",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 6,
+          "Col": 1,
+          "SizeX": 64,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,3",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "None",
+        "EndFitting": "Flange",
+        "Id": "3d4c7a97-1930-4664-abdc-a19568746417",
+        "Type": "Pipe",
+        "Title": "\u041E\u0442\u0432\u043E\u0434 \u043F\u0440\u0438\u0435\u043C\u0430 \u0415\u043C\u043A 22",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 6,
+          "Col": 10,
+          "SizeX": 1,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": {
+          "TagId": "tag_wb_mma_park_10016",
+          "ConnId": "wb_mma_park",
+          "Address": "10016",
+          "DataType": "Bool"
+        },
+        "ClosedFeedbackSource": {
+          "TagId": "tag_wb_mma_park_10017",
+          "ConnId": "wb_mma_park",
+          "Address": "10017",
+          "DataType": "Bool"
+        },
+        "IsVertical": true,
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null,
+        "ShowStatusText": true,
+        "LabelOffset": 0,
+        "Id": "eb61f3ff-506a-421f-9786-6f0acbd39e95",
+        "Type": "Valve",
+        "Title": "LV 22 (\u041F\u0440\u0438\u0435\u043C)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00012",
+          "ConnId": "wb_mma_park",
+          "Address": "00012",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 9,
+          "Col": 7,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,2",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Id": "99637c8b-e49c-4df2-a0f9-ef3a38552556",
+        "Type": "Pipe",
+        "Title": "\u0412\u043F\u0443\u0441\u043A \u0432 \u0415\u043C\u043A 22",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 14,
+          "Col": 10,
+          "SizeX": 1,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,3",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "None",
+        "EndFitting": "Flange",
+        "Id": "01fb7a04-f1f9-424a-86ef-d840ceae0241",
+        "Type": "Pipe",
+        "Title": "\u041E\u0442\u0432\u043E\u0434 \u043F\u0440\u0438\u0435\u043C\u0430 \u0415\u043C\u043A 23",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 6,
+          "Col": 26,
+          "SizeX": 1,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": {
+          "TagId": "tag_wb_mma_park_10018",
+          "ConnId": "wb_mma_park",
+          "Address": "10018",
+          "DataType": "Bool"
+        },
+        "ClosedFeedbackSource": {
+          "TagId": "tag_wb_mma_park_10019",
+          "ConnId": "wb_mma_park",
+          "Address": "10019",
+          "DataType": "Bool"
+        },
+        "IsVertical": true,
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null,
+        "ShowStatusText": true,
+        "LabelOffset": 0,
+        "Id": "e5a38fca-885a-41e7-aa6d-d6440ef26b6e",
+        "Type": "Valve",
+        "Title": "LV 23 (\u041F\u0440\u0438\u0435\u043C)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00013",
+          "ConnId": "wb_mma_park",
+          "Address": "00013",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 9,
+          "Col": 23,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,2",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Id": "b0d16b5f-ce18-403d-9a4c-d3e75e9da248",
+        "Type": "Pipe",
+        "Title": "\u0412\u043F\u0443\u0441\u043A \u0432 \u0415\u043C\u043A 23",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 14,
+          "Col": 26,
+          "SizeX": 1,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,3",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "None",
+        "EndFitting": "Flange",
+        "Id": "49bb59b6-551e-4150-b53e-893d6d3822b4",
+        "Type": "Pipe",
+        "Title": "\u041E\u0442\u0432\u043E\u0434 \u043F\u0440\u0438\u0435\u043C\u0430 \u0415\u043C\u043A 24",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 6,
+          "Col": 42,
+          "SizeX": 1,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": {
+          "TagId": "tag_wb_mma_park_10020",
+          "ConnId": "wb_mma_park",
+          "Address": "10020",
+          "DataType": "Bool"
+        },
+        "ClosedFeedbackSource": {
+          "TagId": "tag_wb_mma_park_10021",
+          "ConnId": "wb_mma_park",
+          "Address": "10021",
+          "DataType": "Bool"
+        },
+        "IsVertical": true,
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null,
+        "ShowStatusText": true,
+        "LabelOffset": 0,
+        "Id": "37aee33d-ab49-4134-b4ec-b5eaaa161367",
+        "Type": "Valve",
+        "Title": "LV 24 (\u041F\u0440\u0438\u0435\u043C)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00014",
+          "ConnId": "wb_mma_park",
+          "Address": "00014",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 9,
+          "Col": 39,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,2",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Id": "cab1c44e-4c73-40ac-a6a9-68a7af2436d9",
+        "Type": "Pipe",
+        "Title": "\u0412\u043F\u0443\u0441\u043A \u0432 \u0415\u043C\u043A 24",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 14,
+          "Col": 42,
+          "SizeX": 1,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,3",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "None",
+        "EndFitting": "Flange",
+        "Id": "8cef008c-02fa-402c-921c-66de2323b301",
+        "Type": "Pipe",
+        "Title": "\u041E\u0442\u0432\u043E\u0434 \u043F\u0440\u0438\u0435\u043C\u0430 \u0415\u043C\u043A 25",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 6,
+          "Col": 58,
+          "SizeX": 1,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": {
+          "TagId": "tag_wb_mma_park_10022",
+          "ConnId": "wb_mma_park",
+          "Address": "10022",
+          "DataType": "Bool"
+        },
+        "ClosedFeedbackSource": {
+          "TagId": "tag_wb_mma_park_10023",
+          "ConnId": "wb_mma_park",
+          "Address": "10023",
+          "DataType": "Bool"
+        },
+        "IsVertical": true,
+        "ActuatorType": "Solenoid",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null,
+        "ShowStatusText": true,
+        "LabelOffset": 0,
+        "Id": "135b6757-3df8-40b2-aba8-f73abc91c0f9",
+        "Type": "Valve",
+        "Title": "LV 25 (\u041F\u0440\u0438\u0435\u043C)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00015",
+          "ConnId": "wb_mma_park",
+          "Address": "00015",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 9,
+          "Col": 55,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,2",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Id": "b1f85cf7-3df1-4455-a388-ad81f00c1199",
+        "Type": "Pipe",
+        "Title": "\u0412\u043F\u0443\u0441\u043A \u0432 \u0415\u043C\u043A 25",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 14,
+          "Col": 58,
+          "SizeX": 1,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "TrueColor": "#FF1744",
+        "FalseColor": "#263238",
+        "Id": "b30a464a-06b4-42bf-a4e7-8c731f3cf9f1",
+        "Type": "PilotLight",
+        "Title": "Lmax 22",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10001",
+          "ConnId": "wb_mma_park",
+          "Address": "10001",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 14,
+          "Col": 12,
+          "SizeX": 4,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 0,
+        "MaxValue": 9250,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LabelInside": false,
+        "Id": "bea53f1a-7b21-4bc6-b46e-72954924de7a",
+        "Type": "Tank",
+        "Title": "\u0415\u043C\u043A\u043E\u0441\u0442\u044C 22 (500 \u043C\u00B3)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30001",
+          "ConnId": "wb_mma_park",
+          "Address": "30001",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 17,
+          "Col": 3,
+          "SizeX": 14,
+          "SizeY": 17
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u00B0C",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "fb2179af-7085-46de-a03e-34a3c1354e3f",
+        "Type": "ValueDisplay",
+        "Title": "\u0422 22",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30009",
+          "ConnId": "wb_mma_park",
+          "Address": "30009",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 35,
+          "Col": 12,
+          "SizeX": 7,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "TrueColor": "#FF1744",
+        "FalseColor": "#263238",
+        "Id": "d6337f25-b250-4a22-9356-2344b431bb09",
+        "Type": "PilotLight",
+        "Title": "Lmax 23",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10002",
+          "ConnId": "wb_mma_park",
+          "Address": "10002",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 14,
+          "Col": 28,
+          "SizeX": 4,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 0,
+        "MaxValue": 9250,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LabelInside": false,
+        "Id": "84f202ef-408e-49e5-a127-a1be56cef2a4",
+        "Type": "Tank",
+        "Title": "\u0415\u043C\u043A\u043E\u0441\u0442\u044C 23 (500 \u043C\u00B3)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30003",
+          "ConnId": "wb_mma_park",
+          "Address": "30003",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 17,
+          "Col": 19,
+          "SizeX": 14,
+          "SizeY": 17
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u00B0C",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "381a1160-c1fe-426b-a14b-5062498491b0",
+        "Type": "ValueDisplay",
+        "Title": "\u0422 23",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30011",
+          "ConnId": "wb_mma_park",
+          "Address": "30011",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 35,
+          "Col": 28,
+          "SizeX": 7,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "TrueColor": "#FF1744",
+        "FalseColor": "#263238",
+        "Id": "c2a75ea8-e890-4fd8-a3e8-fe0a7441bd59",
+        "Type": "PilotLight",
+        "Title": "Lmax 24",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10003",
+          "ConnId": "wb_mma_park",
+          "Address": "10003",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 14,
+          "Col": 44,
+          "SizeX": 4,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 0,
+        "MaxValue": 9250,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LabelInside": false,
+        "Id": "60bba61c-a02d-4d29-a56d-7afd036ce962",
+        "Type": "Tank",
+        "Title": "\u0415\u043C\u043A\u043E\u0441\u0442\u044C 24 (500 \u043C\u00B3)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30005",
+          "ConnId": "wb_mma_park",
+          "Address": "30005",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 17,
+          "Col": 35,
+          "SizeX": 14,
+          "SizeY": 17
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u00B0C",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "15f7f221-0467-43b0-bc89-3a4912af7f11",
+        "Type": "ValueDisplay",
+        "Title": "\u0422 24",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30013",
+          "ConnId": "wb_mma_park",
+          "Address": "30013",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 35,
+          "Col": 44,
+          "SizeX": 7,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "TrueColor": "#FF1744",
+        "FalseColor": "#263238",
+        "Id": "616c7529-c2e2-4573-97e0-6337378bc8ef",
+        "Type": "PilotLight",
+        "Title": "Lmax 25",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10004",
+          "ConnId": "wb_mma_park",
+          "Address": "10004",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 14,
+          "Col": 60,
+          "SizeX": 4,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043C\u043C",
+        "MinValue": 0,
+        "MaxValue": 9250,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LabelInside": false,
+        "Id": "5d261989-39ff-42ab-9a6e-433ee1fb9266",
+        "Type": "Tank",
+        "Title": "\u0415\u043C\u043A\u043E\u0441\u0442\u044C 25 (500 \u043C\u00B3)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30007",
+          "ConnId": "wb_mma_park",
+          "Address": "30007",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 17,
+          "Col": 51,
+          "SizeX": 14,
+          "SizeY": 17
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u00B0C",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "dafcb873-f99e-49cc-8b1b-90627e63de39",
+        "Type": "ValueDisplay",
+        "Title": "\u0422 25",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30015",
+          "ConnId": "wb_mma_park",
+          "Address": "30015",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 35,
+          "Col": 60,
+          "SizeX": 7,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,2",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Id": "f842fa6f-a3b2-4d82-b505-7db9f4d3404b",
+        "Type": "Pipe",
+        "Title": "\u0421\u043B\u0438\u0432 \u0438\u0437 \u0415\u043C\u043A 22",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 34,
+          "Col": 10,
+          "SizeX": 1,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": null,
+        "ClosedFeedbackSource": null,
+        "IsVertical": true,
+        "ActuatorType": "Manual",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null,
+        "ShowStatusText": true,
+        "LabelOffset": 0,
+        "Id": "f4c826ad-350b-4302-a049-b2548c17ef37",
+        "Type": "Valve",
+        "Title": "V 22 (\u0412\u044B\u0445\u043E\u0434)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10017",
+          "ConnId": "wb_mma_park",
+          "Address": "10017",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 37,
+          "Col": 7,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,3",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "None",
+        "Id": "c99e20fc-93e6-4a23-a79a-71d1735119b7",
+        "Type": "Pipe",
+        "Title": "\u041E\u043F\u0443\u0441\u043A 22 \u0432 \u043A\u043E\u043B\u043B\u0435\u043A\u0442\u043E\u0440",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 42,
+          "Col": 10,
+          "SizeX": 1,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,2",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Id": "68ccc9d0-86f0-4392-a7f3-dc2e13a755fe",
+        "Type": "Pipe",
+        "Title": "\u0421\u043B\u0438\u0432 \u0438\u0437 \u0415\u043C\u043A 23",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 34,
+          "Col": 26,
+          "SizeX": 1,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": null,
+        "ClosedFeedbackSource": null,
+        "IsVertical": true,
+        "ActuatorType": "Manual",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null,
+        "ShowStatusText": true,
+        "LabelOffset": 0,
+        "Id": "3029e975-4218-47ba-8771-02d60483599d",
+        "Type": "Valve",
+        "Title": "V 23 (\u0412\u044B\u0445\u043E\u0434)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10019",
+          "ConnId": "wb_mma_park",
+          "Address": "10019",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 37,
+          "Col": 23,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,3",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "None",
+        "Id": "c3aba808-da07-4e2d-8e84-8e6492c0762c",
+        "Type": "Pipe",
+        "Title": "\u041E\u043F\u0443\u0441\u043A 23 \u0432 \u043A\u043E\u043B\u043B\u0435\u043A\u0442\u043E\u0440",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 42,
+          "Col": 26,
+          "SizeX": 1,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,2",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Id": "2508660b-5668-46c7-8d79-815b9d29cd80",
+        "Type": "Pipe",
+        "Title": "\u0421\u043B\u0438\u0432 \u0438\u0437 \u0415\u043C\u043A 24",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 34,
+          "Col": 42,
+          "SizeX": 1,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": null,
+        "ClosedFeedbackSource": null,
+        "IsVertical": true,
+        "ActuatorType": "Manual",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null,
+        "ShowStatusText": true,
+        "LabelOffset": 0,
+        "Id": "4166541f-7acd-404f-8bd4-3edd9adc91f4",
+        "Type": "Valve",
+        "Title": "V 24 (\u0412\u044B\u0445\u043E\u0434)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10021",
+          "ConnId": "wb_mma_park",
+          "Address": "10021",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 37,
+          "Col": 39,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,3",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "None",
+        "Id": "feacb129-c456-4e7e-b9ff-33786abba310",
+        "Type": "Pipe",
+        "Title": "\u041E\u043F\u0443\u0441\u043A 24 \u0432 \u043A\u043E\u043B\u043B\u0435\u043A\u0442\u043E\u0440",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 42,
+          "Col": 42,
+          "SizeX": 1,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,2",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Id": "3ee1333b-0bb5-4b1a-bc0d-700171fd9d77",
+        "Type": "Pipe",
+        "Title": "\u0421\u043B\u0438\u0432 \u0438\u0437 \u0415\u043C\u043A 25",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 34,
+          "Col": 58,
+          "SizeX": 1,
+          "SizeY": 3
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": null,
+        "ClosedFeedbackSource": null,
+        "IsVertical": true,
+        "ActuatorType": "Manual",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null,
+        "ShowStatusText": true,
+        "LabelOffset": 0,
+        "Id": "2fdea303-46a3-4ed7-83e6-2d0b812f8eb2",
+        "Type": "Valve",
+        "Title": "V 25 (\u0412\u044B\u0445\u043E\u0434)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10023",
+          "ConnId": "wb_mma_park",
+          "Address": "10023",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 37,
+          "Col": 55,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;0,3",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 8,
+        "StartFitting": "Flange",
+        "EndFitting": "None",
+        "Id": "d3d4c3fe-1a7c-4ac8-9e36-87924d43a907",
+        "Type": "Pipe",
+        "Title": "\u041E\u043F\u0443\u0441\u043A 25 \u0432 \u043A\u043E\u043B\u043B\u0435\u043A\u0442\u043E\u0440",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 42,
+          "Col": 58,
+          "SizeX": 1,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;49,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 10,
+        "StartFitting": "Cap",
+        "EndFitting": "None",
+        "Id": "3ccb9e26-84a7-469a-84a7-5d3894c25f29",
+        "Type": "Pipe",
+        "Title": "\u0412\u0441\u0430\u0441\u044B\u0432\u0430\u044E\u0449\u0438\u0439 \u043A\u043E\u043B\u043B\u0435\u043A\u0442\u043E\u0440 \u043D\u0430\u0441\u043E\u0441\u043E\u0432",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 45.5,
+          "Col": 10,
+          "SizeX": 50,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#455A64",
+        "ControlWindowWidth": 0,
+        "ControlWindowHeight": 0,
+        "ShowStatusText": true,
+        "Id": "03e60b88-d3ba-4964-a938-6bdf5ce458c9",
+        "Type": "Pump",
+        "Title": "\u041D\u0430\u0441\u043E\u0441 502\u0432 (\u0413\u0425\u041D)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10013",
+          "ConnId": "wb_mma_park",
+          "Address": "10013",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 48,
+          "Col": 8,
+          "SizeX": 7,
+          "SizeY": 7
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u043A\u0433\u0441",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "20422a85-05a3-4240-8300-f167cee66534",
+        "Type": "ValueDisplay",
+        "Title": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 502\u0432",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30017",
+          "ConnId": "wb_mma_park",
+          "Address": "30017",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 56,
+          "Col": 6,
+          "SizeX": 11,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ButtonMode": "Momentary",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
+        "Id": "7d5fff23-e110-41d1-a18a-25630c6160f4",
+        "Type": "CommandButton",
+        "Title": "\u041F\u0443\u0441\u043A 502\u0432",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00007",
+          "ConnId": "wb_mma_park",
+          "Address": "00007",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 61,
+          "Col": 6,
+          "SizeX": 6,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ButtonMode": "Momentary",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
+        "Id": "4a50e30d-89ef-4e33-b0fb-07c493cb0c38",
+        "Type": "CommandButton",
+        "Title": "\u0421\u0442\u043E\u043F 502\u0432",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00008",
+          "ConnId": "wb_mma_park",
+          "Address": "00008",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 61,
+          "Col": 12,
+          "SizeX": 6,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#455A64",
+        "ControlWindowWidth": 0,
+        "ControlWindowHeight": 0,
+        "ShowStatusText": true,
+        "Id": "1513faf6-56c2-4ddb-9aa3-442a94fb6338",
+        "Type": "Pump",
+        "Title": "\u041D\u0430\u0441\u043E\u0441 502\u0433 (\u0413\u0425\u041D)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10014",
+          "ConnId": "wb_mma_park",
+          "Address": "10014",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 48,
+          "Col": 25,
+          "SizeX": 7,
+          "SizeY": 7
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u043A\u0433\u0441",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "aec45c5a-100a-4591-a4c7-575e40fd212b",
+        "Type": "ValueDisplay",
+        "Title": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 502\u0433",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30019",
+          "ConnId": "wb_mma_park",
+          "Address": "30019",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 56,
+          "Col": 23,
+          "SizeX": 11,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ButtonMode": "Momentary",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
+        "Id": "2aefc7c1-61bb-4834-9f86-6d5ac4123566",
+        "Type": "CommandButton",
+        "Title": "\u041F\u0443\u0441\u043A 502\u0433",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00010",
+          "ConnId": "wb_mma_park",
+          "Address": "00010",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 61,
+          "Col": 23,
+          "SizeX": 6,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ButtonMode": "Momentary",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
+        "Id": "643429b5-dbed-4ecf-b6ff-4d295fcf1b72",
+        "Type": "CommandButton",
+        "Title": "\u0421\u0442\u043E\u043F 502\u0433",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00011",
+          "ConnId": "wb_mma_park",
+          "Address": "00011",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 61,
+          "Col": 29,
+          "SizeX": 6,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#455A64",
+        "ControlWindowWidth": 0,
+        "ControlWindowHeight": 0,
+        "ShowStatusText": true,
+        "Id": "5f870408-8807-4d53-b7ce-749c07ec66b3",
+        "Type": "Pump",
+        "Title": "\u041D\u0430\u0441\u043E\u0441 502\u0434 (\u0421\u0412\u041D)",
+        "Source": {
+          "TagId": "tag_wb_mma_park_10015",
+          "ConnId": "wb_mma_park",
+          "Address": "10015",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 48,
+          "Col": 42,
+          "SizeX": 7,
+          "SizeY": 7
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F1} \u043A\u0433\u0441",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "25cc5e67-5203-42dc-bb20-ff9cc05b9fd2",
+        "Type": "ValueDisplay",
+        "Title": "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 502\u0434",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30021",
+          "ConnId": "wb_mma_park",
+          "Address": "30021",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 56,
+          "Col": 40,
+          "SizeX": 11,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ButtonMode": "Momentary",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
+        "Id": "0dc223c4-ab8c-442a-9079-1add59b36af9",
+        "Type": "CommandButton",
+        "Title": "\u041F\u0443\u0441\u043A 502\u0434",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00004",
+          "ConnId": "wb_mma_park",
+          "Address": "00004",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 61,
+          "Col": 40,
+          "SizeX": 6,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ButtonMode": "Momentary",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
+        "Id": "75cc04ba-0471-4414-a4de-8d5e18be2be5",
+        "Type": "CommandButton",
+        "Title": "\u0421\u0442\u043E\u043F 502\u0434",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00005",
+          "ConnId": "wb_mma_park",
+          "Address": "00005",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 61,
+          "Col": 46,
+          "SizeX": 6,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;22,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 10,
+        "StartFitting": "None",
+        "EndFitting": "Flange",
+        "Id": "cd11763b-37bc-4dcd-91ff-69c9373c60c4",
+        "Type": "Pipe",
+        "Title": "\u041D\u0430\u043F\u043E\u0440\u043D\u044B\u0439 \u043A\u043E\u043B\u043B\u0435\u043A\u0442\u043E\u0440 \u043E\u0442\u0433\u0440\u0443\u0437\u043A\u0438",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 51.5,
+          "Col": 49,
+          "SizeX": 23,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043A\u0433/\u0447",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "819ee17b-c6c4-4a9a-b27e-0c7c0a473af2",
+        "Type": "ValueDisplay",
+        "Title": "\u0420\u0430\u0441\u0445\u043E\u0434 \u043D\u0430\u043B\u0438\u0432\u0430 FT2-1",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30037",
+          "ConnId": "wb_mma_park",
+          "Address": "30037",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 39,
+          "Col": 70,
+          "SizeX": 13,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043A\u0433",
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "LayoutMode": "Vertical",
+        "Unit": "",
+        "Id": "ff2c2305-aed0-4dd1-bfb1-0e4bac0cde94",
+        "Type": "ValueDisplay",
+        "Title": "\u041E\u0441\u0442\u0430\u0442\u043E\u043A \u0434\u043E\u0437\u044B",
+        "Source": {
+          "TagId": "tag_wb_mma_park_30047",
+          "ConnId": "wb_mma_park",
+          "Address": "30047",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 39,
+          "Col": 84,
+          "SizeX": 13,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ValveType": "CutOff",
+        "ActiveColor": "#00E676",
+        "InactiveColor": "#D50000",
+        "FeedbackSource": {
+          "TagId": "tag_wb_mma_park_10024",
+          "ConnId": "wb_mma_park",
+          "Address": "10024",
+          "DataType": "Bool"
+        },
+        "ClosedFeedbackSource": {
+          "TagId": "tag_wb_mma_park_10025",
+          "ConnId": "wb_mma_park",
+          "Address": "10025",
+          "DataType": "Bool"
+        },
+        "IsVertical": false,
+        "ActuatorType": "Pneumatic",
+        "Rotation": 0,
+        "AlarmDisabled": false,
+        "Tolerance": 10,
+        "ModeSource": null,
+        "ShowStatusText": true,
+        "LabelOffset": 0,
+        "Id": "567337ac-0cdc-4d85-9497-af5663a089a3",
+        "Type": "Valve",
+        "Title": "\u041E\u0442\u0441\u0435\u0447\u043D\u043E\u0439 \u043A\u0440\u0430\u043D \u043D\u0430\u043B\u0438\u0432\u0430",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00016",
+          "ConnId": "wb_mma_park",
+          "Address": "00016",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 48.5,
+          "Col": 72,
+          "SizeX": 6,
+          "SizeY": 6
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "PipePoints": "0,0;19,0",
+        "ActiveColor": "",
+        "InactiveColor": "",
+        "ShowFlanges": true,
+        "Thickness": 10,
+        "StartFitting": "Flange",
+        "EndFitting": "Flange",
+        "Id": "390ac498-c8ce-4262-b7b8-443d06a71428",
+        "Type": "Pipe",
+        "Title": "\u041B\u0438\u043D\u0438\u044F \u043D\u0430\u043B\u0438\u0432\u0430 \u0432 \u0446\u0438\u0441\u0442\u0435\u0440\u043D\u0443",
+        "Source": {
+          "TagId": null,
+          "ConnId": "",
+          "Address": "",
+          "DataType": ""
+        },
+        "Position": {
+          "Row": 51.5,
+          "Col": 78,
+          "SizeX": 20,
+          "SizeY": 1
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "Format": "{0:F0} \u043A\u0433",
+        "MinValue": 0,
+        "MaxValue": 60000,
+        "ValueColor": "",
+        "ValueFontSize": 0,
+        "Unit": "",
+        "LayoutMode": "Vertical",
+        "Id": "c9731ad5-2664-4fa0-b136-45444a94dcd7",
+        "Type": "SetValue",
+        "Title": "\u0417\u0430\u0434\u0430\u0442\u044C \u0434\u043E\u0437\u0443",
+        "Source": {
+          "TagId": "tag_wb_mma_park_40027",
+          "ConnId": "wb_mma_park",
+          "Address": "40027",
+          "DataType": "Float32"
+        },
+        "Position": {
+          "Row": 45,
+          "Col": 84,
+          "SizeX": 13,
+          "SizeY": 5
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ButtonMode": "Toggle",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
+        "Id": "e1529756-5ccd-434a-acc5-231880edd7ec",
+        "Type": "CommandButton",
+        "Title": "\u041F\u0443\u0441\u043A \u043D\u0430\u043B\u0438\u0432\u0430",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00017",
+          "ConnId": "wb_mma_park",
+          "Address": "00017",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 55,
+          "Col": 70,
+          "SizeX": 13,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ButtonMode": "Momentary",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
+        "Id": "4d1b4cbe-0952-4bac-bd2d-36cccffcb21e",
+        "Type": "CommandButton",
+        "Title": "\u0421\u0431\u0440\u043E\u0441 \u0434\u043E\u0437\u044B",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00018",
+          "ConnId": "wb_mma_park",
+          "Address": "00018",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 55,
+          "Col": 84,
+          "SizeX": 13,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      },
+      {
+        "ButtonMode": "Momentary",
+        "LabelOn": "\u0412\u041A\u041B",
+        "LabelOff": "\u0412\u042B\u041A\u041B",
+        "ColorOn": "#00AA44",
+        "ColorOff": "#AA2200",
+        "ShowIconOnly": false,
+        "Icon": "",
+        "CornerRadius": 6,
+        "Id": "41f95ee9-d374-4849-88e1-f3022aec3d8f",
+        "Type": "CommandButton",
+        "Title": "\u041A\u0432\u0438\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0430\u0432\u0430\u0440\u0438\u0438",
+        "Source": {
+          "TagId": "tag_wb_mma_park_00019",
+          "ConnId": "wb_mma_park",
+          "Address": "00019",
+          "DataType": "Bool"
+        },
+        "Position": {
+          "Row": 61,
+          "Col": 70,
+          "SizeX": 27,
+          "SizeY": 4
+        },
+        "FontSize": 0,
+        "AutoScaleText": true,
+        "ShowTitle": true,
+        "ShowBorder": true,
+        "LabelPosition": "Default",
+        "CompactMode": false,
+        "GroupId": null
+      }
+    ]
+  },
+  "PipingPresets": {
+    "DefaultPipeThickness": 12,
+    "DefaultValveSize": 4,
+    "StandardPipeThicknesses": [
+      4,
+      8,
+      12,
+      16
+    ],
+    "StandardValveSizes": [
+      2,
+      3,
+      4,
+      6
+    ]
+  }
 }

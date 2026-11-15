@@ -24,6 +24,8 @@ using AvaloniaApplication1.Services;
 using AvaloniaApplication1.Services.Piping;
 using System.Linq;
 using AvaloniaApplication1.Models.Config;
+using AvaloniaApplication1.Models.History;
+using AvaloniaApplication1.Services.History;
 using AvaloniaApplication1.ViewModels.Core;
 using AvaloniaApplication1.ViewModels.Widgets;
 using AvaloniaApplication1.ViewModels.Panels;
@@ -2476,7 +2478,353 @@ public static class Program
                     throw new Exception($"Valve resize handle failed to shrink along single axis: expected 2, got {targetSize}");
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (23/23) PASSED SUCCESSFULLY!");
+            // =========================================================================
+            // TEST 24: Change History, Undo/Redo & Time-Travel Engine (RFC Implementation)
+            // =========================================================================
+            Console.WriteLine("[UIValidation] Testing Change History, Undo/Redo & Time-Travel Engine (Test 24)...");
+            {
+                var mockCore = new MockDataCoreService();
+                var projCtx = new ProjectContextService { IsDesignMode = true };
+                var t24_widgetFactory = new WidgetFactory(mockCore, projCtx, sp.GetRequiredService<IAlarmNotificationService>());
+
+                // 24.1: WidgetConfig Unique Identification & Duplication Isolation
+                var valveCfg1 = new ValveConfig { Title = "Valve 1", ValveType = "CutOff" };
+                if (valveCfg1.Id == Guid.Empty)
+                    throw new Exception("WidgetConfig.Id was not initialized with a non-empty Guid.");
+
+                var valveVm1 = new ValveWidgetViewModel(valveCfg1, mockCore, projCtx);
+                if (valveVm1.Id != valveCfg1.Id)
+                    throw new Exception("WidgetViewModelBase.Id does not match OriginalConfig.Id.");
+
+                WidgetClipboard.Copy(valveCfg1);
+                var t24_pastedValve = WidgetClipboard.PasteClone() as ValveConfig;
+                if (t24_pastedValve == null || t24_pastedValve.Id == Guid.Empty || t24_pastedValve.Id == valveCfg1.Id)
+                    throw new Exception("WidgetClipboard.PasteClone failed to generate a fresh, unique Id.");
+
+                var containerCfg = new ContainerButtonConfig
+                {
+                    Title = "Container",
+                    Children = new List<WidgetConfig>
+                    {
+                        new ValveConfig { Title = "Child Valve 1" },
+                        new PumpConfig { Title = "Child Pump 1" }
+                    }
+                };
+                WidgetClipboard.Copy(containerCfg);
+                var t24_pastedContainer = WidgetClipboard.PasteClone() as ContainerButtonConfig;
+                if (t24_pastedContainer == null || t24_pastedContainer.Id == containerCfg.Id)
+                    throw new Exception("ContainerButtonConfig clone must have a fresh Id.");
+                if (t24_pastedContainer.Children[0].Id == containerCfg.Children[0].Id || t24_pastedContainer.Children[1].Id == containerCfg.Children[1].Id)
+                    throw new Exception("ContainerButtonConfig clone children must each receive fresh unique Ids.");
+
+                // 24.2: HistoryService Ring Buffer Capacity (30 steps FIFO sliding window)
+                var historyService = new HistoryService(projCtx, capacity: 30);
+                var baseDashboard = new DashboardConfig
+                {
+                    CellSize = 40,
+                    ZoomScale = 1.0,
+                    Widgets = new List<WidgetConfig> { new ValveConfig { Title = "Base Valve" } }
+                };
+                historyService.Initialize(baseDashboard, "Исходное состояние", "Home");
+                if (historyService.Steps.Count != 1 || historyService.CurrentIndex != 0)
+                    throw new Exception($"HistoryService.Initialize failed: Steps={historyService.Steps.Count}, Index={historyService.CurrentIndex}");
+                if (historyService.CanUndo || historyService.CanRedo)
+                    throw new Exception("HistoryService initial step must have CanUndo=false, CanRedo=false.");
+
+                // Record 35 distinct steps (each modifies the title)
+                for (int i = 1; i <= 35; i++)
+                {
+                    var cfg = new DashboardConfig
+                    {
+                        CellSize = 40,
+                        ZoomScale = 1.0,
+                        Widgets = new List<WidgetConfig> { new ValveConfig { Title = $"Step Valve {i}" } }
+                    };
+                    historyService.RecordStep($"Шаг {i}", "Move", cfg);
+                }
+
+                // Verify capacity capped strictly at 30
+                if (historyService.Steps.Count != 30)
+                    throw new Exception($"HistoryService ring buffer exceeded capacity 30: actual {historyService.Steps.Count}");
+                if (historyService.CurrentIndex != 29)
+                    throw new Exception($"HistoryService CurrentIndex should be at head 29, got {historyService.CurrentIndex}");
+                if (!historyService.CanUndo || historyService.CanRedo)
+                    throw new Exception("At head of history: CanUndo should be true, CanRedo should be false.");
+                if (historyService.Steps[0].Title != "Шаг 6")
+                    throw new Exception($"Ring buffer FIFO should have dropped steps 0..5; first step should be 'Шаг 6', got '{historyService.Steps[0].Title}'");
+                if (historyService.Steps[29].Title != "Шаг 35")
+                    throw new Exception($"Latest step should be 'Шаг 35', got '{historyService.Steps[29].Title}'");
+
+                // 24.3: Step Jumping (Time-Travel) & Active Highlighting
+                var targetStep = historyService.Steps[10]; // "Шаг 16"
+                var jumped = historyService.JumpToStep(targetStep);
+                if (jumped != targetStep || historyService.CurrentIndex != 10)
+                    throw new Exception($"JumpToStep failed: expected Index 10, got {historyService.CurrentIndex}");
+                if (!historyService.Steps[10].IsCurrent || historyService.Steps[29].IsCurrent)
+                    throw new Exception("Step jumping failed to update IsCurrent state correctly.");
+                if (!historyService.CanUndo || !historyService.CanRedo)
+                    throw new Exception("At middle step index 10: both CanUndo and CanRedo should be true.");
+
+                // Jump to oldest step (index 0)
+                historyService.JumpToIndex(0);
+                if (historyService.CurrentIndex != 0 || historyService.CanUndo || !historyService.CanRedo)
+                    throw new Exception("At oldest step index 0: CanUndo must be false, CanRedo must be true.");
+
+                // 24.4: Timeline Branching Truncation
+                var branchCfg = new DashboardConfig
+                {
+                    CellSize = 40,
+                    ZoomScale = 1.0,
+                    Widgets = new List<WidgetConfig> { new ValveConfig { Title = "Ветка альтернативной истории" } }
+                };
+                historyService.RecordStep("Ветка B", "Branch", branchCfg);
+                if (historyService.Steps.Count != 2)
+                    throw new Exception($"Branching failed to truncate future steps: expected 2 steps, got {historyService.Steps.Count}");
+                if (historyService.CurrentIndex != 1 || historyService.CanRedo || !historyService.CanUndo)
+                    throw new Exception($"After branch: Index should be 1, CanUndo=true, CanRedo=false; got Index={historyService.CurrentIndex}, Redo={historyService.CanRedo}");
+
+                // 24.5: Differential ViewModel Reconciliation (In-Place Update, Zero VM Dropping, Telemetry Retained)
+                var t24_dConfig = new DashboardConfig
+                {
+                    CellSize = 40,
+                    ZoomScale = 1.0,
+                    Widgets = new List<WidgetConfig>()
+                };
+                var valveInitial = new ValveConfig
+                {
+                    Title = "Valve_Reconcile",
+                    ValveType = "CutOff",
+                    Position = new WidgetPosition { Col = 5, Row = 5, SizeX = 4, SizeY = 4 },
+                    Source = new DataSourceConfig { ConnId = "wb", Address = "1001", DataType = "Boolean" }
+                };
+                var pumpInitial = new PumpConfig
+                {
+                    Title = "Pump_Reconcile",
+                    Position = new WidgetPosition { Col = 15, Row = 15, SizeX = 6, SizeY = 6 },
+                    Source = new DataSourceConfig { ConnId = "wb", Address = "1002", DataType = "Boolean" }
+                };
+                var pipeInitial = new PipeConfig
+                {
+                    Title = "Pipe_Reconcile",
+                    Position = new WidgetPosition { Col = 9, Row = 7, SizeX = 6, SizeY = 2 },
+                    PipePoints = "0,0;6,0"
+                };
+
+                t24_dConfig.Widgets.Add(valveInitial);
+                t24_dConfig.Widgets.Add(pumpInitial);
+                t24_dConfig.Widgets.Add(pipeInitial);
+
+                var t24_dashVm = new DashboardViewModel(t24_dConfig, mockCore, projCtx, new HmiConfiguration(), null, t24_widgetFactory);
+                
+                // Store references to the created VMs
+                var initialValveVm = t24_dashVm.Widgets.OfType<ValveWidgetViewModel>().First();
+                var initialPumpVm = t24_dashVm.Widgets.OfType<PumpWidgetViewModel>().First();
+                var initialPipeVm = t24_dashVm.Widgets.OfType<PipeWidgetViewModel>().First();
+
+                if (t24_dashVm.Widgets.Count != 3)
+                    throw new Exception("Initial DashboardViewModel widgets count mismatch.");
+
+                // Verify initial step recorded
+                if (t24_dashVm.HistoryService.Steps.Count != 1 || t24_dashVm.CanUndo)
+                    throw new Exception("DashboardViewModel history should start with initial step and CanUndo=false.");
+
+                // Modify Valve position, delete Pipe, add new Tank
+                initialValveVm.Col = 8;
+                initialValveVm.Row = 10;
+                initialValveVm.SizeX = 6;
+                initialValveVm.SizeY = 6;
+                initialValveVm.OriginalConfig.Position.Col = 8;
+                initialValveVm.OriginalConfig.Position.Row = 10;
+                initialValveVm.OriginalConfig.Position.SizeX = 6;
+                initialValveVm.OriginalConfig.Position.SizeY = 6;
+
+                t24_dashVm.RemoveWidgetCommand.Execute(initialPipeVm);
+
+                var tankCfg = new TankConfig
+                {
+                    Title = "Tank_Added",
+                    Position = new WidgetPosition { Col = 25, Row = 25, SizeX = 8, SizeY = 8 }
+                };
+                t24_dashVm.AddWidgetFromConfig(tankCfg);
+
+                if (t24_dashVm.Widgets.Count != 3) // Valve, Pump, Tank
+                    throw new Exception($"Widgets count expected 3 after edit, got {t24_dashVm.Widgets.Count}");
+
+                // Now execute UNDO back to the state with the Pipe and original Valve coordinates
+                while (t24_dashVm.CanUndo)
+                {
+                    t24_dashVm.UndoCommand.Execute(null);
+                }
+
+                // Verify Differential Reconciliation invariants:
+                // 1. Valve VM instance is the exact same object reference (not recreated!)
+                var restoredValveVm = t24_dashVm.Widgets.OfType<ValveWidgetViewModel>().FirstOrDefault();
+                if (!ReferenceEquals(restoredValveVm, initialValveVm))
+                    throw new Exception("Differential reconciliation failed: Valve ViewModel was recreated instead of in-place updated!");
+
+                // 2. Valve coordinates reverted to (5, 5, 4, 4)
+                if (restoredValveVm == null || restoredValveVm.Col != 5 || restoredValveVm.Row != 5 || restoredValveVm.SizeX != 4 || restoredValveVm.SizeY != 4)
+                    throw new Exception($"Restored Valve coordinates mismatch: expected (5,5,4,4), got ({restoredValveVm?.Col},{restoredValveVm?.Row},{restoredValveVm?.SizeX},{restoredValveVm?.SizeY})");
+
+                // 3. Pump VM instance is the exact same object reference
+                var restoredPumpVm = t24_dashVm.Widgets.OfType<PumpWidgetViewModel>().FirstOrDefault();
+                if (!ReferenceEquals(restoredPumpVm, initialPumpVm))
+                    throw new Exception("Differential reconciliation failed: Pump ViewModel was recreated instead of preserved!");
+
+                // 4. Pipe was restored
+                var restoredPipeVm = t24_dashVm.Widgets.OfType<PipeWidgetViewModel>().FirstOrDefault();
+                if (restoredPipeVm == null || restoredPipeVm.Title != "Pipe_Reconcile")
+                    throw new Exception("Differential reconciliation failed to restore deleted Pipe!");
+
+                // 5. Added Tank was removed
+                var anyTank = t24_dashVm.Widgets.OfType<TankWidgetViewModel>().FirstOrDefault();
+                if (anyTank != null)
+                    throw new Exception("Differential reconciliation failed to remove added Tank on undo!");
+
+                // 6. Telemetry subscriptions on preserved Valve VM are still operational
+                mockCore.PublishTag(new TagData("wb", "1001", true));
+                Dispatcher.UIThread.RunJobs();
+                if (!restoredValveVm.IsOpen)
+                    throw new Exception("Telemetry subscription on preserved Valve was lost or failed to update IsOpen!");
+                if (restoredValveVm.CurrentColor != "#00FF00")
+                    throw new Exception($"Restored Valve CurrentColor expected '#00FF00', got '{restoredValveVm.CurrentColor}'");
+
+                // 24.6: Reentrancy Guard
+                if (t24_dashVm.IsReconciling)
+                    throw new Exception("DashboardViewModel.IsReconciling should be false after RestoreSnapshot completes.");
+
+                // 24.7: 20-minute Runtime Expiration Timer & Baseline Re-Establishment
+                var fastTimerHistory = new HistoryService(projCtx, capacity: 30)
+                {
+                    ExpirationTimeout = TimeSpan.FromMilliseconds(40)
+                };
+                fastTimerHistory.SetSnapshotProvider(() => new DashboardConfig
+                {
+                    CellSize = 40,
+                    ZoomScale = 1.0,
+                    Widgets = new List<WidgetConfig> { new ValveConfig { Title = "Active Baseline Valve" } }
+                });
+                fastTimerHistory.Initialize(baseDashboard, "Base", "Home");
+                var action1Dashboard = new DashboardConfig
+                {
+                    CellSize = 40,
+                    ZoomScale = 1.0,
+                    Widgets = new List<WidgetConfig> { new ValveConfig { Title = "Modified Valve 1" } }
+                };
+                fastTimerHistory.RecordStep("Action 1", "Move", action1Dashboard);
+                if (fastTimerHistory.Steps.Count != 2)
+                    throw new Exception("fastTimerHistory should have 2 steps.");
+
+                // Switch to Runtime: timer starts
+                fastTimerHistory.SetDesignMode(false);
+
+                // Switch back within 10ms: history preserved
+                Thread.Sleep(10);
+                fastTimerHistory.SetDesignMode(true);
+                if (fastTimerHistory.Steps.Count != 2)
+                    throw new Exception("Switching back to DesignMode before expiration should preserve history.");
+
+                // Switch to Runtime and let timer elapse (70ms > 40ms)
+                fastTimerHistory.SetDesignMode(false);
+                Thread.Sleep(80);
+                Dispatcher.UIThread.RunJobs();
+                if (fastTimerHistory.Steps.Count != 0 && fastTimerHistory.CurrentIndex != -1)
+                    throw new Exception($"Runtime expiration timer should clear history buffer after timeout; got count {fastTimerHistory.Steps.Count}");
+
+                // Switch back to DesignMode after buffer was wiped: baseline MUST be re-captured!
+                fastTimerHistory.SetDesignMode(true);
+                if (fastTimerHistory.Steps.Count != 1 || fastTimerHistory.CurrentIndex != 0)
+                    throw new Exception($"Returning to DesignMode after timeout expiration must re-establish baseline snapshot; got {fastTimerHistory.Steps.Count} steps.");
+                if (fastTimerHistory.Steps[0].Snapshot.Widgets[0].Title != "Active Baseline Valve")
+                    throw new Exception("Re-established baseline does not match snapshot provider output.");
+
+                // 24.8: History UI ViewModels & Ergonomics
+                var panelVm = t24_dashVm.HistoryPanel;
+                if (panelVm == null)
+                    throw new Exception("DashboardViewModel.HistoryPanel cannot be null.");
+                if (t24_dashVm.IsHistoryPanelOpen)
+                    throw new Exception("IsHistoryPanelOpen should default to false.");
+
+                t24_dashVm.ToggleHistoryPanelCommand.Execute(null);
+                if (!t24_dashVm.IsHistoryPanelOpen || !panelVm.IsOpen)
+                    throw new Exception("ToggleHistoryPanel failed to open drawer panel.");
+
+                panelVm.CloseCommand.Execute(null);
+                if (t24_dashVm.IsHistoryPanelOpen || panelVm.IsOpen)
+                    throw new Exception("HistoryPanelViewModel.CloseCommand failed to close drawer panel.");
+
+                // 24.9: WidgetEditorViewModel ID & GroupId Persistence and In-Place Reversion
+                var sampleValveCfg = new ValveConfig
+                {
+                    Title = "Valve_EditTest",
+                    ValveType = "CutOff",
+                    GroupId = "Group_Alpha",
+                    ActiveColor = "#00FF00"
+                };
+                var originalValveId = sampleValveCfg.Id;
+                var editorVm = new WidgetEditorViewModel(sampleValveCfg, new List<ConnectionConfig>());
+                editorVm.Title = "Valve_Edited";
+                editorVm.ActiveColor = "#00FFFF";
+                var updatedCfg = editorVm.ToWidgetConfig() as ValveConfig;
+                if (updatedCfg == null)
+                    throw new Exception("WidgetEditorViewModel.ToWidgetConfig returned null.");
+                if (updatedCfg.Id != originalValveId)
+                    throw new Exception($"WidgetEditorViewModel must preserve Id; expected {originalValveId}, got {updatedCfg.Id}");
+                if (updatedCfg.GroupId != "Group_Alpha")
+                    throw new Exception($"WidgetEditorViewModel must preserve GroupId; expected 'Group_Alpha', got '{updatedCfg.GroupId}'");
+
+                // 24.10: Reconcile Collection Order (Z-Index / Layering) on Undo/Redo
+                var orderDashConfig = new DashboardConfig
+                {
+                    CellSize = 40,
+                    ZoomScale = 1.0,
+                    Widgets = new List<WidgetConfig>
+                    {
+                        new ValveConfig { Title = "Item_A" },
+                        new ValveConfig { Title = "Item_B" },
+                        new ValveConfig { Title = "Item_C" }
+                    }
+                };
+                var orderDashVm = new DashboardViewModel(orderDashConfig, mockCore, projCtx, new HmiConfiguration(), null, t24_widgetFactory);
+                if (orderDashVm.Widgets[0].Title != "Item_A" || orderDashVm.Widgets[1].Title != "Item_B" || orderDashVm.Widgets[2].Title != "Item_C")
+                    throw new Exception("Order DashboardViewModel initial widgets mismatch.");
+
+                var firstWidget = orderDashVm.Widgets[0];
+                orderDashVm.BringToFrontCommand.Execute(firstWidget);
+                if (orderDashVm.Widgets[2].Title != "Item_A")
+                    throw new Exception("BringToFront failed to move Item_A to the end.");
+
+                // Undo BringToFront: collection order must be restored to [Item_A, Item_B, Item_C]
+                orderDashVm.UndoCommand.Execute(null);
+                if (orderDashVm.Widgets[0].Title != "Item_A" || orderDashVm.Widgets[1].Title != "Item_B" || orderDashVm.Widgets[2].Title != "Item_C")
+                    throw new Exception($"Undo failed to restore exact collection order: [{string.Join(", ", orderDashVm.Widgets.Select(w => w.Title))}]");
+
+                // Redo BringToFront: collection order must return to [Item_B, Item_C, Item_A]
+                orderDashVm.RedoCommand.Execute(null);
+                if (orderDashVm.Widgets[2].Title != "Item_A")
+                    throw new Exception("Redo failed to reapply BringToFront collection order.");
+
+                // 24.11: UpdateFromConfig polymorphic coverage on all SCADA Widget Types
+                var cmdBtnCfg = new CommandButtonConfig { Title = "Cmd", ButtonMode = "Toggle", LabelOn = "ON", LabelOff = "OFF" };
+                var cmdBtnVm = new CommandButtonViewModel(cmdBtnCfg, mockCore, projCtx);
+                cmdBtnVm.UpdateFromConfig(new CommandButtonConfig { Title = "CmdUpdated", ButtonMode = "Latching", LabelOn = "ACTIVE", LabelOff = "STANDBY", ColorOn = "#112233" });
+                if (cmdBtnVm.TypedConfig.ButtonMode != "Latching" || cmdBtnVm.TypedConfig.LabelOn != "ACTIVE" || cmdBtnVm.Title != "CmdUpdated")
+                    throw new Exception("CommandButtonViewModel.UpdateFromConfig failed to update typed configuration.");
+
+                var setValCfg = new SetValueConfig { Title = "Set", MinValue = 0, MaxValue = 50, Format = "{0:F0}" };
+                var setValVm = new SetValueViewModel(setValCfg, mockCore, projCtx);
+                setValVm.UpdateFromConfig(new SetValueConfig { Title = "SetUpdated", MinValue = 10, MaxValue = 200, Format = "{0:F2}" });
+                if (setValVm.MinValue != 10 || setValVm.MaxValue != 200 || setValVm.Format != "{0:F2}" || setValVm.Title != "SetUpdated")
+                    throw new Exception("SetValueViewModel.UpdateFromConfig failed to update min/max or format.");
+
+                var lvlCfg = new LevelSensorConfig { Title = "LT", MinValue = 0, MaxValue = 100, AlarmHigh = 90, AlarmLow = 10 };
+                var lvlVm = new LevelSensorWidgetViewModel(lvlCfg, mockCore, projCtx);
+                lvlVm.UpdateFromConfig(new LevelSensorConfig { Title = "LT_New", MinValue = 5, MaxValue = 50, AlarmHigh = 45, AlarmLow = 8 });
+                if (lvlVm.MinValue != 5 || lvlVm.MaxValue != 50 || lvlVm.AlarmHigh != 45 || lvlVm.Title != "LT_New")
+                    throw new Exception("LevelSensorWidgetViewModel.UpdateFromConfig failed to update alarm limits.");
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (24/24) PASSED SUCCESSFULLY!");
         }
     }
 

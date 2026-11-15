@@ -95,6 +95,7 @@ namespace AvaloniaApplication1.Views.Canvas
         private Point _dragStartPoint;
         private double _dragOriginalRow;
         private double _dragOriginalCol;
+        private Avalonia.Threading.DispatcherTimer? _nudgeDebounceTimer;
         private WidgetViewModelBase? _selectedVm;
         public WidgetViewModelBase? SelectedVm
         {
@@ -1784,6 +1785,9 @@ namespace AvaloniaApplication1.Views.Canvas
                     InvalidateArrange();
                     InvalidateVisual();
                     _selectionOverlay?.InvalidateVisual();
+
+                    var dVm = GetDashboardViewModel();
+                    dVm?.RecordStep($"Трассировка трубы: {pipeVm.Title}", "Pipe");
                 }
                 _isSnappedToEquipmentPort = false;
                 if (ActiveSnapTarget != null)
@@ -1831,6 +1835,12 @@ namespace AvaloniaApplication1.Views.Canvas
 
                 InvalidateMeasure();
                 InvalidateArrange();
+
+                if (newSizeX != _dragOriginalSizeX || newSizeY != _dragOriginalSizeY)
+                {
+                    var dVm = GetDashboardViewModel();
+                    dVm?.RecordStep($"Изменение размера: {_dragVm.Title}", "Resize");
+                }
             }
             else if (_isDragging && _dragVm != null && _dragChild != null)
             {
@@ -1971,6 +1981,7 @@ namespace AvaloniaApplication1.Views.Canvas
                 }
 
                 // 4. Check for Inline Drop & Auto-Split on valve drop
+                bool wasPipeSplit = false;
                 if (_dragVm is ValveWidgetViewModel valveVm && _dragOriginalPositions.Count == 1)
                 {
                     var candidatePipes = Children.Select(c => c.DataContext).OfType<PipeWidgetViewModel>()
@@ -1982,7 +1993,8 @@ namespace AvaloniaApplication1.Views.Canvas
 
                     if (splitResult != null && splitResult.Success)
                     {
-                        dashboardVm?.ReplacePipeWithSplit(splitResult.OriginalPipeVm, splitResult.PipeA, splitResult.PipeB);
+                        wasPipeSplit = true;
+                        dashboardVm?.ReplacePipeWithSplit(splitResult.OriginalPipeVm, splitResult.PipeA, splitResult.PipeB, recordHistoryStep: false);
                         int valveSize = Math.Max(1, Math.Max(valveVm.SizeX, valveVm.SizeY));
                         valveVm.SizeX = valveSize;
                         valveVm.SizeY = valveSize;
@@ -2007,6 +2019,19 @@ namespace AvaloniaApplication1.Views.Canvas
                 }
 
                 dashboardVm?.ResolvePipeConnections();
+
+                if (_dragVm != null && wasPipeSplit)
+                {
+                    dashboardVm?.RecordStep($"Врезка в трубопровод: {_dragVm.Title}", "Pipe");
+                }
+                else if (Math.Abs(deltaCol) > 0.001 || Math.Abs(deltaRow) > 0.001)
+                {
+                    string dragTitle = _dragVm != null ? _dragVm.Title : "Элемент";
+                    string title = _dragOriginalPositions.Count > 1 
+                        ? $"Перемещение элементов ({_dragOriginalPositions.Count})" 
+                        : $"Перемещение: {dragTitle}";
+                    dashboardVm?.RecordStep(title, "Move");
+                }
 
                 ActiveSmartGuides.Clear();
                 DragCurrentBadge = null;
@@ -2214,6 +2239,29 @@ namespace AvaloniaApplication1.Views.Canvas
             {
                 if (dashboardVm != null)
                 {
+                    if (e.Key == Avalonia.Input.Key.Z)
+                    {
+                        _nudgeDebounceTimer?.Stop();
+                        _nudgeDebounceTimer = null;
+                        if (e.KeyModifiers.HasFlag(Avalonia.Input.KeyModifiers.Shift))
+                        {
+                            dashboardVm.RedoCommand.Execute(null);
+                        }
+                        else
+                        {
+                            dashboardVm.UndoCommand.Execute(null);
+                        }
+                        e.Handled = true;
+                        return;
+                    }
+                    if (e.Key == Avalonia.Input.Key.Y)
+                    {
+                        _nudgeDebounceTimer?.Stop();
+                        _nudgeDebounceTimer = null;
+                        dashboardVm.RedoCommand.Execute(null);
+                        e.Handled = true;
+                        return;
+                    }
                     if (e.Key == Avalonia.Input.Key.C && SelectedVm != null)
                     {
                         dashboardVm.CopyWidgetCommand.Execute(SelectedVm);
@@ -2309,6 +2357,23 @@ namespace AvaloniaApplication1.Views.Canvas
                     InvalidateMeasure();
                     InvalidateArrange();
                     _selectionOverlay?.InvalidateVisual();
+
+                    // Debounce nudge commit to history (400ms)
+                    _nudgeDebounceTimer?.Stop();
+                    var nudgedWidgets = selectedWidgets.ToList();
+                    _nudgeDebounceTimer = new Avalonia.Threading.DispatcherTimer(
+                        TimeSpan.FromMilliseconds(400),
+                        Avalonia.Threading.DispatcherPriority.Normal,
+                        (s, ev) =>
+                        {
+                            _nudgeDebounceTimer?.Stop();
+                            _nudgeDebounceTimer = null;
+                            string title = nudgedWidgets.Count > 1 
+                                ? $"Смещение стрелками ({nudgedWidgets.Count})" 
+                                : $"Смещение стрелками: {nudgedWidgets[0].Title}";
+                            dashboardVm?.RecordStep(title, "Move");
+                        });
+                    _nudgeDebounceTimer.Start();
                     return;
                 }
             }

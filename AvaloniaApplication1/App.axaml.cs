@@ -70,6 +70,7 @@ namespace AvaloniaApplication1
             
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<IHmiClipboardService, HmiClipboardService>();
+            services.AddTransient<AvaloniaApplication1.Services.History.IHistoryService, AvaloniaApplication1.Services.History.HistoryService>();
 
             // ViewModels
             services.AddSingleton<IWidgetFactory, WidgetFactory>();

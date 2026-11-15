@@ -257,6 +257,28 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             }
         }
 
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is PipeConfig pipeConfig)
+            {
+                PipePoints = pipeConfig.PipePoints;
+                Thickness = pipeConfig.Thickness;
+                StartFitting = pipeConfig.StartFitting;
+                EndFitting = pipeConfig.EndFitting;
+                TypedConfig.ShowFlanges = pipeConfig.ShowFlanges;
+                TypedConfig.ActiveColor = pipeConfig.ActiveColor;
+                TypedConfig.InactiveColor = pipeConfig.InactiveColor;
+                OnPropertyChanged(nameof(PipePoints));
+                OnPropertyChanged(nameof(Thickness));
+                OnPropertyChanged(nameof(StartFitting));
+                OnPropertyChanged(nameof(EndFitting));
+                OnPropertyChanged(nameof(ActiveColor));
+                OnPropertyChanged(nameof(InactiveColor));
+                OnPropertyChanged(nameof(ShowFlanges));
+            }
+        }
+
         public override void Dispose()
         {
             base.Dispose();

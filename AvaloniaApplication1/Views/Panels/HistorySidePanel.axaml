@@ -1,0 +1,134 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels.Panels"
+             xmlns:models="clr-namespace:AvaloniaApplication1.Models.History"
+             xmlns:c="clr-namespace:AvaloniaApplication1.Converters"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="600"
+             x:Class="AvaloniaApplication1.Views.Panels.HistorySidePanel"
+             x:DataType="vm:HistoryPanelViewModel"
+             x:CompileBindings="True">
+
+    <UserControl.Resources>
+        <c:BoolToBrushConverter x:Key="ActiveStepBackgroundConverter"
+                                TrueBrush="#1E3A5F"
+                                FalseResourceKey="ThemeCardBackgroundBrush"
+                                FalseBrush="#202022" />
+        <c:BoolToBrushConverter x:Key="ActiveStepBorderConverter"
+                                TrueBrush="#00E5FF"
+                                FalseResourceKey="ThemeBorderBrush"
+                                FalseBrush="#38383C" />
+    </UserControl.Resources>
+
+    <Border Width="290"
+            Background="{DynamicResource ThemeToolbarBrush}"
+            BorderBrush="{DynamicResource ThemeBorderBrush}"
+            BorderThickness="1,0,0,0"
+            BoxShadow="-4 0 16 0 #80000000">
+        <Grid RowDefinitions="Auto,Auto,*,Auto">
+            <!-- Header -->
+            <Border Grid.Row="0" Background="{DynamicResource ThemeHeaderBrush}" Padding="12,10" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="0,0,0,1">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                    <TextBlock Grid.Column="0" Text="⏱️" FontSize="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <TextBlock Grid.Column="1" Text="История изменений" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource ThemeTextPrimaryBrush}" VerticalAlignment="Center" />
+                    <Border Grid.Column="2" Background="{DynamicResource ThemeSubtleBrush}" CornerRadius="10" Padding="8,2" Margin="0,0,8,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SummaryText}" FontSize="11" Foreground="{DynamicResource ThemeMutedTextBrush}" />
+                    </Border>
+                    <Button Grid.Column="3" Command="{Binding CloseCommand}"
+                            Content="✖" FontSize="12" Padding="6,2"
+                            Background="Transparent" Foreground="{DynamicResource ThemeMutedTextBrush}" CornerRadius="4"
+                            ToolTip.Tip="Закрыть панель истории">
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#4E4E52" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Action Bar: Undo, Redo, Clear -->
+            <Border Grid.Row="1" Padding="10,6" Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="0,0,0,1">
+                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                    <Button Command="{Binding UndoCommand}" IsEnabled="{Binding CanUndo}"
+                            Padding="8,4" FontSize="11" CornerRadius="4"
+                            Background="{DynamicResource ThemeHeaderBrush}" Foreground="{DynamicResource ThemeTextPrimaryBrush}"
+                            ToolTip.Tip="Отменить последнее действие (Ctrl+Z)">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="↶" FontSize="12" />
+                            <TextBlock Text="Отменить" FontSize="11" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding RedoCommand}" IsEnabled="{Binding CanRedo}"
+                            Padding="8,4" FontSize="11" CornerRadius="4"
+                            Background="{DynamicResource ThemeHeaderBrush}" Foreground="{DynamicResource ThemeTextPrimaryBrush}"
+                            ToolTip.Tip="Повторить отмененное действие (Ctrl+Y / Ctrl+Shift+Z)">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="↷" FontSize="12" />
+                            <TextBlock Text="Повторить" FontSize="11" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding ClearCommand}"
+                            Padding="8,4" FontSize="11" CornerRadius="4"
+                            Background="{DynamicResource ThemeHeaderBrush}" Foreground="#EF5350"
+                            ToolTip.Tip="Очистить историю изменений">
+                        <TextBlock Text="🗑️" FontSize="11" />
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Timeline Steps List -->
+            <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Steps}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="models:HistoryStep">
+                            <Button Command="{Binding $parent[UserControl].((vm:HistoryPanelViewModel)DataContext).JumpToStepCommand}"
+                                    CommandParameter="{Binding}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    Margin="6,3" Padding="8,6"
+                                    CornerRadius="6"
+                                    BorderThickness="1"
+                                    Background="{Binding IsCurrent, Converter={StaticResource ActiveStepBackgroundConverter}}"
+                                    BorderBrush="{Binding IsCurrent, Converter={StaticResource ActiveStepBorderConverter}}">
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover">
+                                        <Setter Property="BorderBrush" Value="#00E5FF" />
+                                    </Style>
+                                </Button.Styles>
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <!-- Action Icon & Active Indicator -->
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center" Margin="0,0,6,0">
+                                        <TextBlock Text="▶" FontSize="10" Foreground="#00E5FF" VerticalAlignment="Center"
+                                                   IsVisible="{Binding IsCurrent}" />
+                                        <TextBlock Text="{Binding DisplayIcon}" FontSize="13" VerticalAlignment="Center" />
+                                    </StackPanel>
+
+                                    <!-- Title -->
+                                    <TextBlock Grid.Column="1" Text="{Binding Title}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource ThemeTextPrimaryBrush}"
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center" />
+
+                                    <!-- Timestamp -->
+                                    <TextBlock Grid.Column="2" Text="{Binding FormattedTime}"
+                                               FontSize="10" Foreground="{DynamicResource ThemeMutedTextBrush}"
+                                               VerticalAlignment="Center" Margin="4,0,0,0" />
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Footer Info -->
+            <Border Grid.Row="3" Padding="10,6" Background="{DynamicResource ThemeHeaderBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="0,1,0,0">
+                <TextBlock Text="💡 Кликните на любой шаг для перехода"
+                           FontSize="10" FontStyle="Italic" Foreground="{DynamicResource ThemeMutedTextBrush}" TextWrapping="Wrap" TextAlignment="Center" />
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

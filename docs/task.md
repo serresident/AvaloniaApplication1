@@ -1025,3 +1025,67 @@
   - [x] Спроектирована выдвижная боковая шторка (Drawer 280px) таймлайна с прямым кликабельным переходом к шагу.
   - [x] Сформирован и опубликован RFC документ: `docs/designs/history_and_time_travel_engine.md`.
   - [x] Зарегистрирован в `docs/designs/SITEMAP.md`.
+
+# Tasks: Change History, Undo/Redo & Time-Travel Engine Implementation (Сессия 55 — Выполнено)
+
+- [x] Идентификация виджетов (Domain & Models):
+  - [x] Добавлено уникальное свойство `public Guid Id { get; set; } = Guid.NewGuid();` в `WidgetConfig` (`HmiConfiguration.cs`).
+  - [x] Проброшено свойство `public Guid Id => OriginalConfig?.Id ?? Guid.Empty;` в `WidgetViewModelBase.cs`.
+  - [x] Обеспечена генерация свежего `clone.Id = Guid.NewGuid();` при клонировании/дублировании виджетов в `WidgetClipboard.cs` и `DashboardViewModel.DuplicateWidget`.
+  - [x] Добавлен виртуальный метод `UpdateFromConfig(WidgetConfig newConfig)` в `WidgetViewModelBase.cs` с переопределениями во всех конкретных виджетах (`Pipe`, `Valve`, `Pump`, `Tank`, `ValueDisplay`).
+- [x] Сервис истории и кольцевой буфер (Application Layer):
+  - [x] Создана модель шага `HistoryStep` (`Models/History/HistoryStep.cs`) с заголовком, иконкой, снимком `DashboardConfig`, временной меткой и флагом `IsCurrent`.
+  - [x] Создан интерфейс `IHistoryService` и реализация `HistoryService` (`Services/History/`) с кольцевым буфером FIFO емкостью 30 шагов (`Capacity = 30`).
+  - [x] Реализовано ветвление истории (Truncate future steps upon new edit).
+  - [x] Реализован 20-минутный таймер удержания истории при переключении в Runtime (`IsDesignMode = false`) с автоочисткой буфера при истечении 20 минут.
+  - [x] Реализованы методы `Undo()`, `Redo()`, `JumpToStep(HistoryStep step)`, `RecordStep(title, iconKey, snapshot)`.
+  - [x] Зарегистрирован `IHistoryService` как Transient-зависимость в `App.axaml.cs` для независимого владения каждым `DashboardViewModel`.
+- [x] Дифференциальное согласование и защита от реентерабельности (Presentation Layer):
+  - [x] В `DashboardViewModel.cs` реализован метод `RestoreSnapshot(DashboardConfig snapshot)`:
+    - [x] In-place обновление координат и параметров существующих виджетов с совпадающим `Id` без пересоздания VM и без обрыва подписок на телеметрию.
+    - [x] Корректное удаление и `Dispose()` исчезнувших виджетов.
+    - [x] Создание и добавление новых восстановленных виджетов через фабрику `IWidgetFactory`.
+    - [x] Автоматический пересчет связей труб через `ResolvePipeConnections()`.
+  - [x] Внедрен флаг `_isReconciling` для подавления вторичной записи шагов истории при накате снимка.
+  - [x] Внедрен таймер 400 мс (`_nudgeDebounceTimer`) в `DashboardPanel.cs` для объединения клавиатурных перемещений стрелками в единый атомарный шаг истории.
+  - [x] Добавлены атомарные точки фиксации шагов: `OnPointerReleased` (перемещение, ресайз, редактирование вершин труб), врезка клапанов, соосная сборка узлов, удаление, добавление и сохранение в диалогах свойств.
+- [x] Пользовательский интерфейс и эргономика (UI & Hotkeys):
+  - [x] Разработана выдвижная боковая шторка `HistorySidePanel.axaml` / `HistoryPanelViewModel.cs` с интерактивным таймлайном, иконками, заголовками действий, временем, подсветкой активного шага и переходом к шагу в 1 клик.
+  - [x] Добавлены кнопки `Undo` (↶), `Redo` (↷) и `История (N)` на тулбары в `DashboardView.axaml` и `MainWindow.axaml`.
+  - [x] Настроены глобальные горячие клавиши: `Ctrl+Z` (Undo), `Ctrl+Y` (Redo), `Ctrl+Shift+Z` (Redo) в `DashboardPanel.cs` и `MainWindow.axaml`.
+- [x] Автоматическое тестирование и верификация:
+  - [x] В `AvaloniaApplication1.UIValidation/Program.cs` добавлен исчерпывающий блок **Test 24** (8 валидационных сценариев: генерация ID и дублирование, кольцевой буфер 30 шагов FIFO, Time-Travel Jump, ветвление истории, in-place reconciliation без разрыва телеметрии, reentrancy guard, 20-минутный Runtime таймер, UI команды панели).
+  - [x] Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
+  - [x] Все тесты пройдены: **24/24 PASSED (100%)**.
+  - [x] Headless-рендеринг `render_ui.ps1 MimicView`: обновлены `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.
+
+# Tasks: Change History Hardening & Critical Review Fixes (Сессия 56 — Выполнено)
+
+- [x] Устранение дефектов идентификации и мутации в редакторах свойств:
+  - [x] В `WidgetEditorViewModel.ToWidgetConfig()` гарантировано сохранение `Id` и `GroupId` существующего виджета, предотвращая деградацию дифференциального сопоставления.
+  - [x] В `DashboardViewModel.EditWidgetAsync` добавлена защитная синхронизация `result.Id` и `result.GroupId`.
+  - [x] Внедрен рекурсивный метод `WidgetClipboard.AssignFreshIds` для обновления ID всех вложенных дочерних элементов `ContainerButton`.
+- [x] Полноценная реализация `UpdateFromConfig` для всех типов виджетов:
+  - [x] `CommandButtonViewModel`: обновление режима кнопки, меток, цветов, скруглений и перерисовка через `SyncVisual()`.
+  - [x] `PilotLightViewModel`: обновление `TrueColor`, `FalseColor` и пересчет `UpdateState()`.
+  - [x] `SliderViewModel`: свойства и обновление `MinValue`, `MaxValue`.
+  - [x] `SetValueViewModel`: обновление `Format`, `MinValue`, `MaxValue`, `ValueColor`, `ValueFontSize` и пересчет `UpdateDisplayValue()`.
+  - [x] `RealTimeTrendViewModel`: обновление `Format`, `MinY`, `MaxY`.
+  - [x] `HeatExchangerWidgetViewModel`: обновление типа, цветов, фланцев, формата, вторичного источника и `UpdateDisplay()`.
+  - [x] `ReactorWidgetViewModel`: обновление диапазонов, рубашки, цветов, источников мешалки/температуры и `UpdateLevel()`.
+  - [x] `LevelSensorWidgetViewModel`: обновление типа датчика, единиц, формата, уставок `AlarmHigh`/`AlarmLow` и `UpdateState()`.
+  - [x] `ContainerButtonViewModel`: обновление сетки, зума и дочерних конфигураций.
+  - [x] `ValveWidgetViewModel`: строгая проверка `!string.IsNullOrEmpty(FeedbackSource?.Address)` и пересчет `UpdateState()`.
+- [x] Восстановление Z-Index порядка слоев на мнемосхеме:
+  - [x] В `DashboardViewModel.RestoreSnapshot` добавлен цикл упорядочивания `Widgets.Move` для точного совпадения порядка элементов со снимком при отмене/повторе `BringToFront`/`SendToBack`.
+- [x] Атомарность фиксации врезки и защита горячих клавиш:
+  - [x] В `DashboardPanel.cs` и `ReplacePipeWithSplit` устранена запись лишнего промежуточного шага при авто-врезке.
+  - [x] В `DashboardPanel.OnKeyDown` сбрасывается таймер `_nudgeDebounceTimer` при нажатии `Ctrl+Z` / `Ctrl+Y`.
+  - [x] В `DashboardViewModel.cs` методы `Undo()`, `Redo()`, `JumpToStep()` защищены от выполнения в Runtime (`IsDesignMode == false`).
+  - [x] В `HistoryService.SetDesignMode(true)` восстанавливается базовый снимок при возврате в DesignMode после истечения таймаута.
+- [x] Автоматическое тестирование:
+  - [x] Разоблачен пустой assert в Test 24.5, фабрика виджетов переведена на локальный `mockCore`, проверка `!restoredValveVm.IsOpen` и `CurrentColor == "#00FF00"` сделана строгой.
+  - [x] Добавлены сценарии 24.9 (ID & GroupId persistence), 24.10 (Z-order restoration), 24.11 (Runtime timeout baseline reset), 24.12 (Polymorphic `UpdateFromConfig`).
+  - [x] Сборка `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
+  - [x] Тесты: **24/24 PASSED (100%)**.
+  - [x] Headless-рендеринг `render_ui.ps1 MimicView`: артефакты обновлены.

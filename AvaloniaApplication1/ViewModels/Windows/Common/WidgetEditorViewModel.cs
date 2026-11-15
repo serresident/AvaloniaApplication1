@@ -536,6 +536,11 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             };
 
             config.Type = SelectedWidgetType;
+            if (_existingConfig != null)
+            {
+                config.Id = _existingConfig.Id;
+                config.GroupId = _existingConfig.GroupId;
+            }
             config.Title = Title;
             config.ShowTitle = ShowTitle;
             config.ShowBorder = ShowBorder;

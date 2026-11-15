@@ -70,6 +70,25 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             return double.TryParse(valObj.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is TankConfig tankConfig)
+            {
+                TypedConfig.MinValue = tankConfig.MinValue;
+                TypedConfig.MaxValue = tankConfig.MaxValue;
+                TypedConfig.Format = tankConfig.Format;
+                TypedConfig.ValueColor = tankConfig.ValueColor;
+                TypedConfig.ValueFontSize = tankConfig.ValueFontSize;
+                OnPropertyChanged(nameof(MinValue));
+                OnPropertyChanged(nameof(MaxValue));
+                OnPropertyChanged(nameof(Format));
+                OnPropertyChanged(nameof(ValueColor));
+                OnPropertyChanged(nameof(ValueFontSize));
+                UpdateState();
+            }
+        }
+
         public override void Dispose()
         {
             base.Dispose();

@@ -126,6 +126,25 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             return double.TryParse(valObj.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is SetValueConfig setConfig)
+            {
+                TypedConfig.Format = setConfig.Format;
+                TypedConfig.MinValue = setConfig.MinValue;
+                TypedConfig.MaxValue = setConfig.MaxValue;
+                TypedConfig.ValueColor = setConfig.ValueColor;
+                TypedConfig.ValueFontSize = setConfig.ValueFontSize;
+                OnPropertyChanged(nameof(Format));
+                OnPropertyChanged(nameof(MinValue));
+                OnPropertyChanged(nameof(MaxValue));
+                OnPropertyChanged(nameof(ValueColor));
+                OnPropertyChanged(nameof(ValueFontSize));
+                UpdateDisplayValue();
+            }
+        }
+
         public override void Dispose()
         {
             base.Dispose();

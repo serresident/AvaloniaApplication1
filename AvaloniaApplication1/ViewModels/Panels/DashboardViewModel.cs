@@ -1,3 +1,5 @@
+using AvaloniaApplication1.Models.History;
+using AvaloniaApplication1.Services.History;
 using AvaloniaApplication1.ViewModels.Core;
 using AvaloniaApplication1.ViewModels.Widgets;
 using AvaloniaApplication1.ViewModels.Popups;
@@ -22,6 +24,13 @@ namespace AvaloniaApplication1.ViewModels.Panels
         private readonly IWidgetFactory _widgetFactory;
         private readonly HmiConfiguration _config;
         private readonly DashboardConfig _dashboardConfig;
+        private readonly IHistoryService _historyService;
+
+        public IHistoryService HistoryService => _historyService;
+        public HistoryPanelViewModel HistoryPanel { get; }
+
+        private bool _isReconciling;
+        public bool IsReconciling => _isReconciling;
 
         public IProjectContextService ProjectContext { get; }
         
@@ -52,6 +61,15 @@ namespace AvaloniaApplication1.ViewModels.Panels
         [ObservableProperty]
         private bool _canAssembleCollinear;
 
+        [ObservableProperty]
+        private bool _isHistoryPanelOpen;
+
+        [ObservableProperty]
+        private string _historyStepsBadgeText = "История (1)";
+
+        public bool CanUndo => _historyService.CanUndo;
+        public bool CanRedo => _historyService.CanRedo;
+
         public bool HasMultiSelection => SelectedWidgetsCount > 1;
         public bool CanGroup => SelectedWidgetsCount > 1;
         public bool CanUngroup => Widgets.Any(w => w.IsSelected && !string.IsNullOrEmpty(w.GroupId));
@@ -81,7 +99,8 @@ namespace AvaloniaApplication1.ViewModels.Panels
             IProjectContextService projectContext,
             HmiConfiguration config,
             IDialogService? dialogService,
-            IWidgetFactory widgetFactory)
+            IWidgetFactory widgetFactory,
+            IHistoryService? historyService = null)
         {
             _mockDataService = mockDataService;
             _dialogService = dialogService;
@@ -94,8 +113,199 @@ namespace AvaloniaApplication1.ViewModels.Panels
             CellHeight = dashboardConfig.CellSize <= 0 ? 40 : dashboardConfig.CellSize;
             ZoomScale = dashboardConfig.ZoomScale <= 0 ? 1.0 : dashboardConfig.ZoomScale;
 
+            _historyService = historyService ?? new HistoryService(projectContext);
+            _historyService.SetSnapshotProvider(() => CreateSnapshot());
+            _historyService.StepRestored += (s, step) => RestoreSnapshot(step.Snapshot);
+            _historyService.HistoryChanged += (s, ev) => UpdateHistoryState();
+            HistoryPanel = new HistoryPanelViewModel(_historyService, this);
+
             LoadWidgets(dashboardConfig);
             ResolvePipeConnections();
+
+            _historyService.Initialize(CreateSnapshot(), "Исходное состояние", "Home");
+            UpdateHistoryState();
+        }
+
+        private void UpdateHistoryState()
+        {
+            OnPropertyChanged(nameof(CanUndo));
+            OnPropertyChanged(nameof(CanRedo));
+            HistoryStepsBadgeText = $"История ({_historyService.Steps.Count})";
+            OnPropertyChanged(nameof(HistoryStepsBadgeText));
+        }
+
+        public DashboardConfig CreateSnapshot()
+        {
+            var snapshot = new DashboardConfig
+            {
+                CellSize = (int)Math.Round(CellWidth),
+                ZoomScale = ZoomScale,
+                Widgets = new List<WidgetConfig>()
+            };
+
+            foreach (var vm in Widgets)
+            {
+                var json = System.Text.Json.JsonSerializer.Serialize(vm.OriginalConfig);
+                var cloned = System.Text.Json.JsonSerializer.Deserialize<WidgetConfig>(json);
+                if (cloned != null)
+                {
+                    cloned.Position.Col = vm.Col;
+                    cloned.Position.Row = vm.Row;
+                    cloned.Position.SizeX = vm.SizeX;
+                    cloned.Position.SizeY = vm.SizeY;
+                    if (vm is PipeWidgetViewModel pvm && cloned is PipeConfig pc)
+                    {
+                        pc.PipePoints = pvm.PipePoints;
+                    }
+                    snapshot.Widgets.Add(cloned);
+                }
+            }
+
+            return snapshot;
+        }
+
+        public void RestoreSnapshot(DashboardConfig snapshot)
+        {
+            if (snapshot == null) return;
+
+            _isReconciling = true;
+            try
+            {
+                UpdateGridAndScale(snapshot.CellSize, snapshot.ZoomScale);
+
+                var targetConfigs = new Dictionary<Guid, WidgetConfig>();
+                foreach (var w in snapshot.Widgets)
+                {
+                    if (w.Id == Guid.Empty)
+                    {
+                        w.Id = Guid.NewGuid();
+                    }
+                    targetConfigs[w.Id] = w;
+                }
+
+                // 1. Remove deleted widgets (not in snapshot)
+                var existingVms = Widgets.ToList();
+                foreach (var vm in existingVms)
+                {
+                    if (!targetConfigs.ContainsKey(vm.Id))
+                    {
+                        vm.PropertyChanged -= OnWidgetPropertyChanged;
+                        vm.Dispose();
+                        Widgets.Remove(vm);
+                        _dashboardConfig.Widgets.Remove(vm.OriginalConfig);
+                    }
+                }
+
+                // 2. In-place update for existing widgets (no VM drop, no subscription drop)
+                foreach (var vm in Widgets.ToList())
+                {
+                    if (targetConfigs.TryGetValue(vm.Id, out var targetConfig))
+                    {
+                        vm.UpdateFromConfig(targetConfig);
+                    }
+                }
+
+                // 3. Add newly restored widgets
+                var currentIds = Widgets.Select(w => w.Id).ToHashSet();
+                foreach (var cfg in snapshot.Widgets)
+                {
+                    if (!currentIds.Contains(cfg.Id))
+                    {
+                        if (!_dashboardConfig.Widgets.Contains(cfg))
+                        {
+                            _dashboardConfig.Widgets.Add(cfg);
+                        }
+                        var newVm = CreateWidgetViewModel(cfg);
+                        if (newVm != null)
+                        {
+                            newVm.PropertyChanged += OnWidgetPropertyChanged;
+                            Widgets.Add(newVm);
+                        }
+                    }
+                }
+
+                // 4. Reconcile collection order to match snapshot exact sequence
+                for (int i = 0; i < snapshot.Widgets.Count; i++)
+                {
+                    var targetId = snapshot.Widgets[i].Id;
+                    int currentIndex = -1;
+                    for (int j = i; j < Widgets.Count; j++)
+                    {
+                        if (Widgets[j].Id == targetId)
+                        {
+                            currentIndex = j;
+                            break;
+                        }
+                    }
+                    if (currentIndex >= 0 && currentIndex != i)
+                    {
+                        Widgets.Move(currentIndex, i);
+                    }
+                }
+                _dashboardConfig.Widgets.Clear();
+                foreach (var vm in Widgets)
+                {
+                    _dashboardConfig.Widgets.Add(vm.OriginalConfig);
+                }
+
+                ResolvePipeConnections();
+                UpdateSelectedWidgetsInfo();
+            }
+            finally
+            {
+                _isReconciling = false;
+            }
+        }
+
+        public void RecordStep(string title, string iconKey)
+        {
+            if (_isReconciling) return;
+            if (ProjectContext != null && !ProjectContext.IsDesignMode) return;
+
+            var snapshot = CreateSnapshot();
+            _historyService.RecordStep(title, iconKey, snapshot);
+        }
+
+        [RelayCommand]
+        public void Undo()
+        {
+            if (!CanUndo) return;
+            if (ProjectContext != null && !ProjectContext.IsDesignMode) return;
+            _historyService.Undo();
+        }
+
+        [RelayCommand]
+        public void Redo()
+        {
+            if (!CanRedo) return;
+            if (ProjectContext != null && !ProjectContext.IsDesignMode) return;
+            _historyService.Redo();
+        }
+
+        [RelayCommand]
+        public void JumpToStep(HistoryStep? step)
+        {
+            if (step == null) return;
+            if (ProjectContext != null && !ProjectContext.IsDesignMode) return;
+            _historyService.JumpToStep(step);
+        }
+
+        [RelayCommand]
+        public void ToggleHistoryPanel()
+        {
+            IsHistoryPanelOpen = !IsHistoryPanelOpen;
+        }
+
+        [RelayCommand]
+        public void CloseHistoryPanel()
+        {
+            IsHistoryPanelOpen = false;
+        }
+
+        [RelayCommand]
+        public void ClearHistory()
+        {
+            _historyService.Clear();
         }
 
         private void LoadWidgets(DashboardConfig config)
@@ -131,6 +341,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 var config = _dashboardConfig.Widgets[index];
                 _dashboardConfig.Widgets.RemoveAt(index);
                 _dashboardConfig.Widgets.Add(config);
+                RecordStep($"На передний план: {widget.Title}", "Order");
             }
         }
 
@@ -146,6 +357,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 var config = _dashboardConfig.Widgets[index];
                 _dashboardConfig.Widgets.RemoveAt(index);
                 _dashboardConfig.Widgets.Insert(index + 1, config);
+                RecordStep($"Переместить вперед: {widget.Title}", "Order");
             }
         }
 
@@ -161,6 +373,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 var config = _dashboardConfig.Widgets[index];
                 _dashboardConfig.Widgets.RemoveAt(index);
                 _dashboardConfig.Widgets.Insert(index - 1, config);
+                RecordStep($"Переместить назад: {widget.Title}", "Order");
             }
         }
 
@@ -176,6 +389,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 var config = _dashboardConfig.Widgets[index];
                 _dashboardConfig.Widgets.RemoveAt(index);
                 _dashboardConfig.Widgets.Insert(0, config);
+                RecordStep($"На задний план: {widget.Title}", "Order");
             }
         }
 
@@ -200,6 +414,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 pipe.PipePoints = PipeAutoRouter.PointsToPipeString(routed);
                 pipe.NormalizePointsAndSize();
                 ResolvePipeConnections();
+                RecordStep($"Автотрассировка трубы: {pipe.Title}", "Pipe");
             }
         }
 
@@ -210,7 +425,11 @@ namespace AvaloniaApplication1.ViewModels.Panels
             var result = await _dialogService.ShowDashboardPropertiesAsync(CellWidth, ZoomScale);
             if (result != null)
             {
-                UpdateGridAndScale(result.Value.CellSize, result.Value.ZoomScale);
+                if (Math.Abs(CellWidth - result.Value.CellSize) > 0.001 || Math.Abs(ZoomScale - result.Value.ZoomScale) > 0.001)
+                {
+                    UpdateGridAndScale(result.Value.CellSize, result.Value.ZoomScale);
+                    RecordStep("Настройка параметров холста", "Settings");
+                }
             }
         }
 
@@ -360,6 +579,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
             widget ??= Widgets.FirstOrDefault(w => w.IsSelected);
             if (widget == null) return;
 
+            string title = widget.Title;
             widget.IsSelected = false;
 
             // Remove from config model
@@ -371,6 +591,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
             Widgets.Remove(widget);
             UpdateSelectedWidgetsInfo();
             ResolvePipeConnections();
+            RecordStep($"Удаление: {title}", "Delete");
         }
 
         [RelayCommand]
@@ -379,6 +600,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
             var selectedList = Widgets.Where(w => w.IsSelected).ToList();
             if (selectedList.Count == 0) return;
 
+            int count = selectedList.Count;
             foreach (var w in selectedList)
             {
                 w.IsSelected = false;
@@ -389,6 +611,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
             }
             UpdateSelectedWidgetsInfo();
             ResolvePipeConnections();
+            RecordStep($"Удаление элементов ({count})", "Delete");
         }
 
         [RelayCommand]
@@ -471,6 +694,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 Widgets.Add(vm);
                 UpdateSelectedWidgetsInfo();
                 ResolvePipeConnections();
+                RecordStep($"Добавление: {config.Title}", "Add");
             }
         }
 
@@ -486,6 +710,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
 
             if (clonedConfig != null)
             {
+                WidgetClipboard.AssignFreshIds(clonedConfig);
                 clonedConfig.Position.Row += 2;
                 clonedConfig.Position.Col += 2;
                 AddWidgetFromConfig(clonedConfig);
@@ -500,6 +725,8 @@ namespace AvaloniaApplication1.ViewModels.Panels
             var result = await _dialogService.ShowWidgetEditorAsync(widget.OriginalConfig, _config.Connections);
             if (result != null)
             {
+                result.Id = widget.OriginalConfig.Id;
+                result.GroupId = widget.OriginalConfig.GroupId;
                 // Find and replace in config model
                 var index = _dashboardConfig.Widgets.IndexOf(widget.OriginalConfig);
                 if (index >= 0)
@@ -518,6 +745,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                     Widgets.RemoveAt(vmIndex);
                     Widgets.Insert(vmIndex, newVm);
                     ResolvePipeConnections();
+                    RecordStep($"Настройка: {newVm.Title}", "Settings");
                 }
             }
         }
@@ -530,6 +758,8 @@ namespace AvaloniaApplication1.ViewModels.Panels
 
         private void OnWidgetPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            if (_isReconciling) return;
+
             if (e.PropertyName == nameof(WidgetViewModelBase.Col) || 
                 e.PropertyName == nameof(WidgetViewModelBase.Row) || 
                 e.PropertyName == "PipePoints")
@@ -577,6 +807,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 w.OriginalConfig.Position.Col = minCol;
             }
             ResolvePipeConnections();
+            RecordStep("Выравнивание по левому краю", "Layout");
         }
 
         [RelayCommand]
@@ -593,6 +824,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 w.OriginalConfig.Position.Col = targetCol;
             }
             ResolvePipeConnections();
+            RecordStep("Выравнивание по правому краю", "Layout");
         }
 
         [RelayCommand]
@@ -612,6 +844,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 w.OriginalConfig.Position.Col = targetCol;
             }
             ResolvePipeConnections();
+            RecordStep("Выравнивание по центру (гор.)", "Layout");
         }
 
         [RelayCommand]
@@ -627,6 +860,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 w.OriginalConfig.Position.Row = minRow;
             }
             ResolvePipeConnections();
+            RecordStep("Выравнивание по верхнему краю", "Layout");
         }
 
         [RelayCommand]
@@ -643,6 +877,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 w.OriginalConfig.Position.Row = targetRow;
             }
             ResolvePipeConnections();
+            RecordStep("Выравнивание по нижнему краю", "Layout");
         }
 
         [RelayCommand]
@@ -662,6 +897,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 w.OriginalConfig.Position.Row = targetRow;
             }
             ResolvePipeConnections();
+            RecordStep("Выравнивание по центру (верт.)", "Layout");
         }
 
         [RelayCommand]
@@ -682,6 +918,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 selected[i].OriginalConfig.Position.Col = targetCol;
             }
             ResolvePipeConnections();
+            RecordStep("Распределение по горизонтали", "Layout");
         }
 
         [RelayCommand]
@@ -702,6 +939,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 selected[i].OriginalConfig.Position.Row = targetRow;
             }
             ResolvePipeConnections();
+            RecordStep("Распределение по вертикали", "Layout");
         }
 
         [RelayCommand]
@@ -716,6 +954,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 w.GroupId = newGroupId;
             }
             UpdateSelectedWidgetsInfo();
+            RecordStep("Группировка элементов", "Layout");
         }
 
         [RelayCommand]
@@ -727,6 +966,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 w.GroupId = null;
             }
             UpdateSelectedWidgetsInfo();
+            RecordStep("Разгруппировка элементов", "Layout");
         }
 
         [RelayCommand]
@@ -742,6 +982,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 var clone = System.Text.Json.JsonSerializer.Deserialize<WidgetConfig>(json);
                 if (clone != null)
                 {
+                    WidgetClipboard.AssignFreshIds(clone);
                     clone.Position.Col += 2;
                     clone.Position.Row += 2;
                     newConfigs.Add(clone);
@@ -764,6 +1005,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
 
             UpdateSelectedWidgetsInfo();
             ResolvePipeConnections();
+            RecordStep($"Дублирование элементов ({newConfigs.Count})", "Add");
         }
 
         #endregion
@@ -846,6 +1088,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
             {
                 ResolvePipeConnections();
                 UpdateSelectedWidgetsInfo();
+                RecordStep("Соосная сборка узла", "Pipe");
             }
         }
 
@@ -872,12 +1115,14 @@ namespace AvaloniaApplication1.ViewModels.Panels
                 Widgets.Add(vm2);
             }
             ResolvePipeConnections();
+            RecordStep("Подключение труб к фланцам", "Pipe");
         }
 
         public (PipeWidgetViewModel? PipeA, PipeWidgetViewModel? PipeB) ReplacePipeWithSplit(
             PipeWidgetViewModel originalPipe, 
             PipeConfig pipeACfg, 
-            PipeConfig pipeBCfg)
+            PipeConfig pipeBCfg,
+            bool recordHistoryStep = true)
         {
             int origIndex = Widgets.IndexOf(originalPipe);
             originalPipe.PropertyChanged -= OnWidgetPropertyChanged;
@@ -909,11 +1154,16 @@ namespace AvaloniaApplication1.ViewModels.Panels
             }
 
             ResolvePipeConnections();
+            if (recordHistoryStep)
+            {
+                RecordStep("Врезка в трубопровод", "Pipe");
+            }
             return (vmA, vmB);
         }
 
         public void Dispose()
         {
+            _historyService.Dispose();
             foreach (var widget in Widgets)
             {
                 widget.PropertyChanged -= OnWidgetPropertyChanged;

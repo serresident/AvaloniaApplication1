@@ -35,6 +35,18 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 IsOn = i > 0;
         }
 
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is PilotLightConfig pilotConfig)
+            {
+                TypedConfig.TrueColor = pilotConfig.TrueColor;
+                TypedConfig.FalseColor = pilotConfig.FalseColor;
+                OnPropertyChanged(nameof(TypedConfig));
+                UpdateState();
+            }
+        }
+
         public override void Dispose()
         {
             base.Dispose();

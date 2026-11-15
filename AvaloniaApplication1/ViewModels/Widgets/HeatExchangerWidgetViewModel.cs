@@ -88,5 +88,25 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 DisplayValue = $"{PrimaryTemp.ToString("F1", CultureInfo.InvariantCulture)} °C";
             }
         }
+
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is HeatExchangerConfig hexConfig)
+            {
+                TypedConfig.ExchangerType = hexConfig.ExchangerType;
+                TypedConfig.ActiveColor = hexConfig.ActiveColor;
+                TypedConfig.InactiveColor = hexConfig.InactiveColor;
+                TypedConfig.ShowFlanges = hexConfig.ShowFlanges;
+                TypedConfig.Format = hexConfig.Format;
+                TypedConfig.SecondarySource = hexConfig.SecondarySource;
+                OnPropertyChanged(nameof(ExchangerType));
+                OnPropertyChanged(nameof(ActiveColor));
+                OnPropertyChanged(nameof(InactiveColor));
+                OnPropertyChanged(nameof(ShowFlanges));
+                OnPropertyChanged(nameof(Format));
+                UpdateDisplay();
+            }
+        }
     }
 }

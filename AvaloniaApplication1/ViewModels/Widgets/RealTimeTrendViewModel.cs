@@ -86,6 +86,20 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             return double.TryParse(valObj.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is RealTimeTrendConfig trendConfig)
+            {
+                TypedConfig.Format = trendConfig.Format;
+                TypedConfig.MinValue = trendConfig.MinValue;
+                TypedConfig.MaxValue = trendConfig.MaxValue;
+                OnPropertyChanged(nameof(Format));
+                OnPropertyChanged(nameof(MinY));
+                OnPropertyChanged(nameof(MaxY));
+            }
+        }
+
         public override void Dispose()
         {
             base.Dispose();

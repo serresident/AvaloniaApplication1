@@ -522,6 +522,44 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             TypedConfig.Rotation = Rotation;
         }
 
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is ValveConfig valveConfig)
+            {
+                TypedConfig.ValveType = valveConfig.ValveType;
+                TypedConfig.ActiveColor = valveConfig.ActiveColor;
+                TypedConfig.InactiveColor = valveConfig.InactiveColor;
+                TypedConfig.ActuatorType = valveConfig.ActuatorType;
+                TypedConfig.IsVertical = valveConfig.IsVertical;
+                TypedConfig.Rotation = valveConfig.Rotation;
+                TypedConfig.ShowStatusText = valveConfig.ShowStatusText;
+                TypedConfig.LabelOffset = valveConfig.LabelOffset;
+                TypedConfig.Tolerance = valveConfig.Tolerance;
+                TypedConfig.AlarmDisabled = valveConfig.AlarmDisabled;
+                TypedConfig.FeedbackSource = valveConfig.FeedbackSource;
+                TypedConfig.ClosedFeedbackSource = valveConfig.ClosedFeedbackSource;
+                TypedConfig.ModeSource = valveConfig.ModeSource;
+
+                HasFeedbackSource = !string.IsNullOrEmpty(valveConfig.FeedbackSource?.Address);
+                HasClosedFeedbackSource = !string.IsNullOrEmpty(valveConfig.ClosedFeedbackSource?.Address);
+
+                IsVertical = valveConfig.IsVertical;
+                ActuatorType = string.IsNullOrEmpty(valveConfig.ActuatorType) ? "Solenoid" : valveConfig.ActuatorType;
+                ShowStatusText = valveConfig.ShowStatusText;
+                LabelOffset = valveConfig.LabelOffset;
+                Rotation = valveConfig.Rotation;
+                Tolerance = valveConfig.Tolerance == 0 ? DefaultTolerance : valveConfig.Tolerance;
+                AlarmDisabled = valveConfig.AlarmDisabled;
+
+                OnPropertyChanged(nameof(ValveType));
+                OnPropertyChanged(nameof(ActiveColor));
+                OnPropertyChanged(nameof(InactiveColor));
+                OnPropertyChanged(nameof(IsRegulating));
+                UpdateState();
+            }
+        }
+
         public override void Dispose()
         {
             _alarmTimer.Stop();

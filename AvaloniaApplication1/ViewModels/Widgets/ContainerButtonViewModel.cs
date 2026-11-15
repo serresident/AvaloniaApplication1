@@ -113,5 +113,16 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 }
             }
         }
+
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is ContainerButtonConfig cConfig)
+            {
+                TypedConfig.CellSize = cConfig.CellSize;
+                TypedConfig.ZoomScale = cConfig.ZoomScale;
+                TypedConfig.Children = cConfig.Children;
+            }
+        }
     }
 }

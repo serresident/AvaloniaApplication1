@@ -13,7 +13,11 @@ namespace AvaloniaApplication1.Services
         public static void Copy(WidgetConfig config)
         {
             if (config == null) return;
-            CopiedWidgetJson = JsonSerializer.Serialize(config);
+            if (string.IsNullOrEmpty(config.Type))
+            {
+                config.Type = config.GetType().Name.Replace("Config", "");
+            }
+            CopiedWidgetJson = JsonSerializer.Serialize(config, config.GetType());
         }
 
         public static WidgetConfig? PasteClone()
@@ -22,12 +26,30 @@ namespace AvaloniaApplication1.Services
 
             try
             {
-                return JsonSerializer.Deserialize<WidgetConfig>(CopiedWidgetJson);
+                var clone = JsonSerializer.Deserialize<WidgetConfig>(CopiedWidgetJson);
+                if (clone != null)
+                {
+                    AssignFreshIds(clone);
+                }
+                return clone;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[WidgetClipboard] Error pasting widget: {ex.Message}");
                 return null;
+            }
+        }
+
+        public static void AssignFreshIds(WidgetConfig? config)
+        {
+            if (config == null) return;
+            config.Id = Guid.NewGuid();
+            if (config is ContainerButtonConfig container && container.Children != null)
+            {
+                foreach (var child in container.Children)
+                {
+                    AssignFreshIds(child);
+                }
             }
         }
 

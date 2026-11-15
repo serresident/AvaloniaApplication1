@@ -123,5 +123,24 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             }
             await Task.CompletedTask;
         }
+
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is CommandButtonConfig btnConfig)
+            {
+                TypedConfig.ButtonMode = btnConfig.ButtonMode;
+                TypedConfig.LabelOn = btnConfig.LabelOn;
+                TypedConfig.LabelOff = btnConfig.LabelOff;
+                TypedConfig.ColorOn = btnConfig.ColorOn;
+                TypedConfig.ColorOff = btnConfig.ColorOff;
+                TypedConfig.ShowIconOnly = btnConfig.ShowIconOnly;
+                TypedConfig.Icon = btnConfig.Icon;
+                TypedConfig.CornerRadius = btnConfig.CornerRadius;
+                OnPropertyChanged(nameof(IsToggleSwitchMode));
+                OnPropertyChanged(nameof(TypedConfig));
+                SyncVisual();
+            }
+        }
     }
 }

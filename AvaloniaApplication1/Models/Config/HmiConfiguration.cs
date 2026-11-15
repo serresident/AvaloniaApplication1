@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -75,6 +76,7 @@ namespace AvaloniaApplication1.Models.Config
     [JsonConverter(typeof(WidgetJsonConverter))]
     public abstract class WidgetConfig
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Type { get; set; } = string.Empty; 
         public string Title { get; set; } = string.Empty;
         public DataSourceConfig Source { get; set; } = new();
@@ -95,6 +97,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class ValueDisplayConfig : WidgetConfig
     {
+        public ValueDisplayConfig() { Type = "ValueDisplay"; }
         public string Format { get; set; } = "{0}";
         public string ValueColor { get; set; } = string.Empty;
         public double ValueFontSize { get; set; } = 0;
@@ -104,12 +107,14 @@ namespace AvaloniaApplication1.Models.Config
 
     public class PilotLightConfig : WidgetConfig
     {
+        public PilotLightConfig() { Type = "PilotLight"; }
         public string TrueColor { get; set; } = "#00FF00";
         public string FalseColor { get; set; } = "#440000";
     }
 
     public class ContainerButtonConfig : WidgetConfig
     {
+        public ContainerButtonConfig() { Type = "ContainerButton"; }
         public int CellSize { get; set; } = 40;
         public double ZoomScale { get; set; } = 1.0;
         public List<WidgetConfig> Children { get; set; } = new();
@@ -117,6 +122,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class CommandButtonConfig : WidgetConfig
     {
+        public CommandButtonConfig() { Type = "CommandButton"; }
         // Toggle | Momentary | Latching | ToggleSwitch
         public string ButtonMode    { get; set; } = "Toggle";
         // Labels
@@ -132,12 +138,14 @@ namespace AvaloniaApplication1.Models.Config
 
     public class SliderConfig : WidgetConfig
     {
+        public SliderConfig() { Type = "Slider"; }
         public double MinValue { get; set; } = 0;
         public double MaxValue { get; set; } = 100;
     }
 
     public class SetValueConfig : WidgetConfig
     {
+        public SetValueConfig() { Type = "SetValue"; }
         public string Format { get; set; } = "{0}";
         public double MinValue { get; set; } = 0;
         public double MaxValue { get; set; } = 100;
@@ -149,6 +157,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class RealTimeTrendConfig : WidgetConfig
     {
+        public RealTimeTrendConfig() { Type = "RealTimeTrend"; }
         public string Format { get; set; } = "{0}";
         public double MinValue { get; set; } = 0;
         public double MaxValue { get; set; } = 100;
@@ -156,6 +165,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class PipeConfig : WidgetConfig
     {
+        public PipeConfig() { Type = "Pipe"; }
         public string PipePoints { get; set; } = string.Empty;
         public string ActiveColor { get; set; } = string.Empty;
         public string InactiveColor { get; set; } = string.Empty;
@@ -167,6 +177,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class ValveConfig : WidgetConfig
     {
+        public ValveConfig() { Type = "Valve"; }
         public string ValveType { get; set; } = "CutOff";
         public string ActiveColor { get; set; } = string.Empty;
         public string InactiveColor { get; set; } = string.Empty;
@@ -184,6 +195,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class TankConfig : WidgetConfig
     {
+        public TankConfig() { Type = "Tank"; }
         public string Format { get; set; } = "{0}";
         public double MinValue { get; set; } = 0;
         public double MaxValue { get; set; } = 100;
@@ -194,6 +206,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class PumpConfig : WidgetConfig
     {
+        public PumpConfig() { Type = "Pump"; }
         public string ActiveColor { get; set; } = string.Empty;
         public string InactiveColor { get; set; } = string.Empty;
         public double ControlWindowWidth { get; set; } = 0;
@@ -203,6 +216,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class HeatExchangerConfig : WidgetConfig
     {
+        public HeatExchangerConfig() { Type = "HeatExchanger"; }
         public string ExchangerType { get; set; } = "ShellAndTube"; // ShellAndTube | Plate
         public DataSourceConfig? SecondarySource { get; set; }
         public string Format { get; set; } = "{0:F1} °C";
@@ -213,6 +227,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class ReactorConfig : WidgetConfig
     {
+        public ReactorConfig() { Type = "Reactor"; }
         public DataSourceConfig? AgitatorSource { get; set; }
         public DataSourceConfig? TempSource { get; set; }
         public double MinValue { get; set; } = 0;
@@ -225,6 +240,7 @@ namespace AvaloniaApplication1.Models.Config
 
     public class LevelSensorConfig : WidgetConfig
     {
+        public LevelSensorConfig() { Type = "LevelSensor"; }
         public string SensorType { get; set; } = "Radar"; // Radar | Ultrasonic | Hydrostatic
         public string TagNumber { get; set; } = "LT-101";
         public string Unit { get; set; } = "%";

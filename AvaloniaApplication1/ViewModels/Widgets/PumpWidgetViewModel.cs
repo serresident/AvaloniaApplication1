@@ -115,6 +115,19 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             }
         }
 
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is PumpConfig pumpConfig)
+            {
+                TypedConfig.ActiveColor = pumpConfig.ActiveColor;
+                TypedConfig.InactiveColor = pumpConfig.InactiveColor;
+                OnPropertyChanged(nameof(ActiveColor));
+                OnPropertyChanged(nameof(InactiveColor));
+                UpdateState();
+            }
+        }
+
         public override void Dispose()
         {
             base.Dispose();

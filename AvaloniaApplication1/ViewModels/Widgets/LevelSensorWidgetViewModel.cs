@@ -63,5 +63,32 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 DisplayValue = "---";
             }
         }
+
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is LevelSensorConfig lConfig)
+            {
+                TypedConfig.SensorType = lConfig.SensorType;
+                TypedConfig.TagNumber = lConfig.TagNumber;
+                TypedConfig.Unit = lConfig.Unit;
+                TypedConfig.Format = lConfig.Format;
+                TypedConfig.MinValue = lConfig.MinValue;
+                TypedConfig.MaxValue = lConfig.MaxValue;
+                TypedConfig.AlarmHigh = lConfig.AlarmHigh;
+                TypedConfig.AlarmLow = lConfig.AlarmLow;
+                TypedConfig.ValueColor = lConfig.ValueColor;
+                OnPropertyChanged(nameof(SensorType));
+                OnPropertyChanged(nameof(TagNumber));
+                OnPropertyChanged(nameof(Unit));
+                OnPropertyChanged(nameof(Format));
+                OnPropertyChanged(nameof(MinValue));
+                OnPropertyChanged(nameof(MaxValue));
+                OnPropertyChanged(nameof(AlarmHigh));
+                OnPropertyChanged(nameof(AlarmLow));
+                OnPropertyChanged(nameof(ValueColor));
+                UpdateState();
+            }
+        }
     }
 }

@@ -117,5 +117,28 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 DataService.WriteCommand(TypedConfig.AgitatorSource.ConnId, TypedConfig.AgitatorSource.Address, nextState);
             }
         }
+
+        public override void UpdateFromConfig(WidgetConfig newConfig)
+        {
+            base.UpdateFromConfig(newConfig);
+            if (newConfig is ReactorConfig rConfig)
+            {
+                TypedConfig.MinValue = rConfig.MinValue;
+                TypedConfig.MaxValue = rConfig.MaxValue;
+                TypedConfig.HasJacket = rConfig.HasJacket;
+                TypedConfig.ActiveColor = rConfig.ActiveColor;
+                TypedConfig.InactiveColor = rConfig.InactiveColor;
+                TypedConfig.Format = rConfig.Format;
+                TypedConfig.AgitatorSource = rConfig.AgitatorSource;
+                TypedConfig.TempSource = rConfig.TempSource;
+                OnPropertyChanged(nameof(MinValue));
+                OnPropertyChanged(nameof(MaxValue));
+                OnPropertyChanged(nameof(HasJacket));
+                OnPropertyChanged(nameof(ActiveColor));
+                OnPropertyChanged(nameof(InactiveColor));
+                OnPropertyChanged(nameof(Format));
+                UpdateLevel();
+            }
+        }
     }
 }
