@@ -1014,3 +1014,14 @@
   - [x] Сборка `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
   - [x] Автоматические тесты: **23/23 PASSED (100%)**.
   - [x] Headless-рендеринг `render_ui.ps1 MimicView`: обновлены `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.
+
+# Tasks: EGM Brainstorm: History, Undo/Redo & Time-Travel Engine RFC (Сессия 54 — Выполнено)
+
+- [x] Интерактивный брейншторм концепции подсистемы истории изменений (/egm-brainstorm):
+  - [x] Проведен аудит требований: кольцевой стек на 30 шагов, охват холста и редакторов свойств, 20-минутный таймер в Runtime.
+  - [x] Выполнен параллельный многолинзовый аудит (6 специализированных линз) через координатор `egm-synthesizer`.
+  - [x] Локализован критический блокер: отсутствие `Id` в `WidgetConfig`, выработано решение по добавлению `Guid Id`.
+  - [x] Спроектировано дифференциальное согласование (Reconciliation) ViewModels без разрыва подписок на телеметрию.
+  - [x] Спроектирована выдвижная боковая шторка (Drawer 280px) таймлайна с прямым кликабельным переходом к шагу.
+  - [x] Сформирован и опубликован RFC документ: `docs/designs/history_and_time_travel_engine.md`.
+  - [x] Зарегистрирован в `docs/designs/SITEMAP.md`.
