@@ -924,3 +924,26 @@
   - [x] Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: 0 ошибок, 0 предупреждений
   - [x] Все тесты пройдены: 22/22 PASS (100%)
   - [x] Сгенерированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json`
+
+# Tasks: Theme Review, Zero-Allocation Render & Full Dialog Migration (Сессия 50 — Выполнено)
+
+- [x] Реактивная инвалидация рендера кастомных контролов при смене темы:
+  - [x] Добавлены подписки на `ActualThemeVariantChanged` в `PipeControl`, `TrendLineControl`, `ValveControl`, `ReactorControl`, `HeatExchangerControl`, `LevelSensorControl`, `GridOverlay`, `SelectionOverlay`
+  - [x] В `DashboardPanel.cs` обеспечена передача изменения темы на слои оверлеев
+- [x] Устранение оставшихся аллокаций в методах `Render()`:
+  - [x] В `TrendLineControl.cs` кэшировано создание перьев через `GetLinePen`
+  - [x] В `ValveControl.cs` кэшировано создание кистей через `GetBodyBrush` и `GetActuatorBrush`
+  - [x] В `PipeControl.cs` кэшированы перья фланцев и маркеров
+- [x] Контрастность CAD-оверлеев и маркерных указателей:
+  - [x] В `SelectionOverlay.cs` добавлен контрастный маркер центра привязки с обводкой `SnapCenterPen`
+  - [x] Настроены темные и светлые кисти для плашки координат виджета
+- [x] Миграция карточек дашборда и всех вспомогательных окон:
+  - [x] В `DashboardView.axaml` заменены жестко заданные фоны карточек виджетов и тулбара на `Border.widget-card` со стилем `{DynamicResource ThemeCardBackgroundBrush}`
+  - [x] В `MainWindow.axaml` табы переведены на стиль `.header-tab` с псевдоклассом `.active` и семантическими ресурсами
+  - [x] Во всех 12 диалоговых и MDI-окнах устранены хардкод-цвета темной темы (`CalculatorView`, `NumpadView`, `ValveControlPopupView`, `ConfirmPromptWindow`, `PasswordPromptWindow`, `DashboardPropertiesWindow`, `ConnectionEditorWindow`, `TagEditWindow`, `TagForceWindow`, `TagImportExportWindow`, `TagPickerWindow`, `TagManagerWindow`)
+  - [x] В `App.axaml` добавлен словарь по умолчанию `x:Key="Default"`
+- [x] Дополнительное тестирование:
+  - [x] В `AvaloniaApplication1.UIValidation/Program.cs` добавлен тест 22.7 на проверку смены темы в живом визуальном дереве со всеми кастомными контролами
+  - [x] Сборка 0 ошибок, 0 предупреждений
+  - [x] Все 22 теста пройдены успешно (100% PASS)
+  - [x] Актуализирован снимок `artifacts/ui_preview.png` и `artifacts/ui_tree.json`

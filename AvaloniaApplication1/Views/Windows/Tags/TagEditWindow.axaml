@@ -10,14 +10,14 @@
         Title="{Binding WindowTitle}"
         Width="560" Height="700"
         WindowStartupLocation="CenterOwner"
-        Background="#1E1E1E"
+        Background="{DynamicResource ThemeBackgroundBrush}"
         CanResize="False">
 
     <Grid RowDefinitions="Auto,*,Auto" Margin="20">
 
         <!-- Header -->
         <TextBlock Grid.Row="0" Text="{Binding WindowTitle}"
-                   Foreground="White" FontSize="18" FontWeight="Bold" Margin="0,0,0,14" />
+                   Foreground="{DynamicResource ThemeTextPrimaryBrush}" FontSize="18" FontWeight="Bold" Margin="0,0,0,14" />
 
         <!-- Form Body in ScrollViewer -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -30,7 +30,7 @@
                 </Border>
 
                 <!-- Section 1: Identification -->
-                <Border Background="#2D2D30" CornerRadius="6" Padding="12">
+                <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12">
                     <StackPanel Spacing="8">
                         <TextBlock Text="Идентификация тега" Foreground="#00AAFF" FontSize="13" FontWeight="SemiBold" />
 
@@ -49,7 +49,7 @@
                 </Border>
 
                 <!-- Section 2: Connection & Addressing -->
-                <Border Background="#2D2D30" CornerRadius="6" Padding="12">
+                <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12">
                     <StackPanel Spacing="8">
                         <TextBlock Text="Связь и адресация (Modbus / MQTT)" Foreground="#00AAFF" FontSize="13" FontWeight="SemiBold" />
 
@@ -76,7 +76,7 @@
                 </Border>
 
                 <!-- Section 3: Engineering Units & Linear Scaling Y = A*X + B -->
-                <Border Background="#2D2D30" CornerRadius="6" Padding="12">
+                <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12">
                     <StackPanel Spacing="8">
                         <TextBlock Text="Единицы измерения и масштабирование Y = A * X + B" Foreground="#00AAFF" FontSize="13" FontWeight="SemiBold" />
 
@@ -118,7 +118,7 @@
                 </Border>
 
                 <!-- Section 4: Telemetry Quality & Watchdog -->
-                <Border Background="#2D2D30" CornerRadius="6" Padding="12">
+                <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12">
                     <StackPanel Spacing="8">
                         <TextBlock Text="Надежность и контроль достоверности" Foreground="#00AAFF" FontSize="13" FontWeight="SemiBold" />
 
@@ -142,7 +142,8 @@
         <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,14,0,0">
             <Button Grid.Column="0" Content="Отмена"
                     Command="{Binding CancelCommand}"
-                    Background="#3E3E42" Foreground="White"
+                    Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1"
+                    Foreground="{DynamicResource ThemeTextPrimaryBrush}"
                     CornerRadius="6" Padding="16,8" FontSize="13"
                     HorizontalAlignment="Left" />
 

@@ -143,6 +143,25 @@ namespace AvaloniaApplication1.Controls.Piping
                 ThicknessProperty);
         }
 
+        private static readonly IBrush FlangeBrush = new SolidColorBrush(Color.FromRgb(160, 160, 164));
+        private static readonly Pen FlangeBorderPenDark = new Pen(new SolidColorBrush(Color.FromRgb(30, 30, 30)), 1);
+        private static readonly Pen FlangeBorderPenLight = new Pen(new SolidColorBrush(Color.FromRgb(50, 50, 50)), 1);
+        private static readonly IBrush MarkerBrush = Brushes.White;
+        private static readonly Pen MarkerPen = new Pen(Brushes.DodgerBlue, 2);
+
+        private SolidColorBrush? _cachedBaseBrush;
+        private Color _cachedBaseColor;
+
+        private IBrush GetBaseBrush(Color color)
+        {
+            if (_cachedBaseBrush == null || _cachedBaseColor != color)
+            {
+                _cachedBaseColor = color;
+                _cachedBaseBrush = new SolidColorBrush(color);
+            }
+            return _cachedBaseBrush;
+        }
+
         private static ContextMenu? _activeMenu;
 
         public static void CloseActiveMenu()
@@ -157,6 +176,23 @@ namespace AvaloniaApplication1.Controls.Piping
         public PipeControl()
         {
             ClipToBounds = false;
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            ActualThemeVariantChanged += OnActualThemeVariantChanged;
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+        }
+
+        private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+        {
+            InvalidateVisual();
         }
 
         public override void Render(DrawingContext context)
@@ -253,24 +289,25 @@ namespace AvaloniaApplication1.Controls.Piping
             }
 
             // 2. Draw Elbow extensions
+            var baseBrush = GetBaseBrush(baseColor);
             if (hasStartElbow)
             {
                 double elbowLength = thickness * 1.2;
                 Point pElbow = startPoint + new Point(Math.Cos(startElbowDir) * elbowLength, Math.Sin(startElbowDir) * elbowLength);
                 Draw3DSegment(context, startPoint, pElbow, baseColor, thickness);
-                context.DrawEllipse(new SolidColorBrush(baseColor), null, startPoint, thickness / 2, thickness / 2);
+                context.DrawEllipse(baseBrush, null, startPoint, thickness / 2, thickness / 2);
             }
             if (hasEndElbow)
             {
                 double elbowLength = thickness * 1.2;
                 Point pElbow = endPoint + new Point(Math.Cos(endElbowDir) * elbowLength, Math.Sin(endElbowDir) * elbowLength);
                 Draw3DSegment(context, endPoint, pElbow, baseColor, thickness);
-                context.DrawEllipse(new SolidColorBrush(baseColor), null, endPoint, thickness / 2, thickness / 2);
+                context.DrawEllipse(baseBrush, null, endPoint, thickness / 2, thickness / 2);
             }
 
             // 3. Draw joint plates, elbows, and flanges
-            var flangeBrush = new SolidColorBrush(Color.FromRgb(160, 160, 164));
-            var flangeBorderPen = new Pen(Brushes.Black, 1);
+            bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+            var flangeBorderPen = isLight ? FlangeBorderPenLight : FlangeBorderPenDark;
 
             for (int i = 0; i < pixelPoints.Count; i++)
             {
@@ -289,7 +326,7 @@ namespace AvaloniaApplication1.Controls.Piping
                         // Outer face is exactly at p, center of plate is offset backwards by half-thickness
                         Point flangeCenter = new Point(p.X + ux * (flangeThickness / 2.0),
                                                        p.Y + uy * (flangeThickness / 2.0));
-                        DrawFlangePlate(context, flangeCenter, startAngle, flangeBrush, flangeBorderPen, thickness);
+                        DrawFlangePlate(context, flangeCenter, startAngle, FlangeBrush, flangeBorderPen, thickness);
                     }
                 }
                 else if (i == pixelPoints.Count - 1) // End
@@ -305,23 +342,21 @@ namespace AvaloniaApplication1.Controls.Piping
                         // Outer face is exactly at p, center of plate is offset backwards by half-thickness
                         Point flangeCenter = new Point(p.X - ux * (flangeThickness / 2.0),
                                                        p.Y - uy * (flangeThickness / 2.0));
-                        DrawFlangePlate(context, flangeCenter, endAngle, flangeBrush, flangeBorderPen, thickness);
+                        DrawFlangePlate(context, flangeCenter, endAngle, FlangeBrush, flangeBorderPen, thickness);
                     }
                 }
                 else // Mid corner
                 {
-                    context.DrawEllipse(new SolidColorBrush(baseColor), null, p, thickness / 2, thickness / 2);
+                    context.DrawEllipse(baseBrush, null, p, thickness / 2, thickness / 2);
                 }
             }
 
             // 4. Markers in Design Mode
             if (IsDesignMode && IsEditingVertices)
             {
-                var markerBrush = Brushes.White;
-                var markerPen = new Pen(Brushes.DodgerBlue, 2);
                 for (int i = 0; i < pixelPoints.Count; i++)
                 {
-                    context.DrawEllipse(markerBrush, markerPen, pixelPoints[i], 6, 6);
+                    context.DrawEllipse(MarkerBrush, MarkerPen, pixelPoints[i], 6, 6);
                 }
             }
         }

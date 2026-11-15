@@ -42,15 +42,19 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
 
         private static readonly IPen SnapRingPen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 230, 118)), 2.5);
         private static readonly IBrush SnapFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(70, 0, 230, 118));
+        private static readonly IPen SnapCenterPen = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
 
         private static readonly IPen SmartGuidePen = new ImmutablePen(
             new ImmutableSolidColorBrush(Color.FromRgb(224, 64, 251)),
             1.2,
             new ImmutableDashStyle(new double[] { 4, 3 }, 0));
 
-        private static readonly IBrush CoordBadgeBg = new ImmutableSolidColorBrush(Color.FromArgb(230, 20, 25, 35));
-        private static readonly IPen CoordBadgeBorder = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 122, 255)), 1.0);
-        private static readonly IBrush CoordBadgeTextBrush = Brushes.White;
+        private static readonly IBrush CoordBadgeBgDark = new ImmutableSolidColorBrush(Color.FromArgb(235, 20, 25, 35));
+        private static readonly IBrush CoordBadgeBgLight = new ImmutableSolidColorBrush(Color.FromArgb(245, 255, 255, 255));
+        private static readonly IPen CoordBadgeBorderDark = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 122, 255)), 1.0);
+        private static readonly IPen CoordBadgeBorderLight = new ImmutablePen(new ImmutableSolidColorBrush(Color.FromRgb(0, 102, 204)), 1.0);
+        private static readonly IBrush CoordBadgeTextBrushDark = Brushes.White;
+        private static readonly IBrush CoordBadgeTextBrushLight = new ImmutableSolidColorBrush(Color.FromRgb(30, 30, 30));
         private static readonly Typeface BadgeTypeface = new Typeface("Inter", FontStyle.Normal, FontWeight.SemiBold);
 
         public SelectionOverlay()
@@ -79,6 +83,7 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
+            ActualThemeVariantChanged += OnActualThemeVariantChanged;
             if (_panel == null)
             {
                 var view = this.FindAncestorOfType<DashboardView>();
@@ -90,6 +95,17 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
                     InvalidateVisual();
                 }
             }
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+        }
+
+        private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+        {
+            InvalidateVisual();
         }
 
         public override void Render(DrawingContext context)
@@ -219,7 +235,7 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
             {
                 var snapPt = _panel.ActiveSnapTarget.Value;
                 context.DrawEllipse(SnapFillBrush, SnapRingPen, snapPt, 11, 11);
-                context.DrawEllipse(Brushes.White, null, snapPt, 3.5, 3.5);
+                context.DrawEllipse(Brushes.White, SnapCenterPen, snapPt, 3.5, 3.5);
             }
 
             // 5. Render Active Smart Alignment Guides
@@ -234,6 +250,11 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
             // 6. Render Coordinate Badge near Cursor
             if (_panel.DragCurrentBadge.HasValue)
             {
+                bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+                var badgeBg = isLight ? CoordBadgeBgLight : CoordBadgeBgDark;
+                var badgeBorder = isLight ? CoordBadgeBorderLight : CoordBadgeBorderDark;
+                var badgeTextBrush = isLight ? CoordBadgeTextBrushLight : CoordBadgeTextBrushDark;
+
                 var badge = _panel.DragCurrentBadge.Value;
                 string text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "X: {0:0.#}, Y: {1:0.#}", badge.Col, badge.Row);
                 var formattedText = new FormattedText(
@@ -242,7 +263,7 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
                     FlowDirection.LeftToRight,
                     BadgeTypeface,
                     11.0,
-                    CoordBadgeTextBrush);
+                    badgeTextBrush);
 
                 double badgeW = formattedText.Width + 14;
                 double badgeH = formattedText.Height + 8;
@@ -250,7 +271,7 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
                 double badgeY = badge.CursorPos.Y + 16;
 
                 var badgeRect = new Rect(badgeX, badgeY, badgeW, badgeH);
-                context.DrawRectangle(CoordBadgeBg, CoordBadgeBorder, badgeRect, 4, 4);
+                context.DrawRectangle(badgeBg, badgeBorder, badgeRect, 4, 4);
                 context.DrawText(formattedText, new Point(badgeX + 7, badgeY + 4));
             }
         }

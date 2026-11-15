@@ -22,13 +22,21 @@
 
     <Window.Resources>
         <c:BoolToBrushConverter x:Key="BoolToColor" TrueBrush="#E51400" FalseBrush="#0050EF" />
-        <c:BoolToBrushConverter x:Key="DashboardTabColor" 
-                                TrueResourceKey="ThemeTabInactiveBrush" TrueBrush="#2D2D30" 
-                                FalseResourceKey="ThemeTabActiveBrush" FalseBrush="#007ACC" />
-        <c:BoolToBrushConverter x:Key="MimicTabColor" 
-                                TrueResourceKey="ThemeTabActiveBrush" TrueBrush="#007ACC" 
-                                FalseResourceKey="ThemeTabInactiveBrush" FalseBrush="#2D2D30" />
     </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="Button.header-tab">
+            <Setter Property="Background" Value="{DynamicResource ThemeTabInactiveBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource ThemeMutedTextBrush}" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Button.header-tab.active">
+            <Setter Property="Background" Value="{DynamicResource ThemeTabActiveBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
 
     <Window.KeyBindings>
         <KeyBinding Gesture="F10" Command="{Binding OpenCalculatorCommand}" />
@@ -54,13 +62,13 @@
                     <Rectangle Width="1" Height="16" Fill="{DynamicResource ThemeSeparatorBrush}" Margin="4,0" IsVisible="{Binding ProjectContext.IsDesignMode}" />
                     <Button Command="{Binding ShowDashboardCommand}"
                             Content="📊 Дашборд"
-                            Background="{Binding IsMimicActive, Converter={StaticResource DashboardTabColor}}"
-                            Foreground="{DynamicResource ThemeTextPrimaryBrush}" CornerRadius="4" Padding="10,4" BorderThickness="0"
+                            Classes="header-tab"
+                            Classes.active="{Binding !IsMimicActive}"
                             IsVisible="{Binding ProjectContext.IsDesignMode}" />
                     <Button Command="{Binding ShowMimicCommand}"
                             Content="📐 Мнемосхема"
-                            Background="{Binding IsMimicActive, Converter={StaticResource MimicTabColor}}"
-                            Foreground="{DynamicResource ThemeTextPrimaryBrush}" CornerRadius="4" Padding="10,4" BorderThickness="0"
+                            Classes="header-tab"
+                            Classes.active="{Binding IsMimicActive}"
                             IsVisible="{Binding ProjectContext.IsDesignMode}" />
                 </StackPanel>
 

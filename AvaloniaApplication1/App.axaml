@@ -11,7 +11,28 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.ThemeDictionaries>
-                <!-- Industrial SCADA Dark Theme (Default) -->
+                <!-- Default Theme Variant (Aliases Dark for industrial SCADA) -->
+                <ResourceDictionary x:Key="Default">
+                    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#1E1E1E" />
+                    <SolidColorBrush x:Key="ThemeCanvasBackgroundBrush" Color="#1E1E1E" />
+                    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#D4D4D4" />
+                    <SolidColorBrush x:Key="ThemeSurfaceBrush" Color="#252526" />
+                    <SolidColorBrush x:Key="ThemeCardBackgroundBrush" Color="#252526" />
+                    <SolidColorBrush x:Key="ThemeHeaderBrush" Color="#2B2B2E" />
+                    <SolidColorBrush x:Key="ThemeToolbarBrush" Color="#1E1E20" />
+                    <SolidColorBrush x:Key="ThemeSubtleBrush" Color="#202022" />
+                    <SolidColorBrush x:Key="ThemeBorderBrush" Color="#38383C" />
+                    <SolidColorBrush x:Key="ThemeSeparatorBrush" Color="#3E3E42" />
+                    <SolidColorBrush x:Key="ThemeTextPrimaryBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="ThemeTextSecondaryBrush" Color="#9CDCFE" />
+                    <SolidColorBrush x:Key="ThemeMutedTextBrush" Color="#858585" />
+                    <SolidColorBrush x:Key="ThemeGridLineBrush" Color="#333333" />
+                    <SolidColorBrush x:Key="ThemeTabActiveBrush" Color="#007ACC" />
+                    <SolidColorBrush x:Key="ThemeTabInactiveBrush" Color="#2D2D30" />
+                    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#007ACC" />
+                </ResourceDictionary>
+
+                <!-- Industrial SCADA Dark Theme -->
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#1E1E1E" />
                     <SolidColorBrush x:Key="ThemeCanvasBackgroundBrush" Color="#1E1E1E" />

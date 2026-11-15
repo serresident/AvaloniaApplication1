@@ -107,6 +107,23 @@ namespace AvaloniaApplication1.Controls.Equipment
             };
         }
 
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            ActualThemeVariantChanged += OnActualThemeVariantChanged;
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+        }
+
+        private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+        {
+            InvalidateVisual();
+        }
+
         // --- Статически кэшированные перья и кисти (Zero-Allocation) ---
         private static readonly IBrush VesselBgBrushDark = new SolidColorBrush(Color.FromRgb(25, 27, 30));
         private static readonly IBrush VesselBgBrushLight = new SolidColorBrush(Color.FromRgb(235, 238, 242));

@@ -534,7 +534,21 @@ namespace AvaloniaApplication1.Views.Canvas
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
+            ActualThemeVariantChanged += OnActualThemeVariantChanged;
             ResolveOverlays();
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+        }
+
+        private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+        {
+            InvalidateVisual();
+            _gridOverlay?.InvalidateVisual();
+            _selectionOverlay?.InvalidateVisual();
         }
 
         public void ResolveOverlays()

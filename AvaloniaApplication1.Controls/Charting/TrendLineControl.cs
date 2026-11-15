@@ -115,6 +115,37 @@ namespace AvaloniaApplication1.Controls.Charting
             InvalidateVisual();
         }
 
+        private Pen? _cachedLinePen;
+        private IBrush? _lastLineBrush;
+
+        private Pen GetLinePen(IBrush? brush)
+        {
+            if (brush == null) return DefaultLinePen;
+            if (_cachedLinePen == null || !ReferenceEquals(_lastLineBrush, brush))
+            {
+                _lastLineBrush = brush;
+                _cachedLinePen = new Pen(brush, 2);
+            }
+            return _cachedLinePen;
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            ActualThemeVariantChanged += OnActualThemeVariantChanged;
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+        }
+
+        private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+        {
+            InvalidateVisual();
+        }
+
         public override void Render(DrawingContext context)
         {
             base.Render(context);
@@ -179,7 +210,7 @@ namespace AvaloniaApplication1.Controls.Charting
             }
 
             // 4. Draw Trend Line & Area Fill
-            var linePen = LineBrush != null ? new Pen(LineBrush, 2) : DefaultLinePen;
+            var linePen = GetLinePen(LineBrush);
 
             // Area Geometry
             var areaGeometry = new StreamGeometry();

@@ -54,6 +54,7 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
+            ActualThemeVariantChanged += OnActualThemeVariantChanged;
             if (_panel == null)
             {
                 var view = this.FindAncestorOfType<DashboardView>();
@@ -65,6 +66,17 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
                     InvalidateVisual();
                 }
             }
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+        }
+
+        private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+        {
+            InvalidateVisual();
         }
 
         public override void Render(DrawingContext context)

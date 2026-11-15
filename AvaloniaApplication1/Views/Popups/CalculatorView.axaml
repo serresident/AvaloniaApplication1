@@ -10,8 +10,10 @@
 
     <UserControl.Styles>
         <Style Selector="Button.calc-btn">
-            <Setter Property="Background" Value="#333842" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{DynamicResource ThemeSubtleBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimaryBrush}" />
             <Setter Property="FontSize" Value="16" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="CornerRadius" Value="6" />
@@ -22,7 +24,8 @@
             <Setter Property="Margin" Value="2" />
         </Style>
         <Style Selector="Button.calc-btn:pointerover">
-            <Setter Property="Background" Value="#454D5A" />
+            <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
+            <Setter Property="Foreground" Value="White" />
         </Style>
         <Style Selector="Button.calc-op">
             <Setter Property="Background" Value="#007ACC" />
@@ -83,14 +86,14 @@
         </Style>
     </UserControl.Styles>
 
-    <TabControl Background="#1E222B" Margin="0" Padding="0" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+    <TabControl Background="{DynamicResource ThemeBackgroundBrush}" Margin="0" Padding="0" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
         <!-- 1. Инженерный калькулятор -->
         <TabItem Header="🔢 Калькулятор" FontSize="12">
             <Grid ColumnDefinitions="*,Auto">
                 <!-- Основная зона калькулятора -->
                 <Grid Grid.Column="0" RowDefinitions="Auto,Auto,Auto,*" Margin="8">
                     <!-- Дисплей калькулятора -->
-                    <Border Grid.Row="0" Background="#12151B" BorderBrush="#374151" BorderThickness="1" CornerRadius="8" Padding="10,6" Margin="0,0,0,6">
+                    <Border Grid.Row="0" Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="10,6" Margin="0,0,0,6">
                         <StackPanel>
                             <!-- Верхняя информационная строка дисплея: индикатор памяти [M], статус буфера, выражение -->
                             <Grid ColumnDefinitions="Auto,*,Auto">

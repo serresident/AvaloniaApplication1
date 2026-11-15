@@ -1484,3 +1484,38 @@
     *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
     *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation` — **22/22 PASS (100%)**.
     *   Сгенерированы актуальные артефакты headless-рендеринга `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.
+
+---
+
+## 📅 15.11.2026 (Сессия 50 — Глубокий ревью, устранение аллокаций и полная адаптация диалоговых окон)
+
+### 📌 Достижение: Комплексный аудит и устранение всех скрытых дефектов смены тем: реактивная инвалидация кастомных контролов при смене темы, нулевые аллокации в Render(), контрастность CAD-оверлеев и миграция всех диалоговых окон/всплывающих панелей на DynamicResource.
+
+*   **Реактивная инвалидация пользовательских элементов (ActualThemeVariantChanged):**
+    *   Обнаружено, что в Avalonia 11+ контролы с императивным рендерингом (`Render()`) не получают автоматический вызов перерисовки при смене темы, если свойства самого контрола не изменились.
+    *   Во все кастомные контролы (`PipeControl`, `TrendLineControl`, `ValveControl`, `ReactorControl`, `HeatExchangerControl`, `LevelSensorControl`, `GridOverlay`, `SelectionOverlay`) добавлены подписки на `ActualThemeVariantChanged` в `OnAttachedToVisualTree`/`OnDetachedFromVisualTree` с гарантированным вызовом `InvalidateVisual()`.
+    *   В `DashboardPanel.cs` добавлена трансляция смены темы на оверлеи сетки и выделения.
+
+*   **Устранение оставшихся аллокаций в циклах Render():**
+    *   `TrendLineControl.cs`: Устранено создание `new Pen(LineBrush, 2)` на каждый кадр отрисовки графика телеметрии; добавлен статический кэш перьев `GetLinePen(IBrush)`.
+    *   `ValveControl.cs`: Устранено создание `new SolidColorBrush(...)` для динамического цвета привода и задвижки; реализован статический кэш кистей `GetBodyBrush` и `GetActuatorBrush`.
+    *   `PipeControl.cs`: Кэшированы перья фланцев и маркеров (`FlangeBorderPenDark/Light`, `MarkerPen`, `MarkerBrush`), исключены аллокации при перерисовке трубопроводов.
+
+*   **Контрастность CAD-оверлеев и указателей привязки:**
+    *   `SelectionOverlay.cs`: Указатель центра привязки портов ранее отрисовывался чисто белым цветом (`Brushes.White`) без обводки, что делало его невидимым на светлом холсте (`#F8F9FA`). Добавлено контрастное перо `SnapCenterPen` с черной обводкой для 100% видимости на любом фоне.
+    *   Добавлены контрастные темы для плашки координат виджета (`CoordBadgeBgDark/Light`, `CoordBadgeBorderDark/Light`, `CoordBadgeTextBrushDark/Light`).
+
+*   **Полная миграция UI, шаблонов виджетов и диалоговых окон:**
+    *   `DashboardView.axaml`: Устранены все жестко закодированные темные подложки (`#2D2D30`, `#2B2B2B`, `#24262B`, `#151515`, `#1E1E1E`) в карточках виджетов (Tank, Pump, HeatExchanger, Reactor, LevelSensor, RealTimeTrend, SetValue, Fallback Widget) и плавающем тулбаре редактирования; добавлен стиль `Border.widget-card` с `{DynamicResource ThemeCardBackgroundBrush}`.
+    *   `MainWindow.axaml`: Табы переключения («Дашборд» / «Мнемосхема») переведены с устаревшего конвертера на стиль `Button.header-tab` с псевдоклассом `.active` и семантическими ресурсами `{DynamicResource ThemeTabActiveBrush}` / `{DynamicResource ThemeTabInactiveBrush}`.
+    *   Все 12 вспомогательных окон и всплывающих панелей переведены на `{DynamicResource ThemeSurfaceBrush}` и `{DynamicResource ThemeCardBackgroundBrush}`:
+        *   `CalculatorView.axaml`, `NumpadView.axaml`, `ValveControlPopupView.axaml`.
+        *   `ConfirmPromptWindow.axaml`, `PasswordPromptWindow.axaml`, `DashboardPropertiesWindow.axaml`.
+        *   `ConnectionEditorWindow.axaml`, `TagEditWindow.axaml`, `TagForceWindow.axaml`, `TagImportExportWindow.axaml`, `TagPickerWindow.axaml`, `TagManagerWindow.axaml`.
+    *   `App.axaml`: Добавлен словарь по умолчанию `x:Key="Default"` для защиты от падений при сбросе темы.
+
+*   **Тестирование и верификация:**
+    *   В `AvaloniaApplication1.UIValidation/Program.cs` добавлен тест 22.7, монтирующий полный набор промышленных контролов в визуальное дерево и циклически переключающий темы для проверки отсутствия сбоев при `ActualThemeVariantChanged`.
+    *   Сборка решения: **0 ошибок, 0 предупреждений**.
+    *   Все тесты: **22/22 PASS (100%)**.
+    *   Актуализированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.

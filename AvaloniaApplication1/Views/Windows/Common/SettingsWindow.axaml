@@ -120,7 +120,7 @@
             <TabItem Header="🔒 Безопасность" FontSize="13">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Spacing="16" Margin="10">
-                        <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="12">
+                        <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12">
                             <StackPanel Spacing="10">
                                 <CheckBox IsChecked="{Binding RequirePassword, Mode=TwoWay}"
                                           Foreground="#FFFFFF" FontWeight="SemiBold">
@@ -136,7 +136,7 @@
                             <TextBlock Text="Пароль администратора для режима редактирования:" Foreground="#D4D4D4" FontWeight="SemiBold" />
                             <TextBox Text="{Binding DesignPassword, Mode=TwoWay}"
                                      PasswordChar="●"
-                                     Background="#1E1E1E" Foreground="#4EC9B0" BorderBrush="#3E3E42" Height="36" CornerRadius="4" />
+                                     Background="{DynamicResource ThemeBackgroundBrush}" Foreground="{DynamicResource ThemeAccentBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" Height="36" CornerRadius="4" />
                             <TextBlock Text="По умолчанию: 1234. Поддерживаются любые символы и цифры." FontSize="11" Foreground="#858585" />
                         </StackPanel>
                     </StackPanel>
@@ -157,7 +157,7 @@
                         </Grid>
 
                         <ListBox ItemsSource="{Binding Connections}"
-                                 Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4"
+                                 Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4"
                                  MinHeight="140">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="cfg:ConnectionConfig">
@@ -180,7 +180,7 @@
             <TabItem Header="🎮 Симуляция" FontSize="13">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Spacing="16" Margin="10">
-                        <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="14">
+                        <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="14">
                             <StackPanel Spacing="12">
                                 <TextBlock Text="Управление программным симулятором техпроцесса" FontWeight="Bold" Foreground="#00E5FF" FontSize="14" />
                                 <TextBlock Text="Симулятор генерирует тестовые значения расхода, температуры, уровня и давления при отсутствии физического подключения к ПЛК."
@@ -206,7 +206,7 @@
             <TabItem Header="❓ Справка" FontSize="13">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Spacing="14" Margin="10">
-                        <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="14">
+                        <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="14">
                             <StackPanel Spacing="10">
                                 <TextBlock Text="⌨️ Горячие клавиши оператора и инженера" FontWeight="Bold" Foreground="#4EC9B0" FontSize="14" />
                                 
@@ -235,7 +235,7 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" Padding="14">
+                        <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="14">
                             <StackPanel Spacing="8">
                                 <TextBlock Text="ℹ️ Особенности работы в режиме SCADA / HMI" FontWeight="Bold" Foreground="#FFD700" FontSize="14" />
                                 <TextBlock Text="• Режим исполнения (Runtime): интерфейс защищен от случайного смещения элементов, кнопки и задвижки работают в оперативном режиме, статус онлайн отображает состояние связи с ПЛК."

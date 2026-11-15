@@ -9,7 +9,7 @@
         Title="Connection Editor"
         Width="420" Height="520"
         WindowStartupLocation="CenterOwner"
-        Background="#1E1E1E"
+        Background="{DynamicResource ThemeBackgroundBrush}"
         CanResize="False">
 
     <Grid RowDefinitions="*,Auto">
@@ -19,35 +19,35 @@
             <StackPanel Spacing="12">
 
                 <!-- Header -->
-                <TextBlock Text="Connection Properties" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,8" />
+                <TextBlock Text="Connection Properties" Foreground="{DynamicResource ThemeTextPrimaryBrush}" FontSize="20" FontWeight="Bold" Margin="0,0,0,8" />
 
                 <!-- Connection Id -->
-                <TextBlock Text="Connection ID" Foreground="#AAAAAA" FontSize="12" />
+                <TextBlock Text="Connection ID" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" />
                 <TextBox Text="{Binding Id}" 
                          IsReadOnly="{Binding IsIdReadOnly}" 
                          PlaceholderText="e.g. plc1, mqtt_broker" />
 
                 <!-- Type -->
-                <TextBlock Text="Protocol Type" Foreground="#AAAAAA" FontSize="12" />
+                <TextBlock Text="Protocol Type" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" />
                 <ComboBox ItemsSource="{Binding AvailableTypes}" 
                           SelectedItem="{Binding SelectedType}"
                           HorizontalAlignment="Stretch" />
 
                 <!-- Host -->
-                <TextBlock Text="Host / IP Address" Foreground="#AAAAAA" FontSize="12" />
+                <TextBlock Text="Host / IP Address" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" />
                 <TextBox Text="{Binding Host}" PlaceholderText="192.168.1.100" />
 
                 <!-- Port -->
-                <TextBlock Text="Port" Foreground="#AAAAAA" FontSize="12" />
+                <TextBlock Text="Port" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" />
                 <NumericUpDown Value="{Binding Port}" Minimum="1" Maximum="65535" FormatString="0" />
 
                 <!-- Poll Interval -->
-                <TextBlock Text="Poll Interval (ms)" Foreground="#AAAAAA" FontSize="12" />
+                <TextBlock Text="Poll Interval (ms)" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" />
                 <NumericUpDown Value="{Binding PollIntervalMs}" Minimum="50" Maximum="60000" FormatString="0" />
 
                 <!-- Byte Order (Modbus only) -->
                 <StackPanel Spacing="4" IsVisible="{Binding ShowModbusSettings}">
-                    <TextBlock Text="Byte Order (Endianness)" Foreground="#AAAAAA" FontSize="12" />
+                    <TextBlock Text="Byte Order (Endianness)" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" />
                     <ComboBox ItemsSource="{Binding AvailableByteOrders}" 
                               SelectedItem="{Binding SelectedByteOrder}"
                               HorizontalAlignment="Stretch" />
@@ -57,14 +57,15 @@
         </ScrollViewer>
 
         <!-- Fixed bottom button bar -->
-        <Border Grid.Row="1" Background="#252526" BorderBrush="#3E3E42" BorderThickness="0,1,0,0" Padding="20,14">
+        <Border Grid.Row="1" Background="{DynamicResource ThemeHeaderBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="0,1,0,0" Padding="20,14">
             <Grid ColumnDefinitions="*,12,*">
                 <Button Grid.Column="0" 
                         Content="❌  Cancel" 
                         IsCancel="True"
                         Command="{Binding CancelCommand}"
                         HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                        Background="#3E3E42" Foreground="White" CornerRadius="6" 
+                        Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1"
+                        Foreground="{DynamicResource ThemeTextPrimaryBrush}" CornerRadius="6" 
                         Padding="12,10" FontSize="14" />
                 <Button Grid.Column="2" 
                         Content="✅  OK" 

@@ -10,7 +10,7 @@
         Title="⚡ Ручной ввод значения (Force Override)"
         Width="460" Height="440"
         WindowStartupLocation="CenterOwner"
-        Background="#1E1E1E"
+        Background="{DynamicResource ThemeBackgroundBrush}"
         CanResize="False">
 
     <Grid RowDefinitions="Auto,*,Auto" Margin="20">
@@ -34,7 +34,7 @@
             </Border>
 
             <!-- Tag Summary Card -->
-            <Border Background="#252526" CornerRadius="6" Padding="10">
+            <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="10">
                 <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Тег (TagId):" Foreground="#888888" FontSize="11" Margin="0,2" />
                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TagId}" Foreground="#9CDCFE" FontFamily="Consolas, monospace" FontWeight="Bold" Margin="10,2" />
@@ -91,7 +91,8 @@
         <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,14,0,0">
             <Button Grid.Column="0" Content="Отмена"
                     Command="{Binding CancelCommand}"
-                    Background="#3E3E42" Foreground="White"
+                    Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1"
+                    Foreground="{DynamicResource ThemeTextPrimaryBrush}"
                     CornerRadius="6" Padding="16,8" FontSize="13"
                     HorizontalAlignment="Left" />
 

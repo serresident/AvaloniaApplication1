@@ -4,7 +4,7 @@
              x:Class="AvaloniaApplication1.Views.Popups.NumpadView"
              x:DataType="vm:NumpadViewModel"
              Width="300" Height="370"
-             Background="#2D2D30">
+             Background="{DynamicResource ThemeSurfaceBrush}">
 
     <UserControl.Styles>
         <Style Selector="Button">
@@ -15,26 +15,33 @@
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="#3E3E42"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeSubtleBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimaryBrush}"/>
+        </Style>
+        <Style Selector="Button:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}"/>
             <Setter Property="Foreground" Value="White"/>
         </Style>
         <Style Selector="Button.paste-btn">
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Margin" Value="0,0,0,6"/>
-            <Setter Property="Background" Value="#1E3A4B"/>
-            <Setter Property="Foreground" Value="#4DD0E1"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
             <Setter Property="CornerRadius" Value="4"/>
         </Style>
         <Style Selector="Button.paste-btn:pointerover">
-            <Setter Property="Background" Value="#295168"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
         </Style>
     </UserControl.Styles>
 
     <Grid RowDefinitions="Auto,Auto,*" Margin="10">
         <!-- Display Area -->
-        <Border Grid.Row="0" Background="#1E1E1E" BorderBrush="#555" BorderThickness="1" CornerRadius="4" Margin="0,0,0,6" Height="50">
-            <TextBlock Text="{Binding InputValue}" FontSize="28" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,0"/>
+        <Border Grid.Row="0" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4" Margin="0,0,0,6" Height="50">
+            <TextBlock Text="{Binding InputValue}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource ThemeTextPrimaryBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,0"/>
         </Border>
 
         <!-- Paste from HMI Clipboard Button -->

@@ -81,27 +81,27 @@
         </Border>
 
         <!-- Row 1: Action Toolbar & Search Filters -->
-        <Border Grid.Row="1" Background="#2D2D30" Padding="12,8" BorderBrush="#3F3F46" BorderThickness="0,0,0,1">
+        <Border Grid.Row="1" Background="{DynamicResource ThemeToolbarBrush}" Padding="12,8" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="0,0,0,1">
             <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto">
                 <!-- Search Box -->
                 <TextBox Grid.Column="0" Width="220"
                          Text="{Binding SearchText}"
                          PlaceholderText="🔍 Поиск по ID, имени, адресу..."
-                         Background="#1E1E1E" Foreground="White"
+                         Background="{DynamicResource ThemeSurfaceBrush}" Foreground="{DynamicResource ThemeForegroundBrush}"
                          CornerRadius="4" Padding="6,5" FontSize="12" />
 
                 <!-- Connection Filter -->
                 <ComboBox Grid.Column="2" Width="140"
                           ItemsSource="{Binding ConnectionFilterOptions}"
                           SelectedItem="{Binding SelectedConnectionFilter}"
-                          Background="#1E1E1E" Foreground="White"
+                          Background="{DynamicResource ThemeSurfaceBrush}" Foreground="{DynamicResource ThemeForegroundBrush}"
                           CornerRadius="4" FontSize="12" />
 
                 <!-- Quality Filter -->
                 <ComboBox Grid.Column="4" Width="155"
                           ItemsSource="{Binding QualityFilterOptions}"
                           SelectedItem="{Binding SelectedQualityFilter}"
-                          Background="#1E1E1E" Foreground="White"
+                          Background="{DynamicResource ThemeSurfaceBrush}" Foreground="{DynamicResource ThemeForegroundBrush}"
                           CornerRadius="4" FontSize="12" />
 
                 <!-- Action CRUD & Import/Export Buttons -->
@@ -172,7 +172,7 @@
         </Border>
 
         <!-- Row 3: Interactive Virtualized Tag List -->
-        <Border Grid.Row="3" Background="#1E1E1E">
+        <Border Grid.Row="3" Background="{DynamicResource ThemeBackgroundBrush}">
             <ListBox ItemsSource="{Binding FilteredTags}"
                      SelectedItem="{Binding SelectedTag}"
                      Background="Transparent"
@@ -188,7 +188,7 @@
 
                             <!-- Col 1: Name -->
                             <TextBlock Grid.Column="1" Text="{Binding Name}"
-                                       Foreground="White"
+                                       Foreground="{DynamicResource ThemeForegroundBrush}"
                                        TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}"
                                        VerticalAlignment="Center" Margin="4,0" />
 

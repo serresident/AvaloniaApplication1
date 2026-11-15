@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="380"
              x:Class="AvaloniaApplication1.Views.Popups.ValveControlPopupView"
              x:DataType="vm:ValveControlPopupViewModel"
-             Background="#1E1E1E">
+             Background="{DynamicResource ThemeBackgroundBrush}">
 
     <UserControl.Resources>
         <c:HexToBrushConverter x:Key="HexToBrush" />
@@ -20,8 +20,8 @@
                 <!-- Header -->
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="{Binding ValveViewModel.Title}" Foreground="White" FontSize="18" FontWeight="Bold" />
-                        <TextBlock Text="Панель управления клапаном" Foreground="#AAAAAA" FontSize="12" />
+                        <TextBlock Text="{Binding ValveViewModel.Title}" Foreground="{DynamicResource ThemeTextPrimaryBrush}" FontSize="18" FontWeight="Bold" />
+                        <TextBlock Text="Панель управления клапаном" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" />
                     </StackPanel>
                     <!-- Type Badge -->
                     <Border Grid.Column="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
@@ -44,7 +44,7 @@
                     </Border>
                 </Grid>
 
-                <Separator Background="#3E3E42" Height="1" Margin="0,2" />
+                <Separator Background="{DynamicResource ThemeSeparatorBrush}" Height="1" Margin="0,2" />
 
                 <!-- Mode Switch Row (Visible only if mode tag exists) -->
                 <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto" IsVisible="{Binding HasModeTag}">
@@ -250,8 +250,8 @@
                                          Height="8" 
                                          Margin="0,4,0,0"
                                          Foreground="{Binding ValveViewModel.CurrentColor, Converter={StaticResource HexToBrush}}" 
-                                         Background="#1E1E1E" 
-                                         BorderBrush="#3E3E42"
+                                         Background="{DynamicResource ThemeBackgroundBrush}" 
+                                         BorderBrush="{DynamicResource ThemeBorderBrush}"
                                          BorderThickness="1"
                                          CornerRadius="3" />
                         </StackPanel>

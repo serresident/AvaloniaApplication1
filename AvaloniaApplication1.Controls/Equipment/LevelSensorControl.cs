@@ -111,6 +111,27 @@ namespace AvaloniaApplication1.Controls.Equipment
         private static readonly Pen FlangeBorderPen = new Pen(Brushes.Black, 1.0);
         private static readonly Typeface InstrumentTypeface = new Typeface(FontFamily.Default, FontStyle.Normal, FontWeight.Bold);
 
+        public LevelSensorControl()
+        {
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            ActualThemeVariantChanged += OnActualThemeVariantChanged;
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+        }
+
+        private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+        {
+            InvalidateVisual();
+        }
+
         public override void Render(DrawingContext context)
         {
             base.Render(context);

@@ -237,6 +237,47 @@ namespace AvaloniaApplication1.Controls.Equipment
             ClipToBounds = false;
         }
 
+        private SolidColorBrush? _cachedBodyBrush;
+        private Color _cachedBodyColor;
+        private IBrush GetBodyBrush(Color color)
+        {
+            if (_cachedBodyBrush == null || _cachedBodyColor != color)
+            {
+                _cachedBodyColor = color;
+                _cachedBodyBrush = new SolidColorBrush(color);
+            }
+            return _cachedBodyBrush;
+        }
+
+        private SolidColorBrush? _cachedActuatorBrush;
+        private Color _cachedActuatorColor;
+        private IBrush GetActuatorBrush(Color color)
+        {
+            if (_cachedActuatorBrush == null || _cachedActuatorColor != color)
+            {
+                _cachedActuatorColor = color;
+                _cachedActuatorBrush = new SolidColorBrush(color);
+            }
+            return _cachedActuatorBrush;
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            ActualThemeVariantChanged += OnActualThemeVariantChanged;
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+        }
+
+        private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+        {
+            InvalidateVisual();
+        }
+
         public override void Render(DrawingContext context)
         {
             base.Render(context);
@@ -402,7 +443,7 @@ namespace AvaloniaApplication1.Controls.Equipment
             }
 
             // Brush & Pen
-            var fillBrush = new SolidColorBrush(bodyColor);
+            var fillBrush = GetBodyBrush(bodyColor);
             var borderPen = ValveBorderPen;
 
             context.DrawGeometry(fillBrush, borderPen, leftGeom);
@@ -438,7 +479,7 @@ namespace AvaloniaApplication1.Controls.Equipment
                 double rectH = headSize;
                 var rect = new Rect(cx - rectW / 2, stemTop - rectH, rectW, rectH);
                 
-                var boxBrush = new SolidColorBrush(actuatorColor); 
+                var boxBrush = GetActuatorBrush(actuatorColor); 
                 var boxPen = BoxOutlinePen;
                 context.DrawRectangle(boxBrush, boxPen, rect, 1, 1);
 
@@ -491,7 +532,7 @@ namespace AvaloniaApplication1.Controls.Equipment
                     ctx.EndFigure(true);
                 }
 
-                var domeBrush = new SolidColorBrush(actuatorColor);
+                var domeBrush = GetActuatorBrush(actuatorColor);
                 var domePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 1.0);
                 context.DrawGeometry(domeBrush, domePen, domeGeom);
             }

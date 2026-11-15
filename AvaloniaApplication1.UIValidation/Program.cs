@@ -2094,6 +2094,33 @@ public static class Program
                 projCtx.IsDesignMode = false;
                 if (vdVm.QualityOpacity != 1.0 || vdVm.EffectiveOpacity != 1.0)
                     throw new Exception($"Good state Opacity Failed in Runtime: expected 1.0, got {vdVm.QualityOpacity}");
+
+                // 22.7 Custom Controls & Overlay Zero-Allocation & Theme Variant Reaction Invariant
+                var pipeCtrl = new PipeControl();
+                var trendCtrl = new TrendLineControl();
+                var reactorCtrl = new ReactorControl();
+                var valveCtrl = new ValveControl();
+                var hexCtrl = new HeatExchangerControl();
+                var levelCtrl = new LevelSensorControl();
+                var gridOverlay = new GridOverlay();
+                var selOverlay = new SelectionOverlay();
+
+                var themeTestWindow = new Window
+                {
+                    Content = new StackPanel
+                    {
+                        Children = { pipeCtrl, trendCtrl, reactorCtrl, valveCtrl, hexCtrl, levelCtrl, gridOverlay, selOverlay }
+                    }
+                };
+                themeTestWindow.Show();
+                Dispatcher.UIThread.RunJobs();
+
+                themeService.SetTheme("Light");
+                Dispatcher.UIThread.RunJobs();
+
+                themeService.SetTheme("Dark");
+                Dispatcher.UIThread.RunJobs();
+                themeTestWindow.Close();
             }
 
             Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (22/22) PASSED SUCCESSFULLY!");

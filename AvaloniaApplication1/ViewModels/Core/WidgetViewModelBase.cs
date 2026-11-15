@@ -81,6 +81,7 @@ namespace AvaloniaApplication1.ViewModels.Core
         private bool _hasCommError;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(EffectiveOpacity))]
         private double _qualityOpacity = 1.0;
 
         public double EffectiveOpacity => (ProjectContext?.IsDesignMode == true) ? 1.0 : QualityOpacity;
