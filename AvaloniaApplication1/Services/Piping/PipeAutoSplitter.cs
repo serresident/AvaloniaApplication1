@@ -57,7 +57,9 @@ namespace AvaloniaApplication1.Services.Piping
             // Врезка допускается только в строго ортогональные прямолинейные сегменты
             if (!isHorizontal && !isVertical) return null;
 
-            double valveLength = Math.Max(2.0, isHorizontal ? valveVm.SizeX : valveVm.SizeY);
+            int valveSize = Math.Max(1, Math.Max(valveVm.SizeX, valveVm.SizeY));
+            double valveLength = Math.Max(2.0, valveSize);
+            const double minRemainingLength = 1.0;
 
             if (isHorizontal)
             {
@@ -66,8 +68,9 @@ namespace AvaloniaApplication1.Services.Piping
                 double maxX = Math.Max(pStart.X, pEnd.X);
                 double segLen = maxX - minX;
 
-                // Длина сегмента должна быть не меньше монтажной длины клапана
-                if (segLen < valveLength) return null;
+                // Длина сегмента должна превышать монтажную длину клапана минимум на 2 * minRemainingLength,
+                // чтобы оба дочерних сегмента трубы имели ненулевую длину (>= 1.0)
+                if (segLen < valveLength + 2.0 * minRemainingLength) return null;
 
                 // Проверка расстояния от центра клапана до оси сегмента
                 double distY = Math.Abs(dropGridCenter.Y - segY);
@@ -76,9 +79,11 @@ namespace AvaloniaApplication1.Services.Piping
                 // Проверка, что центр клапана проецируется на сегмент с учетом допуска
                 if (dropGridCenter.X < minX - snapTolerance || dropGridCenter.X > maxX + snapTolerance) return null;
 
-                // Ограничиваем центр клапана, чтобы фланцы не вылезали за пределы сегмента
-                double minCenterX = minX + valveLength / 2.0;
-                double maxCenterX = maxX - valveLength / 2.0;
+                // Ограничиваем центр клапана, чтобы фланцы оставляли запас minRemainingLength с обоих концов
+                double minCenterX = minX + valveLength / 2.0 + minRemainingLength;
+                double maxCenterX = maxX - valveLength / 2.0 - minRemainingLength;
+                if (minCenterX > maxCenterX) return null;
+
                 double clampedCenterX = Math.Clamp(dropGridCenter.X, minCenterX, maxCenterX);
 
                 // Округление до сетки (с шагом 0.5 для соосности портов)
@@ -93,7 +98,7 @@ namespace AvaloniaApplication1.Services.Piping
                 // port.X = Col - 0.5 => Col = port.X + 0.5
                 double valveCol = flangeInX + 0.5;
                 // CenterY = Row + (SizeY - 1) / 2.0 => Row = CenterY - (SizeY - 1) / 2.0
-                double valveRow = segY - (valveVm.SizeY - 1) / 2.0;
+                double valveRow = segY - (valveSize - 1) / 2.0;
 
                 Point valveCenter = new Point(clampedCenterX, segY);
                 Point flangeIn = new Point(flangeInX, segY);
@@ -124,15 +129,17 @@ namespace AvaloniaApplication1.Services.Piping
                 double maxY = Math.Max(pStart.Y, pEnd.Y);
                 double segLen = maxY - minY;
 
-                if (segLen < valveLength) return null;
+                if (segLen < valveLength + 2.0 * minRemainingLength) return null;
 
                 double distX = Math.Abs(dropGridCenter.X - segX);
                 if (distX > snapTolerance) return null;
 
                 if (dropGridCenter.Y < minY - snapTolerance || dropGridCenter.Y > maxY + snapTolerance) return null;
 
-                double minCenterY = minY + valveLength / 2.0;
-                double maxCenterY = maxY - valveLength / 2.0;
+                double minCenterY = minY + valveLength / 2.0 + minRemainingLength;
+                double maxCenterY = maxY - valveLength / 2.0 - minRemainingLength;
+                if (minCenterY > maxCenterY) return null;
+
                 double clampedCenterY = Math.Clamp(dropGridCenter.Y, minCenterY, maxCenterY);
 
                 clampedCenterY = Math.Round(clampedCenterY * 2.0) / 2.0;
@@ -145,7 +152,7 @@ namespace AvaloniaApplication1.Services.Piping
                 // port.Y = Row - 0.5 => Row = port.Y + 0.5
                 double valveRow = flangeTopY + 0.5;
                 // CenterX = Col + (SizeX - 1) / 2.0 => Col = CenterX - (SizeX - 1) / 2.0
-                double valveCol = segX - (valveVm.SizeX - 1) / 2.0;
+                double valveCol = segX - (valveSize - 1) / 2.0;
 
                 Point valveCenter = new Point(segX, clampedCenterY);
                 Point flangeTop = new Point(segX, flangeTopY);
@@ -254,6 +261,11 @@ namespace AvaloniaApplication1.Services.Piping
                     continue;
                 }
                 pointsB.Add(absPoints[i]);
+            }
+
+            if (pointsA.Count < 2 || pointsB.Count < 2)
+            {
+                return new PipeSplitResult { Success = false };
             }
 
             // Создаем PipeConfig A

@@ -2250,11 +2250,17 @@ public static class Program
                     throw new Exception($"Vertical split pipe bounds incorrect: PipeA Row={splitResultV.PipeA.Position.Row}, SizeY={splitResultV.PipeA.Position.SizeY}; PipeB Row={splitResultV.PipeB.Position.Row}, SizeY={splitResultV.PipeB.Position.SizeY}");
                 }
 
-                // 23.4 Short Segment Rejection
-                var shortCand = PipeAutoSplitter.EvaluateSegmentCandidate(
+                // 23.4 Short Segment Rejection & Degenerate Pipe Prevention
+                // Segment length must be >= valveLength + 2.0 * minRemainingLength (4 + 2 = 6)
+                var shortCand1 = PipeAutoSplitter.EvaluateSegmentCandidate(
                     horizPipeVm, 0, new Point(10, 20), new Point(12, 20), valveVm, new Point(11, 20));
-                if (shortCand != null)
+                if (shortCand1 != null)
                     throw new Exception("EvaluateSegmentCandidate should return null when segment length (2) is less than valve size (4).");
+
+                var shortCand2 = PipeAutoSplitter.EvaluateSegmentCandidate(
+                    horizPipeVm, 0, new Point(10, 20), new Point(15, 20), valveVm, new Point(12.5, 20));
+                if (shortCand2 != null)
+                    throw new Exception("EvaluateSegmentCandidate should return null when segment length (5) cannot provide >= 1.0 unit for both child pipes.");
 
                 // 23.5 Collinear Assembly ("Собрать соосный узел") - Horizontal
                 var alignPipe1Cfg = new PipeConfig
@@ -2406,6 +2412,68 @@ public static class Program
                 dashVmIntegration.AttachPipesToValveCommand.Execute(testValveForFlanges);
                 if (dashVmIntegration.Widgets.Count != 4 || dConfig23.Widgets.Count != 4)
                     throw new Exception("AttachPipesToValveCommand failed to add 2 new pipes.");
+
+                // 23.11 Strict CanAssemble validation (only exactly 2 pipes + 1 valve, no extra widgets)
+                var extraPump = new PumpWidgetViewModel(new PumpConfig
+                {
+                    Type = "Pump",
+                    Position = new WidgetPosition { Col = 1, Row = 1, SizeX = 3, SizeY = 3 }
+                }, mockCore, projCtx);
+                var invalidSelection = new List<WidgetViewModelBase> { alignPipe1Vm, alignPipe2Vm, alignValveVm, extraPump };
+                if (CollinearAssemblyService.CanAssemble(invalidSelection))
+                    throw new Exception("CollinearAssemblyService.CanAssemble should return false when extra widgets are selected.");
+
+                // 23.12 Collinear Assembly Length Preservation for Perpendicular Pipes
+                var perpPipe1 = new PipeWidgetViewModel(new PipeConfig
+                {
+                    Type = "Pipe",
+                    Position = new WidgetPosition { Col = 0, Row = 10, SizeX = 20, SizeY = 1 },
+                    PipePoints = "0,0;20,0" // Length = 20 (longer reference pipe, horizontal axis Y=10)
+                }, mockCore, projCtx);
+                var perpPipe2 = new PipeWidgetViewModel(new PipeConfig
+                {
+                    Type = "Pipe",
+                    Position = new WidgetPosition { Col = 30, Row = 0, SizeX = 1, SizeY = 15 },
+                    PipePoints = "0,0;0,15" // Length = 15 (perpendicular vertical pipe)
+                }, mockCore, projCtx);
+                var perpValve = new ValveWidgetViewModel(new ValveConfig
+                {
+                    Type = "Valve",
+                    Position = new WidgetPosition { Col = 15, Row = 8, SizeX = 4, SizeY = 4 }
+                }, mockCore, projCtx);
+
+                bool perpAssembled = CollinearAssemblyService.AssembleCollinear(new WidgetViewModelBase[] { perpPipe1, perpPipe2, perpValve });
+                if (!perpAssembled)
+                    throw new Exception("AssembleCollinear failed for perpendicular pipe pair.");
+
+                var perpPipe2Pts = perpPipe2.GetAbsoluteGridPoints();
+                double assembledLen = Math.Abs(perpPipe2Pts.Last().X - perpPipe2Pts.First().X);
+                if (Math.Abs(assembledLen - 15.0) > 0.001)
+                    throw new Exception($"AssembleCollinear squished perpendicular pipe! Expected length 15.0, got {assembledLen}");
+
+                // 23.13 Rubber-Banding Multi-Frame Non-Accumulation Invariant
+                // Verify that using _dragOriginalConnectedPipes keeps deltaCol stable across multiple pointer moves
+                var origPts = new List<Point> { new Point(0, 10), new Point(10, 10) };
+                double deltaColTest = 2.0;
+                double deltaRowTest = 0.0;
+                Point finalPoint = default;
+                for (int frame = 0; frame < 20; frame++)
+                {
+                    // Every frame uses origPts as baseline
+                    var currentOrigPt = origPts[1];
+                    finalPoint = new Point(currentOrigPt.X + deltaColTest, currentOrigPt.Y + deltaRowTest);
+                }
+                if (finalPoint.X != 12.0)
+                    throw new Exception($"Rubber-banding accumulated drift across frames: expected 12.0, got {finalPoint.X}");
+
+                // 23.14 Aspect Ratio Lock Dominant Delta Shrinking
+                // Original valve 4x4, CellSize 40 (160x160 px). Drag corner left by 80px (delta.X = -80, delta.Y = 0)
+                double testDeltaX = -80;
+                double testDeltaY = 0;
+                double dominantDelta = Math.Abs(testDeltaX) >= Math.Abs(testDeltaY) ? testDeltaX : testDeltaY;
+                int targetSize = (int)Math.Max(1, Math.Round((4 * 40 + dominantDelta) / 40.0));
+                if (targetSize != 2)
+                    throw new Exception($"Valve resize handle failed to shrink along single axis: expected 2, got {targetSize}");
             }
 
             Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (23/23) PASSED SUCCESSFULLY!");

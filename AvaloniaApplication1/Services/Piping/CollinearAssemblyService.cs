@@ -20,7 +20,7 @@ namespace AvaloniaApplication1.Services.Piping
         {
             if (selectedWidgets == null) return false;
             var list = selectedWidgets.ToList();
-            return list.OfType<PipeWidgetViewModel>().Count() == 2 && list.OfType<ValveWidgetViewModel>().Count() == 1;
+            return list.Count == 3 && list.OfType<PipeWidgetViewModel>().Count() == 2 && list.OfType<ValveWidgetViewModel>().Count() == 1;
         }
 
         /// <summary>
@@ -74,10 +74,17 @@ namespace AvaloniaApplication1.Services.Piping
             ValveWidgetViewModel valve, 
             double yAxis)
         {
+            // Фиксируем пропорцию 1:1 для клапана при сопряжении
+            int valveSize = Math.Max(1, Math.Max(valve.SizeX, valve.SizeY));
+            valve.SizeX = valveSize;
+            valve.SizeY = valveSize;
+            valve.OriginalConfig.Position.SizeX = valveSize;
+            valve.OriginalConfig.Position.SizeY = valveSize;
+
             // Настраиваем ориентацию и вертикальное положение клапана
             valve.IsVertical = false;
             valve.Rotation = 0;
-            valve.Row = yAxis - (valve.SizeY - 1) / 2.0;
+            valve.Row = yAxis - (valveSize - 1) / 2.0;
             valve.OriginalConfig.Position.Row = valve.Row;
             valve.TypedConfig.IsVertical = false;
             valve.TypedConfig.Rotation = 0;
@@ -95,8 +102,8 @@ namespace AvaloniaApplication1.Services.Piping
             var leftPts = leftPipe.GetAbsoluteGridPoints();
             if (leftPts.First().X > leftPts.Last().X) leftPts.Reverse();
 
-            // Выравниваем левую трубу по оси yAxis
-            double leftLen = Math.Max(2.0, leftPts.Last().X - leftPts.First().X);
+            // Выравниваем левую трубу по оси yAxis, сохраняя её суммарную длину
+            double leftLen = Math.Max(2.0, ComputeTotalLength(leftPts));
             double leftStartX = leftPts.First().X;
             double leftEndX = leftStartX + leftLen;
 
@@ -115,12 +122,13 @@ namespace AvaloniaApplication1.Services.Piping
             valve.Col = leftEndX + 0.5;
             valve.OriginalConfig.Position.Col = valve.Col;
 
-            // Правый порт клапана находится в: Col + SizeX - 0.5 = leftEndX + valve.SizeX
-            double rightStartX = leftEndX + valve.SizeX;
+            // Правый порт клапана находится в: Col + SizeX - 0.5 = leftEndX + valveSize
+            double rightStartX = leftEndX + valveSize;
 
-            // Позиционируем правую трубу встык к правому порту клапана
+            // Позиционируем правую трубу встык к правому порту клапана, сохраняя её длину
             var rightPts = rightPipe.GetAbsoluteGridPoints();
-            double rightLen = Math.Max(2.0, Math.Abs(rightPts.Last().X - rightPts.First().X));
+            if (rightPts.First().X > rightPts.Last().X) rightPts.Reverse();
+            double rightLen = Math.Max(2.0, ComputeTotalLength(rightPts));
             double rightEndX = rightStartX + rightLen;
 
             var newRightPoints = new List<Point>
@@ -139,10 +147,17 @@ namespace AvaloniaApplication1.Services.Piping
             ValveWidgetViewModel valve, 
             double xAxis)
         {
+            // Фиксируем пропорцию 1:1 для клапана при сопряжении
+            int valveSize = Math.Max(1, Math.Max(valve.SizeX, valve.SizeY));
+            valve.SizeX = valveSize;
+            valve.SizeY = valveSize;
+            valve.OriginalConfig.Position.SizeX = valveSize;
+            valve.OriginalConfig.Position.SizeY = valveSize;
+
             // Настраиваем ориентацию и горизонтальное положение клапана
             valve.IsVertical = true;
             valve.Rotation = 90;
-            valve.Col = xAxis - (valve.SizeX - 1) / 2.0;
+            valve.Col = xAxis - (valveSize - 1) / 2.0;
             valve.OriginalConfig.Position.Col = valve.Col;
             valve.TypedConfig.IsVertical = true;
             valve.TypedConfig.Rotation = 90;
@@ -160,8 +175,8 @@ namespace AvaloniaApplication1.Services.Piping
             var topPts = topPipe.GetAbsoluteGridPoints();
             if (topPts.First().Y > topPts.Last().Y) topPts.Reverse();
 
-            // Выравниваем верхнюю трубу по оси xAxis
-            double topLen = Math.Max(2.0, topPts.Last().Y - topPts.First().Y);
+            // Выравниваем верхнюю трубу по оси xAxis, сохраняя суммарную длину
+            double topLen = Math.Max(2.0, ComputeTotalLength(topPts));
             double topStartY = topPts.First().Y;
             double topEndY = topStartY + topLen;
 
@@ -180,12 +195,13 @@ namespace AvaloniaApplication1.Services.Piping
             valve.Row = topEndY + 0.5;
             valve.OriginalConfig.Position.Row = valve.Row;
 
-            // Нижний порт клапана находится в: Row + SizeY - 0.5 = topEndY + valve.SizeY
-            double bottomStartY = topEndY + valve.SizeY;
+            // Нижний порт клапана находится в: Row + SizeY - 0.5 = topEndY + valveSize
+            double bottomStartY = topEndY + valveSize;
 
-            // Позиционируем нижнюю трубу встык к нижнему порту клапана
+            // Позиционируем нижнюю трубу встык к нижнему порту клапана, сохраняя длину
             var bottomPts = bottomPipe.GetAbsoluteGridPoints();
-            double bottomLen = Math.Max(2.0, Math.Abs(bottomPts.Last().Y - bottomPts.First().Y));
+            if (bottomPts.First().Y > bottomPts.Last().Y) bottomPts.Reverse();
+            double bottomLen = Math.Max(2.0, ComputeTotalLength(bottomPts));
             double bottomEndY = bottomStartY + bottomLen;
 
             var newBottomPoints = new List<Point>
@@ -207,6 +223,7 @@ namespace AvaloniaApplication1.Services.Piping
             double pipeThickness = 12.0)
         {
             bool isVert = valveVm.IsVertical || valveVm.Rotation == 90 || valveVm.Rotation == 270;
+            double actualPipeLen = Math.Max(2.0, pipeLength);
 
             if (!isVert)
             {
@@ -215,16 +232,17 @@ namespace AvaloniaApplication1.Services.Piping
                 double xLeftFlange = valveVm.Col - 0.5;
                 double xRightFlange = valveVm.Col + valveVm.SizeX - 0.5;
 
+                double leftStartX = xLeftFlange - actualPipeLen;
                 var leftPoints = new List<Point>
                 {
-                    new Point(Math.Max(0, xLeftFlange - pipeLength), y),
+                    new Point(leftStartX, y),
                     new Point(xLeftFlange, y)
                 };
 
                 var rightPoints = new List<Point>
                 {
                     new Point(xRightFlange, y),
-                    new Point(xRightFlange + pipeLength, y)
+                    new Point(xRightFlange + actualPipeLen, y)
                 };
 
                 var pipe1 = new PipeConfig
@@ -262,16 +280,17 @@ namespace AvaloniaApplication1.Services.Piping
                 double yTopFlange = valveVm.Row - 0.5;
                 double yBottomFlange = valveVm.Row + valveVm.SizeY - 0.5;
 
+                double topStartY = yTopFlange - actualPipeLen;
                 var topPoints = new List<Point>
                 {
-                    new Point(x, Math.Max(0, yTopFlange - pipeLength)),
+                    new Point(x, topStartY),
                     new Point(x, yTopFlange)
                 };
 
                 var bottomPoints = new List<Point>
                 {
                     new Point(x, yBottomFlange),
-                    new Point(x, yBottomFlange + pipeLength)
+                    new Point(x, yBottomFlange + actualPipeLen)
                 };
 
                 var pipe1 = new PipeConfig

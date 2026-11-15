@@ -994,3 +994,23 @@
   - [x] Успешная сборка `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: 0 ошибок, 0 предупреждений.
   - [x] Пройдены все 23 теста (23/23 PASS, 100%).
   - [x] Headless-рендеринг `MimicView` и `MainWindowDesign` через `render_ui.ps1`: обновлены `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.
+
+# Tasks: Pipe-Valve Assembly Code Review, Edge-Case Hardening & Drift Elimination (Сессия 53 — Выполнено)
+
+- [x] Устранение дефекта накопления смещения при drag-and-drop резинки (Multi-frame pointer move drift):
+  - [x] Использовать исходный снимок вершин `_dragOriginalConnectedPipes` вместо мутирующих текущих координат `GetAbsoluteGridPoints()` в `DashboardPanel.cs`.
+  - [x] Восстанавливать исходные координаты при отмене перетаскивания в `OnPointerCaptureLost` и очищать словарь в `ClearDragState()`.
+- [x] Устранение залипания визуального маркера точки привязки (Ghost snap highlight):
+  - [x] Добавить сброс `ActiveSnapTarget = null` при уводе курсора от трубы в `PointerMoved` и при завершении перетаскивания.
+- [x] Исправление блокировки уменьшения размера клапана при Aspect Ratio Lock:
+  - [x] Рассчитывать доминирующую дельту перемещения курсора (`dominantDelta`) вместо `Math.Max(newSizeX, newSizeY)` в `PointerMoved` и `PointerReleased`.
+  - [x] Ограничить курсор изменения размера только одиночным выделением (`GetSelectedWidgets().Count == 1`).
+- [x] Защита от дегенеративных труб нулевой длины (0-length / 1-point pipes):
+  - [x] В `PipeAutoSplitter.cs` гарантировать минимальную длину остающихся сегментов (`minRemainingLength = 1.0`), исключая создание 1-точечных труб при врезке у краев.
+  - [x] В `CollinearAssemblyService.cs` сохранять суммарную длину трассы (`ComputeTotalLength`) при сборке перпендикулярных/составных труб.
+  - [x] В `CanAssemble` ограничить выборку строго 3 элементами (2 трубы и 1 клапан без посторонних виджетов).
+- [x] Тестирование и верификация:
+  - [x] Добавить в Test 23 проверки многокадрового драга резинки (20 кадров без дрейфа), ресайза клапана на уменьшение по одной оси, отсечения врезки при недостаточной длине и сборки перпендикулярных труб.
+  - [x] Сборка `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
+  - [x] Автоматические тесты: **23/23 PASSED (100%)**.
+  - [x] Headless-рендеринг `render_ui.ps1 MimicView`: обновлены `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.

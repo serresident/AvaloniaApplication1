@@ -1488,7 +1488,7 @@ namespace AvaloniaApplication1.Views.Canvas
                 if (IsDesignMode)
                 {
                     bool overResize = false;
-                    if (SelectedVm != null)
+                    if (SelectedVm != null && GetSelectedWidgets().Count == 1)
                     {
                         double col = SelectedVm.Col;
                         double row = SelectedVm.Row;
@@ -1527,9 +1527,12 @@ namespace AvaloniaApplication1.Views.Canvas
 
                 if (string.Equals(_dragVm.Type, "Valve", StringComparison.OrdinalIgnoreCase))
                 {
-                    int maxSide = Math.Max(1, Math.Max(newSizeX, newSizeY));
-                    newSizeX = maxSide;
-                    newSizeY = maxSide;
+                    // Пропорциональный ресайз 1:1 по доминирующему смещению курсора,
+                    // обеспечивающий плавное масштабирование как на увеличение, так и на уменьшение
+                    double dominantDelta = Math.Abs(delta.X) >= Math.Abs(delta.Y) ? delta.X : delta.Y;
+                    int targetSize = (int)Math.Max(1, Math.Round((_dragOriginalSizeX * CellWidth + dominantDelta) / CellWidth));
+                    newSizeX = targetSize;
+                    newSizeY = targetSize;
                 }
 
                 if (_gridOverlay != null)
@@ -1583,12 +1586,13 @@ namespace AvaloniaApplication1.Views.Canvas
                     {
                         foreach (var conn in _connectedPipePoints)
                         {
-                            var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
-                            if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
+                            if (_dragOriginalConnectedPipes.TryGetValue(conn.PipeVm, out var origPts) &&
+                                conn.PointIndex >= 0 && conn.PointIndex < origPts.Count)
                             {
-                                var oldPt = pipePoints[conn.PointIndex];
-                                double targetX = oldPt.X + deltaCol;
-                                double targetY = oldPt.Y + deltaRow;
+                                var pipePoints = origPts.ToList();
+                                var origPt = origPts[conn.PointIndex];
+                                double targetX = origPt.X + deltaCol;
+                                double targetY = origPt.Y + deltaRow;
                                 
                                 pipePoints[conn.PointIndex] = new Point(targetX, targetY);
 
@@ -1629,6 +1633,17 @@ namespace AvaloniaApplication1.Views.Canvas
                             if (kvp.Key.PipePoints != ptsStr)
                             {
                                 kvp.Key.PipePoints = ptsStr;
+                            }
+
+                            var pipeChild = FindChildForVm(kvp.Key);
+                            if (pipeChild != null)
+                            {
+                                SetCol(pipeChild, kvp.Key.Col);
+                                SetRow(pipeChild, kvp.Key.Row);
+                                SetSizeX(pipeChild, kvp.Key.SizeX);
+                                SetSizeY(pipeChild, kvp.Key.SizeY);
+                                pipeChild.InvalidateArrange();
+                                pipeChild.InvalidateVisual();
                             }
                         }
                     }
@@ -1695,6 +1710,11 @@ namespace AvaloniaApplication1.Views.Canvas
                             ActiveSnapTarget = snapPt;
                             _selectionOverlay?.InvalidateVisual();
                         }
+                    }
+                    else if (ActiveSnapTarget != null)
+                    {
+                        ActiveSnapTarget = null;
+                        _selectionOverlay?.InvalidateVisual();
                     }
                 }
 
@@ -1791,9 +1811,10 @@ namespace AvaloniaApplication1.Views.Canvas
 
                 if (string.Equals(_dragVm.Type, "Valve", StringComparison.OrdinalIgnoreCase))
                 {
-                    int maxSide = Math.Max(1, Math.Max(newSizeX, newSizeY));
-                    newSizeX = maxSide;
-                    newSizeY = maxSide;
+                    double dominantDelta = Math.Abs(delta.X) >= Math.Abs(delta.Y) ? delta.X : delta.Y;
+                    int targetSize = (int)Math.Max(1, Math.Round((_dragOriginalSizeX * CellWidth + dominantDelta) / CellWidth));
+                    newSizeX = targetSize;
+                    newSizeY = targetSize;
                 }
 
                 _dragVm.SizeX = newSizeX;
@@ -1858,12 +1879,13 @@ namespace AvaloniaApplication1.Views.Canvas
                     {
                         foreach (var conn in _connectedPipePoints)
                         {
-                            var pipePoints = conn.PipeVm.GetAbsoluteGridPoints();
-                            if (conn.PointIndex >= 0 && conn.PointIndex < pipePoints.Count)
+                            if (_dragOriginalConnectedPipes.TryGetValue(conn.PipeVm, out var origPts) &&
+                                conn.PointIndex >= 0 && conn.PointIndex < origPts.Count)
                             {
-                                var oldPt = pipePoints[conn.PointIndex];
-                                double targetX = oldPt.X + deltaCol;
-                                double targetY = oldPt.Y + deltaRow;
+                                var pipePoints = origPts.ToList();
+                                var origPt = origPts[conn.PointIndex];
+                                double targetX = origPt.X + deltaCol;
+                                double targetY = origPt.Y + deltaRow;
                                 
                                 pipePoints[conn.PointIndex] = new Point(targetX, targetY);
 
@@ -1961,20 +1983,30 @@ namespace AvaloniaApplication1.Views.Canvas
                     if (splitResult != null && splitResult.Success)
                     {
                         dashboardVm?.ReplacePipeWithSplit(splitResult.OriginalPipeVm, splitResult.PipeA, splitResult.PipeB);
+                        int valveSize = Math.Max(1, Math.Max(valveVm.SizeX, valveVm.SizeY));
+                        valveVm.SizeX = valveSize;
+                        valveVm.SizeY = valveSize;
                         valveVm.Col = splitResult.ValveSnappedColRow.X;
                         valveVm.Row = splitResult.ValveSnappedColRow.Y;
                         valveVm.Rotation = splitResult.ValveRotation;
                         valveVm.IsVertical = splitResult.ValveIsVertical;
+                        valveVm.OriginalConfig.Position.SizeX = valveSize;
+                        valveVm.OriginalConfig.Position.SizeY = valveSize;
                         valveVm.OriginalConfig.Position.Col = valveVm.Col;
                         valveVm.OriginalConfig.Position.Row = valveVm.Row;
                         valveVm.TypedConfig.Rotation = valveVm.Rotation;
                         valveVm.TypedConfig.IsVertical = valveVm.IsVertical;
 
+                        SetSizeX(_dragChild, valveSize);
+                        SetSizeY(_dragChild, valveSize);
                         SetCol(_dragChild, valveVm.Col);
                         SetRow(_dragChild, valveVm.Row);
+                        _dragChild.InvalidateMeasure();
                         _dragChild.InvalidateArrange();
                     }
                 }
+
+                dashboardVm?.ResolvePipeConnections();
 
                 ActiveSmartGuides.Clear();
                 DragCurrentBadge = null;
@@ -2067,6 +2099,16 @@ namespace AvaloniaApplication1.Views.Canvas
                     }
                 }
 
+                foreach (var kvp in _dragOriginalConnectedPipes)
+                {
+                    var origPts = kvp.Value;
+                    double pipeCol = kvp.Key.Col;
+                    double pipeRow = kvp.Key.Row;
+                    var relPts = origPts.Select(p => new Point(p.X - pipeCol, p.Y - pipeRow)).ToList();
+                    string ptsStr = string.Join(";", relPts.Select(p => string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##},{1:0.##}", p.X, p.Y)));
+                    kvp.Key.PipePoints = ptsStr;
+                }
+
                 ActiveSmartGuides.Clear();
                 DragCurrentBadge = null;
                 Cursor = null;
@@ -2086,6 +2128,7 @@ namespace AvaloniaApplication1.Views.Canvas
             _isDragging = false;
             _isResizing = false;
             _connectedPipePoints.Clear();
+            _dragOriginalConnectedPipes.Clear();
             _isSnappedToEquipmentPort = false;
             _dragOriginalPositions.Clear();
             _dragOriginalPipePoints.Clear();

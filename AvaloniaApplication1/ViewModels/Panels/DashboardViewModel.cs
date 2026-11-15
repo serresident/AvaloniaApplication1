@@ -768,7 +768,7 @@ namespace AvaloniaApplication1.ViewModels.Panels
 
         #endregion
 
-        private void ResolvePipeConnections()
+        public void ResolvePipeConnections()
         {
             var pipes = Widgets.OfType<PipeWidgetViewModel>().ToList();
             
