@@ -172,35 +172,41 @@ dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj -c Debug --nologo
 
 ---
 
-## 👁️ VISUAL FEEDBACK — UI Debugging Protocol (обязательный)
+## 👁️ VISUAL FEEDBACK & UI DEBUGGING PROTOCOL (Двухуровневый протокол)
 
-При любом изменении разметки или стилей:
+При любом изменении разметки, стилей или верстки HMI действует **двухуровневая гибридная система валидации**:
 
-### Инструментарий
+### 🛠️ Инструментарий
 
+| Уровень | Назначение | Инструмент | Преимущества |
+|---|---|---|---|
+| **Tier 1: Fast Headless TDD (Обязательный)** | Автономная проверка верстки при кодинге, CI/CD, контроль переполнений | `powershell -ExecutionPolicy Bypass -File scripts/render_ui.ps1 [ViewName]` | Быстро (2 сек), работает в фоне без GUI-окна, генерирует `ui_preview.png` и `ui_tree.json` |
+| **Tier 2: Live XamlMcp Driving (Интерактивный)** | Живая инспекция запущенного приложения, симуляция кликов, отладка свойств | Инструменты MCP `xamlmcp` (`xaml_get_visual_tree`, `xaml_simulate_click`, `xaml_capture_image`, `xaml_set_property`) | E2E-тестирование, живой Drag&Drop, контекстные меню, смена темы на лету без перезапуска |
+
+### 📸 Артефакты Tier 1 (Headless):
+* `./artifacts/ui_preview.png` — скриншот рендера в headless-режиме
+* `./artifacts/ui_tree.json` — полное дерево контролов (типы, Name, Bounds [X,Y,W,H], Margin, Padding, IsVisible)
+
+### 🔌 Активация Tier 2 (XamlMcp):
+Запуск приложения с включенным in-process агентом (только в `#if DEBUG`):
 ```powershell
-# Windows — рендер и скриншот
-powershell -ExecutionPolicy Bypass -File scripts/render_ui.ps1 [ViewName]
-
-# Артефакты:
-# ./artifacts/ui_preview.png    — скриншот
-# ./artifacts/ui_tree.json      — дерево: типы, Name, Bounds (X,Y,W,H), Margin, Padding, IsVisible
+$env:XAML_MCP=1; dotnet run --project AvaloniaApplication1/AvaloniaApplication1.csproj
 ```
+После старта доступны инструменты MCP сервера `xamlmcp`: `xaml_list_apps`, `xaml_capture_image`, `xaml_get_visual_tree`, `xaml_get_properties`, `xaml_set_property`, `xaml_simulate_click`, `xaml_simulate_text`.
 
-### Обязательный цикл (TDD для UI)
+### 🔄 Обязательный цикл разработки (TDD для UI)
 
-1. **Baseline** — сгенерировать скриншот ДО правок, оценить исходное состояние
-2. **Правки** — изменить `.axaml`/стили/код View, собрать (`dotnet build`, 0 ошибок)
-3. **Vision Inspection** — запустить скрипт рендеринга, изучить `ui_preview.png`:
+1. **Baseline (Tier 1)** — сгенерировать скриншот ДО правок (`render_ui.ps1`), оценить исходное состояние.
+2. **Правки** — изменить `.axaml`/стили/код View, собрать (`dotnet build`, 0 ошибок).
+3. **Vision Inspection (Tier 1)** — запустить `render_ui.ps1`, изучить `ui_preview.png`:
    - Обрезка текста и компонентов (Clipping)
-   - Выравнивание колонок/строк Grid (`*`, `Auto`, фиксированные)
+   - Выравнивание колонок/строк Grid (`*`, `Auto`, пропорции)
    - Наложение элементов (ZIndex)
    - Пропорции и растяжение Path/иконок
-   - Контраст и тема
-4. **Локализация дефекта** — найти проблемный узел в `ui_tree.json` по Bounds (X, Y, Width, Height)
-5. **Итеративное исправление** — повторять до идеального визуального результата
-
-**Нельзя закрывать задачу без успешного финального рендера!**
+   - Контраст и корректность в Dark и Light темах
+4. **Локализация дефекта (Tier 1)** — найти проблемный узел в `ui_tree.json` по координатам Bounds (X, Y, Width, Height).
+5. **Интерактивная верификация (Tier 2, опционально при запущенном приложении)** — проверить кликабельность, динамику всплывающих окон и работу контролов через `xamlmcp`.
+6. **Фиксация** — ни одна задача по верстке не закрывается без успешного финального рендера Tier 1!
 
 ### Правила верстки Avalonia
 

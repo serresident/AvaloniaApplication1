@@ -947,3 +947,23 @@
   - [x] Сборка 0 ошибок, 0 предупреждений
   - [x] Все 22 теста пройдены успешно (100% PASS)
   - [x] Актуализирован снимок `artifacts/ui_preview.png` и `artifacts/ui_tree.json`
+
+# Tasks: UI Debugging Infrastructure Analysis & Two-Tier Hybrid Adoption (Сессия 51 — Выполнено)
+
+- [x] Сравнительный анализ инструментов отладки UI Avalonia:
+  - [x] Исследован скрипт headless-рендеринга `scripts/render_ui.ps1` + `AvaloniaApplication1.UIValidation`
+  - [x] Исследован MCP-сервер `trrahul/XamlMcp` (In-process агент через Named Pipe + Stdio процесс)
+  - [x] Сформулирована гибридная архитектура (Two-Tier Protocol), объединяющая скорость офлайн TDD и глубину онлайн E2E
+- [x] Актуализация системных промптов и регламентов разработки:
+  - [x] Обновлен `AGENTS.md` (секция 👁️ VISUAL FEEDBACK & UI DEBUGGING PROTOCOL: Tier 1 и Tier 2)
+  - [x] Обновлен `GEMINI.md` (синхронизирован с AGENTS.md)
+  - [x] Обновлен `AGENT_RULES.md` (секция 5: регламент двухуровневой валидации и TDD)
+  - [x] Обновлен `.antigravity/rules.md` (актуализирован регламент в конфигурации Antigravity)
+  - [x] Обновлен `docs/agent.md` (секция 27: VISUAL FEEDBACK & UI DEBUGGING PROTOCOL)
+- [x] Актуализация скиллов агента (Skills):
+  - [x] В локальный скилл `.agents/skills/xaml-mcp/SKILL.md` добавлена сравнительная таблица и матрица выбора Tier 1 / Tier 2
+  - [x] Синхронизирован глобальный скилл `C:\Users\erch\.gemini\config\skills\xaml-mcp\SKILL.md`
+- [x] Верификация:
+  - [x] Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: 0 ошибок, 0 предупреждений
+  - [x] Экспорт стенограммы сессии через `powershell -ExecutionPolicy Bypass -File scripts/export_chat.ps1`
+  - [x] Фиксация в `docs/development_log.md` и коммит в git-репозиторий

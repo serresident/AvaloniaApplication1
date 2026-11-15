@@ -1242,18 +1242,38 @@ event для высокочастотной телеметрии
 
 ---
 
-# 27. VISUAL FEEDBACK & UI DEBUGGING PROTOCOL (AVALONIA UI)
+# 27. VISUAL FEEDBACK & UI DEBUGGING PROTOCOL (ДВУХУРОВНЕВЫЙ ПРОТОКОЛ)
+
+При любом изменении разметки, стилей или верстки HMI действует **двухуровневая гибридная система валидации**:
 
 ## 27.1 Доступный инструментарий
-* Скрипт рендеринга артефактов:
-  * Windows: `powershell -ExecutionPolicy Bypass -File scripts/render_ui.ps1 [ViewName]`
-  * Linux/macOS: `./scripts/render_ui.sh [ViewName]`
-* Скриншот экрана: `./artifacts/ui_preview.png`
-* Дерево элементов: `./artifacts/ui_tree.json` (типы контролов, Name, Bounds, Margin, Padding, IsVisible)
+
+| Уровень | Назначение | Инструмент | Преимущества |
+|---|---|---|---|
+| **Tier 1: Fast Headless TDD (Обязательный)** | Автономная проверка верстки при кодинге, CI/CD, контроль переполнений | `powershell -ExecutionPolicy Bypass -File scripts/render_ui.ps1 [ViewName]` | Быстро (2 сек), работает в фоне без GUI-окна, генерирует `ui_preview.png` и `ui_tree.json` |
+| **Tier 2: Live XamlMcp Driving (Интерактивный)** | Живая инспекция запущенного приложения, симуляция кликов, отладка свойств | Инструменты MCP `xamlmcp` (`xaml_get_visual_tree`, `xaml_simulate_click`, `xaml_capture_image`, `xaml_set_property`) | E2E-тестирование, живой Drag&Drop, контекстные меню, смена темы на лету без перезапуска |
+
+### Артефакты Tier 1 (Headless):
+* `./artifacts/ui_preview.png` — скриншот рендера в headless-режиме
+* `./artifacts/ui_tree.json` — полное дерево контролов (типы, Name, Bounds [X,Y,W,H], Margin, Padding, IsVisible)
+
+### Активация Tier 2 (XamlMcp):
+Запуск приложения с включенным in-process агентом (только в `#if DEBUG`):
+```powershell
+$env:XAML_MCP=1; dotnet run --project AvaloniaApplication1/AvaloniaApplication1.csproj
+```
+После старта доступны инструменты MCP сервера `xamlmcp`: `xaml_list_apps`, `xaml_capture_image`, `xaml_get_visual_tree`, `xaml_get_properties`, `xaml_set_property`, `xaml_simulate_click`, `xaml_simulate_text`.
 
 ## 27.2 Цикл TDD для UI
-1. **Baseline**: генерация снимка до правок.
-2. **Внесение изменений**: правки `.axaml`, стилей или кода. Проверка сборки `scripts/check-build.ps1` (Exit code 0).
-3. **Vision Inspection**: генерация свежего `ui_preview.png` и анализ обрезки текста, выравнивания Grid, ZIndex, пропорций Path и контраста.
-4. **Локализация по `ui_tree.json`**: поиск проблемного узла по координатам Bounds и устранение ограничений компоновки.
-5. **Итеративное исправление**: повторение до идеального визуального результата.
+
+1. **Baseline (Tier 1)** — генерация снимка ДО правок (`render_ui.ps1`), оценка исходного состояния.
+2. **Внесение изменений** — правки `.axaml`, стилей или кода View. Проверка сборки `dotnet build` (Exit code 0).
+3. **Vision Inspection (Tier 1)** — запуск `render_ui.ps1`, изучение `ui_preview.png`:
+   - Обрезка текста и компонентов (Clipping)
+   - Выравнивание колонок/строк Grid (`*`, `Auto`, пропорции)
+   - Наложение элементов (ZIndex)
+   - Пропорции и растяжение Path/иконок
+   - Контраст и корректность в Dark и Light темах
+4. **Локализация по `ui_tree.json` (Tier 1)** — поиск проблемного узла по координатам Bounds (X, Y, Width, Height) и устранение ограничений компоновки.
+5. **Интерактивная верификация (Tier 2, опционально при запущенном приложении)** — проверка кликабельности, динамики всплывающих окон и работы контролов через `xamlmcp`.
+6. **Фиксация** — ни одна задача по верстке не закрывается без успешного финального рендера Tier 1!
