@@ -25,7 +25,7 @@
 
 - **Автономное выполнение:** Агент ОБЯЗАН выполнять команды терминала (`dotnet build`, `dotnet test`, `git status`, `git diff`, `git add`, `git commit`, `git push`, скрипты сборки и рендеринга), чтение и правку файлов проекта — **автономно и проактивно БЕЗ предварительных вопросов и запросов разрешения** у пользователя.
 - **Действие вместо вопросов:** Запрещено задавать промежуточные вопросы вида «Запустить ли сборку?», «Сделать ли коммит?», «Разрешите выполнить команду?». Если действие необходимо для решения инженерной задачи — выполнять немедленно.
-- **Журналирование:** При любой работе с репозиторием обязательно вести журнал разработки в `docs/development_log.md` и трекер задач в `docs/task.md`.
+- **Журналирование:** При любой работе с репозиторием обязательно вести журнал разработки в `docs/development_log.md`, трекер задач в `docs/task.md`, а также актуализировать стенограмму сессии в `docs/chat_history/` через `powershell -File scripts/export_chat.ps1`.
 - **Исключения (только деструктивные действия):** Запрашивать подтверждение ТОЛЬКО при `git reset --hard`, `git push --force`, удалении веток или пользовательских файлов.
 
 ---
@@ -300,9 +300,12 @@ AvaloniaApplication1/
 ├── Converters/             — BoolToBrushConverter, HexToBrushConverter, StringEqualsConverter
 ├── artifacts/              — ui_preview.png, ui_tree.json (результаты рендера)
 ├── docs/
+│   ├── chat_history/       — стенограмма и лог диалогов (chat_history.md, transcript_full.jsonl)
 │   ├── development_log.md  — журнал разработки (вести обязательно)
 │   └── task.md             — трекер задач (вести обязательно)
 └── scripts/
+    ├── export_chat.ps1     — экспорт истории текущего чата в документацию (Windows)
+    ├── export_chat.py      — генератор Markdown-истории диалога из системного лога
     ├── render_ui.ps1       — запуск headless-рендера (Windows)
     └── render_ui.sh        — запуск headless-рендера (Linux/macOS)
 ```
@@ -352,7 +355,10 @@ dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIVa
 
 # Headless рендер (Windows)
 powershell -ExecutionPolicy Bypass -File scripts/render_ui.ps1 [ViewName]
-# ViewName: MainWindow | DashboardView | WidgetEditorWindow | MimicView | ...
+# ViewName: MainWindow | MainWindowDesign | DashboardView | WidgetEditorWindow | MimicView | ...
+
+# Экспорт истории текущего чата в документацию
+powershell -ExecutionPolicy Bypass -File scripts/export_chat.ps1
 
 # Git workflow (без запроса разрешения)
 git add -A
@@ -381,6 +387,10 @@ some-command 2>&1 | Select-Object -Last 20
 - `[ ]` ожидает
 ```
 
+**`docs/chat_history/`** — стенограмма и история диалога:
+- Обновлять командой: `powershell -ExecutionPolicy Bypass -File scripts/export_chat.ps1` (или `python scripts/export_chat.py`).
+- Скрипт копирует системный JSONL-лог (`transcript_full.jsonl`) и компилирует читаемый Markdown (`chat_history.md`) со всеми запросами, ответами, кодом и решениями для предотвращения потери контекста между сессиями.
+
 ---
 
 ## 🏆 ГЛАВНЫЙ ПРИНЦИП
@@ -401,4 +411,3 @@ Immutable State     > Глобальное изменяемое состояни
 > **В каком слое должна находиться эта ответственность?**
 
 Если ответ неочевиден — создавать небольшой специализированный компонент с чётко определённой ролью.
-
