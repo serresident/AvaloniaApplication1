@@ -37,15 +37,17 @@
         <KeyBinding Gesture="Ctrl+OemComma" Command="{Binding OpenSettingsCommand}" />
     </Window.KeyBindings>
 
-    <Grid RowDefinitions="Auto,*">
-        <Border Grid.Row="0" Background="#333337" Padding="8,4">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Row 0: Top Header Status & Navigation Bar (Always Visible) -->
+        <Border Grid.Row="0" Background="#2B2B2E" Padding="10,5">
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <!-- Left Section: Title, Windows Count, Tabs (in Design) -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <TextBlock Text="HMI SCADA" Foreground="White" FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0" />
-                    <TextBlock Text="{Binding ActiveChildWindows.Count, StringFormat='[{0}]'}" Foreground="#FF5252" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" ToolTip.Tip="Количество открытых окон" />
+                    <TextBlock Text="HMI SCADA" Foreground="White" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBlock Text="{Binding ActiveChildWindows.Count, StringFormat='[{0}]'}" Foreground="#FF5252" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" ToolTip.Tip="Количество открытых окон" />
                     
                     <!-- Dashboard tab visible in Design mode -->
+                    <Rectangle Width="1" Height="16" Fill="#444448" Margin="4,0" IsVisible="{Binding ProjectContext.IsDesignMode}" />
                     <Button Command="{Binding ShowDashboardCommand}"
                             Content="📊 Дашборд"
                             Background="{Binding IsMimicActive, Converter={StaticResource DashboardTabColor}}"
@@ -61,7 +63,7 @@
                 <!-- Center Section: Live Clock, Connection Health & Alarms Status -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <!-- Live Clock & Date Badge -->
-                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                    <Border Background="#202022" BorderBrush="#38383C" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             ToolTip.Tip="Текущее системное время и дата оператора">
                         <StackPanel Orientation="Horizontal" Spacing="5">
                             <TextBlock Text="🕒" FontSize="11" VerticalAlignment="Center" />
@@ -73,22 +75,22 @@
 
                     <!-- Connection Status Badge (Clickable) -->
                     <Button Command="{Binding OpenConnectionManagerCommand}"
-                            Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                            Background="#202022" BorderBrush="#38383C" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             ToolTip.Tip="Статус сетевых драйверов (нажмите для открытия менеджера связей)">
                         <TextBlock Text="{Binding ConnectionStatusText}" Foreground="#DCDCAA" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Button>
 
                     <!-- Alarms Counter Badge -->
-                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                    <Border Background="#202022" BorderBrush="#38383C" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             ToolTip.Tip="Сводка активных аварийных сигналов технологического процесса">
                         <TextBlock Text="{Binding ActiveAlarmsText}" Foreground="#9CDCFE" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Border>
                 </StackPanel>
 
-                <!-- Right Section: Current Config Badge, Calculator, Settings & Mode Switch -->
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                <!-- Right Section: Current Config Badge, Calculator, Mode Switch (Clean & uncluttered) -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <!-- Active Project Name Badge (ALWAYS VISIBLE) -->
-                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                    <Border Background="#202022" BorderBrush="#38383C" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             VerticalAlignment="Center"
                             ToolTip.Tip="Текущий активный файл конфигурации проекта">
                         <TextBlock Text="{Binding CurrentProjectName, StringFormat='📁 {0}'}" 
@@ -102,58 +104,10 @@
                             Foreground="#00E5FF" CornerRadius="4" Padding="8,4"
                             ToolTip.Tip="Открыть технологический калькулятор и пересчет величин (F10)" />
 
-                    <!-- Settings Button (Design mode) -->
-                    <Button Command="{Binding OpenSettingsCommand}"
-                            Content="⚙️ Настройки"
-                            Background="#3E3E42"
-                            Foreground="White" CornerRadius="4" Padding="8,4"
-                            ToolTip.Tip="Настройки проекта, мнемосхемы, симуляции и пароля (Ctrl+,)"
-                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
-
-                    <!-- Open Project Button (Design mode) -->
-                    <Button Command="{Binding OpenProjectCommand}"
-                            Content="📂 Загрузить..."
-                            Background="#0E639C"
-                            Foreground="White" CornerRadius="4" Padding="8,4"
-                            ToolTip.Tip="Загрузить проект из файла JSON (Ctrl+O)"
-                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
-
-                    <!-- Save Project Button -->
-                    <Button Command="{Binding SaveConfigCommand}"
-                            Content="💾 Сохранить"
-                            Background="#008A00"
-                            Foreground="White" CornerRadius="4" Padding="7,4"
-                            ToolTip.Tip="Сохранить текущий проект (Ctrl+S)"
-                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
-
-                    <!-- Save Project As Button -->
-                    <Button Command="{Binding SaveConfigAsCommand}"
-                            Content="💾 Как..."
-                            Background="#107C41"
-                            Foreground="White" CornerRadius="4" Padding="7,4"
-                            ToolTip.Tip="Сохранить проект под новым именем (Ctrl+Shift+S)"
-                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
-
-                    <!-- Connections Button -->
-                    <Button Command="{Binding OpenConnectionManagerCommand}"
-                            Content="📡 Связь"
-                            Background="#6A1B9A"
-                            Foreground="White" CornerRadius="4" Padding="7,4"
-                            ToolTip.Tip="Менеджер подключений (Modbus, MQTT)"
-                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
-
-                    <!-- Tag Manager Button -->
-                    <Button Command="{Binding OpenTagManagerCommand}"
-                            Content="🏷️ Теги"
-                            Background="#D97706"
-                            Foreground="White" CornerRadius="4" Padding="7,4"
-                            ToolTip.Tip="Менеджер тегов и база сигналов (Ctrl+T)"
-                            IsVisible="{Binding ProjectContext.IsDesignMode}"/>
-
                     <!-- Mode Toggle Button (ALWAYS VISIBLE) -->
                     <Button Command="{Binding ToggleDesignModeCommand}" 
                             Background="{Binding ProjectContext.IsDesignMode, Converter={StaticResource BoolToColor}}" 
-                            Foreground="White" CornerRadius="4" Padding="8,4"
+                            Foreground="White" CornerRadius="4" Padding="10,4"
                             ToolTip.Tip="Переключить режим редактирования (Ctrl+E)">
                         <Button.Content>
                             <Binding Path="ProjectContext.IsDesignMode">
@@ -166,8 +120,66 @@
                 </StackPanel>
             </Grid>
         </Border>
+
+        <!-- Row 1: Dedicated Design Mode Engineering Toolbar (Visible only in Design Mode) -->
+        <Border Grid.Row="1" 
+                Background="#1E1E20" 
+                BorderBrush="#38383C" 
+                BorderThickness="0,0,0,1" 
+                Padding="10,4"
+                IsVisible="{Binding ProjectContext.IsDesignMode}">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <!-- Group 1: Project File Operations -->
+                    <TextBlock Text="Проект:" Foreground="#858585" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Margin="2,0,4,0" />
+                    <Button Command="{Binding OpenProjectCommand}"
+                            Content="📂 Загрузить..."
+                            Background="#0E639C"
+                            Foreground="White" CornerRadius="4" Padding="8,4" FontSize="12"
+                            ToolTip.Tip="Загрузить проект из файла JSON (Ctrl+O)" />
+                    <Button Command="{Binding SaveConfigCommand}"
+                            Content="💾 Сохранить"
+                            Background="#008A00"
+                            Foreground="White" CornerRadius="4" Padding="8,4" FontSize="12"
+                            ToolTip.Tip="Сохранить текущий проект (Ctrl+S)" />
+                    <Button Command="{Binding SaveConfigAsCommand}"
+                            Content="💾 Как..."
+                            Background="#107C41"
+                            Foreground="White" CornerRadius="4" Padding="8,4" FontSize="12"
+                            ToolTip.Tip="Сохранить проект под новым именем (Ctrl+Shift+S)" />
+
+                    <!-- Vertical Separator -->
+                    <Rectangle Width="1" Height="18" Fill="#3E3E42" Margin="6,0" VerticalAlignment="Center" />
+
+                    <!-- Group 2: Engineering & Signals Subsystems -->
+                    <TextBlock Text="Инженерия:" Foreground="#858585" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Margin="2,0,4,0" />
+                    <Button Command="{Binding OpenTagManagerCommand}"
+                            Content="🏷️ База тегов"
+                            Background="#D97706"
+                            Foreground="White" CornerRadius="4" Padding="8,4" FontSize="12"
+                            ToolTip.Tip="Менеджер тегов и база сигналов (Ctrl+T)" />
+                    <Button Command="{Binding OpenConnectionManagerCommand}"
+                            Content="📡 Менеджер связей"
+                            Background="#6A1B9A"
+                            Foreground="White" CornerRadius="4" Padding="8,4" FontSize="12"
+                            ToolTip.Tip="Менеджер сетевых подключений (Modbus TCP/RTU, MQTT)" />
+                    <Button Command="{Binding OpenSettingsCommand}"
+                            Content="⚙️ Настройки"
+                            Background="#3E3E42"
+                            Foreground="White" CornerRadius="4" Padding="8,4" FontSize="12"
+                            ToolTip.Tip="Настройки проекта, мнемосхемы, симуляции и пароля (Ctrl+,)" />
+                </StackPanel>
+
+                <!-- Right Side Hint / Quick Help in Design Mode -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Text="💡 Режим редактирования: ЛКМ — выбор/перемещение, ПКМ — контекстное меню" 
+                               Foreground="#6E6E72" FontSize="11" FontStyle="Italic" VerticalAlignment="Center" Margin="0,0,4,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
         
-        <Grid Grid.Row="1">
+        <!-- Row 2: Main Workspace Canvas & Child Windows -->
+        <Grid Grid.Row="2">
             <!-- Main Dashboard -->
             <ContentControl Content="{Binding Dashboard}">
                 <ContentControl.DataTemplates>

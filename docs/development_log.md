@@ -1406,3 +1406,39 @@
     *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
     *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj --no-build`: **21/21 PASS (100%)**.
     *   Headless-рендер `MainWindow` и `WidgetEditorWindow`: успешно формируются `ui_preview.png` и `ui_tree.json` без исключений.
+
+
+---
+
+## 📅 15.11.2026 (Сессия 48 — Двухуровневая компоновка заголовка и выделенный Design Toolbar)
+
+### 📌 Достижение: Устранение перегруженности и горизонтального переполнения заголовка главного окна в режиме редактирования
+
+*   **Проблема:**
+    *   В режиме редактирования (`IsDesignMode = true`) правая панель заголовка содержала 9 разнородных кнопок и бейджей суммарной шириной более 960 px.
+    *   В результате центральный блок (часы, сетевой статус, аварии) вытеснялся влево, часы наезжали на бейдж `config.json`, а правые кнопки (`Теги`, переключатель режима) выходили за пределы экрана и накладывались на системные индикаторы.
+
+*   **Решение (Вариант 1 — Двухуровневая компоновка):**
+    *   Корневая сетка [MainWindow.axaml](file:///c:/Users/erch/Мой%20диск/1%20for%20ai/avalonia/avalonia%20_continue%20concept/AvaloniaApplication1/AvaloniaApplication1/Views/Windows/Common/MainWindow.axaml) переведена на `<Grid RowDefinitions="Auto,Auto,*">`.
+    *   **Строка 0 (Status & Navigation Header):**
+        *   Остается активной всегда (и в Runtime, и в Design).
+        *   Слева: `HMI SCADA`, счетчик дочерних окон `[N]`, вкладки экранов.
+        *   Центр: Время, дата, статус связи, аварии — теперь идеально отцентрированы с запасом по 159 px свободного пространства с обеих сторон при 1400 px ширины.
+        *   Справа: Только `📁 config.json`, `🧮` (Калькулятор) и кнопка переключения режима `🔒 Runtime (Ctrl+E)` / `✏️ Design (Ctrl+E)`.
+    *   **Строка 1 (Design Mode Toolbar Strip):**
+        *   Активируется строго при `ProjectContext.IsDesignMode = true`, в Runtime полностью схлопывается (`Height = 0`).
+        *   Фон `#1E1E20`, нижняя граница `#38383C`, высота 36 px.
+        *   Логическое секционирование:
+            *   *Группа «Проект:»* — `📂 Загрузить...`, `💾 Сохранить`, `💾 Как...`.
+            *   Вертикальный разделитель `#3E3E42`.
+            *   *Группа «Инженерия:»* — `🏷️ База тегов`, `📡 Менеджер связей`, `⚙️ Настройки`.
+            *   Справа — подсказка по управлению мнемосхемой.
+
+*   **Верификация:**
+    *   В [Program.cs](file:///c:/Users/erch/Мой%20диск/1%20for%20ai/avalonia/avalonia%20_continue%20concept/AvaloniaApplication1/AvaloniaApplication1.UIValidation/Program.cs) добавлена ветка для headless-рендеринга `MainWindowDesign`.
+    *   Сборка решения: `dotnet build AvaloniaApplication1.sln -c Debug --nologo` — **0 ошибок, 0 предупреждений**.
+    *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation` — **21/21 PASS (100%)**.
+    *   Сгенерированы снимки и проверены координаты визуального дерева `artifacts/ui_tree.json`:
+        *   Header (Row 0): Left `[0,397]`, Center `[556,913]`, Right `[1072,1380]`.
+        *   Toolbar (Row 1): Left `[0,809]`, Right `[918,1380]`.
+        *   Полное отсутствие клиппинга и наложений.

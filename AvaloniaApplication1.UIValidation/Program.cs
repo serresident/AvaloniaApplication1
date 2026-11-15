@@ -233,7 +233,24 @@ public static class Program
             }
 
             Window window;
-            if (string.Equals(targetView, "MimicView", StringComparison.OrdinalIgnoreCase) ||
+            if (string.Equals(targetView, "MainWindowDesign", StringComparison.OrdinalIgnoreCase))
+            {
+                mainVm.ProjectContext.IsDesignMode = true;
+                mainVm.ShowMimicCommand.Execute(null);
+                for (int i = 0; i < 20; i++)
+                {
+                    Dispatcher.UIThread.RunJobs();
+                    Thread.Sleep(20);
+                }
+
+                window = new MainWindow
+                {
+                    DataContext = mainVm,
+                    Width = 1400,
+                    Height = 900
+                };
+            }
+            else if (string.Equals(targetView, "MimicView", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(targetView, "Mimic", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(targetView, "MmaPark", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(targetView, "MimicRealLab", StringComparison.OrdinalIgnoreCase))
