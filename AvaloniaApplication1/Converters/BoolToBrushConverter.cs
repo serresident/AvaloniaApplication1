@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using Avalonia;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 
@@ -12,11 +13,31 @@ namespace AvaloniaApplication1.Converters
         public IBrush TrueBrush { get; set; } = Brushes.Red;
         public IBrush FalseBrush { get; set; } = Brushes.DarkRed;
 
+        public string? TrueResourceKey { get; set; }
+        public string? FalseResourceKey { get; set; }
+
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is bool b)
             {
-                return b ? TrueBrush : FalseBrush;
+                if (b)
+                {
+                    if (!string.IsNullOrEmpty(TrueResourceKey) && Application.Current != null)
+                    {
+                        if (Application.Current.TryGetResource(TrueResourceKey, Application.Current.ActualThemeVariant, out var res) && res is IBrush br)
+                            return br;
+                    }
+                    return TrueBrush;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(FalseResourceKey) && Application.Current != null)
+                    {
+                        if (Application.Current.TryGetResource(FalseResourceKey, Application.Current.ActualThemeVariant, out var res) && res is IBrush br)
+                            return br;
+                    }
+                    return FalseBrush;
+                }
             }
             return FalseBrush;
         }

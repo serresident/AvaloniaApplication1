@@ -68,7 +68,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         [RelayCommand]
         private async Task ExecuteCommandAsync()
         {
-            if (ProjectContext.IsDesignMode || Source == null) return;
+            if (ProjectContext?.IsDesignMode == true || Source == null) return;
 
             var cfg = TypedConfig;
             string tagId = Source.TagId ?? ConfigMigrationService.GenerateTagId(Source.ConnId, Source.Address);

@@ -227,8 +227,10 @@ namespace AvaloniaApplication1.Controls.Equipment
         private static readonly Pen BlackAlarmPen = new Pen(Brushes.Black, 0.8);
         private static readonly SolidColorBrush FlangeBrush = new SolidColorBrush(Color.FromRgb(160, 160, 164));
         private static readonly Pen FlangePen = new Pen(new SolidColorBrush(Color.FromRgb(40, 40, 40)), 0.6);
-        private static readonly SolidColorBrush FeedbackBarBgBrush = new SolidColorBrush(Color.FromRgb(30, 30, 30));
-        private static readonly Pen FeedbackBarBgPen = new Pen(new SolidColorBrush(Color.FromRgb(80, 80, 80)), 1);
+        private static readonly SolidColorBrush FeedbackBarBgBrushDark = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+        private static readonly SolidColorBrush FeedbackBarBgBrushLight = new SolidColorBrush(Color.FromRgb(220, 222, 226));
+        private static readonly Pen FeedbackBarBgPenDark = new Pen(new SolidColorBrush(Color.FromRgb(80, 80, 80)), 1);
+        private static readonly Pen FeedbackBarBgPenLight = new Pen(new SolidColorBrush(Color.FromRgb(160, 160, 160)), 1);
 
         public ValveControl()
         {
@@ -530,10 +532,14 @@ namespace AvaloniaApplication1.Controls.Equipment
             double barX = barMargin;
 
             // Background
+            bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+            var barBg = isLight ? FeedbackBarBgBrushLight : FeedbackBarBgBrushDark;
+            var barPen = isLight ? FeedbackBarBgPenLight : FeedbackBarBgPenDark;
+
             var bgRect = new Rect(barX, barY, barW, barH);
             context.DrawRectangle(
-                FeedbackBarBgBrush,
-                FeedbackBarBgPen,
+                barBg,
+                barPen,
                 bgRect, 2, 2);
 
             // Fill

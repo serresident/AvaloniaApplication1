@@ -66,7 +66,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         [RelayCommand]
         private void OpenControlPopup()
         {
-            if (ProjectContext.IsDesignMode || Source == null) return;
+            if (ProjectContext?.IsDesignMode == true || Source == null) return;
 
             if (_controlWindow != null)
             {

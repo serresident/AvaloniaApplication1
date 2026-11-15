@@ -12,8 +12,12 @@ namespace AvaloniaApplication1.Controls.Charting
     public class TrendLineControl : Control
     {
         private IEnumerable? _values;
-        private static readonly Pen GridPen = new Pen(
+        private static readonly Pen DarkGridPen = new Pen(
             new SolidColorBrush(Color.FromArgb(20, 255, 255, 255)), 
+            1, 
+            new DashStyle(new double[] { 4, 4 }, 0));
+        private static readonly Pen LightGridPen = new Pen(
+            new SolidColorBrush(Color.FromArgb(35, 0, 0, 0)), 
             1, 
             new DashStyle(new double[] { 4, 4 }, 0));
         private static readonly Pen DefaultLinePen = new Pen(new SolidColorBrush(Color.FromRgb(0, 255, 204)), 2);
@@ -121,19 +125,22 @@ namespace AvaloniaApplication1.Controls.Charting
 
             if (w <= 0 || h <= 0) return;
 
-            // 1. Draw Grid Lines
+            // 1. Draw Grid Lines with theme awareness
+            bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+            var gridPen = isLight ? LightGridPen : DarkGridPen;
+
             // Horizontal grid lines (4 rows)
             for (int i = 1; i < 4; i++)
             {
                 double y = (h / 4) * i;
-                context.DrawLine(GridPen, new Point(0, y), new Point(w, y));
+                context.DrawLine(gridPen, new Point(0, y), new Point(w, y));
             }
 
             // Vertical grid lines (6 columns)
             for (int i = 1; i < 6; i++)
             {
                 double x = (w / 6) * i;
-                context.DrawLine(GridPen, new Point(x, 0), new Point(x, h));
+                context.DrawLine(gridPen, new Point(x, 0), new Point(x, h));
             }
 
             // 2. Extract Values

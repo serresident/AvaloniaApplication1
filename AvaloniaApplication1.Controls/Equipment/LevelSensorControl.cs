@@ -98,7 +98,10 @@ namespace AvaloniaApplication1.Controls.Equipment
         }
 
         // --- Кэшированные перья и кисти (Zero-Allocation) ---
-        private static readonly IBrush BubbleBgBrush = new SolidColorBrush(Color.FromRgb(30, 32, 38));
+        private static readonly IBrush BubbleBgBrushDark = new SolidColorBrush(Color.FromRgb(30, 32, 38));
+        private static readonly IBrush BubbleBgBrushLight = new SolidColorBrush(Color.FromRgb(245, 247, 250));
+        private static readonly IBrush TextLtBrushLight = Brushes.Black;
+        private static readonly IBrush TextTagBrushLight = new SolidColorBrush(Color.FromRgb(80, 80, 80));
         private static readonly Pen BubblePenNormal = new Pen(new SolidColorBrush(Color.FromRgb(0, 180, 255)), 2.0);
         private static readonly Pen BubblePenAlarmHi = new Pen(new SolidColorBrush(Color.FromRgb(255, 60, 60)), 2.5);
         private static readonly Pen BubblePenAlarmLo = new Pen(new SolidColorBrush(Color.FromRgb(255, 180, 0)), 2.5);
@@ -125,8 +128,13 @@ namespace AvaloniaApplication1.Controls.Equipment
             bool isLoAlarm = Value <= AlarmLow;
             var bubblePen = isHiAlarm ? BubblePenAlarmHi : (isLoAlarm ? BubblePenAlarmLo : BubblePenNormal);
 
+            bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+            var bubbleBg = isLight ? BubbleBgBrushLight : BubbleBgBrushDark;
+            var textLtBrush = isLight ? TextLtBrushLight : Brushes.White;
+            var textTagBrush = isLight ? TextTagBrushLight : Brushes.LightGray;
+
             // 1. Приборный круг стандарта ISA (Bubble)
-            context.DrawEllipse(BubbleBgBrush, bubblePen, bubbleCenter, bubbleRadius, bubbleRadius);
+            context.DrawEllipse(bubbleBg, bubblePen, bubbleCenter, bubbleRadius, bubbleRadius);
 
             // Горизонтальная разделительная черта внутри круга
             context.DrawLine(bubblePen, 
@@ -135,14 +143,14 @@ namespace AvaloniaApplication1.Controls.Equipment
 
             // Буквенное обозначение "LT" сверху
             var textLt = new FormattedText("LT", CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-                InstrumentTypeface, bubbleRadius * 0.5, Brushes.White);
+                InstrumentTypeface, bubbleRadius * 0.5, textLtBrush);
             context.DrawText(textLt, new Point(bubbleCenter.X - textLt.Width / 2, bubbleCenter.Y - bubbleRadius * 0.75));
 
             // Номер позиции датчика снизу
             string tagShort = !string.IsNullOrEmpty(TagNumber) ? TagNumber : "101";
             if (tagShort.Length > 5) tagShort = tagShort.Substring(0, 5);
             var textTag = new FormattedText(tagShort, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-                InstrumentTypeface, bubbleRadius * 0.4, Brushes.LightGray);
+                InstrumentTypeface, bubbleRadius * 0.4, textTagBrush);
             context.DrawText(textTag, new Point(bubbleCenter.X - textTag.Width / 2, bubbleCenter.Y + bubbleRadius * 0.15));
 
             // 2. Монтажный фланец датчика

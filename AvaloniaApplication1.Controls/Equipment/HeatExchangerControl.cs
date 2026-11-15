@@ -87,9 +87,12 @@ namespace AvaloniaApplication1.Controls.Equipment
         }
 
         // --- Статически кэшированные графические ресурсы (Zero-Allocation) ---
-        private static readonly IBrush BodyBgBrush = new SolidColorBrush(Color.FromRgb(38, 40, 44));
-        private static readonly IBrush PlateBgBrush = new SolidColorBrush(Color.FromRgb(30, 32, 36));
-        private static readonly Pen OutlinePen = new Pen(new SolidColorBrush(Color.FromRgb(90, 95, 105)), 2.0);
+        private static readonly IBrush BodyBgBrushDark = new SolidColorBrush(Color.FromRgb(38, 40, 44));
+        private static readonly IBrush BodyBgBrushLight = new SolidColorBrush(Color.FromRgb(238, 240, 245));
+        private static readonly IBrush PlateBgBrushDark = new SolidColorBrush(Color.FromRgb(30, 32, 36));
+        private static readonly IBrush PlateBgBrushLight = new SolidColorBrush(Color.FromRgb(225, 228, 234));
+        private static readonly Pen OutlinePenDark = new Pen(new SolidColorBrush(Color.FromRgb(90, 95, 105)), 2.0);
+        private static readonly Pen OutlinePenLight = new Pen(new SolidColorBrush(Color.FromRgb(50, 55, 65)), 2.0);
         private static readonly Pen InnerTubesPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 220, 200)), 1.5);
         private static readonly Pen SecondaryTubesPen = new Pen(new SolidColorBrush(Color.FromRgb(255, 140, 0)), 1.5);
         private static readonly Pen BafflePen = new Pen(new SolidColorBrush(Color.FromRgb(120, 125, 135)), 1.0, new DashStyle(new double[] { 3, 3 }, 0));
@@ -126,8 +129,12 @@ namespace AvaloniaApplication1.Controls.Equipment
 
         private void RenderShellAndTubeExchanger(DrawingContext context, Rect r, double nozzleLen, double nozzleWidth, double totalW, double totalH)
         {
+            bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+            var bodyBg = isLight ? BodyBgBrushLight : BodyBgBrushDark;
+            var outlinePen = isLight ? OutlinePenLight : OutlinePenDark;
+
             // Корпус со скругленными крышками (эллиптические днища слева и справа)
-            context.DrawRectangle(BodyBgBrush, OutlinePen, r, r.Height / 2.0, r.Height / 2.0);
+            context.DrawRectangle(bodyBg, outlinePen, r, r.Height / 2.0, r.Height / 2.0);
 
             // Отрисовка внутренних трубок
             double cy = r.Center.Y;
@@ -146,8 +153,12 @@ namespace AvaloniaApplication1.Controls.Equipment
 
         private void RenderPlateExchanger(DrawingContext context, Rect r, double nozzleLen, double nozzleWidth, double totalW, double totalH)
         {
+            bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+            var plateBg = isLight ? PlateBgBrushLight : PlateBgBrushDark;
+            var outlinePen = isLight ? OutlinePenLight : OutlinePenDark;
+
             // Пакет пластин с шевронным рифлением
-            context.DrawRectangle(PlateBgBrush, OutlinePen, r, 4, 4);
+            context.DrawRectangle(plateBg, outlinePen, r, 4, 4);
 
             // Шевроны пластин
             int plateCount = Math.Max(3, (int)(r.Width / 12));
@@ -164,25 +175,28 @@ namespace AvaloniaApplication1.Controls.Equipment
 
         private void RenderNozzlesAndFlanges(DrawingContext context, Rect r, double nozzleLen, double nozzleWidth)
         {
+            bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+            var outlinePen = isLight ? OutlinePenLight : OutlinePenDark;
+
             double insetX = r.Width * 0.22;
             double xLeft = r.Left + insetX;
             double xRight = r.Right - insetX;
 
             // 1. Верхний левый патрубок (Hot In)
             var p1Top = new Point(xLeft, 0);
-            context.DrawRectangle(NozzleBrush, OutlinePen, new Rect(xLeft - nozzleWidth / 2, 0, nozzleWidth, nozzleLen));
+            context.DrawRectangle(NozzleBrush, outlinePen, new Rect(xLeft - nozzleWidth / 2, 0, nozzleWidth, nozzleLen));
 
             // 2. Верхний правый патрубок (Cold Out)
             var p2Top = new Point(xRight, 0);
-            context.DrawRectangle(NozzleBrush, OutlinePen, new Rect(xRight - nozzleWidth / 2, 0, nozzleWidth, nozzleLen));
+            context.DrawRectangle(NozzleBrush, outlinePen, new Rect(xRight - nozzleWidth / 2, 0, nozzleWidth, nozzleLen));
 
             // 3. Нижний левый патрубок (Cold In)
             var p3Bottom = new Point(xLeft, r.Bottom);
-            context.DrawRectangle(NozzleBrush, OutlinePen, new Rect(xLeft - nozzleWidth / 2, r.Bottom, nozzleWidth, nozzleLen));
+            context.DrawRectangle(NozzleBrush, outlinePen, new Rect(xLeft - nozzleWidth / 2, r.Bottom, nozzleWidth, nozzleLen));
 
             // 4. Нижний правый патрубок (Hot Out)
             var p4Bottom = new Point(xRight, r.Bottom);
-            context.DrawRectangle(NozzleBrush, OutlinePen, new Rect(xRight - nozzleWidth / 2, r.Bottom, nozzleWidth, nozzleLen));
+            context.DrawRectangle(NozzleBrush, outlinePen, new Rect(xRight - nozzleWidth / 2, r.Bottom, nozzleWidth, nozzleLen));
 
             // Фланцы на торцах патрубков
             if (ShowFlanges)

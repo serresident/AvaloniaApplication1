@@ -43,6 +43,7 @@ namespace AvaloniaApplication1
         private void ConfigureServices(IServiceCollection services)
         {
             // Services
+            services.AddSingleton<IThemeService, ThemeService>();
             services.AddSingleton<IProjectContextService, ProjectContextService>();
             services.AddSingleton<IConfigurationService, ConfigurationService>();
             

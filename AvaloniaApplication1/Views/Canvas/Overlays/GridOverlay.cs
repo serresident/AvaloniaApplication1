@@ -14,6 +14,12 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
     {
         private DashboardPanel? _panel;
 
+        // Static cached pens and brushes for Zero-Allocation in Render() and theme adaptation
+        private static readonly IPen DarkGridPen = new Pen(new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)), 1, new DashStyle(new double[] { 4, 4 }, 0));
+        private static readonly IPen LightGridPen = new Pen(new SolidColorBrush(Color.FromArgb(40, 0, 0, 0)), 1, new DashStyle(new double[] { 4, 4 }, 0));
+        private static readonly IBrush HighlightBrush = new SolidColorBrush(Color.FromArgb(60, 0, 122, 204));
+        private static readonly IPen HighlightBorderPen = new Pen(new SolidColorBrush(Color.FromArgb(180, 0, 122, 204)), 2);
+
         public GridOverlay()
         {
             IsHitTestVisible = false;
@@ -71,9 +77,9 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
             double cellW = _panel != null ? _panel.CellWidth : CellWidth;
             double cellH = _panel != null ? _panel.CellHeight : CellHeight;
 
-            // Draw grid lines
-            var pen = new Pen(new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)), 1,
-                new DashStyle(new double[] { 4, 4 }, 0));
+            // Draw grid lines with theme-adaptive contrast and zero allocations
+            bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+            var pen = isLight ? LightGridPen : DarkGridPen;
 
             double width = Bounds.Width;
             double height = Bounds.Height;
@@ -91,15 +97,12 @@ namespace AvaloniaApplication1.Views.Canvas.Overlays
             // Draw drop target highlight while dragging
             if (ShowHighlight)
             {
-                var highlightBrush = new SolidColorBrush(Color.FromArgb(60, 0, 122, 204));
                 var highlightRect = new Rect(
                     HighlightCol * cellW, HighlightRow * cellH,
                     HighlightSizeX * cellW, HighlightSizeY * cellH);
 
-                context.DrawRectangle(highlightBrush, null, highlightRect);
-
-                var borderPen = new Pen(new SolidColorBrush(Color.FromArgb(180, 0, 122, 204)), 2);
-                context.DrawRectangle(null, borderPen, highlightRect);
+                context.DrawRectangle(HighlightBrush, null, highlightRect);
+                context.DrawRectangle(null, HighlightBorderPen, highlightRect);
             }
         }
     }

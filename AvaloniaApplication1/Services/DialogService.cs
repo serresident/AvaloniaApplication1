@@ -32,6 +32,7 @@ namespace AvaloniaApplication1.Services
         private readonly ISimulationService? _simulationService;
         private readonly IHmiClipboardService? _hmiClipboardService;
         private readonly IConfigurationService? _configurationService;
+        private readonly IThemeService? _themeService;
 
         public DialogService(
             IDataCoreService dataCoreService, 
@@ -39,7 +40,8 @@ namespace AvaloniaApplication1.Services
             IWidgetFactory widgetFactory,
             ISimulationService? simulationService = null,
             IHmiClipboardService? hmiClipboardService = null,
-            IConfigurationService? configurationService = null)
+            IConfigurationService? configurationService = null,
+            IThemeService? themeService = null)
         {
             _dataCoreService = dataCoreService;
             _projectContext = projectContext;
@@ -47,6 +49,7 @@ namespace AvaloniaApplication1.Services
             _simulationService = simulationService;
             _hmiClipboardService = hmiClipboardService;
             _configurationService = configurationService;
+            _themeService = themeService;
         }
 
         public IChildWindowService? ChildWindowService { get; set; }
@@ -416,7 +419,7 @@ namespace AvaloniaApplication1.Services
             if (MainWindow == null) return;
 
             var window = new SettingsWindow();
-            var vm = new SettingsViewModel(config, configService, this, () => window.Close(), _simulationService);
+            var vm = new SettingsViewModel(config, configService, this, () => window.Close(), _simulationService, _themeService);
             window.DataContext = vm;
 
             await window.ShowDialog(MainWindow);

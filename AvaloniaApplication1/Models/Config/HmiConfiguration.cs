@@ -6,6 +6,7 @@ namespace AvaloniaApplication1.Models.Config
     public class HmiConfiguration
     {
         public int SchemaVersion { get; set; } = 1;
+        public string Theme { get; set; } = "Dark";
         public ProjectConfig Project { get; set; } = new();
         public SecurityConfig Security { get; set; } = new();
         public List<ConnectionConfig> Connections { get; set; } = new();
@@ -20,6 +21,7 @@ namespace AvaloniaApplication1.Models.Config
         public string Name { get; set; } = string.Empty;
         public string Version { get; set; } = "1.0.0";
         public bool IsCompactMode { get; set; } = false;
+        public string Theme { get; set; } = "Dark";
     }
 
     public class SecurityConfig

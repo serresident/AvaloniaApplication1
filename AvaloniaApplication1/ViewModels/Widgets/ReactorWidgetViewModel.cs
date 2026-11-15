@@ -107,7 +107,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         [RelayCommand]
         private void ToggleAgitator()
         {
-            if (ProjectContext.IsDesignMode) return;
+            if (ProjectContext?.IsDesignMode == true) return;
 
             if (TypedConfig.AgitatorSource != null && 
                 !string.IsNullOrEmpty(TypedConfig.AgitatorSource.ConnId) && 

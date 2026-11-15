@@ -43,7 +43,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
 
         partial void OnSliderValueChanged(double value)
         {
-            if (ProjectContext.IsDesignMode) return;
+            if (ProjectContext?.IsDesignMode == true) return;
 
             if (!_isUpdatingFromSource && Source != null)
             {

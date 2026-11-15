@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -82,6 +83,29 @@ namespace AvaloniaApplication1.ViewModels.Core
         [ObservableProperty]
         private double _qualityOpacity = 1.0;
 
+        public double EffectiveOpacity => (ProjectContext?.IsDesignMode == true) ? 1.0 : QualityOpacity;
+
+        public void UpdateQualityOpacity()
+        {
+            if (ProjectContext?.IsDesignMode == true)
+            {
+                QualityOpacity = 1.0;
+            }
+            else
+            {
+                QualityOpacity = (IsStale || HasCommError) ? 0.55 : 1.0;
+            }
+            OnPropertyChanged(nameof(EffectiveOpacity));
+        }
+
+        private void OnProjectContextPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IProjectContextService.IsDesignMode))
+            {
+                UpdateQualityOpacity();
+            }
+        }
+
         [ObservableProperty]
         private string _qualityGlyph = string.Empty;
 
@@ -97,7 +121,7 @@ namespace AvaloniaApplication1.ViewModels.Core
                 OriginalConfig.GroupId = value;
         }
 
-        public IProjectContextService ProjectContext { get; }
+        public IProjectContextService? ProjectContext { get; }
 
         /// <summary>
         /// Reference to the original config for syncing back changes in Design Mode.
@@ -124,6 +148,11 @@ namespace AvaloniaApplication1.ViewModels.Core
             LabelPosition = config.LabelPosition;
             CompactMode = config.CompactMode;
             GroupId = config.GroupId;
+
+            if (ProjectContext != null)
+            {
+                ProjectContext.PropertyChanged += OnProjectContextPropertyChanged;
+            }
 
             InitializeTagSubscriptions();
         }
@@ -211,8 +240,9 @@ namespace AvaloniaApplication1.ViewModels.Core
             IsStale = (Quality == TagQuality.Stale || Quality == TagQuality.Timeout);
             HasCommError = (Quality == TagQuality.Bad || Quality == TagQuality.CommFailure);
 
-            // ISA-101 High-Performance HMI dimming & glyph feedback
-            QualityOpacity = (IsStale || HasCommError) ? 0.55 : 1.0;
+            // ISA-101 High-Performance HMI dimming & glyph feedback:
+            // In Design Mode widgets remain 100% opaque. In Runtime Mode, dimmed to 0.55 when degraded.
+            UpdateQualityOpacity();
 
             if (IsOverridden)
             {
@@ -304,6 +334,10 @@ namespace AvaloniaApplication1.ViewModels.Core
 
         public virtual void Dispose()
         {
+            if (ProjectContext != null)
+            {
+                ProjectContext.PropertyChanged -= OnProjectContextPropertyChanged;
+            }
             Disposables.Dispose(); // Clear all reactive subscriptions
             GC.SuppressFinalize(this);
         }

@@ -49,7 +49,11 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         [ObservableProperty]
         private bool _isSimulationRunning;
 
+        [ObservableProperty]
+        private string _theme = "Dark";
+
         private readonly ISimulationService? _simulationService;
+        private readonly IThemeService? _themeService;
 
         public ObservableCollection<ConnectionConfig> Connections { get; } = new();
 
@@ -58,13 +62,15 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             IConfigurationService configService,
             IDialogService? dialogService = null,
             Action? closeAction = null,
-            ISimulationService? simulationService = null)
+            ISimulationService? simulationService = null,
+            IThemeService? themeService = null)
         {
             _config = config;
             _configService = configService;
             _dialogService = dialogService;
             _closeAction = closeAction;
             _simulationService = simulationService;
+            _themeService = themeService;
 
             _config.Project ??= new ProjectConfig();
             _config.Security ??= new SecurityConfig();
@@ -73,6 +79,9 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             ProjectName = _config.Project.Name;
             ProjectVersion = _config.Project.Version;
             IsCompactMode = _config.Project.IsCompactMode;
+            Theme = !string.IsNullOrEmpty(_config.Theme) 
+                ? _config.Theme 
+                : (!string.IsNullOrEmpty(_config.Project.Theme) ? _config.Project.Theme : "Dark");
             CurrentFilePath = _configService.CurrentFilePath;
 
             MimicCellSize = _config.Mimic.CellSize > 0 ? _config.Mimic.CellSize : 10;
@@ -124,6 +133,10 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             _config.Project.Name = ProjectName;
             _config.Project.Version = ProjectVersion;
             _config.Project.IsCompactMode = IsCompactMode;
+            _config.Theme = Theme;
+            if (_config.Project != null)
+                _config.Project.Theme = Theme;
+            _themeService?.SetTheme(Theme);
             _config.Mimic.CellSize = MimicCellSize;
             _config.Mimic.ZoomScale = MimicZoomScale;
             _config.Security.RequirePasswordForDesignMode = RequirePassword;

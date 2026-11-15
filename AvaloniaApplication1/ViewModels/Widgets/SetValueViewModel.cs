@@ -81,7 +81,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         [RelayCommand]
         private async Task InputSetpointAsync()
         {
-            if (ProjectContext.IsDesignMode) return;
+            if (ProjectContext?.IsDesignMode == true) return;
 
             if (DialogService == null) return;
 

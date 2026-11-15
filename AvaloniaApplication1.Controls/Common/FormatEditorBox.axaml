@@ -20,7 +20,10 @@
             <Button Grid.Column="2" 
                     Content="📋 Шаблоны ▼" 
                     Padding="10,6" 
-                    Background="#3E3E42" Foreground="#00AAFF" 
+                    Background="{DynamicResource ThemeSubtleBrush}" 
+                    BorderBrush="{DynamicResource ThemeBorderBrush}"
+                    BorderThickness="1"
+                    Foreground="#00AAFF" 
                     FontWeight="SemiBold" FontSize="12" CornerRadius="4"
                     ToolTip.Tip="Выбрать готовый шаблон физической величины">
                 <Button.Flyout>
@@ -121,7 +124,7 @@
                             <MenuItem Header="{}{0:F1} ч    (Часы)" Click="PresetItem_Click" Tag="{}{0:F1} ч" />
                         </MenuItem>
 
-                        <Separator Background="#3E3E42" Height="1" Margin="0,2" />
+                        <Separator Background="{DynamicResource ThemeSeparatorBrush}" Height="1" Margin="0,2" />
 
                         <!-- 11. Числовые форматы -->
                         <MenuItem Header="🔢  Числовой формат (без единиц)">
@@ -138,27 +141,27 @@
 
         <!-- Row 2: Precision quick-switcher buttons (Smart format switcher) -->
         <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
-            <TextBlock Grid.Column="0" Text="Знаков:" Foreground="#888888" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <TextBlock Grid.Column="0" Text="Знаков:" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0" />
             <UniformGrid Grid.Column="1" Columns="5">
                 <Button Content="0" Click="PrecisionButton_Click" Tag="F0"
                         Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
-                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        Background="{DynamicResource ThemeSubtleBrush}" Foreground="{DynamicResource ThemeForegroundBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" FontSize="11" CornerRadius="3"
                         ToolTip.Tip="Целое число ({0:F0})" />
                 <Button Content=".0" Click="PrecisionButton_Click" Tag="F1"
                         Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
-                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        Background="{DynamicResource ThemeSubtleBrush}" Foreground="{DynamicResource ThemeForegroundBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" FontSize="11" CornerRadius="3"
                         ToolTip.Tip="1 знак после запятой ({0:F1})" />
                 <Button Content=".00" Click="PrecisionButton_Click" Tag="F2"
                         Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
-                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        Background="{DynamicResource ThemeSubtleBrush}" Foreground="{DynamicResource ThemeForegroundBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" FontSize="11" CornerRadius="3"
                         ToolTip.Tip="2 знака после запятой ({0:F2})" />
                 <Button Content=".000" Click="PrecisionButton_Click" Tag="F3"
                         Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
-                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        Background="{DynamicResource ThemeSubtleBrush}" Foreground="{DynamicResource ThemeForegroundBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" FontSize="11" CornerRadius="3"
                         ToolTip.Tip="3 знака после запятой ({0:F3})" />
                 <Button Content="Авто" Click="PrecisionButton_Click" Tag=""
                         Margin="1" Padding="0,3" HorizontalContentAlignment="Center"
-                        Background="#3E3E42" Foreground="#CCCCCC" FontSize="11" CornerRadius="3"
+                        Background="{DynamicResource ThemeSubtleBrush}" Foreground="{DynamicResource ThemeForegroundBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" FontSize="11" CornerRadius="3"
                         ToolTip.Tip="Без форматирования ({0})" />
             </UniformGrid>
         </Grid>

@@ -20,7 +20,7 @@
                 ToolTip.Tip="Нажмите для открытия палитры цветов">
             <Button.Flyout>
                 <Flyout Placement="BottomEdgeAlignedLeft">
-                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1"
+                    <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1"
                             CornerRadius="8" Padding="12" Width="340">
                         <StackPanel Spacing="10">
 
@@ -28,21 +28,21 @@
                             <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
                                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                     <Border Width="34" Height="26" CornerRadius="4"
-                                            BorderBrush="#666666" BorderThickness="1.5"
+                                            BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1.5"
                                             Background="{Binding SelectedBrush}" />
                                     <TextBlock Text="{Binding SelectedColorHex}"
-                                               Foreground="White" FontSize="14" FontWeight="Bold"
+                                               Foreground="{DynamicResource ThemeForegroundBrush}" FontSize="14" FontWeight="Bold"
                                                FontFamily="Consolas,monospace" VerticalAlignment="Center" />
                                 </StackPanel>
                                 <Button Grid.Column="2" Content="✕" Click="CloseFlyout_Click"
-                                        Background="Transparent" Foreground="#888888" Padding="6,2" FontSize="12" />
+                                        Background="Transparent" Foreground="{DynamicResource ThemeMutedTextBrush}" Padding="6,2" FontSize="12" />
                             </Grid>
 
-                            <Separator Background="#3E3E42" Height="1" Margin="0,2" />
+                            <Separator Background="{DynamicResource ThemeSeparatorBrush}" Height="1" Margin="0,2" />
 
                             <!-- HMI/SCADA Palette Swatches -->
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Базовые цвета HMI / SCADA:" Foreground="#AAAAAA" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock Text="Базовые цвета HMI / SCADA:" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="11" FontWeight="SemiBold" />
                                 <ItemsControl x:Name="SwatchesItemsControl">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -62,15 +62,15 @@
                                 </ItemsControl>
                             </StackPanel>
 
-                            <Separator Background="#3E3E42" Height="1" Margin="0,4" />
+                            <Separator Background="{DynamicResource ThemeSeparatorBrush}" Height="1" Margin="0,4" />
 
                             <!-- Hue Spectrum + RGB Sliders -->
                             <StackPanel Spacing="8">
-                                <TextBlock Text="Настройка оттенка (Спектр и RGB):" Foreground="#AAAAAA" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock Text="Настройка оттенка (Спектр и RGB):" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="11" FontWeight="SemiBold" />
 
                                 <!-- Hue -->
                                 <Grid ColumnDefinitions="28,*,44">
-                                    <TextBlock Grid.Column="0" Text="Тон" Foreground="#DDDDDD" FontSize="11" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="0" Text="Тон" Foreground="{DynamicResource ThemeForegroundBrush}" FontSize="11" VerticalAlignment="Center" />
                                     <Slider Grid.Column="1" Minimum="0" Maximum="360"
                                             Value="{Binding Hue}"
                                             Margin="4,0" VerticalAlignment="Center">
@@ -88,7 +88,7 @@
                                     </Slider>
                                     <TextBlock Grid.Column="2"
                                                Text="{Binding HueText}"
-                                               Foreground="#AAAAAA" FontSize="11"
+                                               Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="11"
                                                HorizontalAlignment="Right" VerticalAlignment="Center" />
                                 </Grid>
 
@@ -151,7 +151,10 @@
                 Content="🎨"
                 Click="PaletteButton_Click"
                 Padding="8,5" Margin="4,0,0,0"
-                Background="#3E3E42" Foreground="White" CornerRadius="4"
+                Background="{DynamicResource ThemeSubtleBrush}" 
+                BorderBrush="{DynamicResource ThemeBorderBrush}" 
+                BorderThickness="1" 
+                Foreground="{DynamicResource ThemeForegroundBrush}" CornerRadius="4"
                 ToolTip.Tip="Открыть палитру цветов" />
     </Grid>
 

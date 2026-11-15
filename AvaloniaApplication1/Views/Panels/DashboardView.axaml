@@ -17,8 +17,8 @@
 
      <UserControl.Resources>
          <c:BoolToBrushConverter x:Key="BoolToColor" TrueBrush="#FF0000" FalseBrush="#440000" />
-         <c:BoolToBrushConverter x:Key="BoolToBorderBg" TrueBrush="#2D2D30" FalseBrush="Transparent" />
-         <c:BoolToBrushConverter x:Key="BoolToBorderStroke" TrueBrush="#3E3E42" FalseBrush="Transparent" />
+         <c:BoolToBrushConverter x:Key="BoolToBorderBg" TrueResourceKey="ThemeCardBackgroundBrush" TrueBrush="#2D2D30" FalseBrush="Transparent" />
+         <c:BoolToBrushConverter x:Key="BoolToBorderStroke" TrueResourceKey="ThemeBorderBrush" TrueBrush="#3E3E42" FalseBrush="Transparent" />
          <c:HexToBrushConverter x:Key="HexToBrush" />
      </UserControl.Resources>
 

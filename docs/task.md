@@ -892,3 +892,35 @@
   - [x] Автоматические тесты: 21/21 PASS (100%)
   - [x] Headless-рендеринг в обоих режимах: `MainWindow` (Runtime) и `MainWindowDesign` (Design)
   - [x] Проверены визуальные границы: отсутствие наложений и усечений текста
+
+# Tasks: Dynamic Theme Switching (Dark / Light) & Widget Opacity Fix (Сессия 49 — Выполнено)
+
+- [x] Инфраструктура динамической смены тем (Dark / Light) на лету:
+  - [x] Создан интерфейс `IThemeService` и реализация `ThemeService.cs` с управлением `Application.Current.RequestedThemeVariant`
+  - [x] Зарегистрирован `IThemeService` в DI контейнере `App.axaml.cs`
+  - [x] Добавлена персистентность темы `public string Theme { get; set; } = "Dark";` в `HmiConfiguration.cs` и `ProjectConfig.cs`
+  - [x] Созданы семантические словари ресурсов `ThemeDictionaries` для `"Dark"` и `"Light"` в `App.axaml` (`ThemeBackgroundBrush`, `ThemeCanvasBackgroundBrush`, `ThemeForegroundBrush`, `ThemeSurfaceBrush`, `ThemeCardBackgroundBrush`, `ThemeHeaderBrush`, `ThemeToolbarBrush`, `ThemeSubtleBrush`, `ThemeBorderBrush`, `ThemeSeparatorBrush`, `ThemeTextPrimaryBrush`, `ThemeTextSecondaryBrush`, `ThemeMutedTextBrush`, `ThemeGridLineBrush`, `ThemeTabActiveBrush`, `ThemeTabInactiveBrush`, `ThemeAccentBrush`)
+  - [x] Добавлена поддержка семантических ресурсов в `BoolToBrushConverter.cs` (`TrueResourceKey`, `FalseResourceKey`)
+  - [x] Добавлена кнопка быстрого переключения темы (`🌙` / `☀️`) в заголовок `MainWindow.axaml` с привязкой к `ToggleThemeCommand`
+  - [x] Добавлен селектор темы в окно настроек `SettingsWindow.axaml` и поддержка во вьюмодели `SettingsViewModel.cs`
+  - [x] Семантические динамические ресурсы `{DynamicResource ...}` применены к `MainWindow`, `DashboardView`, `WidgetEditorWindow`, `SettingsWindow`, `ConnectionManagerWindow`, `TagManagerWindow`
+- [x] Адаптация кастомных промышленных контролов и оверлеев:
+  - [x] `GridOverlay.cs`: Кэшированы `DarkGridPen` и `LightGridPen` для нулевых аллокаций в `Render()`
+  - [x] `TrendLineControl.cs`: Кэшированы `DarkGridPen` и `LightGridPen` для нулевых аллокаций
+  - [x] `ReactorControl.cs`: Кэшированы статические кисти и перья `VesselBgBrushDark/Light`, `VesselOutlinePenDark/Light`
+  - [x] `HeatExchangerControl.cs`: Кэшированы `BodyBgBrushDark/Light`, `PlateBgBrushDark/Light`, `OutlinePenDark/Light`
+  - [x] `LevelSensorControl.cs`: Кэшированы `BubbleBgBrushDark/Light`, `TextLtBrushLight`, `TextTagBrushLight`
+  - [x] `ValveControl.cs`: Кэшированы `FeedbackBarBgBrushDark/Light`, `FeedbackBarBgPenDark/Light`
+  - [x] `ColorPickerBox.axaml` и `FormatEditorBox.axaml`: Переведены на `{DynamicResource ...}`
+- [x] Исправление непрозрачности виджетов (Widget Opacity Fix):
+  - [x] В `WidgetViewModelBase.cs` реализован метод `UpdateQualityOpacity()` и свойство `EffectiveOpacity`
+  - [x] Подписка на `ProjectContext.PropertyChanged` для реакции на изменение `IsDesignMode`
+  - [x] В режиме Design Mode (`IsDesignMode = true`) виджеты всегда 100% непрозрачны (`EffectiveOpacity = 1.0`, `QualityOpacity = 1.0`), исключая затемнение при отсутствии связи с контроллером
+  - [x] В режиме Runtime (`IsDesignMode = false`) применяется стандартное диммирование ISA-101 (`0.55`) при сбоях связи (`CommError`, `Stale`)
+  - [x] Устранены предупреждения компилятора CS8602/CS8618 во всех виджетных ViewModel (`CommandButtonViewModel`, `PumpWidgetViewModel`, `ReactorWidgetViewModel`, `SetValueViewModel`, `SliderViewModel`, `ValveWidgetViewModel`)
+- [x] Тестирование и верификация:
+  - [x] Разработан автоматический тест №22 в `AvaloniaApplication1.UIValidation/Program.cs`
+  - [x] Проверено переключение `ThemeVariant.Dark` <-> `ThemeVariant.Light`, сменяемость глифа `🌙`/`☀️`, разрешение семантических кистей, сериализация в JSON и инвариант прозрачности Design/Runtime
+  - [x] Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: 0 ошибок, 0 предупреждений
+  - [x] Все тесты пройдены: 22/22 PASS (100%)
+  - [x] Сгенерированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json`

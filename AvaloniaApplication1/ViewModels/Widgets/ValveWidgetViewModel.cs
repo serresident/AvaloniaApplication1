@@ -452,8 +452,8 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         [RelayCommand]
         private void OpenControlPopup()
         {
-            Console.WriteLine($"[ValveWidget] OpenControlPopup called. IsDesignMode={ProjectContext.IsDesignMode}, Source={Source?.Address}, ChildWindowService={ChildWindowService != null}");
-            if (ProjectContext.IsDesignMode || Source == null) return;
+            Console.WriteLine($"[ValveWidget] OpenControlPopup called. IsDesignMode={ProjectContext?.IsDesignMode == true}, Source={Source?.Address}, ChildWindowService={ChildWindowService != null}");
+            if (ProjectContext?.IsDesignMode == true || Source == null) return;
 
             if (_controlWindow != null)
             {

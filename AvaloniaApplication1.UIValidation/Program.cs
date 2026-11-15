@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Subjects;
 using Avalonia;
+using Avalonia.Styling;
 using Avalonia.Headless;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
@@ -212,6 +213,7 @@ public static class Program
             }
 
             var services = new ServiceCollection();
+            services.AddSingleton<IThemeService, ThemeService>();
             services.AddSingleton<IProjectContextService, ProjectContextService>();
             services.AddSingleton<IConfigurationService>(configService);
             services.AddSingleton<IDataCoreService, MockDataCoreService>();
@@ -487,8 +489,19 @@ public static class Program
             if (frame != null)
             {
                 var imgPath = Path.Combine(outDir, "ui_preview.png");
-                frame.Save(imgPath);
-                Console.WriteLine($"[UIValidation] Screenshot saved: {imgPath} ({new FileInfo(imgPath).Length} bytes)");
+                try
+                {
+                    if (File.Exists(imgPath))
+                    {
+                        try { File.Delete(imgPath); } catch { }
+                    }
+                    frame.Save(imgPath);
+                    Console.WriteLine($"[UIValidation] Screenshot saved: {imgPath} ({new FileInfo(imgPath).Length} bytes)");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[UIValidation] Notice: Could not overwrite {imgPath} ({ex.Message}).");
+                }
             }
             else
             {
@@ -1969,7 +1982,121 @@ public static class Program
                     throw new Exception("FormatEditorBox Format sync failed.");
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (21/21) PASSED SUCCESSFULLY!");
+            // =========================================================================
+            // TEST 22: Enterprise Dynamic Theme Switching (Dark/Light) & Design Mode Opacity Invariant
+            // =========================================================================
+            Console.WriteLine("[UIValidation] Testing Enterprise Dynamic Theme Switching & Opacity Fix (Test 22)...");
+            {
+                var themeService = sp.GetRequiredService<IThemeService>();
+
+                // 22.1 Default State: Industrial Dark Mode
+                themeService.SetTheme("Dark");
+                if (themeService.CurrentTheme != "Dark" || !themeService.IsDarkTheme || themeService.ThemeToggleGlyph != "🌙")
+                    throw new Exception($"Default Dark theme state invalid: Current={themeService.CurrentTheme}, Glyph={themeService.ThemeToggleGlyph}");
+
+                if (Application.Current != null && Application.Current.RequestedThemeVariant != ThemeVariant.Dark)
+                    throw new Exception($"Application.RequestedThemeVariant expected Dark, got: {Application.Current.RequestedThemeVariant}");
+
+                // 22.2 Switch to Light Theme at Runtime
+                themeService.SetTheme("Light");
+                if (themeService.CurrentTheme != "Light" || themeService.IsDarkTheme || themeService.ThemeToggleGlyph != "☀️")
+                    throw new Exception($"Light theme state invalid: Current={themeService.CurrentTheme}, Glyph={themeService.ThemeToggleGlyph}");
+
+                if (Application.Current != null && Application.Current.RequestedThemeVariant != ThemeVariant.Light)
+                    throw new Exception($"Application.RequestedThemeVariant expected Light, got: {Application.Current.RequestedThemeVariant}");
+
+                if (Application.Current != null)
+                {
+                    if (Application.Current.TryFindResource("ThemeBackgroundBrush", Application.Current.ActualThemeVariant, out var lightBg) && lightBg is SolidColorBrush lb)
+                    {
+                        if (lb.Color.R < 200)
+                            throw new Exception($"Light theme ThemeBackgroundBrush color too dark: {lb.Color}");
+                    }
+                }
+
+                // 22.3 Toggle Back to Dark Theme
+                themeService.ToggleTheme();
+                if (themeService.CurrentTheme != "Dark" || !themeService.IsDarkTheme || themeService.ThemeToggleGlyph != "🌙")
+                    throw new Exception($"Toggled Dark theme state invalid: Current={themeService.CurrentTheme}");
+
+                if (Application.Current != null && Application.Current.RequestedThemeVariant != ThemeVariant.Dark)
+                    throw new Exception($"Application.RequestedThemeVariant expected Dark after toggle, got: {Application.Current.RequestedThemeVariant}");
+
+                if (Application.Current != null)
+                {
+                    if (Application.Current.TryFindResource("ThemeBackgroundBrush", Application.Current.ActualThemeVariant, out var darkBg) && darkBg is SolidColorBrush db)
+                    {
+                        if (db.Color.R > 60)
+                            throw new Exception($"Dark theme ThemeBackgroundBrush color too bright: {db.Color}");
+                    }
+                }
+
+                // 22.4 MainViewModel Theme Toggle Command & Persistence
+                mainVm.ToggleThemeCommand.Execute(null);
+                if (mainVm.ThemeToggleGlyph != "☀️" || themeService.CurrentTheme != "Light")
+                    throw new Exception("MainViewModel ToggleThemeCommand failed to activate Light theme.");
+
+                mainVm.ToggleThemeCommand.Execute(null);
+                if (mainVm.ThemeToggleGlyph != "🌙" || themeService.CurrentTheme != "Dark")
+                    throw new Exception("MainViewModel ToggleThemeCommand failed to restore Dark theme.");
+
+                // 22.5 Theme Configuration Persistence (Serialization & Deserialization)
+                var tempCfg = new HmiConfiguration
+                {
+                    Theme = "Light",
+                    Project = new ProjectConfig { Name = "ThemePersistenceTest", Theme = "Light" }
+                };
+                var tempThemeJson = System.Text.Json.JsonSerializer.Serialize(tempCfg, new JsonSerializerOptions { WriteIndented = true });
+                if (!tempThemeJson.Contains("\"Theme\": \"Light\""))
+                    throw new Exception("HmiConfiguration failed to serialize Theme property.");
+
+                var deserialized = System.Text.Json.JsonSerializer.Deserialize<HmiConfiguration>(tempThemeJson);
+                if (deserialized == null || deserialized.Theme != "Light" || deserialized.Project.Theme != "Light")
+                    throw new Exception("HmiConfiguration failed to deserialize Theme property.");
+
+                // 22.6 Design Mode Opacity Fix Invariant
+                // In Design Mode (IsDesignMode = true), widgets MUST remain 100% opaque (1.0) despite offline communication failure
+                var projCtx = new ProjectContextService { IsDesignMode = true };
+                var mockCore = new MockDataCoreService();
+                var vdConfig = new ValueDisplayConfig
+                {
+                    Title = "Датчик T-101",
+                    Format = "{0:F1} °C",
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "40010", TagId = "tag_test_stale" }
+                };
+                var vdVm = new ValueDisplayViewModel(vdConfig, mockCore, projCtx);
+
+                // Apply Stale snapshot while in Design Mode
+                vdVm.ApplySnapshot(new TagSnapshot("tag_test_stale", 70.0f, TagQuality.Stale, DateTime.UtcNow.AddMinutes(-5)));
+                if (vdVm.QualityOpacity != 1.0 || vdVm.EffectiveOpacity != 1.0)
+                    throw new Exception($"Design Mode Opacity Fix Failed: expected Opacity=1.0 for Stale widget in Design Mode, got QualityOpacity={vdVm.QualityOpacity}, EffectiveOpacity={vdVm.EffectiveOpacity}");
+
+                // Apply CommFailure snapshot while in Design Mode
+                vdVm.ApplySnapshot(new TagSnapshot("tag_test_stale", null, TagQuality.CommFailure, DateTime.UtcNow, "Offline PLC"));
+                if (vdVm.QualityOpacity != 1.0 || vdVm.EffectiveOpacity != 1.0)
+                    throw new Exception($"Design Mode Opacity Fix Failed: expected Opacity=1.0 for CommFailure widget in Design Mode, got QualityOpacity={vdVm.QualityOpacity}, EffectiveOpacity={vdVm.EffectiveOpacity}");
+
+                // Switch to Runtime Mode (IsDesignMode = false) -> Opacity MUST update to 0.55
+                projCtx.IsDesignMode = false;
+                if (vdVm.QualityOpacity != 0.55 || vdVm.EffectiveOpacity != 0.55)
+                    throw new Exception($"Runtime Mode Opacity Failed: expected Opacity=0.55 for CommFailure widget in Runtime Mode, got QualityOpacity={vdVm.QualityOpacity}, EffectiveOpacity={vdVm.EffectiveOpacity}");
+
+                // Switch back to Design Mode (IsDesignMode = true) -> Opacity MUST restore to 1.0
+                projCtx.IsDesignMode = true;
+                if (vdVm.QualityOpacity != 1.0 || vdVm.EffectiveOpacity != 1.0)
+                    throw new Exception($"Design Mode Opacity Restore Failed: expected Opacity=1.0 when switching back to Design Mode, got QualityOpacity={vdVm.QualityOpacity}, EffectiveOpacity={vdVm.EffectiveOpacity}");
+
+                // Normal / Good quality tag in both modes MUST remain 1.0
+                vdVm.ApplySnapshot(new TagSnapshot("tag_test_stale", 85.0f, TagQuality.Good, DateTime.UtcNow));
+                if (vdVm.QualityOpacity != 1.0 || vdVm.EffectiveOpacity != 1.0)
+                    throw new Exception($"Good state Opacity Failed: expected 1.0, got {vdVm.QualityOpacity}");
+
+                projCtx.IsDesignMode = false;
+                if (vdVm.QualityOpacity != 1.0 || vdVm.EffectiveOpacity != 1.0)
+                    throw new Exception($"Good state Opacity Failed in Runtime: expected 1.0, got {vdVm.QualityOpacity}");
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (22/22) PASSED SUCCESSFULLY!");
         }
     }
 

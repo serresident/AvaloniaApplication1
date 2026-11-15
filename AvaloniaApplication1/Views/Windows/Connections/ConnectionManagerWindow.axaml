@@ -10,16 +10,16 @@
         Title="Connection Manager"
         Width="620" Height="500"
         WindowStartupLocation="CenterOwner"
-        Background="#1E1E1E"
+        Background="{DynamicResource ThemeBackgroundBrush}"
         CanResize="False">
 
     <Grid RowDefinitions="Auto,*,Auto" Margin="20">
 
         <!-- Header -->
-        <TextBlock Grid.Row="0" Text="Connections" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,12" />
+        <TextBlock Grid.Row="0" Text="Connections" Foreground="{DynamicResource ThemeForegroundBrush}" FontSize="20" FontWeight="Bold" Margin="0,0,0,12" />
 
         <!-- Connection List -->
-        <Border Grid.Row="1" Background="#2D2D30" CornerRadius="6" Padding="4">
+        <Border Grid.Row="1" Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="4">
             <ListBox ItemsSource="{Binding Connections}" 
                      SelectedItem="{Binding SelectedConnection}"
                      Background="Transparent">

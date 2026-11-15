@@ -32,9 +32,14 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         private readonly IDialogService _dialogService;
         private readonly IWidgetFactory _widgetFactory;
         private readonly IHmiClipboardService? _hmiClipboardService;
+        private readonly IThemeService? _themeService;
         private HmiConfiguration? _currentConfig;
 
         public IProjectContextService ProjectContext { get; }
+        public IThemeService? ThemeService => _themeService;
+
+        [ObservableProperty]
+        private string _themeToggleGlyph = "🌙";
 
         [ObservableProperty]
         private string _currentProjectName = "config.json";
@@ -105,7 +110,8 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             IProjectContextService projectContext,
             IDialogService dialogService,
             IWidgetFactory widgetFactory,
-            IHmiClipboardService? hmiClipboardService = null)
+            IHmiClipboardService? hmiClipboardService = null,
+            IThemeService? themeService = null)
         {
             _configurationService = configurationService;
             _dataCoreService = dataCoreService;
@@ -113,7 +119,20 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             _dialogService = dialogService;
             _widgetFactory = widgetFactory;
             _hmiClipboardService = hmiClipboardService;
+            _themeService = themeService;
             ProjectContext = projectContext;
+
+            if (_themeService != null)
+            {
+                _themeService.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(IThemeService.ThemeToggleGlyph) || e.PropertyName == nameof(IThemeService.CurrentTheme))
+                    {
+                        ThemeToggleGlyph = _themeService.ThemeToggleGlyph;
+                    }
+                };
+                ThemeToggleGlyph = _themeService.ThemeToggleGlyph;
+            }
 
             if (_widgetFactory is WidgetFactory factory)
             {
@@ -245,6 +264,24 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         }
 
         [RelayCommand]
+        public void ToggleTheme()
+        {
+            _themeService?.ToggleTheme();
+            if (_themeService != null)
+            {
+                ThemeToggleGlyph = _themeService.ThemeToggleGlyph;
+                if (_currentConfig != null)
+                {
+                    _currentConfig.Theme = _themeService.CurrentTheme;
+                    if (_currentConfig.Project != null)
+                    {
+                        _currentConfig.Project.Theme = _themeService.CurrentTheme;
+                    }
+                }
+            }
+        }
+
+        [RelayCommand]
         private async Task OpenSettingsAsync()
         {
             if (_currentConfig == null) return;
@@ -320,6 +357,14 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             {
                 try
                 {
+                    if (_themeService != null)
+                    {
+                        _currentConfig.Theme = _themeService.CurrentTheme;
+                        if (_currentConfig.Project != null)
+                        {
+                            _currentConfig.Project.Theme = _themeService.CurrentTheme;
+                        }
+                    }
                     await _configurationService.SaveConfigurationAsync(_currentConfig);
                     ShowToast($"Проект сохранен: {CurrentProjectName}");
                 }
@@ -341,6 +386,14 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
 
             try
             {
+                if (_themeService != null)
+                {
+                    _currentConfig.Theme = _themeService.CurrentTheme;
+                    if (_currentConfig.Project != null)
+                    {
+                        _currentConfig.Project.Theme = _themeService.CurrentTheme;
+                    }
+                }
                 await _configurationService.SaveConfigurationAsync(_currentConfig, filePath);
                 CurrentProjectName = Path.GetFileName(filePath);
                 WindowTitle = $"Avalonia HMI Dashboard - [{CurrentProjectName}]";
@@ -447,6 +500,16 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             ActiveChildWindows.Clear();
 
             _currentConfig = loadedConfig;
+            if (_currentConfig == null) return;
+
+            if (_themeService != null)
+            {
+                var targetTheme = !string.IsNullOrEmpty(_currentConfig.Theme)
+                    ? _currentConfig.Theme
+                    : (!string.IsNullOrEmpty(_currentConfig.Project?.Theme) ? _currentConfig.Project.Theme : "Dark");
+                _themeService.SetTheme(targetTheme);
+                ThemeToggleGlyph = _themeService.ThemeToggleGlyph;
+            }
 
             CurrentProjectName = Path.GetFileName(_configurationService.CurrentFilePath);
             WindowTitle = $"Avalonia HMI Dashboard - [{CurrentProjectName}]";

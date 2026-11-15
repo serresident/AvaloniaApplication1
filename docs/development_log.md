@@ -1442,3 +1442,45 @@
         *   Header (Row 0): Left `[0,397]`, Center `[556,913]`, Right `[1072,1380]`.
         *   Toolbar (Row 1): Left `[0,809]`, Right `[918,1380]`.
         *   Полное отсутствие клиппинга и наложений.
+
+---
+
+## 📅 15.11.2026 (Сессия 49 — Динамическая смена тем Dark / Light и фикс прозрачности виджетов)
+
+### 📌 Достижение: Полнофункциональная система переключения тем оформления (Dark / Light) на лету без перезапуска приложения, интеграция семантических DynamicResource, адаптация библиотеки кастомных SCADA-контролов и гарантированный инвариант 100% непрозрачности виджетов в режиме редактирования (Design Mode).
+
+*   **Архитектура динамических тем (ThemeVariant & ThemeDictionaries):**
+    *   Создан сервис тем `IThemeService` и реализация `ThemeService.cs`, управляющая `Application.Current.RequestedThemeVariant`. Переключение темы маршалится в UI-поток через `Dispatcher.UIThread.InvokeAsync` и мгновенно рассылает уведомления через `INotifyPropertyChanged`.
+    *   `IThemeService` зарегистрирован в DI-контейнере `App.axaml.cs` как Singleton.
+    *   В `App.axaml` объявлены двухуровневые семантические словари `ThemeDictionaries` для `ThemeVariant.Dark` (индустриальная темная палитра SCADA) и `ThemeVariant.Light` (светлая инженерная тема):
+        *   `ThemeBackgroundBrush`, `ThemeCanvasBackgroundBrush`, `ThemeForegroundBrush`, `ThemeSurfaceBrush`, `ThemeCardBackgroundBrush`, `ThemeHeaderBrush`, `ThemeToolbarBrush`, `ThemeSubtleBrush`, `ThemeBorderBrush`, `ThemeSeparatorBrush`, `ThemeTextPrimaryBrush`, `ThemeTextSecondaryBrush`, `ThemeMutedTextBrush`, `ThemeGridLineBrush`, `ThemeTabActiveBrush`, `ThemeTabInactiveBrush`, `ThemeAccentBrush`.
+    *   Конвертер `BoolToBrushConverter.cs` расширен свойствами `TrueResourceKey` и `FalseResourceKey` для динамического извлечения кистей по ключу из активного `ThemeVariant` словаря темы.
+
+*   **Персистентность и UI-элементы управления темой:**
+    *   В модель конфигурации `HmiConfiguration.cs` и `ProjectConfig.cs` добавлено свойство `public string Theme { get; set; } = "Dark";`.
+    *   В заголовок `MainWindow.axaml` встроена кнопка быстрого переключения темы `🌙 / ☀️` (`ToggleThemeCommand`) рядом с часами и статусом связи.
+    *   В `SettingsWindow.axaml` и `SettingsViewModel.cs` добавлен выпадающий селектор темы (`ComboBox` со значениями `Dark` и `Light`) с автоматическим сохранением в конфигурацию.
+    *   Все жестко закодированные фоны и цвета рамок в `MainWindow.axaml`, `DashboardView.axaml`, `WidgetEditorWindow.axaml`, `SettingsWindow.axaml`, `ConnectionManagerWindow.axaml`, `TagManagerWindow.axaml` заменены на семантические привязки `{DynamicResource ...}`.
+
+*   **Адаптация библиотеки SCADA-контролов и нулевые аллокации в Render():**
+    *   В контролах `GridOverlay`, `TrendLineControl`, `ReactorControl`, `HeatExchangerControl`, `LevelSensorControl`, `ValveControl` кэшированы статические кисти и перья для светлой и темной тем (`DarkGridPen`, `LightGridPen`, `VesselBgBrushDark/Light`, `OutlinePenDark/Light` и др.).
+    *   При вызове `Render()` контролы проверяют `ActualThemeVariant` и выбирают предсозданные кисти без каких-либо повторных аллокаций памяти (`new Pen` / `new SolidColorBrush`).
+    *   Контролы `ColorPickerBox.axaml` и `FormatEditorBox.axaml` переведены на `{DynamicResource ...}` для идеальной читаемости как на темном, так и на светлом фоне.
+
+*   **Фикс прозрачности виджетов (Widget Opacity Fix):**
+    *   В `WidgetViewModelBase.cs` внедрены вычисляемые свойства `EffectiveOpacity` и метод `UpdateQualityOpacity()`.
+    *   Оформлена подписка на `ProjectContext.PropertyChanged` для оперативного отслеживания переключения `IsDesignMode`.
+    *   В режиме проектирования (`IsDesignMode = true`) виджеты всегда имеют 100% непрозрачность (`EffectiveOpacity = 1.0`, `QualityOpacity = 1.0`), исключая диммирование оборудования на холсте при отсутствии соединения с контроллерами.
+    *   В режиме исполнения (`IsDesignMode = false`) сохраняется классический промышленный стандарт ISA-101: диммирование до `0.55` при потере связи (`CommError`) или устаревании данных (`Stale`).
+    *   Устранены предупреждения компилятора CS8602/CS8618 во всех виджетных ViewModel за счет безопасной навигации `ProjectContext?.IsDesignMode == true`.
+
+*   **Тестирование и верификация:**
+    *   В `AvaloniaApplication1.UIValidation/Program.cs` разработан комплексный автоматический тест №22 (`TEST 22: Enterprise Dynamic Theme Switching & Opacity Fix`):
+        *   Тестирование переключения `Dark` -> `Light` -> `Dark` через `IThemeService`.
+        *   Верификация глифов переключателя (`🌙` / `☀️`).
+        *   Проверка разрешения ресурсов палитры `ThemeBackgroundBrush` для обоих вариантов.
+        *   Тестирование сериализации/десериализации свойства `Theme` в JSON-конфигурации проекта.
+        *   Проверка инварианта `EffectiveOpacity`: в Design Mode при плохом качестве данных непрозрачность равна `1.0`; в Runtime Mode при `Quality = Stale` или `CommError` — `0.55`.
+    *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
+    *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation` — **22/22 PASS (100%)**.
+    *   Сгенерированы актуальные артефакты headless-рендеринга `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.

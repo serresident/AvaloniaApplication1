@@ -18,12 +18,16 @@
         Width="1400" Height="900"
         MinWidth="1024" MinHeight="600"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E1E">
+        Background="{DynamicResource ThemeBackgroundBrush}">
 
     <Window.Resources>
         <c:BoolToBrushConverter x:Key="BoolToColor" TrueBrush="#E51400" FalseBrush="#0050EF" />
-        <c:BoolToBrushConverter x:Key="DashboardTabColor" TrueBrush="#2D2D30" FalseBrush="#007ACC" />
-        <c:BoolToBrushConverter x:Key="MimicTabColor" TrueBrush="#007ACC" FalseBrush="#2D2D30" />
+        <c:BoolToBrushConverter x:Key="DashboardTabColor" 
+                                TrueResourceKey="ThemeTabInactiveBrush" TrueBrush="#2D2D30" 
+                                FalseResourceKey="ThemeTabActiveBrush" FalseBrush="#007ACC" />
+        <c:BoolToBrushConverter x:Key="MimicTabColor" 
+                                TrueResourceKey="ThemeTabActiveBrush" TrueBrush="#007ACC" 
+                                FalseResourceKey="ThemeTabInactiveBrush" FalseBrush="#2D2D30" />
     </Window.Resources>
 
     <Window.KeyBindings>
@@ -39,68 +43,79 @@
 
     <Grid RowDefinitions="Auto,Auto,*">
         <!-- Row 0: Top Header Status & Navigation Bar (Always Visible) -->
-        <Border Grid.Row="0" Background="#2B2B2E" Padding="10,5">
+        <Border Grid.Row="0" Background="{DynamicResource ThemeHeaderBrush}" Padding="10,5">
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <!-- Left Section: Title, Windows Count, Tabs (in Design) -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <TextBlock Text="HMI SCADA" Foreground="White" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBlock Text="HMI SCADA" Foreground="{DynamicResource ThemeTextPrimaryBrush}" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0" />
                     <TextBlock Text="{Binding ActiveChildWindows.Count, StringFormat='[{0}]'}" Foreground="#FF5252" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" ToolTip.Tip="Количество открытых окон" />
                     
                     <!-- Dashboard tab visible in Design mode -->
-                    <Rectangle Width="1" Height="16" Fill="#444448" Margin="4,0" IsVisible="{Binding ProjectContext.IsDesignMode}" />
+                    <Rectangle Width="1" Height="16" Fill="{DynamicResource ThemeSeparatorBrush}" Margin="4,0" IsVisible="{Binding ProjectContext.IsDesignMode}" />
                     <Button Command="{Binding ShowDashboardCommand}"
                             Content="📊 Дашборд"
                             Background="{Binding IsMimicActive, Converter={StaticResource DashboardTabColor}}"
-                            Foreground="White" CornerRadius="4" Padding="10,4" BorderThickness="0"
+                            Foreground="{DynamicResource ThemeTextPrimaryBrush}" CornerRadius="4" Padding="10,4" BorderThickness="0"
                             IsVisible="{Binding ProjectContext.IsDesignMode}" />
                     <Button Command="{Binding ShowMimicCommand}"
                             Content="📐 Мнемосхема"
                             Background="{Binding IsMimicActive, Converter={StaticResource MimicTabColor}}"
-                            Foreground="White" CornerRadius="4" Padding="10,4" BorderThickness="0"
+                            Foreground="{DynamicResource ThemeTextPrimaryBrush}" CornerRadius="4" Padding="10,4" BorderThickness="0"
                             IsVisible="{Binding ProjectContext.IsDesignMode}" />
                 </StackPanel>
 
                 <!-- Center Section: Live Clock, Connection Health & Alarms Status -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <!-- Live Clock & Date Badge -->
-                    <Border Background="#202022" BorderBrush="#38383C" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                    <Border Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             ToolTip.Tip="Текущее системное время и дата оператора">
                         <StackPanel Orientation="Horizontal" Spacing="5">
                             <TextBlock Text="🕒" FontSize="11" VerticalAlignment="Center" />
                             <TextBlock Text="{Binding CurrentTimeText}" Foreground="#4EC9B0" FontSize="12" FontWeight="Bold" FontFamily="Consolas, monospace" VerticalAlignment="Center" />
-                            <TextBlock Text="|" Foreground="#555555" FontSize="11" VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding CurrentDateText}" Foreground="#858585" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Text="|" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding CurrentDateText}" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="11" VerticalAlignment="Center" />
                         </StackPanel>
                     </Border>
 
                     <!-- Connection Status Badge (Clickable) -->
                     <Button Command="{Binding OpenConnectionManagerCommand}"
-                            Background="#202022" BorderBrush="#38383C" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                            Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             ToolTip.Tip="Статус сетевых драйверов (нажмите для открытия менеджера связей)">
                         <TextBlock Text="{Binding ConnectionStatusText}" Foreground="#DCDCAA" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Button>
 
                     <!-- Alarms Counter Badge -->
-                    <Border Background="#202022" BorderBrush="#38383C" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                    <Border Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             ToolTip.Tip="Сводка активных аварийных сигналов технологического процесса">
                         <TextBlock Text="{Binding ActiveAlarmsText}" Foreground="#9CDCFE" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Border>
                 </StackPanel>
 
-                <!-- Right Section: Current Config Badge, Calculator, Mode Switch (Clean & uncluttered) -->
+                <!-- Right Section: Current Config Badge, Theme Switch, Calculator, Mode Switch -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <!-- Active Project Name Badge (ALWAYS VISIBLE) -->
-                    <Border Background="#202022" BorderBrush="#38383C" BorderThickness="1" CornerRadius="4" Padding="8,3"
+                    <Border Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             VerticalAlignment="Center"
                             ToolTip.Tip="Текущий активный файл конфигурации проекта">
                         <TextBlock Text="{Binding CurrentProjectName, StringFormat='📁 {0}'}" 
-                                   Foreground="#9CDCFE" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                   Foreground="{DynamicResource ThemeTextSecondaryBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Border>
+
+                    <!-- Theme Toggle Button (ALWAYS VISIBLE) -->
+                    <Button Command="{Binding ToggleThemeCommand}"
+                            Content="{Binding ThemeToggleGlyph}"
+                            Background="{DynamicResource ThemeSubtleBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4" Padding="8,4"
+                            ToolTip.Tip="Сменить тему оформления (Темная / Светлая)" />
 
                     <!-- Calculator Button (ALWAYS VISIBLE) -->
                     <Button Command="{Binding OpenCalculatorCommand}"
                             Content="🧮"
-                            Background="#2A3344"
+                            Background="{DynamicResource ThemeSubtleBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderBrush}"
+                            BorderThickness="1"
                             Foreground="#00E5FF" CornerRadius="4" Padding="8,4"
                             ToolTip.Tip="Открыть технологический калькулятор и пересчет величин (F10)" />
 
@@ -123,15 +138,15 @@
 
         <!-- Row 1: Dedicated Design Mode Engineering Toolbar (Visible only in Design Mode) -->
         <Border Grid.Row="1" 
-                Background="#1E1E20" 
-                BorderBrush="#38383C" 
+                Background="{DynamicResource ThemeToolbarBrush}" 
+                BorderBrush="{DynamicResource ThemeBorderBrush}" 
                 BorderThickness="0,0,0,1" 
                 Padding="10,4"
                 IsVisible="{Binding ProjectContext.IsDesignMode}">
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <!-- Group 1: Project File Operations -->
-                    <TextBlock Text="Проект:" Foreground="#858585" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Margin="2,0,4,0" />
+                    <TextBlock Text="Проект:" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Margin="2,0,4,0" />
                     <Button Command="{Binding OpenProjectCommand}"
                             Content="📂 Загрузить..."
                             Background="#0E639C"
@@ -149,10 +164,10 @@
                             ToolTip.Tip="Сохранить проект под новым именем (Ctrl+Shift+S)" />
 
                     <!-- Vertical Separator -->
-                    <Rectangle Width="1" Height="18" Fill="#3E3E42" Margin="6,0" VerticalAlignment="Center" />
+                    <Rectangle Width="1" Height="18" Fill="{DynamicResource ThemeSeparatorBrush}" Margin="6,0" VerticalAlignment="Center" />
 
                     <!-- Group 2: Engineering & Signals Subsystems -->
-                    <TextBlock Text="Инженерия:" Foreground="#858585" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Margin="2,0,4,0" />
+                    <TextBlock Text="Инженерия:" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Margin="2,0,4,0" />
                     <Button Command="{Binding OpenTagManagerCommand}"
                             Content="🏷️ База тегов"
                             Background="#D97706"
@@ -165,15 +180,17 @@
                             ToolTip.Tip="Менеджер сетевых подключений (Modbus TCP/RTU, MQTT)" />
                     <Button Command="{Binding OpenSettingsCommand}"
                             Content="⚙️ Настройки"
-                            Background="#3E3E42"
-                            Foreground="White" CornerRadius="4" Padding="8,4" FontSize="12"
-                            ToolTip.Tip="Настройки проекта, мнемосхемы, симуляции и пароля (Ctrl+,)" />
+                            Background="{DynamicResource ThemeSubtleBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderBrush}"
+                            BorderThickness="1"
+                            Foreground="{DynamicResource ThemeTextPrimaryBrush}" CornerRadius="4" Padding="8,4" FontSize="12"
+                            ToolTip.Tip="Настройки проекта, мнемосхемы, темы, симуляции и пароля (Ctrl+,)" />
                 </StackPanel>
 
                 <!-- Right Side Hint / Quick Help in Design Mode -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <TextBlock Text="💡 Режим редактирования: ЛКМ — выбор/перемещение, ПКМ — контекстное меню" 
-                               Foreground="#6E6E72" FontSize="11" FontStyle="Italic" VerticalAlignment="Center" Margin="0,0,4,0" />
+                               Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="11" FontStyle="Italic" VerticalAlignment="Center" Margin="0,0,4,0" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -208,19 +225,19 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type vmCore:ChildWindowViewModel}">
                         <!-- Child Window Frame -->
-                        <Border Background="#2B2B2B" 
-                                BorderBrush="#4E4E50" 
+                        <Border Background="{DynamicResource ThemeSurfaceBrush}" 
+                                BorderBrush="{DynamicResource ThemeBorderBrush}" 
                                 BorderThickness="2" 
                                 CornerRadius="8" 
                                 Width="{Binding Width}" 
                                 Height="{Binding Height}"
-                                BoxShadow="0 8 24 0 #AA000000"
+                                BoxShadow="0 8 24 0 #66000000"
                                 ClipToBounds="True">
                             <Grid RowDefinitions="Auto,*">
                                 <!-- Title Bar (Draggable) -->
                                 <Grid Grid.Row="0" 
                                       ColumnDefinitions="*,Auto,Auto" 
-                                      Background="#3A3A3C" 
+                                      Background="{DynamicResource ThemeHeaderBrush}" 
                                       Height="36"
                                       PointerPressed="OnTitleBarPointerPressed"
                                       PointerMoved="OnTitleBarPointerMoved"
@@ -228,7 +245,7 @@
                                     
                                     <TextBlock Grid.Column="0" 
                                                Text="{Binding Title}" 
-                                               Foreground="White" 
+                                               Foreground="{DynamicResource ThemeTextPrimaryBrush}" 
                                                FontSize="14" 
                                                FontWeight="Bold" 
                                                VerticalAlignment="Center" 
@@ -277,7 +294,7 @@
                                 </Grid>
 
                                 <!-- Panel Content Area -->
-                                <Grid Grid.Row="1" Background="#1E1E1E" IsVisible="{Binding !IsMinimized}">
+                                <Grid Grid.Row="1" Background="{DynamicResource ThemeBackgroundBrush}" IsVisible="{Binding !IsMinimized}">
                                     <ContentControl Content="{Binding Content}">
                                         <ContentControl.DataTemplates>
                                             <DataTemplate DataType="{x:Type vmPanels:DashboardViewModel}">

@@ -108,10 +108,12 @@ namespace AvaloniaApplication1.Controls.Equipment
         }
 
         // --- Статически кэшированные перья и кисти (Zero-Allocation) ---
-        private static readonly IBrush VesselBgBrush = new SolidColorBrush(Color.FromRgb(25, 27, 30));
+        private static readonly IBrush VesselBgBrushDark = new SolidColorBrush(Color.FromRgb(25, 27, 30));
+        private static readonly IBrush VesselBgBrushLight = new SolidColorBrush(Color.FromRgb(235, 238, 242));
         private static readonly IBrush LiquidBrush = new SolidColorBrush(Color.FromArgb(170, 0, 122, 204));
         private static readonly IBrush JacketBrush = new SolidColorBrush(Color.FromArgb(90, 255, 140, 0));
-        private static readonly Pen VesselOutlinePen = new Pen(new SolidColorBrush(Color.FromRgb(100, 105, 115)), 2.0);
+        private static readonly Pen VesselOutlinePenDark = new Pen(new SolidColorBrush(Color.FromRgb(100, 105, 115)), 2.0);
+        private static readonly Pen VesselOutlinePenLight = new Pen(new SolidColorBrush(Color.FromRgb(50, 55, 65)), 2.0);
         private static readonly Pen JacketOutlinePen = new Pen(new SolidColorBrush(Color.FromRgb(200, 110, 0)), 1.5);
         private static readonly IBrush MotorBrush = new SolidColorBrush(Color.FromRgb(65, 70, 80));
         private static readonly Pen MotorPen = new Pen(new SolidColorBrush(Color.FromRgb(130, 135, 145)), 1.5);
@@ -133,6 +135,10 @@ namespace AvaloniaApplication1.Controls.Equipment
             double motorW = Math.Clamp(w * 0.28, 16.0, 36.0);
             double bottomNozzleH = Math.Clamp(h * 0.08, 6.0, 14.0);
 
+            bool isLight = Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+            var vesselBg = isLight ? VesselBgBrushLight : VesselBgBrushDark;
+            var vesselOutline = isLight ? VesselOutlinePenLight : VesselOutlinePenDark;
+
             var bodyRect = new Rect(10, motorH, Math.Max(10, w - 20), Math.Max(10, h - motorH - bottomNozzleH));
 
             // 1. Рубашка обогрева/охлаждения (Jacket)
@@ -144,12 +150,12 @@ namespace AvaloniaApplication1.Controls.Equipment
                 context.DrawRectangle(JacketBrush, JacketOutlinePen, jacketRect, 8, 8);
 
                 // Патрубки рубашки (слева внизу и справа вверху)
-                context.DrawRectangle(MotorBrush, VesselOutlinePen, new Rect(bodyRect.Left - 10, jacketTop + 4, 6, 8));
-                context.DrawRectangle(MotorBrush, VesselOutlinePen, new Rect(bodyRect.Right + 4, jacketTop + jacketH - 12, 6, 8));
+                context.DrawRectangle(MotorBrush, vesselOutline, new Rect(bodyRect.Left - 10, jacketTop + 4, 6, 8));
+                context.DrawRectangle(MotorBrush, vesselOutline, new Rect(bodyRect.Right + 4, jacketTop + jacketH - 12, 6, 8));
             }
 
             // 2. Корпус реактора (Vessel) со скругленными днищами
-            context.DrawRectangle(VesselBgBrush, VesselOutlinePen, bodyRect, 14, 14);
+            context.DrawRectangle(vesselBg, vesselOutline, bodyRect, 14, 14);
 
             // 3. Заполнение жидкостью (Level)
             double levelRatio = Math.Clamp(Level / 100.0, 0.0, 1.0);
@@ -192,11 +198,11 @@ namespace AvaloniaApplication1.Controls.Equipment
             double nozzleW = 12.0;
             // Верхний штуцер (сбоку от мотора)
             double topNozzleX = bodyRect.Left + bodyRect.Width * 0.2;
-            context.DrawRectangle(MotorBrush, VesselOutlinePen, new Rect(topNozzleX - nozzleW / 2, bodyRect.Top - 8, nozzleW, 8));
+            context.DrawRectangle(MotorBrush, vesselOutline, new Rect(topNozzleX - nozzleW / 2, bodyRect.Top - 8, nozzleW, 8));
             context.DrawRectangle(FlangeBrush, FlangeBorderPen, new Rect(topNozzleX - 9, bodyRect.Top - 10, 18, 3));
 
             // Нижний сливной штуцер
-            context.DrawRectangle(MotorBrush, VesselOutlinePen, new Rect(cx - nozzleW / 2, bodyRect.Bottom, nozzleW, bottomNozzleH));
+            context.DrawRectangle(MotorBrush, vesselOutline, new Rect(cx - nozzleW / 2, bodyRect.Bottom, nozzleW, bottomNozzleH));
             context.DrawRectangle(FlangeBrush, FlangeBorderPen, new Rect(cx - 9, Bounds.Height - 3, 18, 3));
         }
     }
