@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.ReactiveUI;
+using XamlMcp.Avalonia;
 
 namespace AvaloniaApplication1
 {
@@ -21,6 +22,7 @@ namespace AvaloniaApplication1
                 .UsePlatformDetect()
 #if DEBUG
                 .WithDeveloperTools()
+                .AttachXamlMcp()
 #endif
                 .WithInterFont()
                 .UseReactiveUI()
