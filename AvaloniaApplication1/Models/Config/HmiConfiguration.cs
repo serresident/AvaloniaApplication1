@@ -218,7 +218,7 @@ namespace AvaloniaApplication1.Models.Config
                     InterpolationMode = "Linear",
                     YAxisBinding = "Left",
                     MinValue = MinValue,
-                    MaxValue = MaxValue > MinValue ? MaxValue : 100.0,
+                    MaxValue = MaxValue > MinValue ? MaxValue : (MinValue >= 100.0 ? MinValue + 10.0 : 100.0),
                     AutoScale = false,
                     Units = "",
                     Format = string.IsNullOrWhiteSpace(Format) ? "{0:F1}" : Format,

@@ -343,8 +343,12 @@
                                               <scada:TrendLineControl
                                                   Pens="{Binding Pens}"
                                                   Values="{Binding Values}"
+                                                  SampleTick="{Binding SampleTick}"
+                                                  ScalingMode="{Binding ScalingMode}"
                                                   MinY="{Binding LeftMinY}"
                                                   MaxY="{Binding LeftMaxY}"
+                                                  RightMinY="{Binding RightMinY}"
+                                                  RightMaxY="{Binding RightMaxY}"
                                                   ShowSetpoint="{Binding ShowSetpoint}"
                                                   SetpointValue="{Binding SetpointValue}"
                                                   ShowWarningLimits="{Binding ShowWarningLimits}"
@@ -417,11 +421,21 @@
                                               </ItemsControl.ItemsPanel>
                                               <ItemsControl.ItemTemplate>
                                                   <DataTemplate x:DataType="vmWidgets:TrendPenViewModel">
-                                                      <Grid ColumnDefinitions="Auto,Auto,Auto,Auto" Margin="0,0,10,2" IsVisible="{Binding IsVisible}">
+                                                      <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,0,10,2" IsVisible="{Binding IsVisible}">
                                                           <Border Grid.Column="0" Width="8" Height="8" CornerRadius="2" Background="{Binding PenBrush}" Margin="0,0,4,0" VerticalAlignment="Center" />
                                                           <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#BBBBBB" FontSize="9" Margin="0,0,4,0" VerticalAlignment="Center" />
-                                                          <TextBlock Grid.Column="2" Text="{Binding LatestFormatted}" Foreground="White" FontSize="9" FontWeight="Bold" Margin="0,0,2,0" VerticalAlignment="Center" />
-                                                          <TextBlock Grid.Column="3" Text="{Binding Units}" Foreground="#777777" FontSize="8" VerticalAlignment="Center" />
+                                                          <TextBlock Grid.Column="2" Text="{Binding LatestFormatted}"
+                                                                     IsVisible="{Binding $parent[Border].((vmWidgets:RealTimeTrendViewModel)DataContext).ShowLegendLatestValue}"
+                                                                     Foreground="White" FontSize="9" FontWeight="Bold" Margin="0,0,3,0" VerticalAlignment="Center" />
+                                                          <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2"
+                                                                      IsVisible="{Binding $parent[Border].((vmWidgets:RealTimeTrendViewModel)DataContext).ShowLegendMinMax}"
+                                                                      VerticalAlignment="Center" Margin="0,0,3,0">
+                                                              <TextBlock Text="{Binding MinFormatted, StringFormat='↓{0}'}" Foreground="#888888" FontSize="8" />
+                                                              <TextBlock Text="{Binding MaxFormatted, StringFormat='↑{0}'}" Foreground="#888888" FontSize="8" />
+                                                          </StackPanel>
+                                                          <TextBlock Grid.Column="4" Text="{Binding Units}"
+                                                                     IsVisible="{Binding $parent[Border].((vmWidgets:RealTimeTrendViewModel)DataContext).ShowLegendUnits}"
+                                                                     Foreground="#777777" FontSize="8" VerticalAlignment="Center" />
                                                       </Grid>
                                                   </DataTemplate>
                                               </ItemsControl.ItemTemplate>

@@ -41,6 +41,9 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         private bool _isPaused;
 
         [ObservableProperty]
+        private long _sampleTick;
+
+        [ObservableProperty]
         private int _selectedSliceIndex = -1;
 
         [ObservableProperty]
@@ -96,6 +99,8 @@ namespace AvaloniaApplication1.ViewModels.Widgets
 
         public double MinY => LeftMinY;
         public double MaxY => LeftMaxY;
+
+        public string ScalingMode => TypedConfig.ScalingMode;
 
         public string Format => string.IsNullOrEmpty(TypedConfig.Format) ? "{0:F1}" : TypedConfig.Format;
 
@@ -153,17 +158,10 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         private void UpdateTimeLabels()
         {
             int winSec = TypedConfig.TimeWindowSeconds > 0 ? TypedConfig.TimeWindowSeconds : 60;
-            if (winSec >= 60)
-            {
-                TimeStartLabel = $"-{winSec}с";
-                TimeMidLabel = $"-{winSec / 2}с";
-            }
-            else
-            {
-                TimeStartLabel = $"-{winSec}с";
-                TimeMidLabel = $"-{winSec / 2}с";
-            }
-            TimeEndLabel = "Сейчас";
+            var now = DateTime.Now;
+            TimeStartLabel = (now - TimeSpan.FromSeconds(winSec)).ToString("HH:mm:ss");
+            TimeMidLabel = (now - TimeSpan.FromSeconds(winSec / 2.0)).ToString("HH:mm:ss");
+            TimeEndLabel = now.ToString("HH:mm:ss");
         }
 
         private void OnSamplingTick()
@@ -175,6 +173,8 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 Pens[i].PushSample();
             }
 
+            SampleTick++;
+            UpdateTimeLabels();
             UpdateAxesScales();
             OnPropertyChanged(nameof(Values));
             OnPropertyChanged(nameof(LatestValueDisplay));
@@ -230,7 +230,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                     if (string.IsNullOrEmpty(rightUnits) && !string.IsNullOrEmpty(pen.Units))
                         rightUnits = pen.Units;
                 }
-                else
+                else if (string.Equals(pen.YAxisBinding, "Left", StringComparison.OrdinalIgnoreCase))
                 {
                     hasLeft = true;
                     if (pMin < leftMin) leftMin = pMin;
@@ -298,7 +298,8 @@ namespace AvaloniaApplication1.ViewModels.Widgets
 
             int remainingPoints = BufferCapacity - 1 - SelectedSliceIndex;
             double secFromEnd = (remainingPoints / (double)(BufferCapacity - 1)) * TypedConfig.TimeWindowSeconds;
-            CrosshairTimeText = secFromEnd <= 0.2 ? "Сейчас" : $"-{secFromEnd:F1}с";
+            var sliceTime = DateTime.Now - TimeSpan.FromSeconds(secFromEnd);
+            CrosshairTimeText = secFromEnd <= 0.2 ? "Сейчас" : $"-{secFromEnd:F1}с ({sliceTime:HH:mm:ss})";
 
             CrosshairValues.Clear();
             for (int i = 0; i < Pens.Count; i++)
@@ -385,6 +386,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
 
                 UpdateAxesScales();
                 UpdateTimeLabels();
+                OnPropertyChanged(nameof(ScalingMode));
                 OnPropertyChanged(nameof(Format));
                 OnPropertyChanged(nameof(IsLegendEffectiveVisible));
                 OnPropertyChanged(nameof(ShowSetpoint));

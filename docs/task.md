@@ -1109,3 +1109,29 @@
   - [x] Интеграция редактора перьев и настроек тренда в `WidgetEditorViewModel` и `WidgetEditorWindow.axaml`.
   - [x] Автоматизированное тестирование в `AvaloniaApplication1.UIValidation` (Блок Test 25: 9 сценариев проверки).
   - [x] Сборка решения: **0 ошибок, 0 предупреждений**, валидация **25/25 PASSED**, артефакты рендера `ui_preview.png` и `ui_tree.json` актуализированы.
+
+# Tasks: RealTimeTrend Critical Review & Architecture Hardening (Сессия 58 — Выполнено)
+
+- [x] Интеграция TagManager в редактор перьев (Requirement 6):
+  - [x] Добавить кнопку `🏷️ Выбрать тег...` (`BrowsePenTagCommand`) и выпадающий список `AvailableTags` для перьев в `WidgetEditorWindow.axaml`.
+  - [x] Добавить выпадающий список `AvailableConnections` для перьев.
+  - [x] Реализовать `TrendPenEditModel.ApplyTag(TagDefinition)` и свойства `SelectedPenTag` в `WidgetEditorViewModel.cs`.
+- [x] Поддержка тегов только по `TagId` и устранение утечки подписок в `TrendPenViewModel`:
+  - [x] Автоматическое разрешение `ConnId` и `Address` из `DataService.TagManager`.
+  - [x] Подписка на `SnapshotUpdates` для отслеживания ручных переопределений и словаря тегов.
+  - [x] Замена накопления в `_disposables` на `SerialDisposable _subscriptionDisposable`.
+- [x] Устранение зависания отрисовки и точность масштабирования в `TrendLineControl`:
+  - [x] Добавить `SampleTickProperty`, `ScalingModeProperty`, `RightMinYProperty`, `RightMaxYProperty`.
+  - [x] Реализовать `GetPenRange(ITrendPenRenderData)` с корректным масштабированием Left и Right перьев.
+  - [x] Предотвратить ложный показ пороговых линий на границах при выходе за пределы шкалы.
+  - [x] Привязать визир и маркеры пересечений к дискретной координате `snappedX`.
+- [x] Динамическая временная ось `HH:mm:ss` и расширенная таблица легенды:
+  - [x] Реализовать обновление меток `HH:mm:ss` по реальному времени в `UpdateTimeLabels()`.
+  - [x] Добавить отображение `MinFormatted` и `MaxFormatted` в легенду `DashboardView.axaml`.
+  - [x] Привязать видимость колонок легенды к `ShowLegendLatestValue`, `ShowLegendMinMax`, `ShowLegendUnits`.
+- [x] Структурный итератор `RingBuffer<T>.Enumerator` с нулевыми аллокациями.
+- [x] Автоматизированное тестирование:
+  - [x] Добавить тесты прямого рендеринга `Render(DrawingContext)` через `DrawingGroup`, TagManager выборки и структурного итератора в Test 25.
+  - [x] Сборка: **0 ошибок, 0 предупреждений**.
+  - [x] Тесты: **25/25 PASSED (100%)**.
+  - [x] Headless-рендеринг `render_ui.ps1 MimicView`: артефакты актуализированы.

@@ -52,11 +52,23 @@ namespace AvaloniaApplication1.Controls.Charting
                 o => o.Pens,
                 (o, v) => o.Pens = v);
 
+        public static readonly StyledProperty<long> SampleTickProperty =
+            AvaloniaProperty.Register<TrendLineControl, long>(nameof(SampleTick), 0L);
+
+        public static readonly StyledProperty<string> ScalingModeProperty =
+            AvaloniaProperty.Register<TrendLineControl, string>(nameof(ScalingMode), "DualAxis");
+
         public static readonly StyledProperty<double> MinYProperty =
             AvaloniaProperty.Register<TrendLineControl, double>(nameof(MinY), 0.0);
 
         public static readonly StyledProperty<double> MaxYProperty =
             AvaloniaProperty.Register<TrendLineControl, double>(nameof(MaxY), 100.0);
+
+        public static readonly StyledProperty<double> RightMinYProperty =
+            AvaloniaProperty.Register<TrendLineControl, double>(nameof(RightMinY), 0.0);
+
+        public static readonly StyledProperty<double> RightMaxYProperty =
+            AvaloniaProperty.Register<TrendLineControl, double>(nameof(RightMaxY), 100.0);
 
         public static readonly StyledProperty<IBrush?> LineBrushProperty =
             AvaloniaProperty.Register<TrendLineControl, IBrush?>(nameof(LineBrush));
@@ -220,6 +232,30 @@ namespace AvaloniaApplication1.Controls.Charting
             set => SetValue(CrosshairIndexProperty, value);
         }
 
+        public long SampleTick
+        {
+            get => GetValue(SampleTickProperty);
+            set => SetValue(SampleTickProperty, value);
+        }
+
+        public string ScalingMode
+        {
+            get => GetValue(ScalingModeProperty);
+            set => SetValue(ScalingModeProperty, value);
+        }
+
+        public double RightMinY
+        {
+            get => GetValue(RightMinYProperty);
+            set => SetValue(RightMinYProperty, value);
+        }
+
+        public double RightMaxY
+        {
+            get => GetValue(RightMaxYProperty);
+            set => SetValue(RightMaxYProperty, value);
+        }
+
         public bool IsCrosshairActive
         {
             get => GetValue(IsCrosshairActiveProperty);
@@ -233,8 +269,12 @@ namespace AvaloniaApplication1.Controls.Charting
             AffectsRender<TrendLineControl>(
                 ValuesProperty,
                 PensProperty,
+                SampleTickProperty,
+                ScalingModeProperty,
                 MinYProperty,
                 MaxYProperty,
+                RightMinYProperty,
+                RightMaxYProperty,
                 LineBrushProperty,
                 AreaBrushProperty,
                 ShowSetpointProperty,
@@ -309,10 +349,10 @@ namespace AvaloniaApplication1.Controls.Charting
                     brush = Brushes.Aqua;
                 }
 
-                DashStyle? dash = key.Item3 switch
+                DashStyle? dash = key.Item3?.ToUpperInvariant() switch
                 {
-                    "Dash" => new DashStyle(new double[] { 4, 3 }, 0),
-                    "Dot" => new DashStyle(new double[] { 1.5, 2 }, 0),
+                    "DASH" => new DashStyle(new double[] { 4, 3 }, 0),
+                    "DOT" => new DashStyle(new double[] { 1.5, 2 }, 0),
                     _ => null
                 };
 
@@ -495,53 +535,25 @@ namespace AvaloniaApplication1.Controls.Charting
             }
         }
 
-        private void DrawThresholdLines(DrawingContext context, double w, double h)
+        private (double Min, double Max) GetPenRange(ITrendPenRenderData pen)
         {
-            double globalMin = MinY;
-            double globalMax = MaxY;
-            if (Math.Abs(globalMax - globalMin) < 0.001) globalMax = globalMin + 1.0;
-            double globalInvRange = 1.0 / (globalMax - globalMin);
-
-            if (ShowSetpoint)
-            {
-                double spY = h - ((Math.Clamp(SetpointValue, globalMin, globalMax) - globalMin) * globalInvRange * h);
-                context.DrawLine(SetpointPen, new Point(0, spY), new Point(w, spY));
-            }
-
-            if (ShowWarningLimits)
-            {
-                double whY = h - ((Math.Clamp(WarningHigh, globalMin, globalMax) - globalMin) * globalInvRange * h);
-                double wlY = h - ((Math.Clamp(WarningLow, globalMin, globalMax) - globalMin) * globalInvRange * h);
-                context.DrawLine(WarningPen, new Point(0, whY), new Point(w, whY));
-                context.DrawLine(WarningPen, new Point(0, wlY), new Point(w, wlY));
-            }
-
-            if (ShowAlarmLimits)
-            {
-                double ahY = h - ((Math.Clamp(AlarmHigh, globalMin, globalMax) - globalMin) * globalInvRange * h);
-                double alY = h - ((Math.Clamp(AlarmLow, globalMin, globalMax) - globalMin) * globalInvRange * h);
-                context.DrawLine(AlarmPen, new Point(0, ahY), new Point(w, ahY));
-                context.DrawLine(AlarmPen, new Point(0, alY), new Point(w, alY));
-            }
-        }
-
-        private void DrawPenSeries(DrawingContext context, ITrendPenRenderData pen, double w, double h)
-        {
-            var values = pen.Values;
-            int count = values.Count;
-            if (count < 2) return;
-
-            // Determine min / max Y
             double pMin, pMax;
             if (pen.AutoScale)
             {
                 pMin = double.MaxValue;
                 pMax = double.MinValue;
+                var vals = pen.Values;
+                int count = vals?.Count ?? 0;
                 for (int i = 0; i < count; i++)
                 {
-                    double v = values[i];
+                    double v = vals![i];
                     if (v < pMin) pMin = v;
                     if (v > pMax) pMax = v;
+                }
+                if (pMin > pMax)
+                {
+                    pMin = pen.MinValue;
+                    pMax = pen.MaxValue;
                 }
                 // ISA-101 / SCADA: Protect against micro-noise in Full Dynamic (Delta Y >= 1.0)
                 if (pMax - pMin < 1.0)
@@ -551,19 +563,93 @@ namespace AvaloniaApplication1.Controls.Charting
                     pMax = mid + 0.5;
                 }
             }
+            else if (string.Equals(ScalingMode, "DualAxis", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.Equals(pen.YAxisBinding, "Right", StringComparison.OrdinalIgnoreCase))
+                {
+                    pMin = RightMinY;
+                    pMax = RightMaxY;
+                }
+                else if (string.Equals(pen.YAxisBinding, "Left", StringComparison.OrdinalIgnoreCase))
+                {
+                    pMin = MinY;
+                    pMax = MaxY;
+                }
+                else
+                {
+                    pMin = pen.MinValue;
+                    pMax = pen.MaxValue;
+                }
+            }
             else
             {
                 pMin = pen.MinValue;
                 pMax = pen.MaxValue;
-                if (Math.Abs(pMax - pMin) < 0.001) pMax = pMin + 1.0;
             }
 
+            if (Math.Abs(pMax - pMin) < 0.001)
+            {
+                pMax = pMin + 1.0;
+            }
+
+            return (pMin, pMax);
+        }
+
+        private void DrawThresholdLines(DrawingContext context, double w, double h)
+        {
+            double globalMin = MinY;
+            double globalMax = MaxY;
+            if (Math.Abs(globalMax - globalMin) < 0.001) globalMax = globalMin + 1.0;
+            double globalInvRange = 1.0 / (globalMax - globalMin);
+
+            if (ShowSetpoint && SetpointValue >= globalMin && SetpointValue <= globalMax)
+            {
+                double spY = h - ((SetpointValue - globalMin) * globalInvRange * h);
+                context.DrawLine(SetpointPen, new Point(0, spY), new Point(w, spY));
+            }
+
+            if (ShowWarningLimits)
+            {
+                if (WarningHigh >= globalMin && WarningHigh <= globalMax)
+                {
+                    double whY = h - ((WarningHigh - globalMin) * globalInvRange * h);
+                    context.DrawLine(WarningPen, new Point(0, whY), new Point(w, whY));
+                }
+                if (WarningLow >= globalMin && WarningLow <= globalMax)
+                {
+                    double wlY = h - ((WarningLow - globalMin) * globalInvRange * h);
+                    context.DrawLine(WarningPen, new Point(0, wlY), new Point(w, wlY));
+                }
+            }
+
+            if (ShowAlarmLimits)
+            {
+                if (AlarmHigh >= globalMin && AlarmHigh <= globalMax)
+                {
+                    double ahY = h - ((AlarmHigh - globalMin) * globalInvRange * h);
+                    context.DrawLine(AlarmPen, new Point(0, ahY), new Point(w, ahY));
+                }
+                if (AlarmLow >= globalMin && AlarmLow <= globalMax)
+                {
+                    double alY = h - ((AlarmLow - globalMin) * globalInvRange * h);
+                    context.DrawLine(AlarmPen, new Point(0, alY), new Point(w, alY));
+                }
+            }
+        }
+
+        private void DrawPenSeries(DrawingContext context, ITrendPenRenderData pen, double w, double h)
+        {
+            var values = pen.Values;
+            int count = values?.Count ?? 0;
+            if (count < 2) return;
+
+            var (pMin, pMax) = GetPenRange(pen);
             double invRange = 1.0 / (pMax - pMin);
             double stepX = w / (count - 1);
             var linePen = GetOrCreatePen(pen.ColorHex, pen.Thickness, pen.StrokeStyle);
             bool isStep = string.Equals(pen.InterpolationMode, "Step", StringComparison.OrdinalIgnoreCase);
 
-            double prevVal = Math.Clamp(values[0], pMin, pMax);
+            double prevVal = Math.Clamp(values![0], pMin, pMax);
             double prevX = 0;
             double prevY = h - ((prevVal - pMin) * invRange * h);
 
@@ -593,12 +679,22 @@ namespace AvaloniaApplication1.Controls.Charting
         private void DrawLegacySeries(DrawingContext context, double w, double h)
         {
             _legacyValList.Clear();
-            foreach (var item in _values!)
+            if (_values is IReadOnlyList<double> doubleList)
             {
-                if (item is double d) _legacyValList.Add(d);
-                else if (item is float f) _legacyValList.Add(f);
-                else if (item != null && double.TryParse(item.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed))
-                    _legacyValList.Add(parsed);
+                for (int i = 0; i < doubleList.Count; i++)
+                {
+                    _legacyValList.Add(doubleList[i]);
+                }
+            }
+            else
+            {
+                foreach (var item in _values!)
+                {
+                    if (item is double d) _legacyValList.Add(d);
+                    else if (item is float f) _legacyValList.Add(f);
+                    else if (item != null && double.TryParse(item.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed))
+                        _legacyValList.Add(parsed);
+                }
             }
 
             int count = _legacyValList.Count;
@@ -631,10 +727,15 @@ namespace AvaloniaApplication1.Controls.Charting
 
         private void DrawCrosshair(DrawingContext context, double w, double h, bool isLight)
         {
-            var chPen = isLight ? LightCrosshairPen : DarkCrosshairPen;
-            context.DrawLine(chPen, new Point(CrosshairX, 0), new Point(CrosshairX, h));
-
             int sliceIdx = CrosshairIndex;
+            int maxPoints = GetMaxPointsCount();
+            double drawX = (maxPoints > 1 && sliceIdx >= 0)
+                ? (w / (maxPoints - 1)) * sliceIdx
+                : CrosshairX;
+
+            var chPen = isLight ? LightCrosshairPen : DarkCrosshairPen;
+            context.DrawLine(chPen, new Point(drawX, 0), new Point(drawX, h));
+
             if (sliceIdx < 0) return;
 
             // Draw intersection dots on active pens
@@ -645,37 +746,13 @@ namespace AvaloniaApplication1.Controls.Charting
                     if (!pen.IsVisible || pen.Values == null || sliceIdx >= pen.Values.Count)
                         continue;
 
-                    double pMin = pen.MinValue;
-                    double pMax = pen.MaxValue;
-                    if (pen.AutoScale)
-                    {
-                        double min = double.MaxValue, max = double.MinValue;
-                        for (int i = 0; i < pen.Values.Count; i++)
-                        {
-                            double v = pen.Values[i];
-                            if (v < min) min = v;
-                            if (v > max) max = v;
-                        }
-                        if (max - min < 1.0)
-                        {
-                            double mid = (max + min) * 0.5;
-                            pMin = mid - 0.5;
-                            pMax = mid + 0.5;
-                        }
-                        else
-                        {
-                            pMin = min;
-                            pMax = max;
-                        }
-                    }
-                    if (Math.Abs(pMax - pMin) < 0.001) pMax = pMin + 1.0;
-
+                    var (pMin, pMax) = GetPenRange(pen);
                     double invRange = 1.0 / (pMax - pMin);
                     double val = Math.Clamp(pen.Values[sliceIdx], pMin, pMax);
                     double ptY = h - ((val - pMin) * invRange * h);
 
                     var brush = GetOrCreateBrush(pen.ColorHex);
-                    context.DrawEllipse(brush, null, new Point(CrosshairX, ptY), 3.5, 3.5);
+                    context.DrawEllipse(brush, null, new Point(drawX, ptY), 3.5, 3.5);
                 }
             }
         }

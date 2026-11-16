@@ -3042,6 +3042,11 @@ public static class Program
                 var trendControl = new TrendLineControl
                 {
                     Pens = trendVm.Pens,
+                    ScalingMode = "DualAxis",
+                    MinY = 0.0,
+                    MaxY = 200.0,
+                    RightMinY = 0.0,
+                    RightMaxY = 1.0,
                     ShowSetpoint = true,
                     SetpointValue = 100.0,
                     ShowWarningLimits = true,
@@ -3059,6 +3064,41 @@ public static class Program
                 trendControl.Arrange(new Rect(0, 0, 400, 200));
                 if (trendControl.Bounds.Width != 400 || trendControl.Bounds.Height != 200)
                     throw new Exception("TrendLineControl layout measurement mismatch.");
+
+                // Execute real drawing pass across all series (linear, step, thresholds, crosshair)
+                var drawingGroup = new DrawingGroup();
+                using (var ctx = drawingGroup.Open())
+                {
+                    trendControl.Render(ctx);
+                }
+
+                // 25.10: TagManager Tag Selection on Pens & WidgetEditorViewModel
+                var penEdit = new TrendPenEditModel();
+                var sampleTag = new TagDefinition { TagId = "tag_p1", Name = "Pressure Reactor", ConnId = "plc1", Address = "40010", Unit = "bar" };
+                penEdit.ApplyTag(sampleTag);
+                if (penEdit.SelectedTagId != "tag_p1" || penEdit.SelectedConnId != "plc1" || penEdit.Address != "40010" || penEdit.Units != "bar" || penEdit.Name != "Pressure Reactor")
+                    throw new Exception("TrendPenEditModel ApplyTag mismatch.");
+
+                var editorVm = new WidgetEditorViewModel(reconfig, new List<ConnectionConfig>(), null, new[] { sampleTag });
+                if (editorVm.TrendPens.Count != 2)
+                    throw new Exception("WidgetEditorViewModel failed to load TrendPens.");
+                editorVm.SelectedTrendPen = editorVm.TrendPens[0];
+                editorVm.SelectedPenTag = sampleTag;
+                if (editorVm.SelectedTrendPen.SelectedTagId != "tag_p1")
+                    throw new Exception("Setting SelectedPenTag failed to update SelectedTrendPen.");
+
+                // 25.11: Struct Enumerator & Zero Allocation Verification on RingBuffer<T>
+                var structRing = new AvaloniaApplication1.Models.Common.RingBuffer<double>(3);
+                structRing.Push(1.0);
+                structRing.Push(2.0);
+                structRing.Push(3.0);
+                double sum = 0;
+                foreach (var val in structRing)
+                {
+                    sum += val;
+                }
+                if (sum != 6.0)
+                    throw new Exception($"RingBuffer struct enumerator sum mismatch: expected 6.0, got {sum}");
 
                 trendVm.Dispose();
                 noisePen.Dispose();

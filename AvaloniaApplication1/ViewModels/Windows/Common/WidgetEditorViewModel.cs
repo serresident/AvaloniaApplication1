@@ -350,6 +350,41 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         [ObservableProperty]
         private TrendPenEditModel? _selectedTrendPen;
 
+        partial void OnSelectedTrendPenChanged(TrendPenEditModel? value)
+        {
+            OnPropertyChanged(nameof(SelectedPenTag));
+        }
+
+        public AvaloniaApplication1.Models.TagDefinition? SelectedPenTag
+        {
+            get
+            {
+                if (SelectedTrendPen == null || string.IsNullOrEmpty(SelectedTrendPen.SelectedTagId))
+                    return null;
+                return AvailableTags.FirstOrDefault(t => t.TagId == SelectedTrendPen.SelectedTagId);
+            }
+            set
+            {
+                if (SelectedTrendPen != null && value != null)
+                {
+                    SelectedTrendPen.ApplyTag(value);
+                    OnPropertyChanged(nameof(SelectedPenTag));
+                }
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowsePenTagAsync()
+        {
+            if (DialogService == null || SelectedTrendPen == null) return;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, SelectedTrendPen.SelectedTagId);
+            if (picked != null)
+            {
+                SelectedTrendPen.ApplyTag(picked);
+                OnPropertyChanged(nameof(SelectedPenTag));
+            }
+        }
+
         [ObservableProperty]
         private bool _showTrendSettings;
 

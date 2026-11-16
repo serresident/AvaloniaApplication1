@@ -76,13 +76,39 @@ namespace AvaloniaApplication1.Models.Common
         public T? Latest => _count > 0 ? this[_count - 1] : default;
         public T? Oldest => _count > 0 ? this[0] : default;
 
-        public IEnumerator<T> GetEnumerator()
+        public struct Enumerator : IEnumerator<T>
         {
-            for (int i = 0; i < _count; i++)
+            private readonly RingBuffer<T> _buffer;
+            private int _index;
+            private T? _current;
+
+            internal Enumerator(RingBuffer<T> buffer)
             {
-                yield return this[i];
+                _buffer = buffer;
+                _index = 0;
+                _current = default;
             }
+
+            public bool MoveNext()
+            {
+                if (_index < _buffer.Count)
+                {
+                    _current = _buffer[_index];
+                    _index++;
+                    return true;
+                }
+                return false;
+            }
+
+            public T Current => _current!;
+            object? IEnumerator.Current => Current;
+            public void Reset() { _index = 0; _current = default; }
+            public void Dispose() { }
         }
+
+        public Enumerator GetEnumerator() => new Enumerator(this);
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

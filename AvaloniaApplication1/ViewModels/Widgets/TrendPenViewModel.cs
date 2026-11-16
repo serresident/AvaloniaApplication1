@@ -17,6 +17,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
     public partial class TrendPenViewModel : ObservableObject, ITrendPenRenderData, IDisposable
     {
         private readonly CompositeDisposable _disposables = new();
+        private readonly SerialDisposable _subscriptionDisposable = new();
         private readonly RingBuffer<double> _buffer;
         private double _latestRawValue;
 
@@ -91,6 +92,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             DataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
 
             _buffer = new RingBuffer<double>(bufferCapacity > 0 ? bufferCapacity : 120);
+            _disposables.Add(_subscriptionDisposable);
 
             ApplyConfig(config);
             InitializeInitialValue();
@@ -130,9 +132,31 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         private void InitializeInitialValue()
         {
             double initialVal = 0.0;
-            if (Config.Source != null && !string.IsNullOrEmpty(Config.Source.ConnId) && !string.IsNullOrEmpty(Config.Source.Address))
+            string? connId = Config.Source?.ConnId;
+            string? address = Config.Source?.Address;
+            string? tagId = Config.Source?.TagId;
+
+            if (!string.IsNullOrEmpty(tagId) && DataService.TagManager != null)
             {
-                var val = DataService.GetCurrentValue(Config.Source.ConnId, Config.Source.Address);
+                var snap = DataService.GetTagSnapshot(tagId);
+                if (snap.Value != null && TryConvertDouble(snap.Value, out double sVal))
+                {
+                    initialVal = sVal;
+                }
+                else
+                {
+                    var tagDef = DataService.TagManager.GetTagDefinition(tagId);
+                    if (tagDef != null)
+                    {
+                        if (string.IsNullOrEmpty(connId)) connId = tagDef.ConnId;
+                        if (string.IsNullOrEmpty(address)) address = tagDef.Address;
+                    }
+                }
+            }
+
+            if (initialVal == 0.0 && !string.IsNullOrEmpty(connId) && !string.IsNullOrEmpty(address))
+            {
+                var val = DataService.GetCurrentValue(connId, address);
                 if (val != null && TryConvertDouble(val, out double dVal))
                 {
                     initialVal = dVal;
@@ -148,32 +172,56 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             UpdateStatistics();
         }
 
-        private IDisposable? _tagSubscription;
-
         private void SubscribeToDataService()
         {
-            _tagSubscription?.Dispose();
-            if (Config.Source == null || string.IsNullOrEmpty(Config.Source.ConnId) || string.IsNullOrEmpty(Config.Source.Address))
-                return;
+            if (Config.Source == null) return;
 
-            string connId = Config.Source.ConnId;
-            string address = Config.Source.Address;
+            string? connId = Config.Source.ConnId;
+            string? address = Config.Source.Address;
+            string? tagId = Config.Source.TagId;
 
-            _tagSubscription = DataService.TagUpdates
-                .Where(t => string.Equals(t.ConnId, connId, StringComparison.OrdinalIgnoreCase) &&
-                            string.Equals(t.Address, address, StringComparison.OrdinalIgnoreCase))
-                .Subscribe(tag =>
-                {
-                    if (TryConvertDouble(tag.Value, out double val))
-                    {
-                        _latestRawValue = val;
-                    }
-                });
-
-            if (_tagSubscription != null)
+            if ((string.IsNullOrEmpty(connId) || string.IsNullOrEmpty(address)) && !string.IsNullOrEmpty(tagId) && DataService.TagManager != null)
             {
-                _disposables.Add(_tagSubscription);
+                var tagDef = DataService.TagManager.GetTagDefinition(tagId);
+                if (tagDef != null)
+                {
+                    connId = tagDef.ConnId;
+                    address = tagDef.Address;
+                }
             }
+
+            var composite = new CompositeDisposable();
+
+            if (!string.IsNullOrEmpty(connId) && !string.IsNullOrEmpty(address))
+            {
+                var tagSub = DataService.TagUpdates
+                    .Where(t => string.Equals(t.ConnId, connId, StringComparison.OrdinalIgnoreCase) &&
+                                string.Equals(t.Address, address, StringComparison.OrdinalIgnoreCase))
+                    .Subscribe(tag =>
+                    {
+                        if (TryConvertDouble(tag.Value, out double val))
+                        {
+                            _latestRawValue = val;
+                        }
+                    });
+                composite.Add(tagSub);
+            }
+
+            if (!string.IsNullOrEmpty(tagId))
+            {
+                var snapSub = DataService.SnapshotUpdates
+                    .Where(s => string.Equals(s.TagId, tagId, StringComparison.OrdinalIgnoreCase))
+                    .Subscribe(s =>
+                    {
+                        if (s.Value != null && TryConvertDouble(s.Value, out double val))
+                        {
+                            _latestRawValue = val;
+                        }
+                    });
+                composite.Add(snapSub);
+            }
+
+            _subscriptionDisposable.Disposable = composite;
         }
 
         public void PushSample()

@@ -57,6 +57,26 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         [ObservableProperty]
         private bool _isVisible = true;
 
+        public void ApplyTag(AvaloniaApplication1.Models.TagDefinition? tag)
+        {
+            if (tag == null) return;
+            SelectedTagId = tag.TagId;
+            if (!string.IsNullOrEmpty(tag.ConnId)) SelectedConnId = tag.ConnId;
+            if (!string.IsNullOrEmpty(tag.Address)) Address = tag.Address;
+            if (string.IsNullOrWhiteSpace(Name) || Name.StartsWith("Перо"))
+            {
+                Name = tag.Name;
+            }
+            if (!string.IsNullOrEmpty(tag.Unit))
+            {
+                Units = tag.Unit;
+                if (string.IsNullOrWhiteSpace(Format) || Format == "{0:F1}")
+                {
+                    Format = $"{{0:F1}} {tag.Unit}";
+                }
+            }
+        }
+
         public TrendPenConfig ToConfig()
         {
             return new TrendPenConfig

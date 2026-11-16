@@ -1815,3 +1815,34 @@
     *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
     *   Тесты UIValidation: **25/25 PASSED (100%)**.
     *   Headless-рендеринг `render_ui.ps1 MimicView`: обновлены `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.
+
+---
+
+## 📅 16.11.2026 (Сессия 58 — Критическое ревью и устранение архитектурных дефектов RealTimeTrend)
+
+### 📌 Достижение: Полная интеграция TagManager для перьев, устранение зависания отрисовки и точность Dual-Axis
+
+*   **Интеграция TagManager в редактор перьев (Requirement 6):**
+    *   В `WidgetEditorWindow.axaml` и `WidgetEditorViewModel.cs` добавлена кнопка `🏷️ Выбрать тег...` (`BrowsePenTagCommand`) с вызовом диалога `ShowTagPickerAsync`, выпадающий список `AvailableTags`, а также выбор подключения `AvailableConnections`.
+    *   В `TrendPenEditModel` реализован метод `ApplyTag(TagDefinition)`, выполняющий автоподстановку `TagId`, `ConnId`, `Address`, имени пера, единиц измерения `Units` и строки форматирования `Format`.
+*   **Поддержка `TagId` и устранение утечки подписок в `TrendPenViewModel`:**
+    *   Устранено игнорирование тегов, настроенных только по `TagId`: метод `SubscribeToDataService` теперь автоматически разрешает `ConnId` и `Address` через `DataService.TagManager.GetTagDefinition(tagId)`.
+    *   Добавлена подписка на поток `DataService.SnapshotUpdates` по `TagId` для мгновенной реакции на ручные переопределения (Force Override) и обновления в словаре тегов.
+    *   Использование `SerialDisposable _subscriptionDisposable` гарантирует своевременное освобождение старых подписок при многократных вызовах `UpdateFromConfig`.
+*   **Устранение зависания рендера и поддержка Dual-Axis в `TrendLineControl`:**
+    *   Добавлено StyledProperty `SampleTickProperty` с регистрацией в `AffectsRender`. В `RealTimeTrendViewModel.OnSamplingTick()` счетчик инкрементируется, предотвращая блокировку перерисовки из-за ссылочного равенства `_buffer` в `SetAndRaise`.
+    *   Добавлены StyledProperty `ScalingModeProperty`, `RightMinYProperty`, `RightMaxYProperty`.
+    *   Реализован единый метод диапазона `GetPenRange(ITrendPenRenderData pen)`: в режиме `DualAxis` левые перья масштабируются строго по `[MinY..MaxY]`, а правые — по `[RightMinY..RightMaxY]`, предотвращая искажение показаний относительно шкалы.
+    *   В `DrawCrosshair` вертикальная линия и маркеры пересечения привязаны к дискретной координате выборки `snappedX = (w / (maxPoints - 1)) * CrosshairIndex` для идеального совпадения с вершинами кривых.
+    *   В `DrawThresholdLines` устранен ложный `Math.Clamp`, рисовавший линии уставок и аварий на границах графика, когда значения находились за пределами видимого диапазона.
+*   **Динамическая временная ось HH:mm:ss и расширенная таблица легенды:**
+    *   В `RealTimeTrendViewModel.UpdateTimeLabels()` метки X-оси формируются в формате астрономического времени `HH:mm:ss` (`now - winSec`, `now - winSec/2`, `now`) и обновляются на каждом такте квантования.
+    *   В `UpdateCrosshairSlice()` срез визира отображает точное астрономическое время точки выборки `HH:mm:ss`.
+    *   В `DashboardView.axaml` в легенду добавлены блоки `MinFormatted` и `MaxFormatted`, а видимость колонок привязана к флагам `ShowLegendLatestValue`, `ShowLegendMinMax`, `ShowLegendUnits`.
+*   **Структурный итератор RingBuffer<T> без аллокаций:**
+    *   В `RingBuffer<T>` реализован `public struct Enumerator : IEnumerator<T>`, обеспечивающий нулевые аллокации в куче при обходе буфера через `foreach`.
+*   **Автоматическое тестирование и верификация:**
+    *   В блоке **Test 25** (`Program.cs`) добавлены тесты прямого рендеринга `TrendLineControl.Render(DrawingContext)` через `DrawingGroup`, проверки выбора тегов через `SelectedPenTag` / `BrowsePenTagCommand` и структурного перечислителя `RingBuffer<T>.Enumerator`.
+    *   Сборка `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
+    *   Тесты: **25/25 PASSED (100%)**.
+    *   Headless-рендеринг `render_ui.ps1 MimicView`: артефакты `ui_preview.png` и `ui_tree.json` актуализированы.
