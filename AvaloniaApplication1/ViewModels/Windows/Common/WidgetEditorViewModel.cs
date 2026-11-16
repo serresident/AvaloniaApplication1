@@ -293,6 +293,108 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         [ObservableProperty]
         private bool _showContainerSettings;
 
+        // --- Widget-specific: RealTimeTrend ---
+        public string[] AvailableScalingModes => new[] { "DualAxis", "Individual" };
+        public int[] AvailableTimeWindows => new[] { 60, 300, 900, 1800, 3600 };
+        public string[] AvailableStrokeStyles => new[] { "Solid", "Dash", "Dot" };
+        public string[] AvailableInterpolationModes => new[] { "Linear", "Step" };
+        public string[] AvailableYAxisBindings => new[] { "Left", "Right", "Individual" };
+
+        [ObservableProperty]
+        private string _trendScalingMode = "DualAxis";
+
+        [ObservableProperty]
+        private int _trendTimeWindowSeconds = 60;
+
+        [ObservableProperty]
+        private bool _trendShowSetpoint = false;
+
+        [ObservableProperty]
+        private double _trendSetpointValue = 50.0;
+
+        [ObservableProperty]
+        private bool _trendShowWarningLimits = false;
+
+        [ObservableProperty]
+        private double _trendWarningHigh = 80.0;
+
+        [ObservableProperty]
+        private double _trendWarningLow = 20.0;
+
+        [ObservableProperty]
+        private bool _trendShowAlarmLimits = false;
+
+        [ObservableProperty]
+        private double _trendAlarmHigh = 90.0;
+
+        [ObservableProperty]
+        private double _trendAlarmLow = 10.0;
+
+        [ObservableProperty]
+        private bool _trendShowLegendTable = true;
+
+        [ObservableProperty]
+        private bool _trendShowLegendLatestValue = true;
+
+        [ObservableProperty]
+        private bool _trendShowLegendMinMax = true;
+
+        [ObservableProperty]
+        private bool _trendShowLegendUnits = true;
+
+        [ObservableProperty]
+        private bool _trendEnableCrosshair = true;
+
+        public System.Collections.ObjectModel.ObservableCollection<TrendPenEditModel> TrendPens { get; } = new();
+
+        [ObservableProperty]
+        private TrendPenEditModel? _selectedTrendPen;
+
+        [ObservableProperty]
+        private bool _showTrendSettings;
+
+        [RelayCommand]
+        private void AddTrendPen()
+        {
+            if (TrendPens.Count >= 8) return;
+
+            string[] defaultColors = { "#00FFCC", "#FF8000", "#FF3366", "#FFFF00", "#3399FF", "#9933FF", "#00FF66", "#FF66B2" };
+            string nextColor = defaultColors[TrendPens.Count % defaultColors.Length];
+
+            var newPen = new TrendPenEditModel
+            {
+                Id = Guid.NewGuid(),
+                Name = $"Перо {TrendPens.Count + 1}",
+                ColorHex = nextColor,
+                Thickness = 2.0,
+                StrokeStyle = "Solid",
+                InterpolationMode = "Linear",
+                YAxisBinding = TrendPens.Count % 2 == 1 ? "Right" : "Left",
+                MinValue = MinValue,
+                MaxValue = MaxValue > MinValue ? MaxValue : 100.0,
+                AutoScale = false,
+                Units = "",
+                Format = "{0:F1}",
+                IsVisible = true
+            };
+            TrendPens.Add(newPen);
+            SelectedTrendPen = newPen;
+        }
+
+        [RelayCommand]
+        private void RemoveTrendPen()
+        {
+            if (SelectedTrendPen != null && TrendPens.Count > 1)
+            {
+                int idx = TrendPens.IndexOf(SelectedTrendPen);
+                TrendPens.Remove(SelectedTrendPen);
+                if (TrendPens.Count > 0)
+                {
+                    SelectedTrendPen = TrendPens[Math.Clamp(idx, 0, TrendPens.Count - 1)];
+                }
+            }
+        }
+
         private bool _isEditing;
         private readonly WidgetConfig? _existingConfig;
 
@@ -346,7 +448,35 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                 if (existingConfig is CommandButtonConfig cb) { SelectedButtonMode = cb.ButtonMode; LabelOn = cb.LabelOn; LabelOff = cb.LabelOff; ColorOn = cb.ColorOn; ColorOff = cb.ColorOff; }
                 if (existingConfig is SliderConfig sl) { MinValue = sl.MinValue; MaxValue = sl.MaxValue; }
                 if (existingConfig is SetValueConfig sv) { Format = sv.Format; MinValue = sv.MinValue; MaxValue = sv.MaxValue; ValueColor = sv.ValueColor; ValueFontSize = sv.ValueFontSize; }
-                if (existingConfig is RealTimeTrendConfig rt) { Format = rt.Format; MinValue = rt.MinValue; MaxValue = rt.MaxValue; }
+                if (existingConfig is RealTimeTrendConfig rt)
+                {
+                    rt.EnsureDefaultPen();
+                    Format = rt.Format;
+                    MinValue = rt.MinValue;
+                    MaxValue = rt.MaxValue;
+                    TrendScalingMode = string.IsNullOrEmpty(rt.ScalingMode) ? "DualAxis" : rt.ScalingMode;
+                    TrendTimeWindowSeconds = rt.TimeWindowSeconds > 0 ? rt.TimeWindowSeconds : 60;
+                    TrendShowSetpoint = rt.ShowSetpoint;
+                    TrendSetpointValue = rt.SetpointValue;
+                    TrendShowWarningLimits = rt.ShowWarningLimits;
+                    TrendWarningHigh = rt.WarningHigh;
+                    TrendWarningLow = rt.WarningLow;
+                    TrendShowAlarmLimits = rt.ShowAlarmLimits;
+                    TrendAlarmHigh = rt.AlarmHigh;
+                    TrendAlarmLow = rt.AlarmLow;
+                    TrendShowLegendTable = rt.ShowLegendTable;
+                    TrendShowLegendLatestValue = rt.ShowLegendLatestValue;
+                    TrendShowLegendMinMax = rt.ShowLegendMinMax;
+                    TrendShowLegendUnits = rt.ShowLegendUnits;
+                    TrendEnableCrosshair = rt.EnableCrosshair;
+
+                    TrendPens.Clear();
+                    foreach (var pen in rt.Pens)
+                    {
+                        TrendPens.Add(TrendPenEditModel.FromConfig(pen));
+                    }
+                    SelectedTrendPen = TrendPens.FirstOrDefault();
+                }
                 if (existingConfig is PipeConfig pc) { PipePoints = pc.PipePoints; ActiveColor = pc.ActiveColor; InactiveColor = pc.InactiveColor; ShowFlanges = pc.ShowFlanges; Thickness = pc.Thickness; SelectedStartFitting = pc.StartFitting; SelectedEndFitting = pc.EndFitting; }
                 if (existingConfig is ValveConfig vc) { 
                     SelectedValveType = vc.ValveType; 
@@ -472,13 +602,18 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         {
             ShowValueDisplaySettings = SelectedWidgetType == "ValueDisplay" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "Tank" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor" || SelectedWidgetType == "LevelSensor";
             ShowCommandButtonSettings = SelectedWidgetType == "CommandButton";
-            ShowSliderSettings = SelectedWidgetType == "Slider" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "RealTimeTrend" || SelectedWidgetType == "Tank" || SelectedWidgetType == "Reactor" || SelectedWidgetType == "LevelSensor";
+            ShowSliderSettings = SelectedWidgetType == "Slider" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "Tank" || SelectedWidgetType == "Reactor" || SelectedWidgetType == "LevelSensor";
             ShowPilotLightSettings = SelectedWidgetType == "PilotLight";
             ShowPipeSettings = SelectedWidgetType == "Pipe";
             ShowValveSettings = SelectedWidgetType == "Valve";
             ShowIndustrialSettings = SelectedWidgetType == "Pipe" || SelectedWidgetType == "Valve" || SelectedWidgetType == "Pump" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor";
             ShowRegulatingSettings = SelectedWidgetType == "Valve";
             ShowContainerSettings = SelectedWidgetType == "ContainerButton";
+            ShowTrendSettings = SelectedWidgetType == "RealTimeTrend";
+            if (ShowTrendSettings && TrendPens.Count == 0)
+            {
+                AddTrendPen();
+            }
         }
 
         [RelayCommand]
@@ -504,7 +639,28 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                 "CommandButton" => new CommandButtonConfig { ButtonMode = SelectedButtonMode, LabelOn = LabelOn, LabelOff = LabelOff, ColorOn = ColorOn, ColorOff = ColorOff },
                 "Slider" => new SliderConfig { MinValue = MinValue, MaxValue = MaxValue },
                 "SetValue" => new SetValueConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
-                "RealTimeTrend" => new RealTimeTrendConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue },
+                "RealTimeTrend" => new RealTimeTrendConfig
+                {
+                    Format = Format,
+                    MinValue = MinValue,
+                    MaxValue = MaxValue,
+                    ScalingMode = TrendScalingMode,
+                    TimeWindowSeconds = TrendTimeWindowSeconds,
+                    ShowSetpoint = TrendShowSetpoint,
+                    SetpointValue = TrendSetpointValue,
+                    ShowWarningLimits = TrendShowWarningLimits,
+                    WarningHigh = TrendWarningHigh,
+                    WarningLow = TrendWarningLow,
+                    ShowAlarmLimits = TrendShowAlarmLimits,
+                    AlarmHigh = TrendAlarmHigh,
+                    AlarmLow = TrendAlarmLow,
+                    ShowLegendTable = TrendShowLegendTable,
+                    ShowLegendLatestValue = TrendShowLegendLatestValue,
+                    ShowLegendMinMax = TrendShowLegendMinMax,
+                    ShowLegendUnits = TrendShowLegendUnits,
+                    EnableCrosshair = TrendEnableCrosshair,
+                    Pens = TrendPens.Select(p => p.ToConfig()).ToList()
+                },
                 "Pipe" => new PipeConfig { PipePoints = PipePoints, ActiveColor = ActiveColor, InactiveColor = InactiveColor, ShowFlanges = ShowFlanges, Thickness = Thickness, StartFitting = SelectedStartFitting, EndFitting = SelectedEndFitting },
                 "Valve" => new ValveConfig { 
                     ValveType = SelectedValveType, 

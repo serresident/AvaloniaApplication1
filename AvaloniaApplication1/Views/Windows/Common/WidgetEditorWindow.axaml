@@ -239,6 +239,179 @@
                     </StackPanel>
                 </Border>
 
+                <!-- RealTimeTrend Multi-Pen & SCADA Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowTrendSettings}">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="📈 Настройки промышленного тренда (ISA-101)" Foreground="#00FFCC" FontSize="14" FontWeight="SemiBold" />
+
+                        <!-- Scaling Mode & Time Window -->
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Режим шкалы Y" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableScalingModes}"
+                                          SelectedItem="{Binding TrendScalingMode}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Окно времени (сек)" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableTimeWindows}"
+                                          SelectedItem="{Binding TrendTimeWindowSeconds}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Setpoint (SP) -->
+                        <CheckBox IsChecked="{Binding TrendShowSetpoint}" Content="Отображать уставку (SP)" Foreground="#DDDDDD" FontSize="12" />
+                        <Grid ColumnDefinitions="*,10,*" IsVisible="{Binding TrendShowSetpoint}">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Значение уставки" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding TrendSetpointValue}" FormatString="F1" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Warning Limits (H/L) -->
+                        <CheckBox IsChecked="{Binding TrendShowWarningLimits}" Content="Предупредительные границы (Warning H/L)" Foreground="#DDDDDD" FontSize="12" />
+                        <Grid ColumnDefinitions="*,10,*" IsVisible="{Binding TrendShowWarningLimits}">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Warning High" Foreground="#FFD700" FontSize="11" />
+                                <NumericUpDown Value="{Binding TrendWarningHigh}" FormatString="F1" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Warning Low" Foreground="#FFD700" FontSize="11" />
+                                <NumericUpDown Value="{Binding TrendWarningLow}" FormatString="F1" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Alarm Limits (HH/LL) -->
+                        <CheckBox IsChecked="{Binding TrendShowAlarmLimits}" Content="Аварийные границы (Alarm HH/LL)" Foreground="#DDDDDD" FontSize="12" />
+                        <Grid ColumnDefinitions="*,10,*" IsVisible="{Binding TrendShowAlarmLimits}">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Alarm High" Foreground="#FF4444" FontSize="11" />
+                                <NumericUpDown Value="{Binding TrendAlarmHigh}" FormatString="F1" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Alarm Low" Foreground="#FF4444" FontSize="11" />
+                                <NumericUpDown Value="{Binding TrendAlarmLow}" FormatString="F1" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Legend & Crosshair Options -->
+                        <TextBlock Text="Параметры отображения" Foreground="#AAAAAA" FontSize="11" FontWeight="SemiBold" Margin="0,4,0,0" />
+                        <WrapPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding TrendEnableCrosshair}" Content="Визир (Crosshair)" Margin="0,0,12,4" Foreground="#DDDDDD" FontSize="12" />
+                            <CheckBox IsChecked="{Binding TrendShowLegendTable}" Content="Таблица легенды" Margin="0,0,12,4" Foreground="#DDDDDD" FontSize="12" />
+                            <CheckBox IsChecked="{Binding TrendShowLegendLatestValue}" Content="Текущее" Margin="0,0,12,4" Foreground="#DDDDDD" FontSize="12" />
+                            <CheckBox IsChecked="{Binding TrendShowLegendMinMax}" Content="Мин/Макс" Margin="0,0,12,4" Foreground="#DDDDDD" FontSize="12" />
+                            <CheckBox IsChecked="{Binding TrendShowLegendUnits}" Content="Ед. изм." Margin="0,0,12,4" Foreground="#DDDDDD" FontSize="12" />
+                        </WrapPanel>
+
+                        <Separator Background="#444444" Height="1" Margin="0,4" />
+
+                        <!-- Pens Management -->
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                            <TextBlock Grid.Column="0" Text="Каналы / Перья (до 8)" Foreground="#00FFCC" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Command="{Binding AddTrendPenCommand}" Content="＋ Добавить" Background="#007ACC" Foreground="White" Padding="8,4" CornerRadius="4" Margin="0,0,6,0" FontSize="11" />
+                            <Button Grid.Column="2" Command="{Binding RemoveTrendPenCommand}" Content="✕ Удалить" Background="#AA3333" Foreground="White" Padding="8,4" CornerRadius="4" FontSize="11" />
+                        </Grid>
+
+                        <!-- Pens Selector Tabs / List -->
+                        <ListBox ItemsSource="{Binding TrendPens}"
+                                 SelectedItem="{Binding SelectedTrendPen}"
+                                 Background="#252526"
+                                 CornerRadius="4"
+                                 MaxHeight="120">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:TrendPenEditModel">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                        <Border Grid.Column="0" Width="14" Height="14" CornerRadius="3" Background="{Binding ColorHex}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="White" FontSize="12" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2" Text="{Binding YAxisBinding}" Foreground="#888888" FontSize="10" Margin="4,0" VerticalAlignment="Center" />
+                                        <CheckBox Grid.Column="3" IsChecked="{Binding IsVisible}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <!-- Selected Pen Detailed Editor -->
+                        <Border Background="#222224" CornerRadius="4" Padding="8" Margin="0,4"
+                                IsVisible="{Binding SelectedTrendPen, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <StackPanel Spacing="6" x:DataType="vm:TrendPenEditModel" DataContext="{Binding SelectedTrendPen}">
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Название пера" Foreground="#AAAAAA" FontSize="10" />
+                                        <TextBox Text="{Binding Name}" FontSize="11" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Цвет пера" Foreground="#AAAAAA" FontSize="10" />
+                                        <scada:ColorPickerBox SelectedColorHex="{Binding ColorHex}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="ID соединения (ConnId)" Foreground="#AAAAAA" FontSize="10" />
+                                        <TextBox Text="{Binding SelectedConnId}" FontSize="11" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Адрес тега (Address)" Foreground="#AAAAAA" FontSize="10" />
+                                        <TextBox Text="{Binding Address}" FontSize="11" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,10,*,10,*">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Ось Y" Foreground="#AAAAAA" FontSize="10" />
+                                        <ComboBox ItemsSource="{Binding AvailableYAxisBindings}"
+                                                  SelectedItem="{Binding YAxisBinding}"
+                                                  HorizontalAlignment="Stretch" FontSize="11" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Интерполяция" Foreground="#AAAAAA" FontSize="10" />
+                                        <ComboBox ItemsSource="{Binding AvailableInterpolationModes}"
+                                                  SelectedItem="{Binding InterpolationMode}"
+                                                  HorizontalAlignment="Stretch" FontSize="11" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="4">
+                                        <TextBlock Text="Стиль линии" Foreground="#AAAAAA" FontSize="10" />
+                                        <ComboBox ItemsSource="{Binding AvailableStrokeStyles}"
+                                                  SelectedItem="{Binding StrokeStyle}"
+                                                  HorizontalAlignment="Stretch" FontSize="11" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,10,*,10,*">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Мин Y" Foreground="#AAAAAA" FontSize="10" />
+                                        <NumericUpDown Value="{Binding MinValue}" FormatString="F1" FontSize="11" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Макс Y" Foreground="#AAAAAA" FontSize="10" />
+                                        <NumericUpDown Value="{Binding MaxValue}" FormatString="F1" FontSize="11" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="4">
+                                        <TextBlock Text="Толщина (px)" Foreground="#AAAAAA" FontSize="10" />
+                                        <NumericUpDown Value="{Binding Thickness}" Minimum="1" Maximum="8" FormatString="0 px" FontSize="11" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Единицы (Units)" Foreground="#AAAAAA" FontSize="10" />
+                                        <TextBox Text="{Binding Units}" FontSize="11" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Формат числа" Foreground="#AAAAAA" FontSize="10" />
+                                        <TextBox Text="{Binding Format}" FontSize="11" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <CheckBox IsChecked="{Binding AutoScale}" Content="Автомасштабирование (Full Dynamic)" Foreground="#DDDDDD" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
                 <!-- Pipe Settings -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowPipeSettings}">

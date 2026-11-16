@@ -157,10 +157,75 @@ namespace AvaloniaApplication1.Models.Config
 
     public class RealTimeTrendConfig : WidgetConfig
     {
-        public RealTimeTrendConfig() { Type = "RealTimeTrend"; }
-        public string Format { get; set; } = "{0}";
+        public RealTimeTrendConfig()
+        {
+            Type = "RealTimeTrend";
+            EnsureDefaultPen();
+        }
+
+        // Legacy fields for backward compatibility
+        public string Format { get; set; } = "{0:F1}";
         public double MinValue { get; set; } = 0;
         public double MaxValue { get; set; } = 100;
+
+        // Multi-Pen configuration
+        public List<TrendPenConfig> Pens { get; set; } = new();
+
+        // Scaling & Axes
+        public string ScalingMode { get; set; } = "DualAxis"; // "DualAxis" or "Individual"
+        public int TimeWindowSeconds { get; set; } = 60; // 60, 300, 900, 1800, 3600
+
+        // Setpoint & Limit Thresholds
+        public bool ShowSetpoint { get; set; } = false;
+        public double SetpointValue { get; set; } = 50.0;
+
+        public bool ShowWarningLimits { get; set; } = false;
+        public double WarningHigh { get; set; } = 80.0;
+        public double WarningLow { get; set; } = 20.0;
+
+        public bool ShowAlarmLimits { get; set; } = false;
+        public double AlarmHigh { get; set; } = 90.0;
+        public double AlarmLow { get; set; } = 10.0;
+
+        // Legend Display Options
+        public bool ShowLegendTable { get; set; } = true;
+        public bool ShowLegendLatestValue { get; set; } = true;
+        public bool ShowLegendMinMax { get; set; } = true;
+        public bool ShowLegendUnits { get; set; } = true;
+
+        // Interactive Crosshair Inspection
+        public bool EnableCrosshair { get; set; } = true;
+
+        public void EnsureDefaultPen()
+        {
+            if (Pens == null)
+            {
+                Pens = new List<TrendPenConfig>();
+            }
+
+            if (Pens.Count == 0)
+            {
+                Pens.Add(new TrendPenConfig
+                {
+                    Id = Guid.NewGuid(),
+                    Name = string.IsNullOrWhiteSpace(Title) ? "Перо 1" : Title,
+                    Source = Source != null 
+                        ? new DataSourceConfig { ConnId = Source.ConnId, Address = Source.Address, DataType = Source.DataType, TagId = Source.TagId } 
+                        : new DataSourceConfig(),
+                    ColorHex = "#00FFCC",
+                    Thickness = 2.0,
+                    StrokeStyle = "Solid",
+                    InterpolationMode = "Linear",
+                    YAxisBinding = "Left",
+                    MinValue = MinValue,
+                    MaxValue = MaxValue > MinValue ? MaxValue : 100.0,
+                    AutoScale = false,
+                    Units = "",
+                    Format = string.IsNullOrWhiteSpace(Format) ? "{0:F1}" : Format,
+                    IsVisible = true
+                });
+            }
+        }
     }
 
     public class PipeConfig : WidgetConfig

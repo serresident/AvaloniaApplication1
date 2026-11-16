@@ -1090,7 +1090,7 @@
   - [x] Тесты: **24/24 PASSED (100%)**.
   - [x] Headless-рендеринг `render_ui.ps1 MimicView`: артефакты обновлены.
 
-# Tasks: Industrial Multi-Pen RealTimeTrend Control (Сессия 57 — В процессе)
+# Tasks: Industrial Multi-Pen RealTimeTrend Control (Сессия 57 — Выполнено)
 
 - [x] EGM Brainstorm: Концепция и многолинзовый аудит промышленного тренд-контрола:
   - [x] Проведен сравнительный аудит требований: многоканальность (до 8 перьев), режимы Dual-Axis и Individual Scales, ступенчатая интерполяция Step для дискретных сигналов.
@@ -1100,13 +1100,12 @@
   - [x] Спроектирован интерактивный визир (Crosshair) с тултипом значений.
   - [x] Сформирован концептуальный документ: `concepts_brief.md` и `docs/designs/industrial_multi_pen_real_time_trend.md`.
   - [x] Зарегистрирован в `docs/designs/SITEMAP.md`.
-- [ ] Формальный драфт проектной документации (/egm-draft):
-  - [ ] Разработка полного технического проекта в `docs/designs/industrial_multi_pen_real_time_trend.md`.
-- [ ] Практическая реализация и интеграция (/boost):
-  - [ ] Создание моделей `TrendPenConfig` и расширение `RealTimeTrendConfig`.
-  - [ ] Разработка структуры данных `RingBuffer<T>` с нулевыми аллокациями.
-  - [ ] Разработка `TrendPenViewModel` и переработка `RealTimeTrendViewModel`.
-  - [ ] Модернизация `TrendLineControl` (отрисовка кривых, Step-режим, пороговые линии, Crosshair).
-  - [ ] Обновление XAML разметки в `DashboardView.axaml` (шкалы, сетка, легенда).
-  - [ ] Интеграция редактора перьев в `WidgetEditorWindow`.
-  - [ ] Тестирование в `AvaloniaApplication1.UIValidation` и проверка рендера.
+- [x] Практическая реализация и интеграция (/boost):
+  - [x] Создание моделей `TrendPenConfig` и расширение `RealTimeTrendConfig` с обратной совместимостью (`EnsureDefaultPen`).
+  - [x] Разработка кольцевого буфера `RingBuffer<T>` с нулевыми аллокациями на push и O(1) чтением по индексу.
+  - [x] Разработка `TrendPenViewModel` и переработка `RealTimeTrendViewModel` (квантование времени, пауза, визир, двойные шкалы, адаптивное скрытие легенды).
+  - [x] Модернизация `TrendLineControl` (отрисовка кривых через `context.DrawLine` с кэшем `Pen`, Step/Linear интерполяция, линии SP/Warning/Alarm, интерактивный визир Crosshair).
+  - [x] Обновление XAML разметки в `DashboardView.axaml` (двойные шкалы Y, временная ось X, карточка среза визира, сворачиваемая таблица легенды).
+  - [x] Интеграция редактора перьев и настроек тренда в `WidgetEditorViewModel` и `WidgetEditorWindow.axaml`.
+  - [x] Автоматизированное тестирование в `AvaloniaApplication1.UIValidation` (Блок Test 25: 9 сценариев проверки).
+  - [x] Сборка решения: **0 ошибок, 0 предупреждений**, валидация **25/25 PASSED**, артефакты рендера `ui_preview.png` и `ui_tree.json` актуализированы.

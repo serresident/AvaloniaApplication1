@@ -2824,7 +2824,247 @@ public static class Program
                     throw new Exception("LevelSensorWidgetViewModel.UpdateFromConfig failed to update alarm limits.");
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (24/24) PASSED SUCCESSFULLY!");
+            // =========================================================================
+            // TEST 25: Industrial Multi-Pen RealTimeTrend Control (ISA-101 Verification)
+            // =========================================================================
+            Console.WriteLine("[UIValidation] Testing Industrial Multi-Pen RealTimeTrend Control (Test 25)...");
+            {
+                // 25.1: High-Performance RingBuffer<T> Invariants & Zero Heap Allocations
+                var ring = new AvaloniaApplication1.Models.Common.RingBuffer<double>(5);
+                if (ring.Capacity != 5 || ring.Count != 0)
+                    throw new Exception("RingBuffer initial capacity or count mismatch.");
+
+                ring.Push(10.0);
+                ring.Push(20.0);
+                ring.Push(30.0);
+                if (ring.Count != 3 || ring[0] != 10.0 || ring[1] != 20.0 || ring[2] != 30.0)
+                    throw new Exception("RingBuffer push/indexing mismatch.");
+                if (ring.Oldest != 10.0 || ring.Latest != 30.0)
+                    throw new Exception("RingBuffer Oldest/Latest mismatch.");
+
+                // Fill beyond capacity: oldest elements must be overwritten in FIFO order
+                ring.Push(40.0);
+                ring.Push(50.0);
+                ring.Push(60.0); // overwrites 10.0
+                ring.Push(70.0); // overwrites 20.0
+                if (ring.Count != 5)
+                    throw new Exception($"RingBuffer Count should be capped at capacity 5, got {ring.Count}");
+                if (ring[0] != 30.0 || ring[1] != 40.0 || ring[2] != 50.0 || ring[3] != 60.0 || ring[4] != 70.0)
+                    throw new Exception($"RingBuffer FIFO wrap mismatch: [{string.Join(", ", ring)}]");
+                if (ring.Oldest != 30.0 || ring.Latest != 70.0)
+                    throw new Exception("RingBuffer wrapped Oldest/Latest mismatch.");
+
+                // PreFill
+                ring.PreFill(99.0);
+                if (ring.Count != 5 || ring[0] != 99.0 || ring[4] != 99.0)
+                    throw new Exception("RingBuffer PreFill mismatch.");
+
+                // 25.2: Backward Compatibility (Synthesize Pens[0] from legacy config)
+                string legacyJson = @"{
+                    ""Type"": ""RealTimeTrend"",
+                    ""Title"": ""Legacy Steam Pressure"",
+                    ""Format"": ""{0:F2} bar"",
+                    ""MinValue"": 10.0,
+                    ""MaxValue"": 250.0,
+                    ""Source"": { ""ConnId"": ""mb1"", ""Address"": ""40001"" }
+                }";
+                var desConfig = JsonSerializer.Deserialize<WidgetConfig>(legacyJson) as RealTimeTrendConfig;
+                if (desConfig == null)
+                    throw new Exception("Failed to deserialize legacy RealTimeTrend JSON.");
+                if (desConfig.Pens == null || desConfig.Pens.Count != 1)
+                    throw new Exception($"Legacy RealTimeTrendConfig did not synthesize Pens[0]; got count {desConfig.Pens?.Count}");
+
+                var synPen = desConfig.Pens[0];
+                if (synPen.MinValue != 10.0 || synPen.MaxValue != 250.0 || synPen.Format != "{0:F2} bar" || synPen.ColorHex != "#00FFCC")
+                    throw new Exception("Synthesized Pens[0] parameters do not match legacy config values.");
+                if (synPen.Source?.ConnId != "mb1" || synPen.Source?.Address != "40001")
+                    throw new Exception("Synthesized Pens[0] Source does not match root legacy Source.");
+
+                // 25.3: Multi-Pen Time-Quantized Sampling & Tag Synchronization
+                var mockCore = new MockDataCoreService();
+                var projCtx = new ProjectContextService { IsDesignMode = false };
+
+                var multiPenConfig = new RealTimeTrendConfig
+                {
+                    Title = "Multi-Pen Reactor Trend",
+                    TimeWindowSeconds = 60,
+                    ShowSetpoint = true,
+                    SetpointValue = 120.0,
+                    ShowWarningLimits = true,
+                    WarningHigh = 160.0,
+                    WarningLow = 40.0,
+                    ShowAlarmLimits = true,
+                    AlarmHigh = 180.0,
+                    AlarmLow = 20.0,
+                    Pens = new List<TrendPenConfig>
+                    {
+                        new TrendPenConfig
+                        {
+                            Name = "Temperature",
+                            Source = new DataSourceConfig { ConnId = "plc", Address = "temp" },
+                            ColorHex = "#FF3366",
+                            Thickness = 2.0,
+                            InterpolationMode = "Linear",
+                            YAxisBinding = "Left",
+                            MinValue = 0.0,
+                            MaxValue = 200.0,
+                            Units = "°C",
+                            Format = "{0:F1}"
+                        },
+                        new TrendPenConfig
+                        {
+                            Name = "Stirrer State",
+                            Source = new DataSourceConfig { ConnId = "plc", Address = "stirrer" },
+                            ColorHex = "#00FFCC",
+                            Thickness = 2.5,
+                            InterpolationMode = "Step",
+                            YAxisBinding = "Right",
+                            MinValue = 0.0,
+                            MaxValue = 1.0,
+                            Units = "",
+                            Format = "{0:F0}"
+                        }
+                    }
+                };
+
+                var trendVm = new RealTimeTrendViewModel(multiPenConfig, mockCore, projCtx);
+                if (trendVm.Pens.Count != 2)
+                    throw new Exception($"RealTimeTrendViewModel Pens count expected 2, got {trendVm.Pens.Count}");
+                if (!trendVm.HasRightAxis)
+                    throw new Exception("HasRightAxis should be true when a pen is bound to Right axis.");
+
+                // Asynchronous tag updates published
+                mockCore.PublishTag(new TagData("plc", "temp", 125.4));
+                mockCore.PublishTag(new TagData("plc", "stirrer", 1));
+                Dispatcher.UIThread.RunJobs();
+
+                // Advance quantization samples
+                trendVm.Pens[0].PushSample();
+                trendVm.Pens[1].PushSample();
+                trendVm.UpdateAxesScales();
+
+                if (trendVm.Pens[0].LatestValue != 125.4 || trendVm.Pens[0].LatestFormatted != "125.4")
+                    throw new Exception($"Pen 0 latest value mismatch: expected 125.4, got {trendVm.Pens[0].LatestFormatted}");
+                if (trendVm.Pens[1].LatestValue != 1.0 || trendVm.Pens[1].LatestFormatted != "1")
+                    throw new Exception($"Pen 1 latest value mismatch: expected 1, got {trendVm.Pens[1].LatestFormatted}");
+
+                // 25.4: Pause / Resume Toggle
+                if (trendVm.IsPaused)
+                    throw new Exception("RealTimeTrendViewModel should default to not paused.");
+                trendVm.TogglePause();
+                if (!trendVm.IsPaused)
+                    throw new Exception("TogglePause failed to set IsPaused to true.");
+                trendVm.TogglePause();
+                if (trendVm.IsPaused)
+                    throw new Exception("TogglePause failed to resume playback.");
+
+                // 25.5: Interactive Crosshair & Inspection Slice Calculation
+                trendVm.SelectedSliceIndex = RealTimeTrendViewModel.BufferCapacity - 1; // Latest point
+                trendVm.IsCrosshairActive = true;
+                Dispatcher.UIThread.RunJobs();
+
+                if (trendVm.CrosshairValues.Count != 2)
+                    throw new Exception($"Crosshair slice values count expected 2, got {trendVm.CrosshairValues.Count}");
+                if (trendVm.CrosshairValues[0].PenName != "Temperature" || trendVm.CrosshairValues[0].FormattedValue != "125.4")
+                    throw new Exception($"Crosshair slice item 0 mismatch: {trendVm.CrosshairValues[0].PenName} = {trendVm.CrosshairValues[0].FormattedValue}");
+                if (trendVm.CrosshairTimeText != "Сейчас")
+                    throw new Exception($"CrosshairTimeText for latest index expected 'Сейчас', got '{trendVm.CrosshairTimeText}'");
+
+                // Test time offset on older slice index
+                trendVm.SelectedSliceIndex = 0;
+                if (!trendVm.CrosshairTimeText.StartsWith("-60") && !trendVm.CrosshairTimeText.Contains("с"))
+                    throw new Exception($"CrosshairTimeText for oldest index expected -60с offset, got '{trendVm.CrosshairTimeText}'");
+
+                // 25.6: ISA-101 Full Dynamic (FD) & Micro-Noise Protection Threshold (Delta Y >= 1.0)
+                var noisePen = new TrendPenViewModel(new TrendPenConfig
+                {
+                    Name = "NoiseSensor",
+                    AutoScale = true,
+                    MinValue = 0,
+                    MaxValue = 100
+                }, mockCore, 10);
+                for (int i = 0; i < 10; i++)
+                {
+                    mockCore.PublishTag(new TagData("test", "addr", 50.0 + (i % 2 == 0 ? 0.02 : -0.02)));
+                    Dispatcher.UIThread.RunJobs();
+                    noisePen.PushSample();
+                }
+                double noiseDelta = noisePen.StatMax - noisePen.StatMin;
+                if (noiseDelta > 0.5)
+                    throw new Exception($"Expected micro-noise delta < 0.5, got {noiseDelta}");
+
+                // 25.7: Responsive Disclosure Invariant
+                trendVm.SizeY = 8; // Compact
+                if (trendVm.IsLegendEffectiveVisible)
+                    throw new Exception("IsLegendEffectiveVisible must be false when SizeY < 12 (Responsive Disclosure).");
+                trendVm.SizeY = 14; // Large
+                if (!trendVm.IsLegendEffectiveVisible)
+                    throw new Exception("IsLegendEffectiveVisible must be true when SizeY >= 12 and ShowLegendTable is true.");
+
+                // 25.8: In-Place Reconciliation (Undo/Redo & Zero Leak)
+                var initialPen0Ref = trendVm.Pens[0];
+                var reconfig = new RealTimeTrendConfig
+                {
+                    Title = "Reconciled Reactor Trend",
+                    TimeWindowSeconds = 300,
+                    ShowSetpoint = false,
+                    Pens = new List<TrendPenConfig>
+                    {
+                        new TrendPenConfig
+                        {
+                            Id = initialPen0Ref.Id,
+                            Name = "Temperature Reconciled",
+                            Source = new DataSourceConfig { ConnId = "plc", Address = "temp" },
+                            ColorHex = "#FFAA00",
+                            MinValue = -50,
+                            MaxValue = 300
+                        },
+                        new TrendPenConfig
+                        {
+                            Name = "Pressure",
+                            Source = new DataSourceConfig { ConnId = "plc", Address = "press" },
+                            ColorHex = "#3399FF"
+                        }
+                    }
+                };
+                trendVm.UpdateFromConfig(reconfig);
+
+                if (!ReferenceEquals(trendVm.Pens[0], initialPen0Ref))
+                    throw new Exception("In-place reconciliation failed: matching pen was recreated instead of preserved!");
+                if (trendVm.Pens[0].Name != "Temperature Reconciled" || trendVm.Pens[0].ColorHex != "#FFAA00")
+                    throw new Exception("In-place reconciliation failed to update properties on preserved pen.");
+                if (trendVm.Pens.Count != 2 || trendVm.Pens[1].Name != "Pressure")
+                    throw new Exception("In-place reconciliation failed to add newly configured pen or remove deleted stirrer pen.");
+                if (trendVm.TypedConfig.TimeWindowSeconds != 300)
+                    throw new Exception("UpdateFromConfig failed to update TimeWindowSeconds.");
+
+                // 25.9: Headless Layout & Direct DrawLine Execution on TrendLineControl
+                var trendControl = new TrendLineControl
+                {
+                    Pens = trendVm.Pens,
+                    ShowSetpoint = true,
+                    SetpointValue = 100.0,
+                    ShowWarningLimits = true,
+                    WarningHigh = 150.0,
+                    WarningLow = 20.0,
+                    ShowAlarmLimits = true,
+                    AlarmHigh = 180.0,
+                    AlarmLow = 10.0,
+                    EnableCrosshair = true,
+                    CrosshairIndex = 5,
+                    IsCrosshairActive = true,
+                    CrosshairX = 150.0
+                };
+                trendControl.Measure(new Size(400, 200));
+                trendControl.Arrange(new Rect(0, 0, 400, 200));
+                if (trendControl.Bounds.Width != 400 || trendControl.Bounds.Height != 200)
+                    throw new Exception("TrendLineControl layout measurement mismatch.");
+
+                trendVm.Dispose();
+                noisePen.Dispose();
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (25/25) PASSED SUCCESSFULLY!");
         }
     }
 

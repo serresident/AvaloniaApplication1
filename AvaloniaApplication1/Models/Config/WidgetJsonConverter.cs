@@ -31,7 +31,7 @@ namespace AvaloniaApplication1.Models.Config
                 "CommandButton" => JsonSerializer.Deserialize<CommandButtonConfig>(doc.RootElement.GetRawText(), deserializeOptions),
                 "Slider" => JsonSerializer.Deserialize<SliderConfig>(doc.RootElement.GetRawText(), deserializeOptions),
                 "SetValue" => JsonSerializer.Deserialize<SetValueConfig>(doc.RootElement.GetRawText(), deserializeOptions),
-                "RealTimeTrend" => JsonSerializer.Deserialize<RealTimeTrendConfig>(doc.RootElement.GetRawText(), deserializeOptions),
+                "RealTimeTrend" => DeserializeTrendConfig(doc.RootElement.GetRawText(), deserializeOptions),
                 "Pipe" => JsonSerializer.Deserialize<PipeConfig>(doc.RootElement.GetRawText(), deserializeOptions),
                 "Valve" => JsonSerializer.Deserialize<ValveConfig>(doc.RootElement.GetRawText(), deserializeOptions),
                 "Tank" => JsonSerializer.Deserialize<TankConfig>(doc.RootElement.GetRawText(), deserializeOptions),
@@ -42,6 +42,24 @@ namespace AvaloniaApplication1.Models.Config
                 _ => JsonSerializer.Deserialize<WidgetConfigBase>(doc.RootElement.GetRawText(), deserializeOptions) // Fallback
             };
 
+            return config;
+        }
+
+        private static RealTimeTrendConfig? DeserializeTrendConfig(string json, JsonSerializerOptions options)
+        {
+            var config = JsonSerializer.Deserialize<RealTimeTrendConfig>(json, options);
+            if (config != null)
+            {
+                using var doc = JsonDocument.Parse(json);
+                bool hasPens = doc.RootElement.TryGetProperty("Pens", out var pensElem) && 
+                               pensElem.ValueKind == JsonValueKind.Array && 
+                               pensElem.GetArrayLength() > 0;
+                if (!hasPens)
+                {
+                    config.Pens.Clear();
+                    config.EnsureDefaultPen();
+                }
+            }
             return config;
         }
 

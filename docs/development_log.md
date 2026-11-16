@@ -1749,3 +1749,69 @@
     *   Сформирован бриф `concepts_brief.md` и спецификация `docs/designs/industrial_multi_pen_real_time_trend.md`.
     *   Зарегистрирован в `docs/designs/SITEMAP.md`.
     *   Обновлена стенограмма сессии через `scripts/export_chat.ps1`.
+
+---
+
+## 📅 16.11.2026 (Сессия 58 — Реализация Industrial Multi-Pen RealTimeTrend Control по стандартам ISA-101 / ГОСТ 21.408)
+
+### 📌 Достижение: Полномасштабная программная реализация промышленного многоканального тренд-контрола RealTimeTrend с нулевыми аллокациями памяти на рендере, двойными шкалами Dual-Axis, ступенчатой интерполяцией Step, пороговыми технологическими линиями SP/Warning/Alarm, интерактивным визиром Crosshair и полной интеграцией в WidgetEditorWindow и движок истории Undo/Redo.
+
+*   **Коллекции и слой производительности (Collections & Performance Layer):**
+    *   Разработан класс `RingBuffer<T>` (`AvaloniaApplication1.Controls/Common/RingBuffer.cs` в пространстве `AvaloniaApplication1.Models.Common`):
+        *   Высокопроизводительный кольцевой буфер с предварительно выделенным массивом.
+        *   Нулевые аллокации памяти в куче при вызове `Push(T item)` и индексированном доступе `this[int index]` O(1).
+        *   Реализует `IReadOnlyList<T>`, поддерживает свойства `Capacity`, `Count`, `Oldest`, `Latest`, методы `PreFill()` и `Clear()`.
+*   **Доменные модели (Domain Layer):**
+    *   Создана модель `TrendPenConfig` (`AvaloniaApplication1/Models/Config/TrendPenConfig.cs`):
+        *   `Id` (Guid), `Name`, `Source` (`DataSourceConfig`), `ColorHex`, `Thickness`, `StrokeStyle` (`Solid`, `Dash`, `Dot`), `InterpolationMode` (`Linear`, `Step`), `YAxisBinding` (`Left`, `Right`, `Individual`), `MinValue`, `MaxValue`, `AutoScale` (Full Dynamic), `Units`, `Format`, `IsVisible`.
+        *   Реализован метод глубокого клонирования `Clone()`.
+    *   Расширена конфигурация `RealTimeTrendConfig` (`HmiConfiguration.cs`):
+        *   Добавлены свойства: `Pens`, `ScalingMode` (`DualAxis`/`Individual`), `TimeWindowSeconds` (60, 300, 900, 1800, 3600), `ShowSetpoint`, `SetpointValue`, `ShowWarningLimits`, `WarningHigh`/`WarningLow`, `ShowAlarmLimits`, `AlarmHigh`/`AlarmLow`, `ShowLegendTable`, `ShowLegendLatestValue`, `ShowLegendMinMax`, `ShowLegendUnits`, `EnableCrosshair`.
+        *   Сохранены legacy-поля `Format`, `MinValue`, `MaxValue` для 100% обратной совместимости.
+        *   Реализован метод авто-синтеза `EnsureDefaultPen()`, гарантирующий, что при десериализации старых конфигураций `config.json` автоматически генерируется `Pens[0]` из legacy-параметров с цветом `#00FFCC`.
+    *   В `WidgetJsonConverter.cs` внедрен метод `DeserializeTrendConfig`, автоматически вызывающий `EnsureDefaultPen()` при отсутствии массива `Pens` в JSON.
+*   **Слой представления и вьюмодели (Presentation ViewModels):**
+    *   Создан `TrendPenViewModel` (`AvaloniaApplication1/ViewModels/Widgets/TrendPenViewModel.cs`):
+        *   Управляет индивидуальной подпиской на тег через `IDataCoreService` с освобождением в `CompositeDisposable`.
+        *   Ведет собственный кольцевой буфер `RingBuffer<double>`, вычисляет статистику (`LatestValue`, `StatMin`, `StatMax`), форматированные строки для легенды (`LatestFormatted`, `MinFormatted`, `MaxFormatted`) и кисть `PenBrush`.
+        *   Реализует интерфейс `ITrendPenRenderData` и дифференциальное обновление `UpdateFromConfig(TrendPenConfig)`.
+    *   Модернизирован `RealTimeTrendViewModel` (`AvaloniaApplication1/ViewModels/Widgets/RealTimeTrendViewModel.cs`):
+        *   Оркестрирует коллекцию перьев `ObservableCollection<TrendPenViewModel> Pens`.
+        *   Реализует тактовое квантование времени (Time-Quantized Sampling) через `DispatcherTimer` с адаптивным интервалом `TimeWindowSeconds * 1000 / BufferCapacity`, синхронизируя разрозненные Modbus/MQTT источники на общей временной сетке.
+        *   Команда `TogglePauseCommand` и свойство `IsPaused` для фиксации графика оператором.
+        *   Расчет сечения интерактивного визира (`CrosshairSliceItem`, `SelectedSliceIndex`, `CrosshairTimeText`, `CrosshairValues`).
+        *   Автоматический расчет шкал `LeftMinY`/`LeftMaxY` и `RightMinY`/`RightMaxY` с флагом `HasRightAxis`.
+        *   Адаптивное автоскрытие легенды (Responsive Disclosure): свойство `IsLegendEffectiveVisible => TypedConfig.ShowLegendTable && SizeY >= 12`.
+        *   Поддержка дифференциальной истории Undo/Redo: метод `UpdateFromConfig(WidgetConfig)` сопоставляет перья по `Id` и обновляет существующие экземпляры in-place без утечек подписок.
+*   **Отрисовка с нулевыми аллокациями (Zero-Allocation Render Control):**
+    *   Полностью переписан `TrendLineControl.cs` (`AvaloniaApplication1.Controls/Charting/TrendLineControl.cs`):
+        *   Ликвидированы все аллокации в куче на каждом кадре: полностью устранены `new StreamGeometry` и боксинг в `IEnumerable`.
+        *   Отрисовка всех кривых выполнена прямыми вызовами `context.DrawLine` с использованием кэшированного словаря перьев `Pen` (`_penCache` по ключу `(ColorHex, Thickness, StrokeStyle)`) и кэша кистей `IBrush` (`_brushCache`).
+        *   Поддержана ступенчатая интерполяция `Step` (ортогональная "лесенка" для дискретных 0/1 сигналов) и непрерывная линейная `Linear`.
+        *   Отрисовка технологических пунктирных линий: уставка SP (зеленая), предупреждения Warning H/L (желтая), аварийные пределы Alarm HH/LL (красная).
+        *   Защита от микрошума в Full Dynamic: при $\Delta Y < 1.0$ диапазон центрируется с шагом $1.0$ для предотвращения ложного дребезга на весь экран.
+        *   Обработка событий указателя (`OnPointerMoved`, `OnPointerEntered`, `OnPointerExited`, `OnPointerPressed`): точный расчет индекса среза по нормализованной координате X, отрисовка вертикальной линии визира и маркеров пересечений с активными перьями.
+*   **XAML Разметка Мнемосхемы (DashboardView.axaml):**
+    *   Обновлен `DataTemplate` для `RealTimeTrendViewModel`:
+        *   Header: заголовок, кнопка паузы/возобновления с переключением иконок `⏸` / `▶`, вывод текущего значения.
+        *   Центральная область: двойные шкалы Y (LeftMax/Mid/Min и RightMax/Mid/Min), контрол `scada:TrendLineControl`, временная шкала X (`-60с`, `-30с`, `Сейчас`).
+        *   Всплывающая плашка сечения визира с цветными индикаторами перьев, именами, точными значениями и временем среза.
+        *   Сворачиваемая табличная легенда под графиком с цветными плашками, именами, текущими значениями и единицами измерения.
+*   **Интеграция в Редактор Виджетов (WidgetEditor):**
+    *   Создан класс `TrendPenEditModel` (`AvaloniaApplication1/ViewModels/Windows/Common/TrendPenEditModel.cs`).
+    *   В `WidgetEditorViewModel.cs` добавлены свойства настройки режима шкалы, окна времени, порогов SP/Warning/Alarm, видимости элементов легенды, визира, а также список `TrendPens` с командами `AddTrendPenCommand` и `RemoveTrendPenCommand`.
+    *   В `WidgetEditorWindow.axaml` встроена специализированная панель настроек тренда: выбор шкал, тайм-аутов, порогов, переключатели колонок легенды, список перьев и детальный редактор выбранного пера (тег, цвет через `ColorPickerBox`, толщина, стиль, тип интерполяции, привязка оси, пределы, единицы).
+*   **Автоматизированное тестирование и верификация:**
+    *   В `AvaloniaApplication1.UIValidation/Program.cs` добавлен блок **Test 25** (9 сценариев проверки):
+        *   `25.1`: Инварианты `RingBuffer<double>`, FIFO-переполнение при превышении емкости, O(1) доступ.
+        *   `25.2`: Обратная совместимость с синтезом `Pens[0]` из legacy JSON конфигурации.
+        *   `25.3`: Квантование времени и синхронизация асинхронных тегов разных протоколов.
+        *   `25.4`: Пауза и возобновление выборки.
+        *   `25.5`: Интерактивный визир Crosshair и расчет среза параметров.
+        *   `25.6`: Защитный порог микрошума $\Delta Y \ge 1.0$ в режиме Full Dynamic.
+        *   `25.7`: Инвариант Responsive Disclosure автоскрытия легенды (`SizeY < 12`).
+        *   `25.8`: Дифференциальное обновление `UpdateFromConfig` без утечки подписок.
+        *   `25.9`: Headless layout и прямой вызов рендера `TrendLineControl`.
+    *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
+    *   Тесты UIValidation: **25/25 PASSED (100%)**.
+    *   Headless-рендеринг `render_ui.ps1 MimicView`: обновлены `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.
