@@ -1089,3 +1089,24 @@
   - [x] Сборка `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
   - [x] Тесты: **24/24 PASSED (100%)**.
   - [x] Headless-рендеринг `render_ui.ps1 MimicView`: артефакты обновлены.
+
+# Tasks: Industrial Multi-Pen RealTimeTrend Control (Сессия 57 — В процессе)
+
+- [x] EGM Brainstorm: Концепция и многолинзовый аудит промышленного тренд-контрола:
+  - [x] Проведен сравнительный аудит требований: многоканальность (до 8 перьев), режимы Dual-Axis и Individual Scales, ступенчатая интерполяция Step для дискретных сигналов.
+  - [x] Анализ нулевых аллокаций в `TrendLineControl.Render`: исключение `StreamGeometry`, устранение боксинга в `IEnumerable`, использование `RingBuffer<double>`.
+  - [x] Спроектированы опциональные линии технологических границ: уставка SP, предупреждения (Warning H/L), аварии (Alarm HH/LL).
+  - [x] Спроектирована табличная легенда с настраиваемыми колонками и адаптивным скрытием (Responsive Disclosure) при компактных размерах.
+  - [x] Спроектирован интерактивный визир (Crosshair) с тултипом значений.
+  - [x] Сформирован концептуальный документ: `concepts_brief.md` и `docs/designs/industrial_multi_pen_real_time_trend.md`.
+  - [x] Зарегистрирован в `docs/designs/SITEMAP.md`.
+- [ ] Формальный драфт проектной документации (/egm-draft):
+  - [ ] Разработка полного технического проекта в `docs/designs/industrial_multi_pen_real_time_trend.md`.
+- [ ] Практическая реализация и интеграция (/boost):
+  - [ ] Создание моделей `TrendPenConfig` и расширение `RealTimeTrendConfig`.
+  - [ ] Разработка структуры данных `RingBuffer<T>` с нулевыми аллокациями.
+  - [ ] Разработка `TrendPenViewModel` и переработка `RealTimeTrendViewModel`.
+  - [ ] Модернизация `TrendLineControl` (отрисовка кривых, Step-режим, пороговые линии, Crosshair).
+  - [ ] Обновление XAML разметки в `DashboardView.axaml` (шкалы, сетка, легенда).
+  - [ ] Интеграция редактора перьев в `WidgetEditorWindow`.
+  - [ ] Тестирование в `AvaloniaApplication1.UIValidation` и проверка рендера.
