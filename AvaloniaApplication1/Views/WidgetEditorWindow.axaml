@@ -189,6 +189,31 @@
                             </TextBlock>
                         </Border>
 
+                        <!-- ToggleSwitch Style & Orientation -->
+                        <Border Background="#252528" CornerRadius="6" Padding="10,8" Margin="0,2"
+                                IsVisible="{Binding IsToggleSwitchSelected}">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Параметры переключателя (ToggleSwitch)" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Стиль переключателя" Foreground="#AAAAAA" FontSize="11" />
+                                        <ComboBox ItemsSource="{Binding AvailableSwitchStyles}"
+                                                  SelectedItem="{Binding SelectedSwitchStyle}"
+                                                  HorizontalAlignment="Stretch" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Ориентация" Foreground="#AAAAAA" FontSize="11" />
+                                        <ComboBox ItemsSource="{Binding AvailableOrientations}"
+                                                  SelectedItem="{Binding SelectedOrientation}"
+                                                  HorizontalAlignment="Stretch" />
+                                    </StackPanel>
+                                </Grid>
+                                <CheckBox Content="Запрашивать подтверждение переключения"
+                                          IsChecked="{Binding RequireConfirmation}"
+                                          Foreground="White" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+
                         <Separator Background="#3E3E42" Height="1" Margin="0,4" />
 
                         <!-- Labels -->

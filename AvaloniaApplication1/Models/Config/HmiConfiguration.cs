@@ -105,6 +105,11 @@ namespace AvaloniaApplication1.Models.Config
 
     public class CommandButtonConfig : WidgetConfig
     {
+        public CommandButtonConfig()
+        {
+            Type = "CommandButton";
+        }
+
         // Toggle | Momentary | Latching | ToggleSwitch
         public string ButtonMode    { get; set; } = "Toggle";
         // Labels
@@ -116,6 +121,11 @@ namespace AvaloniaApplication1.Models.Config
         public bool ShowIconOnly    { get; set; } = false;
         public string Icon          { get; set; } = string.Empty;
         public double CornerRadius  { get; set; } = 6;
+        // ToggleSwitch: Pill | Rocker | Lever
+        public string SwitchStyle   { get; set; } = "Pill";
+        // ToggleSwitch: Horizontal | Vertical
+        public string Orientation   { get; set; } = "Horizontal";
+        public bool RequireConfirmation { get; set; } = false;
     }
 
     public class SliderConfig : WidgetConfig

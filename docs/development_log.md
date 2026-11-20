@@ -1328,3 +1328,59 @@
     *   Сборка: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj` — **0 ошибок, 0 предупреждений**.
     *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation` — **20/20 PASS** (включая комплексный тест №20).
     *   Headless-рендер: Сгенерированы артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json` для `TagManagerWindow`.
+
+---
+
+## 📅 20.11.2026 (Сессия 46 — Универсальный промышленный ToggleSwitch: Multi-Style & Dual-Orientation)
+
+### 📌 Достижение: Полнофункциональная поддержка переключателя CommandButton в режиме ToggleSwitch с 3 промышленными стилями (Pill, Rocker, Lever) и 2 ориентациями (Horizontal, Vertical)
+
+*   **Модели и типы конфигурации (`Models/Config/HmiConfiguration.cs`, `ConnectionType.cs`):**
+    *   Определены справочники: `SwitchStyles` (`Pill`, `Rocker`, `Lever`) и `SwitchOrientations` (`Horizontal`, `Vertical`).
+    *   В `CommandButtonConfig` добавлены свойства `SwitchStyle` (по умолчанию `"Pill"`) и `Orientation` (по умолчанию `"Horizontal"`), автоматическая установка типа `Type = "CommandButton"`.
+
+*   **Логика и представление (`ViewModels/CommandButtonViewModel.cs`):**
+    *   Добавлены реактивные свойства `SwitchStyle`, `Orientation`, булевы флаги `IsPillStyle`, `IsRockerStyle`, `IsLeverStyle`, `IsVertical`, `IsHorizontal`.
+    *   Для обеспечения нулевых аллокаций в UI-цикле (`Render`) вынесены статические и кэшированные кисти: `ButtonBackground`, `BrushOn`, `BrushOff`, `OnLabelBrush`, `OffLabelBrush`, `TrackBackground`, `TrackBorderBrush`, `ActiveShoulderBg`, `InactiveShoulderBg`.
+    *   В `ExecuteCommandAsync` реализовано переключение состояния и немедленная отправка дискретной команды в `DataCoreService`.
+    *   В `OnTagValueUpdated` добавлена поддержка обновления состояния `IsActive` от входящей сетевой телеметрии.
+
+*   **Чистый векторный XAML в `Views/DashboardView.axaml`:**
+    *   Все 6 комбинаций реализованы на чистой векторной графике Avalonia XAML (Grid, Border, Path, Canvas, Ellipse) без растра.
+    *   **Стиль Pill (Слайдер-таблетка):** Скругленный трек с круглым бегунком (Thumb), центрированной точкой состояния и подписями `LabelOff` / `LabelOn`.
+    *   **Стиль Rocker (Клавиша-рокер):** Двухплечевой переключатель с центральным разделителем, рельефным фоном активного/неактивного плеча и индикаторными светодиодными полосками `BrushOn` / `BrushOff`.
+    *   **Стиль Lever (Рычажный тумблер):** Промышленная гайка-основание с внутренним колодцем и перекидным штоком с углом наклона ±25° с металлическим набалдашником.
+    *   Ориентации: `Horizontal` (слева направо) и `Vertical` (снизу вверх) с автомасштабированием через `Viewbox` и полноразмерным сенсорным хитбоксом.
+
+*   **Редактор виджетов (`Views/WidgetEditorWindow.axaml` & `ViewModels/WidgetEditorViewModel.cs`):**
+    *   При выборе режима `ToggleSwitch` динамически открывается блок параметров переключателя с ComboBox для выбора стиля (*Pill*, *Rocker*, *Lever*) и ориентации (*Horizontal*, *Vertical*).
+    *   Поддержана полная двусторонняя синхронизация при открытии существующего виджета и сохранении в `ToWidgetConfig()`.
+
+*   **Верификация:**
+    *   Сборка проекта `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj -c Debug --nologo` — **0 ошибок, 0 предупреждений**.
+    *   Автоматические тесты: `dotnet run --project AvaloniaApplication1.UIValidation` — **21/21 PASS** (успешно выполнен комплексный тест №21, покрывающий все 6 комбинаций стилей и ориентаций, инверсию состояния, диспетчеризацию команд, телеметрию и сериализацию редактора).
+
+---
+
+## 📅 20.11.2026 (Сессия 47 — Code Review Audit, Hardening & Confirmation Safety)
+
+### 📌 Достижение: Устранение дефектов разметки, реализация RequireConfirmation и обеспечение отказоустойчивости переключателя ToggleSwitch
+
+*   **Требования безопасности (ISA-101 / Concepts Brief Requirement 3):**
+    *   В `CommandButtonConfig` добавлено свойство `RequireConfirmation`.
+    *   В `CommandButtonViewModel.ExecuteCommandAsync` реализован вызов модального подтверждения оператора через `DialogService.ShowConfirmAsync`. При отказе оператора состояние не изменяется и команда в ПЛК не посылается.
+    *   В `WidgetEditorWindow.axaml` и `WidgetEditorViewModel.cs` добавлен чекбокс подтверждения и двусторонняя привязка свойства.
+    *   Сохранены свойства `Icon`, `ShowIconOnly`, `CornerRadius` при пересохранении конфигурации виджета.
+
+*   **Устойчивость XAML-разметки к наложению и обрезке (`Views/DashboardView.axaml`):**
+    *   Внутренняя сетка кнопки переведена на `RowDefinitions="Auto,*"`, за счет чего опциональный заголовок `Title` больше не накладывается поверх переключателя.
+    *   Удалены жесткие ограничения `Width="124"` / `Height="124"`, приводившие к сжатию и обрезке меток состояний при длинных текстовых значениях ("ВКЛЮЧЕНО" / "ВЫКЛЮЧЕНО"). Колонки/строки переведены на автоматическое измерение `Auto,Auto,Auto`.
+    *   В рокерном стиле `Rocker` добавлен `TextTrimming="CharacterEllipsis"` и безопасные внутренние отступы плеч.
+
+*   **Отказоустойчивость и безопасность модели:**
+    *   Реализован безопасный fallback для `IsPillStyle`: при пустом или неизвестном `SwitchStyle` контрол корректно отображается в стиле `Pill` вместо пустого невидимого блока.
+    *   Все сравнения `ButtonMode`, `SwitchStyle` и `Orientation` переведены на регистронезависимые (`StringComparison.OrdinalIgnoreCase`).
+
+*   **Комплексная верификация:**
+    *   Сборка проекта: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj -c Debug --nologo` — **0 ошибок, 0 предупреждений**.
+    *   Автотесты: `dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj` — **21/21 PASS**. В тест №21 добавлены сценарии отмены и подтверждения модального окна `RequireConfirmation`, проверка безопасного отката на стиль `Pill` и нечувствительность к регистру строк.

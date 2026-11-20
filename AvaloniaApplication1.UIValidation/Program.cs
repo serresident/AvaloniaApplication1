@@ -1825,7 +1825,166 @@ public static class Program
                 }
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (20/20) PASSED SUCCESSFULLY!");
+            // ---------------------------------------------------------
+            // Test 21: ToggleSwitch Multi-Style & Dual-Orientation Validation
+            // ---------------------------------------------------------
+            Console.WriteLine("[UIValidation] Testing ToggleSwitch Multi-Style (Pill, Rocker, Lever) & Dual-Orientation (Horizontal, Vertical) (Test 21)...");
+            {
+                var tsMockCore = new MockDataCoreService();
+                var tsProjContext = new ProjectContextService { IsDesignMode = false };
+
+                // Test all 6 combinations (3 styles x 2 orientations)
+                string[] styles = new[] { "Pill", "Rocker", "Lever" };
+                string[] orientations = new[] { "Horizontal", "Vertical" };
+
+                foreach (var style in styles)
+                {
+                    foreach (var orientation in orientations)
+                    {
+                        var config = new CommandButtonConfig
+                        {
+                            Title = $"{style} {orientation}",
+                            ButtonMode = "ToggleSwitch",
+                            SwitchStyle = style,
+                            Orientation = orientation,
+                            LabelOn = "ON",
+                            LabelOff = "OFF",
+                            ColorOn = "#00FF00",
+                            ColorOff = "#FF0000",
+                            Source = new DataSourceConfig { ConnId = "plc1", Address = "40010" }
+                        };
+
+                        var vm = new CommandButtonViewModel(config, tsMockCore, tsProjContext);
+
+                        if (!vm.IsToggleSwitchMode)
+                            throw new Exception($"CommandButtonViewModel.IsToggleSwitchMode should be true for {style} {orientation}");
+
+                        if (orientation == "Horizontal")
+                        {
+                            if (!vm.IsHorizontal || vm.IsVertical)
+                                throw new Exception($"Orientation booleans invalid for {style} {orientation}: IsHorizontal={vm.IsHorizontal}, IsVertical={vm.IsVertical}");
+                        }
+                        else
+                        {
+                            if (!vm.IsVertical || vm.IsHorizontal)
+                                throw new Exception($"Orientation booleans invalid for {style} {orientation}: IsHorizontal={vm.IsHorizontal}, IsVertical={vm.IsVertical}");
+                        }
+
+                        if (style == "Pill" && (!vm.IsPillStyle || vm.IsRockerStyle || vm.IsLeverStyle))
+                            throw new Exception($"Style booleans invalid for Pill");
+                        if (style == "Rocker" && (!vm.IsRockerStyle || vm.IsPillStyle || vm.IsLeverStyle))
+                            throw new Exception($"Style booleans invalid for Rocker");
+                        if (style == "Lever" && (!vm.IsLeverStyle || vm.IsPillStyle || vm.IsRockerStyle))
+                            throw new Exception($"Style booleans invalid for Lever");
+
+                        // Test toggle interaction via ExecuteCommandAsync
+                        if (vm.IsActive)
+                            throw new Exception($"Initial state should be inactive");
+
+                        vm.ExecuteCommandCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                        if (!vm.IsActive)
+                            throw new Exception($"State should become active after ExecuteCommandAsync for {style} {orientation}");
+                        if (tsMockCore.GetCurrentValue("plc1", "40010") is not bool b1 || !b1)
+                            throw new Exception($"DataCoreService did not receive true command on toggle for {style} {orientation}");
+
+                        vm.ExecuteCommandCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                        if (vm.IsActive)
+                            throw new Exception($"State should become inactive after second ExecuteCommandAsync for {style} {orientation}");
+                        if (tsMockCore.GetCurrentValue("plc1", "40010") is not bool b2 || b2)
+                            throw new Exception($"DataCoreService did not receive false command on toggle for {style} {orientation}");
+
+                        // Test telemetry snapshot update
+                        vm.ApplySnapshot(new TagSnapshot(ConfigMigrationService.GenerateTagId("plc1", "40010"), true, TagQuality.Good, DateTime.UtcNow));
+                        if (!vm.IsActive)
+                            throw new Exception($"Snapshot update should set IsActive=true for {style} {orientation}");
+
+                        vm.ApplySnapshot(new TagSnapshot(ConfigMigrationService.GenerateTagId("plc1", "40010"), false, TagQuality.Good, DateTime.UtcNow));
+                        if (vm.IsActive)
+                            throw new Exception($"Snapshot update should set IsActive=false for {style} {orientation}");
+                    }
+                }
+
+                // Test dynamic property switches
+                var dynamicCfg = new CommandButtonConfig
+                {
+                    Title = "Dynamic Switch",
+                    ButtonMode = "ToggleSwitch",
+                    SwitchStyle = "Pill",
+                    Orientation = "Horizontal",
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "40010" }
+                };
+                var dynamicVm = new CommandButtonViewModel(dynamicCfg, tsMockCore, tsProjContext);
+                dynamicVm.SwitchStyle = "Rocker";
+                if (!dynamicVm.IsRockerStyle || dynamicVm.TypedConfig.SwitchStyle != "Rocker")
+                    throw new Exception("Dynamic SwitchStyle update failed");
+                dynamicVm.SwitchStyle = "Lever";
+                if (!dynamicVm.IsLeverStyle || dynamicVm.TypedConfig.SwitchStyle != "Lever")
+                    throw new Exception("Dynamic SwitchStyle update to Lever failed");
+                dynamicVm.Orientation = "Vertical";
+                if (!dynamicVm.IsVertical || dynamicVm.TypedConfig.Orientation != "Vertical")
+                    throw new Exception("Dynamic Orientation update failed");
+
+                // Test WidgetEditorViewModel integration
+                var editorVm = new WidgetEditorViewModel(dynamicCfg, new List<ConnectionConfig> { new() { Id = "plc1" } });
+                if (!editorVm.IsToggleSwitchSelected)
+                    throw new Exception("WidgetEditorViewModel should have IsToggleSwitchSelected=true for ToggleSwitch");
+                if (editorVm.SelectedSwitchStyle != "Lever" || editorVm.SelectedOrientation != "Vertical")
+                    throw new Exception($"WidgetEditorViewModel loaded wrong switch style or orientation: {editorVm.SelectedSwitchStyle}, {editorVm.SelectedOrientation}");
+
+                editorVm.SelectedSwitchStyle = "Pill";
+                editorVm.SelectedOrientation = "Horizontal";
+                editorVm.RequireConfirmation = true;
+                var savedCfg = (CommandButtonConfig)editorVm.ToWidgetConfig();
+                if (savedCfg.SwitchStyle != "Pill" || savedCfg.Orientation != "Horizontal")
+                    throw new Exception($"WidgetEditorViewModel.ToWidgetConfig failed to save SwitchStyle or Orientation: {savedCfg.SwitchStyle}, {savedCfg.Orientation}");
+                if (!savedCfg.RequireConfirmation)
+                    throw new Exception("WidgetEditorViewModel.ToWidgetConfig failed to save RequireConfirmation");
+
+                // Test RequireConfirmation modal safety dialog
+                var confirmMockDialog = new MockTestDialogService { ConfirmResult = false };
+                var safeCfg = new CommandButtonConfig
+                {
+                    Title = "Safe Industrial Switch",
+                    ButtonMode = "ToggleSwitch",
+                    SwitchStyle = "Lever",
+                    Orientation = "Vertical",
+                    RequireConfirmation = true,
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "40010" }
+                };
+                var safeVm = new CommandButtonViewModel(safeCfg, tsMockCore, tsProjContext) { DialogService = confirmMockDialog };
+                
+                // When operator cancels confirmation:
+                safeVm.ExecuteCommandCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (safeVm.IsActive)
+                    throw new Exception("Switch should not activate when operator cancels confirmation dialog");
+                if (!confirmMockDialog.ShowConfirmCalled)
+                    throw new Exception("ShowConfirmAsync was not called when RequireConfirmation=true");
+
+                // When operator confirms:
+                confirmMockDialog.ConfirmResult = true;
+                safeVm.ExecuteCommandCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (!safeVm.IsActive)
+                    throw new Exception("Switch should activate when operator confirms dialog");
+
+                // Test safe fallback for unknown / empty / case-insensitive styles
+                var fallbackCfg = new CommandButtonConfig
+                {
+                    Title = "Fallback Test",
+                    ButtonMode = "toggleswitch",
+                    SwitchStyle = "UnknownCustomStyle",
+                    Orientation = "horizontal",
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "40010" }
+                };
+                var fallbackVm = new CommandButtonViewModel(fallbackCfg, tsMockCore, tsProjContext);
+                if (!fallbackVm.IsToggleSwitchMode)
+                    throw new Exception("Case-insensitive ButtonMode ('toggleswitch') should activate IsToggleSwitchMode");
+                if (!fallbackVm.IsPillStyle || fallbackVm.IsRockerStyle || fallbackVm.IsLeverStyle)
+                    throw new Exception("Unknown SwitchStyle should safely fall back to Pill style");
+                if (!fallbackVm.IsHorizontal || fallbackVm.IsVertical)
+                    throw new Exception("Case-insensitive Orientation ('horizontal') should activate IsHorizontal");
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (21/21) PASSED SUCCESSFULLY!");
         }
     }
 

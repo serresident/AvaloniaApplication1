@@ -143,6 +143,27 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string _selectedButtonMode = ButtonModes.All[0];
 
+        public string[] AvailableSwitchStyles => SwitchStyles.All;
+
+        [ObservableProperty]
+        private string _selectedSwitchStyle = SwitchStyles.All[0];
+
+        public string[] AvailableOrientations => SwitchOrientations.All;
+
+        [ObservableProperty]
+        private string _selectedOrientation = SwitchOrientations.All[0];
+
+        [ObservableProperty]
+        private bool _isToggleSwitchSelected;
+
+        [ObservableProperty]
+        private bool _requireConfirmation;
+
+        partial void OnSelectedButtonModeChanged(string value)
+        {
+            IsToggleSwitchSelected = SelectedWidgetType == "CommandButton" && value == "ToggleSwitch";
+        }
+
         [ObservableProperty]
         private string _labelOn = "ВКЛ";
 
@@ -324,7 +345,20 @@ namespace AvaloniaApplication1.ViewModels
 
                 if (existingConfig is ValueDisplayConfig vd) { Format = vd.Format; ValueColor = vd.ValueColor; ValueFontSize = vd.ValueFontSize; }
                 if (existingConfig is PilotLightConfig pl) { TrueColor = pl.TrueColor; FalseColor = pl.FalseColor; }
-                if (existingConfig is CommandButtonConfig cb) { SelectedButtonMode = cb.ButtonMode; LabelOn = cb.LabelOn; LabelOff = cb.LabelOff; ColorOn = cb.ColorOn; ColorOff = cb.ColorOff; }
+                if (existingConfig is CommandButtonConfig cb)
+                {
+                    if (string.IsNullOrEmpty(SelectedWidgetType))
+                        SelectedWidgetType = "CommandButton";
+                    SelectedButtonMode = cb.ButtonMode;
+                    LabelOn = cb.LabelOn;
+                    LabelOff = cb.LabelOff;
+                    ColorOn = cb.ColorOn;
+                    ColorOff = cb.ColorOff;
+                    SelectedSwitchStyle = string.IsNullOrEmpty(cb.SwitchStyle) ? "Pill" : cb.SwitchStyle;
+                    SelectedOrientation = string.IsNullOrEmpty(cb.Orientation) ? "Horizontal" : cb.Orientation;
+                    RequireConfirmation = cb.RequireConfirmation;
+                    IsToggleSwitchSelected = cb.ButtonMode == "ToggleSwitch";
+                }
                 if (existingConfig is SliderConfig sl) { MinValue = sl.MinValue; MaxValue = sl.MaxValue; }
                 if (existingConfig is SetValueConfig sv) { Format = sv.Format; MinValue = sv.MinValue; MaxValue = sv.MaxValue; ValueColor = sv.ValueColor; ValueFontSize = sv.ValueFontSize; }
                 if (existingConfig is RealTimeTrendConfig rt) { Format = rt.Format; MinValue = rt.MinValue; MaxValue = rt.MaxValue; }
@@ -453,6 +487,7 @@ namespace AvaloniaApplication1.ViewModels
         {
             ShowValueDisplaySettings = SelectedWidgetType == "ValueDisplay" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "Tank" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor" || SelectedWidgetType == "LevelSensor";
             ShowCommandButtonSettings = SelectedWidgetType == "CommandButton";
+            IsToggleSwitchSelected = SelectedWidgetType == "CommandButton" && SelectedButtonMode == "ToggleSwitch";
             ShowSliderSettings = SelectedWidgetType == "Slider" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "RealTimeTrend" || SelectedWidgetType == "Tank" || SelectedWidgetType == "Reactor" || SelectedWidgetType == "LevelSensor";
             ShowPilotLightSettings = SelectedWidgetType == "PilotLight";
             ShowPipeSettings = SelectedWidgetType == "Pipe";
@@ -482,7 +517,20 @@ namespace AvaloniaApplication1.ViewModels
             {
                 "ValueDisplay" => new ValueDisplayConfig { Format = Format, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
                 "PilotLight" => new PilotLightConfig { TrueColor = TrueColor, FalseColor = FalseColor },
-                "CommandButton" => new CommandButtonConfig { ButtonMode = SelectedButtonMode, LabelOn = LabelOn, LabelOff = LabelOff, ColorOn = ColorOn, ColorOff = ColorOff },
+                "CommandButton" => new CommandButtonConfig
+                {
+                    ButtonMode = SelectedButtonMode,
+                    LabelOn = LabelOn,
+                    LabelOff = LabelOff,
+                    ColorOn = ColorOn,
+                    ColorOff = ColorOff,
+                    SwitchStyle = SelectedSwitchStyle,
+                    Orientation = SelectedOrientation,
+                    RequireConfirmation = RequireConfirmation,
+                    ShowIconOnly = (_existingConfig as CommandButtonConfig)?.ShowIconOnly ?? false,
+                    Icon = (_existingConfig as CommandButtonConfig)?.Icon ?? string.Empty,
+                    CornerRadius = (_existingConfig as CommandButtonConfig)?.CornerRadius ?? 6
+                },
                 "Slider" => new SliderConfig { MinValue = MinValue, MaxValue = MaxValue },
                 "SetValue" => new SetValueConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
                 "RealTimeTrend" => new RealTimeTrendConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue },
