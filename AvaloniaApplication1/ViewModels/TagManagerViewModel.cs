@@ -75,6 +75,116 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableProperty]
         private string _statusSummaryText = string.Empty;
 
+        [ObservableProperty]
+        private string _sortColumn = "TagId";
+
+        [ObservableProperty]
+        private bool _sortAscending = true;
+
+        private bool _isSortingBatch;
+
+        public string TagIdHeader => "Идентификатор (TagId)" + GetArrow("TagId");
+        public string NameHeader => "Наименование" + GetArrow("Name");
+        public string ConnIdHeader => "Драйвер" + GetArrow("ConnId");
+        public string AddressHeader => "Адрес / Топик" + GetArrow("Address");
+        public string DataTypeHeader => "Тип данных" + GetArrow("DataType");
+        public string UnitHeader => "Ед. изм." + GetArrow("Unit");
+        public string ScalingHeader => "Масштаб (Y)" + GetArrow("Scaling");
+        public string DeadbandHeader => "Апертура" + GetArrow("Deadband");
+        public string LiveValueHeader => "Текущее (Live)" + GetArrow("LiveValue");
+        public string QualityHeader => "Качество" + GetArrow("Quality");
+        public string TimestampHeader => "Время" + GetArrow("Timestamp");
+
+        private string GetArrow(string column)
+        {
+            if (string.Equals(SortColumn, column, StringComparison.OrdinalIgnoreCase))
+            {
+                return SortAscending ? " ▲" : " ▼";
+            }
+            return string.Empty;
+        }
+
+        private void NotifyHeaderProperties()
+        {
+            OnPropertyChanged(nameof(TagIdHeader));
+            OnPropertyChanged(nameof(NameHeader));
+            OnPropertyChanged(nameof(ConnIdHeader));
+            OnPropertyChanged(nameof(AddressHeader));
+            OnPropertyChanged(nameof(DataTypeHeader));
+            OnPropertyChanged(nameof(UnitHeader));
+            OnPropertyChanged(nameof(ScalingHeader));
+            OnPropertyChanged(nameof(DeadbandHeader));
+            OnPropertyChanged(nameof(LiveValueHeader));
+            OnPropertyChanged(nameof(QualityHeader));
+            OnPropertyChanged(nameof(TimestampHeader));
+        }
+
+        partial void OnSortColumnChanged(string value)
+        {
+            if (!_isSortingBatch)
+            {
+                ApplyFilter();
+                NotifyHeaderProperties();
+            }
+        }
+
+        partial void OnSortAscendingChanged(bool value)
+        {
+            if (!_isSortingBatch)
+            {
+                ApplyFilter();
+                NotifyHeaderProperties();
+            }
+        }
+
+        [RelayCommand]
+        public void Sort(string column)
+        {
+            if (string.IsNullOrWhiteSpace(column)) return;
+
+            var normalized = column.ToLowerInvariant() switch
+            {
+                "tagid" => "TagId",
+                "name" => "Name",
+                "connid" or "driver" => "ConnId",
+                "address" or "topic" => "Address",
+                "datatype" or "type" => "DataType",
+                "unit" => "Unit",
+                "scaling" => "Scaling",
+                "deadband" => "Deadband",
+                "livevalue" or "value" => "LiveValue",
+                "quality" => "Quality",
+                "timestamp" or "time" => "Timestamp",
+                _ => column
+            };
+
+            if (string.Equals(SortColumn, normalized, StringComparison.OrdinalIgnoreCase))
+            {
+                SortAscending = !SortAscending;
+            }
+            else
+            {
+                _isSortingBatch = true;
+                try
+                {
+                    SortAscending = true;
+                    SortColumn = normalized;
+                }
+                finally
+                {
+                    _isSortingBatch = false;
+                }
+                ApplyFilter();
+                NotifyHeaderProperties();
+            }
+        }
+
+        [RelayCommand]
+        public void Close()
+        {
+            CloseAction?.Invoke();
+        }
+
         public Action? CloseAction { get; set; }
 
         public TagManagerViewModel(
@@ -173,6 +283,7 @@ namespace AvaloniaApplication1.ViewModels
 
         public void ApplyFilter()
         {
+            var currentSelected = SelectedTag;
             FilteredTags.Clear();
 
             var query = SearchText?.Trim();
@@ -181,36 +292,86 @@ namespace AvaloniaApplication1.ViewModels
             bool filterConn = !string.IsNullOrEmpty(SelectedConnectionFilter) && SelectedConnectionFilter != "Все подключения";
             bool filterQuality = !string.IsNullOrEmpty(SelectedQualityFilter) && SelectedQualityFilter != "Все качества";
 
-            foreach (var tag in Tags)
+            IEnumerable<TagItemViewModel> stream = Tags;
+
+            if (hasQuery)
             {
-                if (hasQuery)
-                {
-                    bool match = tag.TagId.Contains(query!, StringComparison.OrdinalIgnoreCase) ||
-                                 tag.Name.Contains(query!, StringComparison.OrdinalIgnoreCase) ||
-                                 tag.Address.Contains(query!, StringComparison.OrdinalIgnoreCase) ||
-                                 tag.ConnId.Contains(query!, StringComparison.OrdinalIgnoreCase) ||
-                                 (tag.Unit != null && tag.Unit.Contains(query!, StringComparison.OrdinalIgnoreCase)) ||
-                                 (tag.Description != null && tag.Description.Contains(query!, StringComparison.OrdinalIgnoreCase));
-                    if (!match) continue;
-                }
+                stream = stream.Where(tag =>
+                    (tag.TagId != null && tag.TagId.Contains(query!, StringComparison.OrdinalIgnoreCase)) ||
+                    (tag.Name != null && tag.Name.Contains(query!, StringComparison.OrdinalIgnoreCase)) ||
+                    (tag.Address != null && tag.Address.Contains(query!, StringComparison.OrdinalIgnoreCase)) ||
+                    (tag.ConnId != null && tag.ConnId.Contains(query!, StringComparison.OrdinalIgnoreCase)) ||
+                    (tag.Unit != null && tag.Unit.Contains(query!, StringComparison.OrdinalIgnoreCase)) ||
+                    (tag.Description != null && tag.Description.Contains(query!, StringComparison.OrdinalIgnoreCase)));
+            }
 
-                if (filterConn && !string.Equals(tag.ConnId, SelectedConnectionFilter, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
+            if (filterConn)
+            {
+                stream = stream.Where(tag => string.Equals(tag.ConnId, SelectedConnectionFilter, StringComparison.OrdinalIgnoreCase));
+            }
 
-                if (filterQuality)
+            if (filterQuality)
+            {
+                stream = stream.Where(tag =>
                 {
-                    if (SelectedQualityFilter.Contains("Good") && tag.Quality != TagQuality.Good) continue;
-                    if (SelectedQualityFilter.Contains("Stale") && tag.Quality != TagQuality.Stale) continue;
-                    if (SelectedQualityFilter.Contains("Timeout") && tag.Quality != TagQuality.Timeout && tag.Quality != TagQuality.CommFailure && tag.Quality != TagQuality.Bad) continue;
-                    if (SelectedQualityFilter.Contains("Overridden") && !tag.IsOverridden) continue;
-                }
+                    if (SelectedQualityFilter.Contains("Good") && tag.Quality != TagQuality.Good) return false;
+                    if (SelectedQualityFilter.Contains("Stale") && tag.Quality != TagQuality.Stale) return false;
+                    if (SelectedQualityFilter.Contains("Timeout") && tag.Quality != TagQuality.Timeout && tag.Quality != TagQuality.CommFailure && tag.Quality != TagQuality.Bad) return false;
+                    if (SelectedQualityFilter.Contains("Overridden") && !tag.IsOverridden) return false;
+                    return true;
+                });
+            }
 
+            // Sorting
+            stream = (SortColumn?.ToLowerInvariant(), SortAscending) switch
+            {
+                ("tagid", true) => stream.OrderBy(t => t.TagId ?? string.Empty, StringComparer.OrdinalIgnoreCase),
+                ("tagid", false) => stream.OrderByDescending(t => t.TagId ?? string.Empty, StringComparer.OrdinalIgnoreCase),
+
+                ("name", true) => stream.OrderBy(t => t.Name ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("name", false) => stream.OrderByDescending(t => t.Name ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                ("connid" or "driver", true) => stream.OrderBy(t => t.ConnId ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("connid" or "driver", false) => stream.OrderByDescending(t => t.ConnId ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                ("address" or "topic", true) => stream.OrderBy(t => t.Address ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("address" or "topic", false) => stream.OrderByDescending(t => t.Address ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                ("datatype" or "type", true) => stream.OrderBy(t => t.DataType ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("datatype" or "type", false) => stream.OrderByDescending(t => t.DataType ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                ("unit", true) => stream.OrderBy(t => t.Unit ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("unit", false) => stream.OrderByDescending(t => t.Unit ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                ("scaling", true) => stream.OrderBy(t => t.ScalingDisplay ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("scaling", false) => stream.OrderByDescending(t => t.ScalingDisplay ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                ("deadband", true) => stream.OrderBy(t => t.Deadband).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("deadband", false) => stream.OrderByDescending(t => t.Deadband).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                ("livevalue" or "value", true) => stream.OrderBy(t => t.LiveValue ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("livevalue" or "value", false) => stream.OrderByDescending(t => t.LiveValue ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                ("quality", true) => stream.OrderBy(t => (int)t.Quality).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("quality", false) => stream.OrderByDescending(t => (int)t.Quality).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                ("timestamp" or "time", true) => stream.OrderBy(t => t.TimestampText ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("timestamp" or "time", false) => stream.OrderByDescending(t => t.TimestampText ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+
+                (_, false) => stream.OrderByDescending(t => t.TagId ?? string.Empty, StringComparer.OrdinalIgnoreCase),
+                _ => stream.OrderBy(t => t.TagId ?? string.Empty, StringComparer.OrdinalIgnoreCase),
+            };
+
+            foreach (var tag in stream)
+            {
                 FilteredTags.Add(tag);
             }
 
-            if (SelectedTag != null && !FilteredTags.Contains(SelectedTag))
+            if (currentSelected != null && FilteredTags.Contains(currentSelected))
+            {
+                SelectedTag = currentSelected;
+            }
+            else
             {
                 SelectedTag = FilteredTags.FirstOrDefault();
             }

@@ -1786,6 +1786,36 @@ public static class Program
 
                 tmVm.SelectedQualityFilter = "Все качества";
 
+                // Test multi-column interactive sorting in TagManagerViewModel
+                tmVm.SortCommand.Execute("Name");
+                if (tmVm.SortColumn != "Name" || !tmVm.SortAscending)
+                    throw new Exception("TagManagerViewModel SortCommand 'Name' ascending failed.");
+                if (tmVm.FilteredTags[0].TagId != "tag_p1" || tmVm.FilteredTags[^1].TagId != "tag_l1")
+                    throw new Exception("TagManagerViewModel Name ascending sort order invalid.");
+                if (!tmVm.NameHeader.Contains("▲"))
+                    throw new Exception("TagManagerViewModel NameHeader should contain ascending arrow.");
+
+                // Toggle Name descending
+                tmVm.SortCommand.Execute("Name");
+                if (tmVm.SortAscending || tmVm.FilteredTags[0].TagId != "tag_l1" || tmVm.FilteredTags[^1].TagId != "tag_p1")
+                    throw new Exception("TagManagerViewModel Name descending sort order invalid.");
+                if (!tmVm.NameHeader.Contains("▼"))
+                    throw new Exception("TagManagerViewModel NameHeader should contain descending arrow.");
+
+                // Sort by TagId ascending
+                tmVm.SortCommand.Execute("TagId");
+                if (tmVm.SortColumn != "TagId" || !tmVm.SortAscending)
+                    throw new Exception("TagManagerViewModel TagId sort failed.");
+                if (tmVm.FilteredTags[0].TagId != "tag_l1" || tmVm.FilteredTags[^1].TagId != "tag_t1")
+                    throw new Exception("TagManagerViewModel TagId ascending sort order invalid.");
+
+                // Test CloseCommand & CloseAction
+                bool tmClosed = false;
+                tmVm.CloseAction = () => tmClosed = true;
+                tmVm.CloseCommand.Execute(null);
+                if (!tmClosed)
+                    throw new Exception("TagManagerViewModel.CloseCommand failed to invoke CloseAction.");
+
                 // Force override & Clear override from VM
                 var targetRow = tmVm.Tags.First(t => t.TagId == "tag_t1");
                 tmVm.ForceOverrideCommand.Execute(targetRow);
@@ -2101,6 +2131,16 @@ public static class Program
                     throw new Exception("Active sort column should display descending arrow in header");
                 if (pickerVm.TagIdHeader.Contains("▲") || pickerVm.TagIdHeader.Contains("▼"))
                     throw new Exception("Inactive sort columns should not display arrow");
+
+                // Test Scaling sort
+                pickerVm.SortCommand.Execute("Scaling");
+                if (pickerVm.SortColumn != "Scaling" || !pickerVm.SortAscending)
+                    throw new Exception("SortColumn should be Scaling ascending");
+                if (!pickerVm.ScalingHeader.Contains("▲"))
+                    throw new Exception("ScalingHeader should display ascending arrow");
+                pickerVm.SortCommand.Execute("Scaling");
+                if (pickerVm.SortAscending || !pickerVm.ScalingHeader.Contains("▼"))
+                    throw new Exception("ScalingHeader should display descending arrow");
 
                 // Part 2: Express Filtering
                 // Text search

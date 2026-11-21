@@ -1415,3 +1415,41 @@
     *   **Навигация клавиатурой:** Добавлен возврат фокуса в строку поиска по клавише `Up` из первой строки таблицы.
     *   **Надежность редактора виджетов:** Добавлено автодобавление выбранных драйверов в `AvailableConnections` и предфильтрация `Bool` для дискретных кнопочных виджетов.
 
+---
+
+## 2026-11-22 — Сессия 49: Реализация выхода и сортировки по колонкам в TagManager и TagPicker
+
+### 🎯 Цели сессии:
+1. Добавить удобные и явные способы выхода/закрытия окна базы тегов (`TagManagerWindow`): кнопка «✕ Закрыть» в верхнем заголовке, кнопка «🚪 Выход» на панели инструментов, поддержка горячей клавиши `Esc` и привязка к `CloseCommand` / `CloseAction`.
+2. Реализовать полноценную интерактивную сортировку по клику на заголовки таблицы в базе тегов (`TagManagerWindow` / `TagManagerViewModel`): поддержка всех столбцов (`TagId`, `Name`, `ConnId`, `Address`, `DataType`, `Unit`, `Scaling`, `Deadband`, `LiveValue`, `Quality`, `Timestamp`) с переключением направления (Asc/Desc) и индикацией стрелками (`▲`/`▼`).
+3. Доработать сортировку по колонкам в окне выбора тегов (`TagPickerWindow` / `TagPickerViewModel`): исправить стили кнопок `Button.header-btn` с псевдоклассами `:pointerover` и `:pressed` через шаблон `ContentPresenter`, исключить блокировку кликов внутренними `TextBlock` (`IsHitTestVisible="False"`), добавить сортировку по столбцу «Масштаб Y» и кнопку «✕ Закрыть» в заголовке окна.
+4. Верифицировать сборку (0 ошибок, 0 предупреждений) и обновить автоматические тесты в `AvaloniaApplication1.UIValidation`.
+
+### 🛠️ Выполненные работы:
+*   **Окно базы тегов (`Views/TagManagerWindow.axaml`, `Views/TagManagerWindow.axaml.cs`):**
+    *   В верхнюю строку заголовка (Row 0) рядом со счетчиками статистики добавлена заметная кнопка «✕ Закрыть» (`Command="{Binding CloseCommand}"`, `Click="OnCloseClick"`).
+    *   На панель инструментов (Row 1) добавлена кнопка «🚪 Выход» (`Command="{Binding CloseCommand}"`, `Click="OnCloseClick"`).
+    *   В нижнем статусном колонтитуле (Row 4) кнопка «Закрыть» обновлена до «Закрыть (Esc)» с привязкой к `CloseCommand`.
+    *   В `TagManagerWindow.axaml.cs` реализован перехват клавиши `Escape` в `OnKeyDown` для закрытия окна.
+    *   В `OnOpened` добавлена автоматическая привязка `vm.CloseAction ??= Close;`.
+    *   Все статические заголовки колонок в Row 2 заменены на интерактивные кнопки `Button.header-btn` с привязкой к `SortCommand`, параметрами колонок и обработчиком `Click="OnHeaderClick"`.
+*   **Вьюмодель базы тегов (`ViewModels/TagManagerViewModel.cs`):**
+    *   Добавлены свойства `SortColumn` и `SortAscending` с пакетной нотификацией.
+    *   Добавлены свойства заголовков с индикаторами направления (`TagIdHeader`, `NameHeader`, `ConnIdHeader`, `AddressHeader`, `DataTypeHeader`, `UnitHeader`, `ScalingHeader`, `DeadbandHeader`, `LiveValueHeader`, `QualityHeader`, `TimestampHeader`).
+    *   Реализована команда `SortCommand(string column)` с поддержкой переключения Asc/Desc.
+    *   Добавлена команда `CloseCommand()`, вызывающая `CloseAction?.Invoke()`.
+    *   В `ApplyFilter()` интегрирована многокритериальная сортировка LINQ по выбранной колонке и направлению.
+*   **Окно выбора тега (`Views/TagPickerWindow.axaml`, `Views/TagPickerWindow.axaml.cs`):**
+    *   В заголовок (Row 0) добавлена кнопка «✕ Закрыть» (`Command="{Binding CancelCommand}"`).
+    *   Заголовок колонки «Масштаб Y» переведён в интерактивную кнопку с сортировкой (`CommandParameter="Scaling"`).
+    *   Для `TextBlock` внутри заголовков установлен `IsHitTestVisible="False"`.
+    *   Стили `Button.header-btn` дополнены селекторами псевдоклассов через `ContentPresenter#PART_ContentPresenter` для корректного отображения ховера (`#2D2D30`) и нажатия (`#3E3E42`).
+    *   В `TagPickerWindow.axaml.cs` добавлен обработчик `OnHeaderClick` для гарантированного вызова `SortCommand`.
+*   **Вьюмодель выбора тега (`ViewModels/TagPickerViewModel.cs`):**
+    *   Добавлено свойство `ScalingHeader` и обработка колонки `"scaling"` в `Sort` и `ApplyFilter`.
+*   **Автоматическое тестирование (`AvaloniaApplication1.UIValidation/Program.cs`):**
+    *   В Тест 20 добавлена проверка сортировки `TagManagerViewModel` по колонкам (`Name`, `TagId`), стрелок индикации и работы `CloseCommand`.
+    *   В Тест 22 добавлена проверка сортировки `TagPickerViewModel` по столбцу `Scaling` в обоих направлениях.
+    *   Все 22 автоматических теста пройдены успешно.
+    *   Выполнен контрольный headless-рендер `TagManagerWindow` и `TagPickerWindow`.
+

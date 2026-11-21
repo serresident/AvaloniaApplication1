@@ -64,6 +64,14 @@ namespace AvaloniaApplication1.Views
             }
         }
 
+        private void OnHeaderClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.CommandParameter is string col && DataContext is TagPickerViewModel vm)
+            {
+                vm.SortCommand.Execute(col);
+            }
+        }
+
         private void OnRowDoubleTapped(object? sender, TappedEventArgs e)
         {
             if (DataContext is TagPickerViewModel vm && vm.SelectedTag != null)

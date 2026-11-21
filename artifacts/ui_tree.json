@@ -171,13 +171,13 @@
                   "IsVisible": true,
                   "Children": [
                     {
-                      "Type": "TextBlock",
+                      "Type": "Grid",
                       "Name": null,
                       "Bounds": {
                         "X": 0,
                         "Y": 0,
                         "Width": 828,
-                        "Height": 22
+                        "Height": 28
                       },
                       "Margin": {
                         "Left": 0,
@@ -185,21 +185,115 @@
                         "Right": 0,
                         "Bottom": 10
                       },
-                      "Padding": {
-                        "Left": 0,
-                        "Top": 0,
-                        "Right": 0,
-                        "Bottom": 0
-                      },
+                      "Padding": null,
                       "IsVisible": true,
-                      "Children": []
+                      "Children": [
+                        {
+                          "Type": "TextBlock",
+                          "Name": null,
+                          "Bounds": {
+                            "X": 0,
+                            "Y": 3,
+                            "Width": 736,
+                            "Height": 22
+                          },
+                          "Margin": {
+                            "Left": 0,
+                            "Top": 0,
+                            "Right": 0,
+                            "Bottom": 0
+                          },
+                          "Padding": {
+                            "Left": 0,
+                            "Top": 0,
+                            "Right": 0,
+                            "Bottom": 0
+                          },
+                          "IsVisible": true,
+                          "Children": []
+                        },
+                        {
+                          "Type": "Button",
+                          "Name": null,
+                          "Bounds": {
+                            "X": 736,
+                            "Y": 0,
+                            "Width": 92,
+                            "Height": 28
+                          },
+                          "Margin": {
+                            "Left": 0,
+                            "Top": 0,
+                            "Right": 0,
+                            "Bottom": 0
+                          },
+                          "Padding": {
+                            "Left": 12,
+                            "Top": 5,
+                            "Right": 12,
+                            "Bottom": 5
+                          },
+                          "IsVisible": true,
+                          "Children": [
+                            {
+                              "Type": "ContentPresenter",
+                              "Name": "PART_ContentPresenter",
+                              "Bounds": {
+                                "X": 0,
+                                "Y": 0,
+                                "Width": 92,
+                                "Height": 28
+                              },
+                              "Margin": {
+                                "Left": 0,
+                                "Top": 0,
+                                "Right": 0,
+                                "Bottom": 0
+                              },
+                              "Padding": {
+                                "Left": 12,
+                                "Top": 5,
+                                "Right": 12,
+                                "Bottom": 5
+                              },
+                              "IsVisible": true,
+                              "Children": [
+                                {
+                                  "Type": "AccessText",
+                                  "Name": null,
+                                  "Bounds": {
+                                    "X": 13,
+                                    "Y": 6,
+                                    "Width": 66,
+                                    "Height": 16
+                                  },
+                                  "Margin": {
+                                    "Left": 0,
+                                    "Top": 0,
+                                    "Right": 0,
+                                    "Bottom": 0
+                                  },
+                                  "Padding": {
+                                    "Left": 0,
+                                    "Top": 0,
+                                    "Right": 0,
+                                    "Bottom": 0
+                                  },
+                                  "IsVisible": true,
+                                  "Children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "Type": "Grid",
                       "Name": null,
                       "Bounds": {
                         "X": 0,
-                        "Y": 32,
+                        "Y": 38,
                         "Width": 828,
                         "Height": 37
                       },
@@ -1715,9 +1809,9 @@
                       "Name": null,
                       "Bounds": {
                         "X": 0,
-                        "Y": 79,
+                        "Y": 85,
                         "Width": 828,
-                        "Height": 381
+                        "Height": 375
                       },
                       "Margin": {
                         "Left": 0,
@@ -1740,7 +1834,7 @@
                             "X": 1,
                             "Y": 1,
                             "Width": 826,
-                            "Height": 379
+                            "Height": 373
                           },
                           "Margin": {
                             "Left": 0,
@@ -2237,7 +2331,7 @@
                                       ]
                                     },
                                     {
-                                      "Type": "Border",
+                                      "Type": "Button",
                                       "Name": null,
                                       "Bounds": {
                                         "X": 738,
@@ -2252,21 +2346,21 @@
                                         "Bottom": 0
                                       },
                                       "Padding": {
-                                        "Left": 6,
+                                        "Left": 4,
                                         "Top": 4,
-                                        "Right": 6,
+                                        "Right": 4,
                                         "Bottom": 4
                                       },
                                       "IsVisible": true,
                                       "Children": [
                                         {
-                                          "Type": "TextBlock",
-                                          "Name": null,
+                                          "Type": "ContentPresenter",
+                                          "Name": "PART_ContentPresenter",
                                           "Bounds": {
-                                            "X": 6,
-                                            "Y": 4,
-                                            "Width": 68,
-                                            "Height": 14
+                                            "X": 0,
+                                            "Y": 0,
+                                            "Width": 80,
+                                            "Height": 22
                                           },
                                           "Margin": {
                                             "Left": 0,
@@ -2275,13 +2369,38 @@
                                             "Bottom": 0
                                           },
                                           "Padding": {
-                                            "Left": 0,
-                                            "Top": 0,
-                                            "Right": 0,
-                                            "Bottom": 0
+                                            "Left": 4,
+                                            "Top": 4,
+                                            "Right": 4,
+                                            "Bottom": 4
                                           },
                                           "IsVisible": true,
-                                          "Children": []
+                                          "Children": [
+                                            {
+                                              "Type": "TextBlock",
+                                              "Name": null,
+                                              "Bounds": {
+                                                "X": 4,
+                                                "Y": 4,
+                                                "Width": 62,
+                                                "Height": 14
+                                              },
+                                              "Margin": {
+                                                "Left": 0,
+                                                "Top": 0,
+                                                "Right": 0,
+                                                "Bottom": 0
+                                              },
+                                              "Padding": {
+                                                "Left": 0,
+                                                "Top": 0,
+                                                "Right": 0,
+                                                "Bottom": 0
+                                              },
+                                              "IsVisible": true,
+                                              "Children": []
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
@@ -2296,7 +2415,7 @@
                                 "X": 0,
                                 "Y": 27,
                                 "Width": 826,
-                                "Height": 352
+                                "Height": 346
                               },
                               "Margin": {
                                 "Left": 0,
@@ -2319,7 +2438,7 @@
                                     "X": 0,
                                     "Y": 0,
                                     "Width": 826,
-                                    "Height": 352
+                                    "Height": 346
                                   },
                                   "Margin": {
                                     "Left": 0,
@@ -2342,7 +2461,7 @@
                                         "X": 0,
                                         "Y": 0,
                                         "Width": 826,
-                                        "Height": 352
+                                        "Height": 346
                                       },
                                       "Margin": {
                                         "Left": 0,
@@ -2365,7 +2484,7 @@
                                             "X": 0,
                                             "Y": 0,
                                             "Width": 826,
-                                            "Height": 352
+                                            "Height": 346
                                           },
                                           "Margin": {
                                             "Left": 0,
@@ -2383,7 +2502,7 @@
                                                 "X": 0,
                                                 "Y": 0,
                                                 "Width": 826,
-                                                "Height": 352
+                                                "Height": 346
                                               },
                                               "Margin": {
                                                 "Left": 0,
@@ -2406,7 +2525,7 @@
                                                     "X": 0,
                                                     "Y": 0,
                                                     "Width": 826,
-                                                    "Height": 352
+                                                    "Height": 346
                                                   },
                                                   "Margin": {
                                                     "Left": 0,
@@ -2424,7 +2543,7 @@
                                                         "X": 0,
                                                         "Y": 0,
                                                         "Width": 826,
-                                                        "Height": 352
+                                                        "Height": 346
                                                       },
                                                       "Margin": {
                                                         "Left": 0,
@@ -3809,7 +3928,7 @@
                                               "Name": "PART_ScrollBarsSeparator",
                                               "Bounds": {
                                                 "X": 826,
-                                                "Y": 352,
+                                                "Y": 346,
                                                 "Width": 0,
                                                 "Height": 0
                                               },

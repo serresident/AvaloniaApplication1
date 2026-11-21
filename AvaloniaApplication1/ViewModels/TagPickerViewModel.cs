@@ -49,6 +49,7 @@ namespace AvaloniaApplication1.ViewModels
         public string AddressHeader => "Адрес" + GetArrow("Address");
         public string DataTypeHeader => "Тип" + GetArrow("DataType");
         public string UnitHeader => "Ед." + GetArrow("Unit");
+        public string ScalingHeader => "Масштаб Y" + GetArrow("Scaling");
 
         public TagPickerViewModel(IEnumerable<TagDefinition> tags, string? initialTagId = null, string? targetDataType = null)
         {
@@ -150,6 +151,7 @@ namespace AvaloniaApplication1.ViewModels
                 "address" => "Address",
                 "datatype" or "type" => "DataType",
                 "unit" => "Unit",
+                "scaling" => "Scaling",
                 _ => column
             };
 
@@ -199,6 +201,7 @@ namespace AvaloniaApplication1.ViewModels
             OnPropertyChanged(nameof(AddressHeader));
             OnPropertyChanged(nameof(DataTypeHeader));
             OnPropertyChanged(nameof(UnitHeader));
+            OnPropertyChanged(nameof(ScalingHeader));
         }
 
         private void ApplyFilter()
@@ -250,6 +253,8 @@ namespace AvaloniaApplication1.ViewModels
                 ("datatype" or "type", false) => query.OrderByDescending(t => t.DataType ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
                 ("unit", true) => query.OrderBy(t => t.Unit ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
                 ("unit", false) => query.OrderByDescending(t => t.Unit ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("scaling", true) => query.OrderBy(t => t.ScalingDisplay ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
+                ("scaling", false) => query.OrderByDescending(t => t.ScalingDisplay ?? string.Empty, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.TagId, StringComparer.OrdinalIgnoreCase),
                 (_, false) => query.OrderByDescending(t => t.TagId ?? string.Empty, StringComparer.OrdinalIgnoreCase),
                 _ => query.OrderBy(t => t.TagId ?? string.Empty, StringComparer.OrdinalIgnoreCase),
             };
