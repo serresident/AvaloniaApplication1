@@ -82,7 +82,12 @@ namespace AvaloniaApplication1.ViewModels
         public async System.Threading.Tasks.Task BrowseTagsAsync()
         {
             if (DialogService == null) return;
-            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, SelectedTagId);
+            string? targetType = null;
+            if (SelectedWidgetType == "PilotLight" || SelectedWidgetType == "CommandButton" || (SelectedWidgetType == "Valve" && SelectedValveType == "CutOff"))
+            {
+                targetType = "Bool";
+            }
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, SelectedTagId, targetType);
             if (picked != null)
             {
                 ApplyTag(picked);
@@ -94,10 +99,17 @@ namespace AvaloniaApplication1.ViewModels
         {
             if (DialogService == null) return;
             var targetType = SelectedValveType == "CutOff" ? "Bool" : null;
-            var currentTagId = AvailableTags.FirstOrDefault(t => t.ConnId == FeedbackConnectionId && t.Address == FeedbackAddress)?.TagId;
+            var currentTagId = !string.IsNullOrEmpty(FeedbackAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(FeedbackConnectionId) || t.ConnId == FeedbackConnectionId) && t.Address == FeedbackAddress)?.TagId
+                : null;
             var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, targetType);
             if (picked != null)
             {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
                 FeedbackConnectionId = picked.ConnId;
                 FeedbackAddress = picked.Address;
             }
@@ -110,10 +122,17 @@ namespace AvaloniaApplication1.ViewModels
         public async System.Threading.Tasks.Task BrowseClosedFeedbackTagAsync()
         {
             if (DialogService == null) return;
-            var currentTagId = AvailableTags.FirstOrDefault(t => t.ConnId == ClosedFeedbackConnectionId && t.Address == ClosedFeedbackAddress)?.TagId;
+            var currentTagId = !string.IsNullOrEmpty(ClosedFeedbackAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(ClosedFeedbackConnectionId) || t.ConnId == ClosedFeedbackConnectionId) && t.Address == ClosedFeedbackAddress)?.TagId
+                : null;
             var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, "Bool");
             if (picked != null)
             {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
                 ClosedFeedbackConnectionId = picked.ConnId;
                 ClosedFeedbackAddress = picked.Address;
             }
@@ -126,10 +145,17 @@ namespace AvaloniaApplication1.ViewModels
         public async System.Threading.Tasks.Task BrowseModeTagAsync()
         {
             if (DialogService == null) return;
-            var currentTagId = AvailableTags.FirstOrDefault(t => t.ConnId == ModeConnectionId && t.Address == ModeAddress)?.TagId;
+            var currentTagId = !string.IsNullOrEmpty(ModeAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(ModeConnectionId) || t.ConnId == ModeConnectionId) && t.Address == ModeAddress)?.TagId
+                : null;
             var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, "Bool");
             if (picked != null)
             {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
                 ModeConnectionId = picked.ConnId;
                 ModeAddress = picked.Address;
             }

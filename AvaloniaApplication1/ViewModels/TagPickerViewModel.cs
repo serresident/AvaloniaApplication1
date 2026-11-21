@@ -12,6 +12,7 @@ namespace AvaloniaApplication1.ViewModels
     public partial class TagPickerViewModel : ViewModelBase
     {
         private readonly List<TagDefinition> _allTags;
+        private bool _isSortingBatch;
 
         public ObservableCollection<TagDefinition> FilteredTags { get; } = new();
 
@@ -39,6 +40,8 @@ namespace AvaloniaApplication1.ViewModels
 
         public bool IsConfirmed { get; private set; }
         public Action? CloseAction { get; set; }
+
+        public bool HasNoTags => FilteredTags.Count == 0;
 
         public string TagIdHeader => "TagId" + GetArrow("TagId");
         public string NameHeader => "Наименование" + GetArrow("Name");
@@ -102,7 +105,6 @@ namespace AvaloniaApplication1.ViewModels
             if (!string.IsNullOrEmpty(initialTagId))
             {
                 SelectedTag = FilteredTags.FirstOrDefault(t => string.Equals(t.TagId, initialTagId, StringComparison.OrdinalIgnoreCase))
-                           ?? _allTags.FirstOrDefault(t => string.Equals(t.TagId, initialTagId, StringComparison.OrdinalIgnoreCase))
                            ?? FilteredTags.FirstOrDefault();
             }
             else
@@ -119,14 +121,20 @@ namespace AvaloniaApplication1.ViewModels
 
         partial void OnSortColumnChanged(string value)
         {
-            ApplyFilter();
-            NotifyHeaderProperties();
+            if (!_isSortingBatch)
+            {
+                ApplyFilter();
+                NotifyHeaderProperties();
+            }
         }
 
         partial void OnSortAscendingChanged(bool value)
         {
-            ApplyFilter();
-            NotifyHeaderProperties();
+            if (!_isSortingBatch)
+            {
+                ApplyFilter();
+                NotifyHeaderProperties();
+            }
         }
 
         [RelayCommand]
@@ -136,8 +144,12 @@ namespace AvaloniaApplication1.ViewModels
 
             var normalized = column.ToLowerInvariant() switch
             {
-                "driver" => "ConnId",
-                "type" => "DataType",
+                "tagid" => "TagId",
+                "name" => "Name",
+                "connid" or "driver" => "ConnId",
+                "address" => "Address",
+                "datatype" or "type" => "DataType",
+                "unit" => "Unit",
                 _ => column
             };
 
@@ -147,9 +159,27 @@ namespace AvaloniaApplication1.ViewModels
             }
             else
             {
-                SortColumn = normalized;
-                SortAscending = true;
+                _isSortingBatch = true;
+                try
+                {
+                    SortAscending = true;
+                    SortColumn = normalized;
+                }
+                finally
+                {
+                    _isSortingBatch = false;
+                }
+                ApplyFilter();
+                NotifyHeaderProperties();
             }
+        }
+
+        [RelayCommand]
+        public void ResetFilters()
+        {
+            SearchText = string.Empty;
+            SelectedConnectionFilter = "Все подключения";
+            SelectedDataTypeFilter = "Все типы";
         }
 
         private string GetArrow(string column)
@@ -187,6 +217,7 @@ namespace AvaloniaApplication1.ViewModels
                     (t.Name != null && t.Name.Contains(text, StringComparison.OrdinalIgnoreCase)) ||
                     (t.Address != null && t.Address.Contains(text, StringComparison.OrdinalIgnoreCase)) ||
                     (t.ConnId != null && t.ConnId.Contains(text, StringComparison.OrdinalIgnoreCase)) ||
+                    (t.DataType != null && t.DataType.Contains(text, StringComparison.OrdinalIgnoreCase)) ||
                     (t.Unit != null && t.Unit.Contains(text, StringComparison.OrdinalIgnoreCase)));
             }
 
@@ -236,6 +267,8 @@ namespace AvaloniaApplication1.ViewModels
             {
                 SelectedTag = FilteredTags.FirstOrDefault();
             }
+
+            OnPropertyChanged(nameof(HasNoTags));
         }
 
         [RelayCommand]

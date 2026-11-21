@@ -2127,12 +2127,26 @@ public static class Program
                 if (pickerVm.FilteredTags.Count != 1 || pickerVm.FilteredTags[0].TagId != "tag_v1_sqh")
                     throw new Exception("Combined SearchText, ConnId and DataType filter should yield exactly tag_v1_sqh");
 
-                // Reset filters
-                pickerVm.SearchText = "";
+                // DataType in text search
+                pickerVm.SearchText = "Float32";
                 pickerVm.SelectedConnectionFilter = "Все подключения";
                 pickerVm.SelectedDataTypeFilter = "Все типы";
-                if (pickerVm.FilteredTags.Count != testTags.Count)
-                    throw new Exception("Resetting all filters should show all tags");
+                if (pickerVm.FilteredTags.Count != 2 || pickerVm.FilteredTags.Any(t => t.DataType != "Float32"))
+                    throw new Exception("SearchText matching DataType 'Float32' should return 2 tags");
+
+                // Empty state / HasNoTags verification
+                pickerVm.SearchText = "NonExistentTagFilterXYZ";
+                if (!pickerVm.HasNoTags || pickerVm.FilteredTags.Count != 0)
+                    throw new Exception("HasNoTags should be true when no tags match filter");
+
+                // Reset filters via ResetFiltersCommand
+                pickerVm.ResetFiltersCommand.Execute(null);
+                if (pickerVm.HasNoTags || pickerVm.FilteredTags.Count != testTags.Count)
+                    throw new Exception("ResetFiltersCommand should restore all tags and set HasNoTags=false");
+                if (!string.IsNullOrEmpty(pickerVm.SearchText) ||
+                    pickerVm.SelectedConnectionFilter != "Все подключения" ||
+                    pickerVm.SelectedDataTypeFilter != "Все типы")
+                    throw new Exception("ResetFiltersCommand should reset SearchText and both ComboBox filters");
 
                 // Part 3: Pre-filtering via Constructor
                 var prefilteredVm = new TagPickerViewModel(testTags, initialTagId: "tag_v1_sqh", targetDataType: "Bool");
@@ -2217,6 +2231,21 @@ public static class Program
                     throw new Exception("Saved ValveConfig ClosedFeedbackSource is incorrect");
                 if (savedConfig.ModeSource?.Address != "10004" || savedConfig.ModeSource?.ConnId != "modbus_tcp")
                     throw new Exception("Saved ValveConfig ModeSource is incorrect");
+
+                // Test BrowseTagsCommand on discrete widget passes targetDataType='Bool'
+                var buttonConfig = new CommandButtonConfig
+                {
+                    Type = "CommandButton",
+                    ButtonMode = "Toggle",
+                    Source = new DataSourceConfig { ConnId = "wb_plc", Address = "10001", DataType = "Bool" }
+                };
+                var buttonEditorVm = new WidgetEditorViewModel(buttonConfig, connections, initialPosition: null, tags: unsortedTags, dialogService: mockDialog);
+                mockDialog.TagPickerResult = testTags.First(t => t.TagId == "tag_p1_run");
+                buttonEditorVm.BrowseTagsCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (mockDialog.LastTagPickerTargetDataType != "Bool")
+                    throw new Exception("BrowseTagsCommand for discrete button widget should pass targetDataType='Bool'");
+                if (buttonEditorVm.Address != "10001" || buttonEditorVm.SelectedConnectionId != "wb_plc")
+                    throw new Exception("BrowseTagsCommand should update Address and ConnectionId");
             }
 
             Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (22/22) PASSED SUCCESSFULLY!");

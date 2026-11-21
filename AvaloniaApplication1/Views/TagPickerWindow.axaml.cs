@@ -52,6 +52,16 @@ namespace AvaloniaApplication1.Views
                     e.Handled = true;
                 }
             }
+            else if (e.Key == Key.Up && e.Source is not TextBox)
+            {
+                var listBox = this.FindControl<ListBox>("TagsListBox");
+                if (listBox != null && listBox.SelectedIndex <= 0)
+                {
+                    var searchBox = this.FindControl<TextBox>("SearchBox");
+                    searchBox?.Focus();
+                    e.Handled = true;
+                }
+            }
         }
 
         private void OnRowDoubleTapped(object? sender, TappedEventArgs e)
