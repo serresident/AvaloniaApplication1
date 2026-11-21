@@ -1384,3 +1384,25 @@
 *   **Комплексная верификация:**
     *   Сборка проекта: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj -c Debug --nologo` — **0 ошибок, 0 предупреждений**.
     *   Автотесты: `dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj` — **21/21 PASS**. В тест №21 добавлены сценарии отмены и подтверждения модального окна `RequireConfirmation`, проверка безопасного отката на стиль `Pill` и нечувствительность к регистру строк.
+
+---
+
+## 📅 21.11.2026 (Сессия 48 — Оптимизация выбора тегов: Поиск, Сортировка, Экспресс-фильтры и Вторичные теги)
+
+### 📌 Достижение: Усовершенствование TagPicker и интеграция вторичных тегов в редактор виджетов
+
+*   **Окно выбора тегов `TagPicker` (`Views/TagPickerWindow.axaml` / `ViewModels/TagPickerViewModel.cs`):**
+    *   **Интерактивная многоколоночная сортировка:** Заголовки таблицы (`TagId`, `Наименование`, `Драйвер`, `Адрес`, `Тип`, `Ед.`) преобразованы в стилизованные интерактивные кнопки. Клик переключает сортировку Ascending ⇄ Descending с индикацией направления стрелками `▲` / `▼`.
+    *   **Панель экспресс-фильтрации:** Добавлена шапка с тремя элементами управления в одной строке: текстовый поиск `SearchText`, фильтр по подключениям (`AvailableConnectionsFilter`, "Все подключения" + список активных драйверов), фильтр по типам данных (`AvailableDataTypesFilter`, "Все типы" + Bool, Int16, Float32 и др.). Фильтры работают реактивно и комбинированно.
+    *   **Предварительная фильтрация (Target DataType):** Конструктор `TagPickerViewModel` дополнен опциональным параметром `targetDataType`. При передаче целевого типа (например, `"Bool"`) окно открывается уже отфильтрованным для релевантных сигналов.
+    *   **Клавиатурная навигация:** Поддержаны клавиши `Enter` (подтвердить выбор), `Esc` (отмена/закрытие) и стрелка `Down` из поля поиска для мгновенного перехода к выбору строки.
+
+*   **Редактор свойств виджетов (`Views/WidgetEditorWindow.axaml` / `ViewModels/WidgetEditorViewModel.cs`):**
+    *   Список `AvailableTags` теперь отсортирован по `TagId` / `Name` для быстрого и предсказуемого поиска в выпадающем списке `ComboBox`.
+    *   Для полей концевиков клапана («Открыт» SQH / FB, «Закрыт» SQL / Closed Feedback) и тега режима («Ручной / Авто» ModeSource) добавлены кнопки быстрого вызова «🏷️ Выбрать...».
+    *   Реализованы команды `BrowseFeedbackTagCommand` / `PickFeedbackTagCommand`, `BrowseClosedFeedbackTagCommand` / `PickClosedFeedbackTagCommand`, `BrowseModeTagCommand` / `PickModeTagCommand`. Концевики автоматически предфильтруются по типу `Bool`.
+
+*   **Верификация и тестирование:**
+    *   Сборка проекта: `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj -c Debug --nologo` — **0 ошибок, 0 предупреждений**.
+    *   Автотесты: `dotnet run --project AvaloniaApplication1.UIValidation/AvaloniaApplication1.UIValidation.csproj` — **22/22 PASS** (добавлен комплексный Тест 22, проверяющий сортировку по колонкам, экспресс-фильтрацию, предфильтрацию, клавиатурные действия и привязку вторичных тегов клапана).
+

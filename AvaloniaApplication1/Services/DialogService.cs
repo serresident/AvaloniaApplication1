@@ -251,11 +251,11 @@ namespace AvaloniaApplication1.Services
             return vm.IsConfirmed ? vm.ResultTag : null;
         }
 
-        public async Task<Models.TagDefinition?> ShowTagPickerAsync(IEnumerable<Models.TagDefinition> availableTags, string? initialTagId = null)
+        public async Task<Models.TagDefinition?> ShowTagPickerAsync(IEnumerable<Models.TagDefinition> availableTags, string? initialTagId = null, string? targetDataType = null)
         {
             if (MainWindow == null) return null;
 
-            var vm = new TagPickerViewModel(availableTags, initialTagId);
+            var vm = new TagPickerViewModel(availableTags, initialTagId, targetDataType);
             var window = new TagPickerWindow
             {
                 DataContext = vm

@@ -857,5 +857,27 @@
   - [x] Проверка безопасного отката на стиль Pill при неизвестном стиле и нечувствительности к регистру
   - [x] 21/21 тестов пройдено успешно, 0 предупреждений, 0 ошибок
 
+# Tasks: TagPicker UX Optimization, Multi-Column Sorting, Express Filtering & Secondary Valve Tags (Сессия 48 — Выполнено)
+
+- [x] Окно выбора тегов TagPicker (`Views/TagPickerWindow.axaml` и `ViewModels/TagPickerViewModel.cs`):
+  - [x] Интерактивная сортировка по клику на заголовки колонок: TagId, Наименование, Драйвер/Подключение, Адрес, Тип данных, Ед. изм.
+  - [x] Отображение маркеров направления сортировки (▲ / ▼) в заголовках активных колонок
+  - [x] Экспресс-фильтрация: комбинированный текстовый поиск `SearchText` + фильтр по подключению/драйверу (`AvailableConnectionsFilter`, `SelectedConnectionFilter`) + фильтр по типу данных (`AvailableDataTypesFilter`, `SelectedDataTypeFilter`)
+  - [x] Поддержка предфильтрации через конструктор `targetDataType` (автоматический выбор фильтра при вызове для дискретных/специфичных сигналов)
+  - [x] Навигация с клавиатуры: подтверждение по клавише Enter, отмена по Esc, переход из поисковой строки в список по стрелке Down
+- [x] Редактор свойств виджетов (`Views/WidgetEditorWindow.axaml` и `ViewModels/WidgetEditorViewModel.cs`):
+  - [x] Алфавитная сортировка выпадающего списка `AvailableTags` по `TagId` / `Name`
+  - [x] Кнопки вызова браузера тегов «🏷️ Выбрать...» для концевиков клапанов SQH (Feedback), SQL (ClosedFeedback) и тега режима ModeSource
+  - [x] Команды `BrowseFeedbackTagCommand` / `PickFeedbackTagCommand`, `BrowseClosedFeedbackTagCommand` / `PickClosedFeedbackTagCommand`, `BrowseModeTagCommand` / `PickModeTagCommand`
+- [x] Автоматическое тестирование и верификация:
+  - [x] Разработан комплексный автотест (Тест 22) в `AvaloniaApplication1.UIValidation/Program.cs`
+  - [x] Проверка сортировки по всем колонкам в обоих направлениях (Asc/Desc)
+  - [x] Проверка сквозной фильтрации (поиск + драйвер + тип) и сброса фильтров
+  - [x] Проверка предварительной фильтрации конструктора (`targetDataType="Bool"`)
+  - [x] Проверка выбора вторичных тегов клапана и сохранения конфигурации
+  - [x] Успешное прохождение всех автотестов (22/22 PASS)
+  - [x] Сборка проекта без ошибок и предупреждений (0 ошибок, 0 предупреждений)
+
+
 
 

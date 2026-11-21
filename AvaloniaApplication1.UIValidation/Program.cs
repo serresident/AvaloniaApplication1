@@ -88,7 +88,15 @@ public class MockTestDialogService : IDialogService
     // Tag Manager Dialog mocks
     public Task ShowTagManagerAsync(HmiConfiguration config) => Task.CompletedTask;
     public Task<TagDefinition?> ShowTagEditorAsync(TagDefinition? existingTag, IEnumerable<ConnectionConfig> connections, IEnumerable<TagDefinition> existingTags) => Task.FromResult<TagDefinition?>(null);
-    public Task<TagDefinition?> ShowTagPickerAsync(IEnumerable<TagDefinition> availableTags, string? initialTagId = null) => Task.FromResult<TagDefinition?>(null);
+    public TagDefinition? TagPickerResult { get; set; }
+    public string? LastTagPickerTargetDataType { get; set; }
+    public string? LastTagPickerInitialTagId { get; set; }
+    public Task<TagDefinition?> ShowTagPickerAsync(IEnumerable<TagDefinition> availableTags, string? initialTagId = null, string? targetDataType = null)
+    {
+        LastTagPickerInitialTagId = initialTagId;
+        LastTagPickerTargetDataType = targetDataType;
+        return Task.FromResult(TagPickerResult);
+    }
     public Task<(bool Confirmed, object? Value)> ShowTagForceDialogAsync(TagDefinition tag, object? currentValue) => Task.FromResult<(bool Confirmed, object? Value)>((true, currentValue ?? (object)100));
     public Task<List<TagDefinition>?> ShowTagImportExportAsync(bool isImportMode, IEnumerable<TagDefinition> currentTags, IHmiClipboardService? clipboard = null) => Task.FromResult<List<TagDefinition>?>(null);
 }
@@ -296,6 +304,25 @@ public static class Program
                     DataContext = tagManagerVm,
                     Width = 1320,
                     Height = 750
+                };
+            }
+            else if (string.Equals(targetView, "TagPickerWindow", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(targetView, "TagPicker", StringComparison.OrdinalIgnoreCase))
+            {
+                var sampleTags = new List<TagDefinition>
+                {
+                    new() { TagId = "tag_p101_press", Name = "Давление в напорном коллекторе", ConnId = "plc_511", Address = "40001", DataType = "Float32", Unit = "бар" },
+                    new() { TagId = "tag_t101_temp", Name = "Температура продукта в реакторе R-101", ConnId = "plc_511", Address = "40003", DataType = "Float32", Unit = "°C" },
+                    new() { TagId = "tag_pump1_run", Name = "Состояние насоса H-1 (Пуск)", ConnId = "plc_511", Address = "00001", DataType = "Bool" },
+                    new() { TagId = "tag_valve_sqh", Name = "Клапан К-1 Открыт (SQH)", ConnId = "wb_plc", Address = "10016", DataType = "Bool" },
+                    new() { TagId = "tag_valve_sql", Name = "Клапан К-1 Закрыт (SQL)", ConnId = "wb_plc", Address = "10017", DataType = "Bool" }
+                };
+                var pickerVm = new TagPickerViewModel(sampleTags);
+                window = new TagPickerWindow
+                {
+                    DataContext = pickerVm,
+                    Width = 860,
+                    Height = 540
                 };
             }
             else if (string.Equals(targetView, "WidgetEditorWindow", StringComparison.OrdinalIgnoreCase))
@@ -1984,7 +2011,215 @@ public static class Program
                     throw new Exception("Case-insensitive Orientation ('horizontal') should activate IsHorizontal");
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (21/21) PASSED SUCCESSFULLY!");
+            // ---------------------------------------------------------
+            // Test 22: TagPicker Advanced Search, Multi-Column Sorting,
+            // Express Filtering & Valve Secondary Tag Browser
+            // ---------------------------------------------------------
+            Console.WriteLine("[UIValidation] Testing TagPicker Search, Sorting, Filtering & Secondary Valve Tags (Test 22)...");
+            {
+                var testTags = new List<TagDefinition>
+                {
+                    new TagDefinition { TagId = "tag_p1_run", Name = "Насос 1 Пуск", ConnId = "wb_plc", Address = "10001", DataType = "Bool", Unit = "" },
+                    new TagDefinition { TagId = "tag_v1_sqh", Name = "Клапан 1 Открыт (SQH)", ConnId = "wb_plc", Address = "10002", DataType = "Bool", Unit = "" },
+                    new TagDefinition { TagId = "tag_v1_sql", Name = "Клапан 1 Закрыт (SQL)", ConnId = "wb_plc", Address = "10003", DataType = "Bool", Unit = "" },
+                    new TagDefinition { TagId = "tag_v1_pos", Name = "Клапан 1 Текущая позиция", ConnId = "wb_plc", Address = "40005", DataType = "Float32", Unit = "%" },
+                    new TagDefinition { TagId = "tag_p1_curr", Name = "Насос 1 Ток", ConnId = "mqtt_srv", Address = "power/curr", DataType = "Float32", Unit = "A" },
+                    new TagDefinition { TagId = "tag_t1_val", Name = "Температура Реактора", ConnId = "modbus_tcp", Address = "30001", DataType = "Int16", Unit = "°C" },
+                    new TagDefinition { TagId = "tag_v1_mode", Name = "Клапан 1 Режим (Авто/Ручной)", ConnId = "modbus_tcp", Address = "10004", DataType = "Bool", Unit = "" },
+                    new TagDefinition { TagId = "tag_tank_lvl", Name = "Уровень в емкости", ConnId = "modbus_tcp", Address = "30002", DataType = "Double", Unit = "m3" }
+                };
+
+                // Part 1: TagPickerViewModel Sorting Tests
+                var pickerVm = new TagPickerViewModel(testTags);
+
+                // Default state: sorted by TagId ascending
+                if (pickerVm.SortColumn != "TagId" || !pickerVm.SortAscending)
+                    throw new Exception("Default sort should be TagId ascending");
+                if (pickerVm.FilteredTags[0].TagId != "tag_p1_curr" || pickerVm.FilteredTags[^1].TagId != "tag_v1_sql")
+                    throw new Exception("TagId ascending sort order invalid");
+
+                // Toggle TagId to descending
+                pickerVm.SortCommand.Execute("TagId");
+                if (pickerVm.SortAscending || pickerVm.FilteredTags[0].TagId != "tag_v1_sql" || pickerVm.FilteredTags[^1].TagId != "tag_p1_curr")
+                    throw new Exception("TagId descending sort order invalid");
+
+                // Sort by Name ascending
+                pickerVm.SortCommand.Execute("Name");
+                if (pickerVm.SortColumn != "Name" || !pickerVm.SortAscending)
+                    throw new Exception("SortColumn should be Name ascending");
+                if (pickerVm.FilteredTags[0].Name != "Клапан 1 Закрыт (SQL)")
+                    throw new Exception("Name ascending sort order invalid");
+
+                // Sort by Name descending
+                pickerVm.SortCommand.Execute("Name");
+                if (pickerVm.SortAscending || pickerVm.FilteredTags[0].Name != "Уровень в емкости")
+                    throw new Exception("Name descending sort order invalid");
+
+                // Sort by Address ascending
+                pickerVm.SortCommand.Execute("Address");
+                if (pickerVm.SortColumn != "Address" || !pickerVm.SortAscending)
+                    throw new Exception("SortColumn should be Address ascending");
+                if (pickerVm.FilteredTags[0].Address != "10001")
+                    throw new Exception("Address ascending sort order invalid");
+
+                // Sort by Address descending
+                pickerVm.SortCommand.Execute("Address");
+                if (pickerVm.SortAscending || pickerVm.FilteredTags[0].Address != "power/curr")
+                    throw new Exception("Address descending sort order invalid");
+
+                // Sort by DataType ascending
+                pickerVm.SortCommand.Execute("DataType");
+                if (pickerVm.SortColumn != "DataType" || !pickerVm.SortAscending)
+                    throw new Exception("SortColumn should be DataType ascending");
+                if (pickerVm.FilteredTags[0].DataType != "Bool")
+                    throw new Exception("DataType ascending sort order invalid");
+
+                // Sort by DataType descending
+                pickerVm.SortCommand.Execute("DataType");
+                if (pickerVm.SortAscending || pickerVm.FilteredTags[0].DataType != "Int16")
+                    throw new Exception("DataType descending sort order invalid");
+
+                // Sort by ConnId/Driver ascending
+                pickerVm.SortCommand.Execute("ConnId");
+                if (pickerVm.SortColumn != "ConnId" || !pickerVm.SortAscending)
+                    throw new Exception("SortColumn should be ConnId ascending");
+                if (pickerVm.FilteredTags[0].ConnId != "modbus_tcp")
+                    throw new Exception("ConnId ascending sort order invalid");
+
+                // Sort by Unit ascending
+                pickerVm.SortCommand.Execute("Unit");
+                if (pickerVm.SortColumn != "Unit" || !pickerVm.SortAscending)
+                    throw new Exception("SortColumn should be Unit ascending");
+                if (pickerVm.FilteredTags[^1].Unit != "°C")
+                    throw new Exception("Unit ascending sort order invalid");
+
+                // Verify header arrows
+                if (!pickerVm.UnitHeader.Contains("▲"))
+                    throw new Exception("Active sort column should display ascending arrow in header");
+                pickerVm.SortCommand.Execute("Unit");
+                if (!pickerVm.UnitHeader.Contains("▼"))
+                    throw new Exception("Active sort column should display descending arrow in header");
+                if (pickerVm.TagIdHeader.Contains("▲") || pickerVm.TagIdHeader.Contains("▼"))
+                    throw new Exception("Inactive sort columns should not display arrow");
+
+                // Part 2: Express Filtering
+                // Text search
+                pickerVm.SearchText = "Клапан";
+                if (pickerVm.FilteredTags.Count != 4)
+                    throw new Exception($"Expected 4 valve tags matching search 'Клапан', got {pickerVm.FilteredTags.Count}");
+
+                pickerVm.SearchText = "";
+                if (pickerVm.FilteredTags.Count != testTags.Count)
+                    throw new Exception("Clearing SearchText should restore all tags");
+
+                // Connection filter
+                pickerVm.SelectedConnectionFilter = "wb_plc";
+                if (pickerVm.FilteredTags.Count != 4 || pickerVm.FilteredTags.Any(t => t.ConnId != "wb_plc"))
+                    throw new Exception("SelectedConnectionFilter='wb_plc' should only show tags with ConnId='wb_plc'");
+
+                // Data Type filter
+                pickerVm.SelectedDataTypeFilter = "Bool";
+                if (pickerVm.FilteredTags.Count != 3 || pickerVm.FilteredTags.Any(t => t.DataType != "Bool" || t.ConnId != "wb_plc"))
+                    throw new Exception("Combined connection and DataType filters should produce 3 boolean tags");
+
+                // Combined SearchText + Connection + DataType
+                pickerVm.SearchText = "SQH";
+                if (pickerVm.FilteredTags.Count != 1 || pickerVm.FilteredTags[0].TagId != "tag_v1_sqh")
+                    throw new Exception("Combined SearchText, ConnId and DataType filter should yield exactly tag_v1_sqh");
+
+                // Reset filters
+                pickerVm.SearchText = "";
+                pickerVm.SelectedConnectionFilter = "Все подключения";
+                pickerVm.SelectedDataTypeFilter = "Все типы";
+                if (pickerVm.FilteredTags.Count != testTags.Count)
+                    throw new Exception("Resetting all filters should show all tags");
+
+                // Part 3: Pre-filtering via Constructor
+                var prefilteredVm = new TagPickerViewModel(testTags, initialTagId: "tag_v1_sqh", targetDataType: "Bool");
+                if (prefilteredVm.SelectedDataTypeFilter != "Bool")
+                    throw new Exception("Constructor targetDataType='Bool' should set SelectedDataTypeFilter to 'Bool'");
+                if (prefilteredVm.FilteredTags.Count != 4 || prefilteredVm.FilteredTags.Any(t => t.DataType != "Bool"))
+                    throw new Exception("Prefiltered ViewModel should only contain Bool tags");
+                if (prefilteredVm.SelectedTag?.TagId != "tag_v1_sqh")
+                    throw new Exception("InitialTagId 'tag_v1_sqh' should be selected");
+
+                // Part 4: Confirmation and Cancel actions
+                bool closed = false;
+                prefilteredVm.CloseAction = () => closed = true;
+                prefilteredVm.ConfirmCommand.Execute(null);
+                if (!prefilteredVm.IsConfirmed || !closed)
+                    throw new Exception("ConfirmCommand should set IsConfirmed=true and invoke CloseAction");
+
+                closed = false;
+                prefilteredVm.CancelCommand.Execute(null);
+                if (prefilteredVm.IsConfirmed || !closed)
+                    throw new Exception("CancelCommand should set IsConfirmed=false and invoke CloseAction");
+
+                // Part 5: WidgetEditorViewModel AvailableTags Sorting & Secondary Valve Tag Pickers
+                var mockDialog = new MockTestDialogService();
+                var connections = new List<ConnectionConfig>
+                {
+                    new ConnectionConfig { Id = "wb_plc", Type = "ModbusTCP" },
+                    new ConnectionConfig { Id = "modbus_tcp", Type = "ModbusTCP" }
+                };
+
+                // Unsorted input tags:
+                var unsortedTags = new List<TagDefinition>
+                {
+                    new TagDefinition { TagId = "z_tag", Name = "Zeta", ConnId = "wb_plc", Address = "100" },
+                    new TagDefinition { TagId = "a_tag", Name = "Alpha", ConnId = "wb_plc", Address = "200" },
+                    new TagDefinition { TagId = "m_tag", Name = "Mu", ConnId = "wb_plc", Address = "300" }
+                };
+
+                var valveTestConfig = new ValveConfig
+                {
+                    Type = "Valve",
+                    Title = "Клапан К-1",
+                    ValveType = "CutOff",
+                    Source = new DataSourceConfig { ConnId = "wb_plc", Address = "10001", DataType = "Bool" }
+                };
+
+                var editorVm = new WidgetEditorViewModel(valveTestConfig, connections, initialPosition: null, tags: unsortedTags, dialogService: mockDialog);
+
+                // Check that AvailableTags in editor are sorted by TagId
+                if (editorVm.AvailableTags[0].TagId != "a_tag" || editorVm.AvailableTags[1].TagId != "m_tag" || editorVm.AvailableTags[2].TagId != "z_tag")
+                    throw new Exception("AvailableTags in WidgetEditorViewModel should be sorted by TagId");
+
+                // Test BrowseFeedbackTagCommand / PickFeedbackTagCommand
+                mockDialog.TagPickerResult = testTags.First(t => t.TagId == "tag_v1_sqh");
+                editorVm.BrowseFeedbackTagCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (editorVm.FeedbackAddress != "10002" || editorVm.FeedbackConnectionId != "wb_plc")
+                    throw new Exception("BrowseFeedbackTagCommand should set FeedbackAddress and FeedbackConnectionId from picked tag");
+                if (mockDialog.LastTagPickerTargetDataType != "Bool")
+                    throw new Exception("BrowseFeedbackTag for CutOff valve should pass targetDataType='Bool'");
+
+                // Test BrowseClosedFeedbackTagCommand / PickClosedFeedbackTagCommand
+                mockDialog.TagPickerResult = testTags.First(t => t.TagId == "tag_v1_sql");
+                editorVm.BrowseClosedFeedbackTagCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (editorVm.ClosedFeedbackAddress != "10003" || editorVm.ClosedFeedbackConnectionId != "wb_plc")
+                    throw new Exception("BrowseClosedFeedbackTagCommand should set ClosedFeedbackAddress and ClosedFeedbackConnectionId");
+                if (mockDialog.LastTagPickerTargetDataType != "Bool")
+                    throw new Exception("BrowseClosedFeedbackTag should pass targetDataType='Bool'");
+
+                // Test BrowseModeTagCommand / PickModeTagCommand
+                mockDialog.TagPickerResult = testTags.First(t => t.TagId == "tag_v1_mode");
+                editorVm.BrowseModeTagCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (editorVm.ModeAddress != "10004" || editorVm.ModeConnectionId != "modbus_tcp")
+                    throw new Exception("BrowseModeTagCommand should set ModeAddress and ModeConnectionId");
+
+                // Save config and verify produced ValveConfig
+                var savedConfig = editorVm.ToWidgetConfig() as ValveConfig;
+                if (savedConfig == null)
+                    throw new Exception("BuildWidgetConfig should return ValveConfig");
+                if (savedConfig.FeedbackSource?.Address != "10002" || savedConfig.FeedbackSource?.ConnId != "wb_plc")
+                    throw new Exception("Saved ValveConfig FeedbackSource is incorrect");
+                if (savedConfig.ClosedFeedbackSource?.Address != "10003" || savedConfig.ClosedFeedbackSource?.ConnId != "wb_plc")
+                    throw new Exception("Saved ValveConfig ClosedFeedbackSource is incorrect");
+                if (savedConfig.ModeSource?.Address != "10004" || savedConfig.ModeSource?.ConnId != "modbus_tcp")
+                    throw new Exception("Saved ValveConfig ModeSource is incorrect");
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (22/22) PASSED SUCCESSFULLY!");
         }
     }
 

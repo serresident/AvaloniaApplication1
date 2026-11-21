@@ -89,6 +89,55 @@ namespace AvaloniaApplication1.ViewModels
             }
         }
 
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseFeedbackTagAsync()
+        {
+            if (DialogService == null) return;
+            var targetType = SelectedValveType == "CutOff" ? "Bool" : null;
+            var currentTagId = AvailableTags.FirstOrDefault(t => t.ConnId == FeedbackConnectionId && t.Address == FeedbackAddress)?.TagId;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, targetType);
+            if (picked != null)
+            {
+                FeedbackConnectionId = picked.ConnId;
+                FeedbackAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task PickFeedbackTagAsync() => await BrowseFeedbackTagAsync();
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseClosedFeedbackTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = AvailableTags.FirstOrDefault(t => t.ConnId == ClosedFeedbackConnectionId && t.Address == ClosedFeedbackAddress)?.TagId;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, "Bool");
+            if (picked != null)
+            {
+                ClosedFeedbackConnectionId = picked.ConnId;
+                ClosedFeedbackAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task PickClosedFeedbackTagAsync() => await BrowseClosedFeedbackTagAsync();
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseModeTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = AvailableTags.FirstOrDefault(t => t.ConnId == ModeConnectionId && t.Address == ModeAddress)?.TagId;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, "Bool");
+            if (picked != null)
+            {
+                ModeConnectionId = picked.ConnId;
+                ModeAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task PickModeTagAsync() => await BrowseModeTagAsync();
+
         [ObservableProperty]
         private string? _selectedConnectionId;
 
@@ -314,7 +363,7 @@ namespace AvaloniaApplication1.ViewModels
             AvailableConnections = connections.Select(c => c.Id).ToList();
             if (tags != null)
             {
-                AvailableTags.AddRange(tags);
+                AvailableTags.AddRange(tags.OrderBy(t => t.TagId, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.Name, StringComparer.OrdinalIgnoreCase));
             }
 
             if (existingConfig != null)
