@@ -13,7 +13,7 @@ Write-Host "==========================================================" -Foregro
 Write-Host "`n[1/3] Восстановление проектных .NET инструментов (dotnet tool restore)..." -ForegroundColor Yellow
 dotnet tool restore
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "✓ Локальные инструменты (binlog-mcp, dotnet-dump, dotnet-gcdump) успешно восстановлены!" -ForegroundColor Green
+    Write-Host "✓ Локальные инструменты (binlog-mcp, dotnet-dump, dotnet-gcdump, ilspycmd, sharplens) успешно восстановлены!" -ForegroundColor Green
 } else {
     Write-Warning "! Ошибка при вызове dotnet tool restore."
 }
@@ -47,8 +47,11 @@ if (Test-Path $cursorConfig) {
 }
 
 Write-Host "`n=== Все компоненты MCP готовы к работе! ===" -ForegroundColor Cyan
-Write-Host "Доступные команды:" -ForegroundColor White
-Write-Host "  dotnet tool run binlog-mcp   - MCP-сервер анализа логов сборки MSBuild" -ForegroundColor White
-Write-Host "  dotnet tool run dotnet-dump  - Диагностика и снятие дампов памяти CLR" -ForegroundColor White
-Write-Host "  dotnet tool run dotnet-gcdump - Снятие легких дампов GC для поиска утечек памяти" -ForegroundColor White
-Write-Host "  `$env:XAML_MCP=1; dotnet run - Запуск приложения с живым агентом XamlMcp" -ForegroundColor Green
+Write-Host "Доступные инструменты и серверы:" -ForegroundColor White
+Write-Host "  1. avalonia-docs             - Официальный сервер документации Avalonia (HTTP: docs-mcp.avaloniaui.net)" -ForegroundColor White
+Write-Host "  2. dotnet tool run binlog-mcp - Официальный MCP-сервер MSBuild для анализа сборки и XAMLIL" -ForegroundColor White
+Write-Host "  3. dotnet tool run sharplens  - Семантический анализ C# и навигация по коду (SharpLens MCP)" -ForegroundColor White
+Write-Host "  4. dotnet tool run ilspycmd   - Декомпиляция и исследование сборок Avalonia 12 / .NET 10" -ForegroundColor White
+Write-Host "  5. powershell scripts/diag_memory.ps1 - Диагностика утечек памяти и анализ графов GC Roots" -ForegroundColor White
+Write-Host "  6. ScadaDebugBridge           - Внутрипроцессный мост (http://127.0.0.1:5110/mcp и /api/*)" -ForegroundColor Green
+Write-Host "  7. `$env:XAML_MCP=1; dotnet run - Запуск приложения с живым агентом XamlMcp" -ForegroundColor Green

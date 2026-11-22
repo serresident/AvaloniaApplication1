@@ -22,6 +22,20 @@
         "binlog-mcp"
       ],
       "rollForward": false
+    },
+    "ilspycmd": {
+      "version": "8.2.0.7535",
+      "commands": [
+        "ilspycmd"
+      ],
+      "rollForward": false
+    },
+    "sharplensmcp": {
+      "version": "1.6.4",
+      "commands": [
+        "sharplens"
+      ],
+      "rollForward": false
     }
   }
 }

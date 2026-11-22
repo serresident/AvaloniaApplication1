@@ -8,6 +8,14 @@
       "command": "dotnet",
       "args": ["tool", "run", "binlog-mcp"]
     },
+    "sharplens": {
+      "command": "dotnet",
+      "args": ["tool", "run", "sharplens"]
+    },
+    "scada-bridge": {
+      "command": "powershell",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts/scada_mcp.ps1"]
+    },
     "xamlmcp": {
       "command": "dotnet",
       "args": ["C:/Users/erch/.gemini/tools/xamlmcp/XamlMcp.Server.dll"]

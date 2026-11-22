@@ -9,6 +9,16 @@
       "command": "dotnet",
       "args": ["tool", "run", "binlog-mcp"]
     },
+    "sharplens": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": ["tool", "run", "sharplens"]
+    },
+    "scada-bridge": {
+      "type": "stdio",
+      "command": "powershell",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/scripts/scada_mcp.ps1"]
+    },
     "xamlmcp": {
       "type": "stdio",
       "command": "dotnet",

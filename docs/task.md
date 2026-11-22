@@ -1246,3 +1246,25 @@
   - [x] Разработка скрипта автоматического восстановления и синхронизации `scripts/setup_mcp.ps1`.
   - [x] Актуализация регламента и правил самозапуска агентов в `AGENTS.md` и `GEMINI.md`.
   - [x] Верификация: `dotnet tool restore`, чистая сборка решения (0 ошибок, 0 предупреждений), успешный прогон всех 25 тестов UIValidation (100% PASS).
+
+# Tasks: Deployment of 5 Debug & Diagnostics MCP Solutions (Сессия 60 — Выполнено)
+
+- [x] Развертывание всех 5 решений отладочного обвеса (.NET 10 / Avalonia 12 / In-App SCADA):
+  - [x] Решение 1 (UI & Документация): Подключение официального HTTP MCP сервера `avalonia-docs` (`https://docs-mcp.avaloniaui.net/mcp`) в `.vscode/mcp.json` и `.cursor/mcp.json` + связка с Tier 1 (`scripts/render_ui.ps1`) и Tier 2 (`XamlMcp`).
+  - [x] Решение 2 (Сборка и диагностика XAMLIL): Закрепление `microsoft.aitools.binlogmcp` (3.0.5) в манифесте `.config/dotnet-tools.json` и конфигах MCP (`binlog-mcp`).
+  - [x] Решение 3 (Семантический анализ C#): Интеграция `sharplensmcp` (1.6.4) как локального CLI инструмента и Stdio MCP сервера (`sharplens`).
+  - [x] Решение 4 (Декомпиляция и исследование API Avalonia 12 / .NET 10): Интеграция `ilspycmd` (8.2.0.7535) в `.config/dotnet-tools.json`.
+  - [x] Решение 5 (Диагностика памяти 24/7): Интеграция `dotnet-dump` и `dotnet-gcdump` + разработка скрипта экспресс-анализа кучи `scripts/diag_memory.ps1`.
+  - [x] Решение 6 (In-App SCADA Debug Bridge):
+    - [x] Разработка `ScadaDebugBridge.cs` в `AvaloniaApplication1/Services/Debug/` под `#if DEBUG`.
+    - [x] Реализация MCP JSON-RPC 2.0 сервера на эндпоинте `/mcp` с поддержкой методов: `initialize`, `tools/list`, `tools/call`.
+    - [x] Реализация инструментов: `scada_get_status`, `scada_get_tags`, `scada_set_tag`, `scada_clear_override`, `scada_toggle_design_mode`.
+    - [x] Реализация параллельного легковесного REST API: `/api/status`, `/api/tags`, `/api/tag/override`, `/api/tag/clear`, `/api/design-mode`.
+    - [x] Разработка Stdio-прокси скрипта `scripts/scada_mcp.ps1` для подключения любых MCP-клиентов.
+    - [x] Интеграция старта моста в `App.axaml.cs` при запуске приложения.
+- [x] Автоматическое тестирование и верификация:
+  - [x] Разработан автоматический тест (Тест 28) в `AvaloniaApplication1.UIValidation/Program.cs`.
+  - [x] Проверка старта моста, вызовов `/api/status`, MCP `tools/list`, `scada_set_tag`, `scada_clear_override`, `scada_toggle_design_mode`.
+  - [x] Все 28 автотестов успешно пройдены (28/28 PASS, 100%).
+  - [x] Выполнен headless-рендер `scripts/render_ui.ps1 MimicView` с сохранением `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.
+  - [x] Сборка решения `AvaloniaApplication1.sln` — 0 ошибок, 0 предупреждений.

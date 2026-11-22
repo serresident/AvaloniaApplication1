@@ -1992,3 +1992,44 @@
     *   Скрипт `scripts/setup_mcp.ps1` успешно протестирован: 0 ошибок.
     *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
     *   Автоматические тесты `AvaloniaApplication1.UIValidation`: **25/25 PASSED (100%)**.
+
+---
+
+## 📅 23.11.2026 (Сессия 60 — Развертывание 5 решений отладочного обвеса и внутрипроцессного SCADA Debug Bridge)
+
+### 📌 Достижение: Внедрены и развернуты все 5 ключевых инструментов отладки, инспекции и диагностики .NET 10 / Avalonia 12. Разработан и интегрирован легковесный внутрипроцессный мост ScadaDebugBridge с поддержкой протокола Model Context Protocol (MCP JSON-RPC 2.0) и REST API.
+
+*   **Решение 1: Документация и UI-правила Avalonia (avalonia-docs):**
+    *   В конфигурации `.vscode/mcp.json` и `.cursor/mcp.json` интегрирован официальный открытый HTTP MCP-сервер Avalonia: `https://docs-mcp.avaloniaui.net/mcp`.
+    *   Предоставляет агентам прямой доступ к инструментам: `search_avalonia_docs`, `lookup_avalonia_api`, `get_avalonia_expert_rules`, `recreate-ui`.
+    *   Дополняет существующий двухуровневый стек проекта: Headless Tier 1 (`scripts/render_ui.ps1`) и Live Tier 2 (`XamlMcp`).
+*   **Решение 2: Диагностика сборки и компилятора XAMLIL (binlog-mcp):**
+    *   В манифест `.config/dotnet-tools.json` закреплена утилита `microsoft.aitools.binlogmcp` (версия 3.0.5).
+    *   Позволяет ИИ-агентам выполнять глубокий семантический анализ бинарных логов MSBuild (`.binlog`), моментально локализуя скрытые конфликты типов в Compiled Bindings и сбои XAMLIL-генератора.
+*   **Решение 3: Семантический анализ C# и AST (SharpLens MCP):**
+    *   В проектный манифест добавлена утилита `sharplensmcp` (версия 1.6.4), запускаемая через команду `dotnet tool run sharplens`.
+    *   Обеспечивает агентам возможность исследования графов вызовов, ссылок на символы и семантического рефакторинга без ручного парсинга текстовых файлов.
+*   **Решение 4: Декомпилятор сборок Avalonia 12 / .NET 10 (ilspycmd):**
+    *   В манифест добавлен официальный CLI-декомпилятор `ilspycmd` (версия 8.2.0.7535).
+    *   Дает возможность исследовать приватные и internal API Avalonia 12, сгенерированный код source-генераторов CommunityToolkit.Mvvm и внутренности .NET 10.
+*   **Решение 5: Непрерывная диагностика памяти 24/7 (dotnet-dump & dotnet-gcdump):**
+    *   В `.config/dotnet-tools.json` зафиксированы диагностические инструменты CLR: `dotnet-dump` и `dotnet-gcdump` (версии 10.0.750501).
+    *   Разработан специализированный скрипт автоматизированного анализа `scripts/diag_memory.ps1`: снятие легковесных GC-снимков кучи без блокировки UI, генерация отчета Топ-25 типов и проверка утечек в SCADA-компонентах (`WidgetViewModel`, `DashboardPanel`, `CompositeDisposable`, `TrendPenViewModel`, `ValveControl`, `PipeControl`).
+*   **Решение 6: Внутрипроцессный SCADA Debug Bridge (ScadaDebugBridge & MCP Endpoint):**
+    *   В слое `AvaloniaApplication1/Services/Debug/` разработан компонент `ScadaDebugBridge.cs`, компилируемый строго под `#if DEBUG`.
+    *   Реализован эндпоинт `/mcp` с полной поддержкой спецификации MCP JSON-RPC 2.0 (методы `initialize`, `tools/list`, `tools/call`).
+    *   Поддержаны специализированные инструменты SCADA:
+        *   `scada_get_status` — состояние приложения, режим Design Mode, активный проект, uptime, количество тегов.
+        *   `scada_get_tags` — список тегов, значения, качество (Good/Bad/Stale), ручные переопределения с фильтрацией.
+        *   `scada_set_tag` — принудительное операторское переопределение значения любого тега на лету (`ForceOverride`).
+        *   `scada_clear_override` — снятие ручного переопределения и возврат тега к физическому источнику ПЛК.
+        *   `scada_toggle_design_mode` — программное переключение режимов Мнемосхема ⇄ Редактирование через UI-поток Dispatcher.
+    *   Параллельно реализован легковесный REST API: `/api/status`, `/api/tags`, `/api/tag/override`, `/api/tag/clear`, `/api/design-mode`.
+    *   Разработан консольный прокси-скрипт `scripts/scada_mcp.ps1` (stdio-to-http) для интеграции моста в любые MCP-клиенты.
+    *   В `App.axaml.cs` интегрирован фоновый запуск моста при инициализации приложения в `#if DEBUG`.
+*   **Автоматическое тестирование и верификация:**
+    *   В `AvaloniaApplication1.UIValidation/Program.cs` разработан комплексный интеграционный автотест (Тест 28), проверяющий запуск моста, вызовы REST `/api/status`, MCP `tools/list`, переопределение тега через `scada_set_tag`, валидацию снимка `TagSnapshot`, снятие переопределения через `scada_clear_override` и смену `IsDesignMode`.
+    *   Все **28 из 28** автоматических тестов успешно пройдены (100% PASS).
+    *   Сборка решения `AvaloniaApplication1.sln`: **0 ошибок, 0 предупреждений**.
+    *   Скрипт развертывания `scripts/setup_mcp.ps1` восстанавливает и верифицирует все инструменты за 1 секунду.
+    *   Tier 1 headless-рендер `scripts/render_ui.ps1 MimicView` сгенерировал актуальные артефакты `artifacts/ui_preview.png` и `artifacts/ui_tree.json`.

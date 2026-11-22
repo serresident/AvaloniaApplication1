@@ -37,6 +37,18 @@ namespace AvaloniaApplication1
                 };
             }
 
+#if DEBUG
+            try
+            {
+                var debugBridge = Services.GetService<AvaloniaApplication1.Services.Debug.IScadaDebugBridge>();
+                _ = debugBridge?.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ScadaDebugBridge] Init failed: {ex.Message}");
+            }
+#endif
+
             base.OnFrameworkInitializationCompleted();
         }
 
@@ -75,6 +87,10 @@ namespace AvaloniaApplication1
             // ViewModels
             services.AddSingleton<IWidgetFactory, WidgetFactory>();
             services.AddSingleton<MainViewModel>();
+
+#if DEBUG
+            services.AddSingleton<AvaloniaApplication1.Services.Debug.IScadaDebugBridge, AvaloniaApplication1.Services.Debug.ScadaDebugBridge>();
+#endif
         }
     }
 }

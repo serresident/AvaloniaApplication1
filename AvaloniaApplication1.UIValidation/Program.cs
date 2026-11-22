@@ -3567,7 +3567,89 @@ public static class Program
                     throw new Exception("BrowseTagsCommand should update Address and ConnectionId");
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (27/27) PASSED SUCCESSFULLY!");
+            // ---------------------------------------------------------
+            // Test 28: In-App SCADA Debug Bridge & Diagnostics MCP Verification
+            // ---------------------------------------------------------
+            Console.WriteLine("[UIValidation] Testing In-App SCADA Debug Bridge & Diagnostics MCP (Test 28)...");
+            {
+                var testCore = new MockDataCoreService();
+                testCore.TagManager.RegisterTag(new TagDefinition { TagId = "bridge_test_t1", Name = "Bridge Test Tag", ConnId = "plc1", Address = "30001", DataType = "Float32" });
+                var testProjContext = new ProjectContextService { IsDesignMode = false };
+                var bridge = new AvaloniaApplication1.Services.Debug.ScadaDebugBridge(testCore, testProjContext);
+
+                try
+                {
+                    bridge.StartAsync(5120).GetAwaiter().GetResult();
+                    if (!bridge.IsRunning || bridge.Port < 5120)
+                        throw new Exception("ScadaDebugBridge failed to start on expected port");
+
+                    using var http = new System.Net.Http.HttpClient();
+                    string baseUrl = $"http://127.0.0.1:{bridge.Port}";
+
+                    // 28.1 Test /api/status
+                    var statusJson = http.GetStringAsync($"{baseUrl}/api/status").GetAwaiter().GetResult();
+                    var statusDoc = System.Text.Json.JsonDocument.Parse(statusJson);
+                    if (statusDoc.RootElement.GetProperty("status").GetString() != "Running")
+                        throw new Exception("/api/status returned invalid status");
+
+                    // 28.2 Test /mcp tools/list
+                    var toolsListPayload = new System.Net.Http.StringContent("{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}", System.Text.Encoding.UTF8, "application/json");
+                    var toolsResp = http.PostAsync($"{baseUrl}/mcp", toolsListPayload).GetAwaiter().GetResult();
+                    var toolsJson = toolsResp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    var toolsDoc = System.Text.Json.JsonDocument.Parse(toolsJson);
+                    var toolsArray = toolsDoc.RootElement.GetProperty("result").GetProperty("tools");
+                    if (toolsArray.GetArrayLength() < 5)
+                        throw new Exception($"Expected at least 5 MCP tools, found {toolsArray.GetArrayLength()}");
+
+                    // 28.3 Test /mcp tools/call: scada_set_tag
+                    var setTagPayload = new System.Net.Http.StringContent(
+                        "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"scada_set_tag\",\"arguments\":{\"tagId\":\"bridge_test_t1\",\"value\":99.5}}}",
+                        System.Text.Encoding.UTF8, "application/json");
+                    var callResp = http.PostAsync($"{baseUrl}/mcp", setTagPayload).GetAwaiter().GetResult();
+                    var callJson = callResp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    var callDoc = System.Text.Json.JsonDocument.Parse(callJson);
+                    var callText = callDoc.RootElement.GetProperty("result").GetProperty("content")[0].GetProperty("text").GetString() ?? "";
+                    if (!callText.Contains("успешно переопределен") && !callJson.Contains("успешно переопределен"))
+                        throw new Exception($"scada_set_tag failed: {callJson}");
+
+                    var snap = testCore.GetTagSnapshot("bridge_test_t1");
+                    if (!snap.IsOverridden || Math.Abs(Convert.ToDouble(snap.Value) - 99.5) > 0.001)
+                        throw new Exception("Tag snapshot was not overridden by ScadaDebugBridge");
+
+                    // 28.4 Test /mcp tools/call: scada_clear_override
+                    var clrPayload = new System.Net.Http.StringContent(
+                        "{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"scada_clear_override\",\"arguments\":{\"tagId\":\"bridge_test_t1\"}}}",
+                        System.Text.Encoding.UTF8, "application/json");
+                    var clrResp = http.PostAsync($"{baseUrl}/mcp", clrPayload).GetAwaiter().GetResult();
+                    var clrJson = clrResp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    var clrDoc = System.Text.Json.JsonDocument.Parse(clrJson);
+                    var clrText = clrDoc.RootElement.GetProperty("result").GetProperty("content")[0].GetProperty("text").GetString() ?? "";
+                    if (!clrText.Contains("снято") && !clrJson.Contains("снято"))
+                        throw new Exception($"scada_clear_override failed: {clrJson}");
+
+                    var snapCleared = testCore.GetTagSnapshot("bridge_test_t1");
+                    if (snapCleared.IsOverridden)
+                        throw new Exception("Tag snapshot is still overridden after clear_override");
+
+                    // 28.5 Test /mcp tools/call: scada_toggle_design_mode
+                    var togglePayload = new System.Net.Http.StringContent(
+                        "{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/call\",\"params\":{\"name\":\"scada_toggle_design_mode\",\"arguments\":{\"enable\":true}}}",
+                        System.Text.Encoding.UTF8, "application/json");
+                    var toggleResp = http.PostAsync($"{baseUrl}/mcp", togglePayload).GetAwaiter().GetResult();
+                    var toggleJson = toggleResp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    if (!toggleJson.Contains("True") && !toggleJson.Contains("true"))
+                        throw new Exception($"scada_toggle_design_mode failed: {toggleJson}");
+
+                    if (!testProjContext.IsDesignMode)
+                        throw new Exception("IsDesignMode was not updated by ScadaDebugBridge");
+                }
+                finally
+                {
+                    bridge.DisposeAsync().GetAwaiter().GetResult();
+                }
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (28/28) PASSED SUCCESSFULLY!");
         }
     }
 
