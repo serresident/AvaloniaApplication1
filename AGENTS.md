@@ -350,6 +350,29 @@ AvaloniaApplication1/
 
 ---
 
+## 🔌 MCP И ИНСТРУМЕНТАЛЬНЫЙ ОБВЕС (Multi-Agent Portable Harness)
+
+Репозиторий содержит версионируемый инструментальный обвес MCP, зафиксированный в Git для бесшовной работы любых AI-агентов (Antigravity, Cursor, VS Code Copilot, Claude Code):
+
+| Инструмент | Команда вызова | Назначение |
+|---|---|---|
+| **binlog-mcp** | `dotnet tool run binlog-mcp` | Официальный MCP-сервер MSBuild: анализ логов сборки и сбоев XAMLIL генератора |
+| **dotnet-dump** | `dotnet tool run dotnet-dump` | Снятие и глубокий анализ дампов памяти CLR (.NET 10) |
+| **dotnet-gcdump** | `dotnet tool run dotnet-gcdump` | Диагностика утечек памяти, циклических ссылок и графов GC Roots в 24/7 SCADA |
+| **XamlMcp** | `$env:XAML_MCP=1; dotnet run` | Live-драйвинг: живая инспекция Visual Tree, эмуляция кликов, правка свойств |
+
+### 🚀 Инициализация обвеса (Zero Friction Onboarding)
+При клонировании репозитория или входе нового агента выполнить:
+```powershell
+dotnet tool restore ; powershell -ExecutionPolicy Bypass -File scripts/setup_mcp.ps1
+```
+Файлы конфигурации серверов зафиксированы в репозитории:
+* `.config/dotnet-tools.json` — проектный манифест версий .NET инструментов
+* `.vscode/mcp.json` — конфигурация для VS Code / GitHub Copilot
+* `.cursor/mcp.json` — конфигурация для Cursor
+
+---
+
 ## 💻 POWERSHELL — ПРАКТИЧЕСКИЕ КОМАНДЫ
 
 ```powershell

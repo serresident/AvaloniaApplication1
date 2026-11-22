@@ -1846,3 +1846,24 @@
     *   Сборка `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
     *   Тесты: **25/25 PASSED (100%)**.
     *   Headless-рендеринг `render_ui.ps1 MimicView`: артефакты `ui_preview.png` и `ui_tree.json` актуализированы.
+
+---
+
+## 📅 23.11.2026 (Сессия 59 — Аудит MCP-экосистемы и внедрение переносимого инструментального обвеса в Git)
+
+### 📌 Достижение: Проведен глубокий инженерный аудит доступных Model Context Protocol (MCP) серверов для Avalonia 12 и .NET 10. Сформирована прикладная матрица решений для проекта SCADA/HMI. Спроектирована и развернута версионируемая архитектура хранения MCP-обвеса прямо в Git-репозитории, гарантирующая мгновенный автозапуск и одинаковое окружение для любых AI-агентов (Antigravity, Cursor, VS Code, Claude Code).
+
+*   **Анализ экосистемы MCP для Avalonia 12 и .NET 10:**
+    *   *Визуальный уровень UI:* Выделены `avalonia_devtools` (официальный Accelerate инструмент), `trrahul/XamlMcp` (бесплатный opensource-мост через Named Pipes для интерактивного E2E-драйвинга живого окна — уже интегрирован как Tier 2 в проекте) и `decriptor/DilettoLabs.AvaloniaUI.MCP` (XAML-валидация и база знаний по 500+ контролам).
+    *   *Семантический анализ C#:* Исследованы Roslyn-серверы (`RoslynMcpServer`, `roslyncodelens.mcp`, `AmazingMCP` с ILSpy декомпиляцией сборок). Позволяют агенту безопасно рефакторить код с Source Generators и исследовать внутренние изменения в API Avalonia 12.
+    *   *Диагностика памяти 24/7:* Исследованы инструменты анализа дампов памяти (`dotnet-dump`, `dotnet-gcdump`, `dotnet-dump-mcp`), критичные для исключения утечек в `IObservable` подписках SCADA.
+    *   *In-App SCADA Debug Bridge:* Спроектирована интеграция официального `modelcontextprotocol/csharp-sdk` прямо внутрь HMI-приложения под `#if DEBUG` для прямого манипулирования тегами и экранами из чата.
+*   **Архитектура закрепления обвеса в GitHub (Multi-Agent Portable Harness):**
+    *   *Локальный манифест .NET (`.config/dotnet-tools.json`):* Создан манифест с фиксированными версиями: `microsoft.aitools.binlogmcp` (официальный MCP-сервер MSBuild для анализа сборки), `dotnet-dump` (10.0), `dotnet-gcdump` (10.0). Любой агент восстанавливает инструменты через `dotnet tool restore`.
+    *   *Проектные файлы конфигурации MCP:* Созданы `.vscode/mcp.json` и `.cursor/mcp.json` с портативными командами (`dotnet tool run binlog-mcp` и путь к `XamlMcp.Server.dll`). Агенты в VS Code и Cursor подхватывают инструменты автоматически при открытии репозитория.
+    *   *Скрипт автоматической настройки (`scripts/setup_mcp.ps1`):* Восстанавливает локальные инструменты, проверяет окружение .NET 10 и валидирует конфиги IDE.
+    *   *Правила самозапуска в `AGENTS.md` и `GEMINI.md`:* Добавлен регламент инициализации `dotnet tool restore ; powershell -ExecutionPolicy Bypass -File scripts/setup_mcp.ps1`.
+*   **Верификация:**
+    *   Скрипт `scripts/setup_mcp.ps1` успешно протестирован: 0 ошибок.
+    *   Сборка решения `dotnet build AvaloniaApplication1.sln -c Debug --nologo`: **0 ошибок, 0 предупреждений**.
+    *   Автоматические тесты `AvaloniaApplication1.UIValidation`: **25/25 PASSED (100%)**.

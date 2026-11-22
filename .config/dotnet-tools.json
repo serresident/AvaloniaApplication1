@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-dump": {
+      "version": "10.0.750501",
+      "commands": [
+        "dotnet-dump"
+      ],
+      "rollForward": false
+    },
+    "dotnet-gcdump": {
+      "version": "10.0.750501",
+      "commands": [
+        "dotnet-gcdump"
+      ],
+      "rollForward": false
+    },
+    "microsoft.aitools.binlogmcp": {
+      "version": "3.0.5",
+      "commands": [
+        "binlog-mcp"
+      ],
+      "rollForward": false
+    }
+  }
+}

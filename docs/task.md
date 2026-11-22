@@ -1135,3 +1135,17 @@
   - [x] Сборка: **0 ошибок, 0 предупреждений**.
   - [x] Тесты: **25/25 PASSED (100%)**.
   - [x] Headless-рендеринг `render_ui.ps1 MimicView`: артефакты актуализированы.
+
+# Tasks: MCP Ecosystem Analysis & Multi-Agent Portable Harness (Сессия 59 — Выполнено)
+
+- [x] Глубокий анализ экосистемы MCP-серверов для Avalonia 12 и .NET 10:
+  - [x] Анализ Avalonia UI серверов (`avalonia_devtools`, `XamlMcp`, `DilettoLabs.AvaloniaUI.MCP`).
+  - [x] Анализ семантических Roslyn серверов (`RoslynMcpServer`, `roslyncodelens.mcp`, `AmazingMCP` с ILSpy декомпиляцией).
+  - [x] Анализ CLR диагностики и памяти (`dotnet-dump`, `dotnet-gcdump`, `frankbolero/dotnet-dump-mcp`, `mcp-dotnet-diagnostics`).
+  - [x] Анализ официального .NET SDK `modelcontextprotocol/csharp-sdk` для создания in-app SCADA MCP bridge.
+- [x] Проектирование и внедрение переносимого MCP-обвеса (Portable Harness) в репозиторий Git:
+  - [x] Создание проектного манифеста .NET инструментов `.config/dotnet-tools.json` (версионирование `dotnet-dump`, `dotnet-gcdump`, `microsoft.aitools.binlogmcp`).
+  - [x] Создание единых проектных конфигураций MCP для IDE/агентов: `.vscode/mcp.json` и `.cursor/mcp.json`.
+  - [x] Разработка скрипта автоматического восстановления и синхронизации `scripts/setup_mcp.ps1`.
+  - [x] Актуализация регламента и правил самозапуска агентов в `AGENTS.md` и `GEMINI.md`.
+  - [x] Верификация: `dotnet tool restore`, чистая сборка решения (0 ошибок, 0 предупреждений), успешный прогон всех 25 тестов UIValidation (100% PASS).

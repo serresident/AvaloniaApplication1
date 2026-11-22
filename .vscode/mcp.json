@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "binlog-mcp": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": ["tool", "run", "binlog-mcp"]
+    },
+    "xamlmcp": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": ["${env:USERPROFILE}/.gemini/tools/xamlmcp/XamlMcp.Server.dll"]
+    }
+  }
+}
