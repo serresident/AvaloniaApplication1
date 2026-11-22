@@ -101,12 +101,87 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         public async System.Threading.Tasks.Task BrowseTagsAsync()
         {
             if (DialogService == null) return;
-            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, SelectedTagId);
+            string? targetType = null;
+            if (SelectedWidgetType == "PilotLight" || SelectedWidgetType == "CommandButton" || (SelectedWidgetType == "Valve" && SelectedValveType == "CutOff"))
+            {
+                targetType = "Bool";
+            }
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, SelectedTagId, targetType);
             if (picked != null)
             {
                 ApplyTag(picked);
             }
         }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseFeedbackTagAsync()
+        {
+            if (DialogService == null) return;
+            var targetType = SelectedValveType == "CutOff" ? "Bool" : null;
+            var currentTagId = !string.IsNullOrEmpty(FeedbackAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(FeedbackConnectionId) || t.ConnId == FeedbackConnectionId) && t.Address == FeedbackAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, targetType);
+            if (picked != null)
+            {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
+                FeedbackConnectionId = picked.ConnId;
+                FeedbackAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task PickFeedbackTagAsync() => await BrowseFeedbackTagAsync();
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseClosedFeedbackTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(ClosedFeedbackAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(ClosedFeedbackConnectionId) || t.ConnId == ClosedFeedbackConnectionId) && t.Address == ClosedFeedbackAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, "Bool");
+            if (picked != null)
+            {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
+                ClosedFeedbackConnectionId = picked.ConnId;
+                ClosedFeedbackAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task PickClosedFeedbackTagAsync() => await BrowseClosedFeedbackTagAsync();
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseModeTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(ModeAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(ModeConnectionId) || t.ConnId == ModeConnectionId) && t.Address == ModeAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, "Bool");
+            if (picked != null)
+            {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
+                ModeConnectionId = picked.ConnId;
+                ModeAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task PickModeTagAsync() => await BrowseModeTagAsync();
 
         [ObservableProperty]
         private string? _selectedConnectionId;
@@ -161,6 +236,27 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
 
         [ObservableProperty]
         private string _selectedButtonMode = ButtonModes.All[0];
+
+        public string[] AvailableSwitchStyles => SwitchStyles.All;
+
+        [ObservableProperty]
+        private string _selectedSwitchStyle = SwitchStyles.All[0];
+
+        public string[] AvailableOrientations => SwitchOrientations.All;
+
+        [ObservableProperty]
+        private string _selectedOrientation = SwitchOrientations.All[0];
+
+        [ObservableProperty]
+        private bool _isToggleSwitchSelected;
+
+        [ObservableProperty]
+        private bool _requireConfirmation;
+
+        partial void OnSelectedButtonModeChanged(string value)
+        {
+            IsToggleSwitchSelected = SelectedWidgetType == "CommandButton" && value == "ToggleSwitch";
+        }
 
         [ObservableProperty]
         private string _labelOn = "ВКЛ";
@@ -449,7 +545,7 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             AvailableConnections = connections.Select(c => c.Id).ToList();
             if (tags != null)
             {
-                AvailableTags.AddRange(tags);
+                AvailableTags.AddRange(tags.OrderBy(t => t.TagId, StringComparer.OrdinalIgnoreCase).ThenBy(t => t.Name, StringComparer.OrdinalIgnoreCase));
             }
 
             if (existingConfig != null)
@@ -480,7 +576,20 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
 
                 if (existingConfig is ValueDisplayConfig vd) { Format = vd.Format; ValueColor = vd.ValueColor; ValueFontSize = vd.ValueFontSize; }
                 if (existingConfig is PilotLightConfig pl) { TrueColor = pl.TrueColor; FalseColor = pl.FalseColor; }
-                if (existingConfig is CommandButtonConfig cb) { SelectedButtonMode = cb.ButtonMode; LabelOn = cb.LabelOn; LabelOff = cb.LabelOff; ColorOn = cb.ColorOn; ColorOff = cb.ColorOff; }
+                if (existingConfig is CommandButtonConfig cb)
+                {
+                    if (string.IsNullOrEmpty(SelectedWidgetType))
+                        SelectedWidgetType = "CommandButton";
+                    SelectedButtonMode = cb.ButtonMode;
+                    LabelOn = cb.LabelOn;
+                    LabelOff = cb.LabelOff;
+                    ColorOn = cb.ColorOn;
+                    ColorOff = cb.ColorOff;
+                    SelectedSwitchStyle = string.IsNullOrEmpty(cb.SwitchStyle) ? "Pill" : cb.SwitchStyle;
+                    SelectedOrientation = string.IsNullOrEmpty(cb.Orientation) ? "Horizontal" : cb.Orientation;
+                    RequireConfirmation = cb.RequireConfirmation;
+                    IsToggleSwitchSelected = cb.ButtonMode == "ToggleSwitch";
+                }
                 if (existingConfig is SliderConfig sl) { MinValue = sl.MinValue; MaxValue = sl.MaxValue; }
                 if (existingConfig is SetValueConfig sv) { Format = sv.Format; MinValue = sv.MinValue; MaxValue = sv.MaxValue; ValueColor = sv.ValueColor; ValueFontSize = sv.ValueFontSize; }
                 if (existingConfig is RealTimeTrendConfig rt)
@@ -637,6 +746,7 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         {
             ShowValueDisplaySettings = SelectedWidgetType == "ValueDisplay" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "Tank" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor" || SelectedWidgetType == "LevelSensor";
             ShowCommandButtonSettings = SelectedWidgetType == "CommandButton";
+            IsToggleSwitchSelected = SelectedWidgetType == "CommandButton" && SelectedButtonMode == "ToggleSwitch";
             ShowSliderSettings = SelectedWidgetType == "Slider" || SelectedWidgetType == "SetValue" || SelectedWidgetType == "Tank" || SelectedWidgetType == "Reactor" || SelectedWidgetType == "LevelSensor";
             ShowPilotLightSettings = SelectedWidgetType == "PilotLight";
             ShowPipeSettings = SelectedWidgetType == "Pipe";
@@ -671,7 +781,20 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             {
                 "ValueDisplay" => new ValueDisplayConfig { Format = Format, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
                 "PilotLight" => new PilotLightConfig { TrueColor = TrueColor, FalseColor = FalseColor },
-                "CommandButton" => new CommandButtonConfig { ButtonMode = SelectedButtonMode, LabelOn = LabelOn, LabelOff = LabelOff, ColorOn = ColorOn, ColorOff = ColorOff },
+                "CommandButton" => new CommandButtonConfig
+                {
+                    ButtonMode = SelectedButtonMode,
+                    LabelOn = LabelOn,
+                    LabelOff = LabelOff,
+                    ColorOn = ColorOn,
+                    ColorOff = ColorOff,
+                    SwitchStyle = SelectedSwitchStyle,
+                    Orientation = SelectedOrientation,
+                    RequireConfirmation = RequireConfirmation,
+                    ShowIconOnly = (_existingConfig as CommandButtonConfig)?.ShowIconOnly ?? false,
+                    Icon = (_existingConfig as CommandButtonConfig)?.Icon ?? string.Empty,
+                    CornerRadius = (_existingConfig as CommandButtonConfig)?.CornerRadius ?? 6
+                },
                 "Slider" => new SliderConfig { MinValue = MinValue, MaxValue = MaxValue },
                 "SetValue" => new SetValueConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
                 "RealTimeTrend" => new RealTimeTrendConfig

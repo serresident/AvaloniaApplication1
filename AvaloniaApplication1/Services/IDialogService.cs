@@ -18,7 +18,7 @@ namespace AvaloniaApplication1.Services
         // Tag Manager & Signal Database dialogs
         Task ShowTagManagerAsync(HmiConfiguration config);
         Task<Models.TagDefinition?> ShowTagEditorAsync(Models.TagDefinition? existingTag, IEnumerable<ConnectionConfig> connections, IEnumerable<Models.TagDefinition> existingTags);
-        Task<Models.TagDefinition?> ShowTagPickerAsync(IEnumerable<Models.TagDefinition> availableTags, string? initialTagId = null);
+        Task<Models.TagDefinition?> ShowTagPickerAsync(IEnumerable<Models.TagDefinition> availableTags, string? initialTagId = null, string? targetDataType = null);
         Task<(bool Confirmed, object? Value)> ShowTagForceDialogAsync(Models.TagDefinition tag, object? currentValue);
         Task<List<Models.TagDefinition>?> ShowTagImportExportAsync(bool isImportMode, IEnumerable<Models.TagDefinition> currentTags, IHmiClipboardService? clipboard = null);
 

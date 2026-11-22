@@ -1,3 +1,4 @@
+using System;
 using AvaloniaApplication1.ViewModels.Core;
 using System.Threading.Tasks;
 using AvaloniaApplication1.Models;
@@ -11,11 +12,35 @@ namespace AvaloniaApplication1.ViewModels.Widgets
 {
     public partial class CommandButtonViewModel : WidgetViewModelBase
     {
+        private static readonly IBrush BrightWhiteBrush = new SolidColorBrush(Avalonia.Media.Color.Parse("#FFFFFF"));
+        private static readonly IBrush DimmedGrayBrush = new SolidColorBrush(Avalonia.Media.Color.Parse("#77777A"));
+        private static readonly IBrush DefaultTrackBg = new SolidColorBrush(Avalonia.Media.Color.Parse("#2B2B30"));
+        private static readonly IBrush DefaultTrackBorder = new SolidColorBrush(Avalonia.Media.Color.Parse("#505058"));
+        private static readonly IBrush ActiveTrackBorder = new SolidColorBrush(Avalonia.Media.Color.Parse("#44FFFFFF"));
+        private static readonly IBrush SwitchFaceplateBg = new SolidColorBrush(Avalonia.Media.Color.Parse("#212226"));
+        private static readonly IBrush RaisedShoulderBg = new SolidColorBrush(Avalonia.Media.Color.Parse("#383A40"));
+        private static readonly IBrush DepressedShoulderBg = new SolidColorBrush(Avalonia.Media.Color.Parse("#202124"));
+
         public CommandButtonConfig TypedConfig => (CommandButtonConfig)OriginalConfig;
 
         // ── State (for Latching/ToggleSwitch mode) ──
         [ObservableProperty]
         private bool _isActive;
+
+        // ── Switch Style & Orientation ──
+        [ObservableProperty]
+        private string _switchStyle = "Pill";
+
+        [ObservableProperty]
+        private string _orientation = "Horizontal";
+
+        /// <summary>True when ButtonMode == ToggleSwitch — switches to multi-style vector toggle display.</summary>
+        public bool IsToggleSwitchMode => string.Equals(TypedConfig.ButtonMode, "ToggleSwitch", StringComparison.OrdinalIgnoreCase);
+        public bool IsRockerStyle => string.Equals(SwitchStyle, "Rocker", StringComparison.OrdinalIgnoreCase);
+        public bool IsLeverStyle => string.Equals(SwitchStyle, "Lever", StringComparison.OrdinalIgnoreCase);
+        public bool IsPillStyle => !IsRockerStyle && !IsLeverStyle;
+        public bool IsVertical => string.Equals(Orientation, "Vertical", StringComparison.OrdinalIgnoreCase);
+        public bool IsHorizontal => !IsVertical;
 
         // ── Displayed label (reacts to IsActive for Latching) ──
         [ObservableProperty]
@@ -25,36 +50,96 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         [ObservableProperty]
         private IBrush _currentBackground = Brushes.DimGray;
 
-        /// <summary>True when ButtonMode == ToggleSwitch — shows left/right edge labels in UI.</summary>
-        public bool IsToggleSwitchMode => TypedConfig.ButtonMode == "ToggleSwitch";
+        [ObservableProperty]
+        private IBrush _buttonBackground = Brushes.DimGray;
+
+        [ObservableProperty]
+        private IBrush _brushOn = new SolidColorBrush(Avalonia.Media.Color.Parse("#00AA44"));
+
+        [ObservableProperty]
+        private IBrush _brushOff = new SolidColorBrush(Avalonia.Media.Color.Parse("#AA2200"));
+
+        [ObservableProperty]
+        private IBrush _onLabelBrush = BrightWhiteBrush;
+
+        [ObservableProperty]
+        private IBrush _offLabelBrush = DimmedGrayBrush;
+
+        [ObservableProperty]
+        private IBrush _trackBackground = DefaultTrackBg;
+
+        [ObservableProperty]
+        private IBrush _trackBorderBrush = DefaultTrackBorder;
+
+        [ObservableProperty]
+        private IBrush _activeShoulderBg = RaisedShoulderBg;
+
+        [ObservableProperty]
+        private IBrush _inactiveShoulderBg = DepressedShoulderBg;
 
         public CommandButtonViewModel(CommandButtonConfig config, IDataCoreService dataService, IProjectContextService projectContext)
             : base(config, dataService, projectContext)
         {
+            _switchStyle = string.IsNullOrEmpty(config.SwitchStyle) ? "Pill" : config.SwitchStyle;
+            _orientation = string.IsNullOrEmpty(config.Orientation) ? "Horizontal" : config.Orientation;
             SyncVisual();
         }
 
-        private void SyncVisual()
+        partial void OnIsActiveChanged(bool value)
+        {
+            SyncVisual();
+        }
+
+        partial void OnSwitchStyleChanged(string value)
+        {
+            TypedConfig.SwitchStyle = value;
+            OnPropertyChanged(nameof(IsPillStyle));
+            OnPropertyChanged(nameof(IsRockerStyle));
+            OnPropertyChanged(nameof(IsLeverStyle));
+            SyncVisual();
+        }
+
+        partial void OnOrientationChanged(string value)
+        {
+            TypedConfig.Orientation = value;
+            OnPropertyChanged(nameof(IsVertical));
+            OnPropertyChanged(nameof(IsHorizontal));
+            SyncVisual();
+        }
+
+        public void SyncVisual()
         {
             var cfg = TypedConfig;
+            ParseBrush(cfg.ColorOn, out var bOn);
+            BrushOn = bOn;
+            ParseBrush(cfg.ColorOff, out var bOff);
+            BrushOff = bOff;
+
+            OnLabelBrush = IsActive ? BrightWhiteBrush : DimmedGrayBrush;
+            OffLabelBrush = IsActive ? DimmedGrayBrush : BrightWhiteBrush;
+
+            ActiveShoulderBg = IsActive ? RaisedShoulderBg : DepressedShoulderBg;
+            InactiveShoulderBg = !IsActive ? RaisedShoulderBg : DepressedShoulderBg;
+
             if (cfg.ButtonMode == "Latching")
             {
                 CurrentLabel = IsActive ? cfg.LabelOn : cfg.LabelOff;
-                ParseBrush(IsActive ? cfg.ColorOn : cfg.ColorOff, out var br);
-                CurrentBackground = br;
+                CurrentBackground = IsActive ? BrushOn : BrushOff;
+                ButtonBackground = CurrentBackground;
             }
             else if (cfg.ButtonMode == "ToggleSwitch")
             {
-                // Label shown on the button body = current state label
                 CurrentLabel = IsActive ? cfg.LabelOn : cfg.LabelOff;
-                ParseBrush(IsActive ? cfg.ColorOn : cfg.ColorOff, out var br);
-                CurrentBackground = br;
+                CurrentBackground = IsActive ? BrushOn : BrushOff;
+                ButtonBackground = SwitchFaceplateBg;
+                TrackBackground = IsActive ? BrushOn : DefaultTrackBg;
+                TrackBorderBrush = IsActive ? ActiveTrackBorder : DefaultTrackBorder;
             }
             else
             {
-                // Toggle / Momentary — just show title
                 CurrentLabel = cfg.Title;
-                CurrentBackground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#4A4A4D"));
+                CurrentBackground = new SolidColorBrush(Avalonia.Media.Color.Parse("#4A4A4D"));
+                ButtonBackground = CurrentBackground;
             }
         }
 
@@ -63,6 +148,26 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             brush = Brushes.DimGray;
             if (!string.IsNullOrWhiteSpace(hex) && Avalonia.Media.Color.TryParse(hex, out var c))
                 brush = new SolidColorBrush(c);
+        }
+
+        protected override void OnTagValueUpdated(object newValue)
+        {
+            base.OnTagValueUpdated(newValue);
+            if (TypedConfig.ButtonMode == "Latching" || TypedConfig.ButtonMode == "ToggleSwitch")
+            {
+                if (newValue is bool b)
+                {
+                    IsActive = b;
+                }
+                else if (newValue is int i)
+                {
+                    IsActive = i != 0;
+                }
+                else if (bool.TryParse(newValue?.ToString(), out var parsedBool))
+                {
+                    IsActive = parsedBool;
+                }
+            }
         }
 
         [RelayCommand]
@@ -92,24 +197,28 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 DataService.ForceOverride(tagId, true);
             }
 
+            // Operator Confirmation safety check (ISA-101 / Concepts Brief)
+            if (cfg.RequireConfirmation && DialogService != null)
+            {
+                string targetState = (!IsActive) ? (cfg.LabelOn ?? "ВКЛ") : (cfg.LabelOff ?? "ВЫКЛ");
+                bool confirmed = await DialogService.ShowConfirmAsync(
+                    "Подтверждение переключения",
+                    $"Вы уверены, что хотите переключить '{Title}' в состояние '{targetState}' ({Source.ConnId}:{Source.Address})?");
+                if (!confirmed)
+                {
+                    return;
+                }
+            }
+
             switch (cfg.ButtonMode)
             {
                 case "Latching":
-                    // Toggle the latch state
-                    IsActive = !IsActive;
-                    DataService.WriteCommand(Source.ConnId, Source.Address, IsActive);
-                    SyncVisual();
-                    break;
-
                 case "ToggleSwitch":
-                    // Same as Latching but visual is a switch
                     IsActive = !IsActive;
                     DataService.WriteCommand(Source.ConnId, Source.Address, IsActive);
-                    SyncVisual();
                     break;
 
                 case "Momentary":
-                    // Send true; caller should handle release separately
                     DataService.WriteCommand(Source.ConnId, Source.Address, true);
                     break;
 

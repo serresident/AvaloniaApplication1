@@ -189,6 +189,31 @@
                             </TextBlock>
                         </Border>
 
+                        <!-- ToggleSwitch Style & Orientation -->
+                        <Border Background="#252528" CornerRadius="6" Padding="10,8" Margin="0,2"
+                                IsVisible="{Binding IsToggleSwitchSelected}">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Параметры переключателя (ToggleSwitch)" Foreground="#00AAFF" FontSize="12" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Стиль переключателя" Foreground="#AAAAAA" FontSize="11" />
+                                        <ComboBox ItemsSource="{Binding AvailableSwitchStyles}"
+                                                  SelectedItem="{Binding SelectedSwitchStyle}"
+                                                  HorizontalAlignment="Stretch" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Ориентация" Foreground="#AAAAAA" FontSize="11" />
+                                        <ComboBox ItemsSource="{Binding AvailableOrientations}"
+                                                  SelectedItem="{Binding SelectedOrientation}"
+                                                  HorizontalAlignment="Stretch" />
+                                    </StackPanel>
+                                </Grid>
+                                <CheckBox Content="Запрашивать подтверждение переключения"
+                                          IsChecked="{Binding RequireConfirmation}"
+                                          Foreground="White" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+
                         <Separator Background="#3E3E42" Height="1" Margin="0,4" />
 
                         <!-- Labels -->
@@ -508,14 +533,24 @@
                     <StackPanel Spacing="8">
                         <TextBlock Text="Обратная связь и концевые выключатели" Foreground="#FFD700" FontSize="14" FontWeight="SemiBold" />
                         
-                        <TextBlock Text="Концевик «Открыт» / Положение (SQH / FB)" Foreground="#AAAAAA" FontSize="11" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Концевик «Открыт» / Положение (SQH / FB)" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="🏷️ Выбрать..." Command="{Binding BrowseFeedbackTagCommand}"
+                                    Background="#0E639C" Foreground="White" CornerRadius="4" Padding="6,2" FontSize="11" FontWeight="SemiBold"
+                                    ToolTip.Tip="Выбрать тег концевика открытого положения (SQH) из базы" />
+                        </Grid>
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
                                   SelectedItem="{Binding FeedbackConnectionId}"
                                   HorizontalAlignment="Stretch"
                                   PlaceholderText="Как у основного или выберите..." />
                         <TextBox Text="{Binding FeedbackAddress}" PlaceholderText="напр. 10016 или 40002" />
 
-                        <TextBlock Text="Концевик «Закрыт» (SQL / Closed Feedback)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                            <TextBlock Grid.Column="0" Text="Концевик «Закрыт» (SQL / Closed Feedback)" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="🏷️ Выбрать..." Command="{Binding BrowseClosedFeedbackTagCommand}"
+                                    Background="#0E639C" Foreground="White" CornerRadius="4" Padding="6,2" FontSize="11" FontWeight="SemiBold"
+                                    ToolTip.Tip="Выбрать тег концевика закрытого положения (SQL) из базы" />
+                        </Grid>
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
                                   SelectedItem="{Binding ClosedFeedbackConnectionId}"
                                   HorizontalAlignment="Stretch"
@@ -525,7 +560,12 @@
                         <TextBlock Text="Допустимое рассогласование (%)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
                         <NumericUpDown Value="{Binding Tolerance}" Minimum="0" Maximum="100" FormatString="0.0 '%'" />
 
-                        <TextBlock Text="Тэг режима управления (Ручной / Авто)" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" />
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                            <TextBlock Grid.Column="0" Text="Тэг режима управления (Ручной / Авто)" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="🏷️ Выбрать..." Command="{Binding BrowseModeTagCommand}"
+                                    Background="#0E639C" Foreground="White" CornerRadius="4" Padding="6,2" FontSize="11" FontWeight="SemiBold"
+                                    ToolTip.Tip="Выбрать тег режима управления (ручной/авто) из базы" />
+                        </Grid>
                         <ComboBox ItemsSource="{Binding AvailableConnections}" 
                                   SelectedItem="{Binding ModeConnectionId}"
                                   HorizontalAlignment="Stretch"

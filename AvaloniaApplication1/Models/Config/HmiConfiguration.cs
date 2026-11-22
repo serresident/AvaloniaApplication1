@@ -134,6 +134,11 @@ namespace AvaloniaApplication1.Models.Config
         public bool ShowIconOnly    { get; set; } = false;
         public string Icon          { get; set; } = string.Empty;
         public double CornerRadius  { get; set; } = 6;
+        // ToggleSwitch styles: Pill | Rocker | Lever
+        public string SwitchStyle   { get; set; } = "Pill";
+        // Orientation: Horizontal | Vertical
+        public string Orientation   { get; set; } = "Horizontal";
+        public bool RequireConfirmation { get; set; } = false;
     }
 
     public class SliderConfig : WidgetConfig
