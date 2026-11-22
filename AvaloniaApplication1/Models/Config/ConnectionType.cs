@@ -24,4 +24,14 @@ namespace AvaloniaApplication1.Models.Config
     {
         public static readonly string[] All = { "Toggle", "Momentary", "Latching", "ToggleSwitch", "SetValue" };
     }
+
+    public static class SwitchStyles
+    {
+        public static readonly string[] All = { "Pill", "Rocker", "Lever" };
+    }
+
+    public static class SwitchOrientations
+    {
+        public static readonly string[] All = { "Horizontal", "Vertical" };
+    }
 }

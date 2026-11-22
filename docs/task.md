@@ -814,6 +814,7 @@
   - [x] Чистая сборка: 0 ошибок, 0 предупреждений
 
 
+
 # Tasks: Industrial SCADA Controls Library Extraction & Hierarchical Reorganization (Сессия 46 — Выполнено)
 
 - [x] Архитектурное проектирование и дизайн-документ:
@@ -1135,3 +1136,104 @@
   - [x] Сборка: **0 ошибок, 0 предупреждений**.
   - [x] Тесты: **25/25 PASSED (100%)**.
   - [x] Headless-рендеринг `render_ui.ps1 MimicView`: артефакты актуализированы.
+
+# Tasks: Universal Industrial ToggleSwitch (Pill, Rocker, Lever) & Dual-Orientation (Сессия 46 — Выполнено)
+
+- [x] Конфигурация и модели (`Models/Config/HmiConfiguration.cs`, `ConnectionType.cs`):
+  - [x] Добавлены `SwitchStyles` (`Pill`, `Rocker`, `Lever`) и `SwitchOrientations` (`Horizontal`, `Vertical`)
+  - [x] В `CommandButtonConfig` добавлены свойства `SwitchStyle` (по умолчанию `"Pill"`) и `Orientation` (по умолчанию `"Horizontal"`), автоинициализация `Type = "CommandButton"`
+- [x] Логика и состояние виджета (`ViewModels/CommandButtonViewModel.cs`):
+  - [x] Реактивные свойства `SwitchStyle`, `Orientation`, флаги стилей `IsPillStyle`, `IsRockerStyle`, `IsLeverStyle`, ориентации `IsVertical`, `IsHorizontal`
+  - [x] Кэшированные кисти для нулевых аллокаций в UI: `ButtonBackground`, `BrushOn`, `BrushOff`, `OnLabelBrush`, `OffLabelBrush`, `TrackBackground`, `TrackBorderBrush`, `ActiveShoulderBg`, `InactiveShoulderBg`
+  - [x] Обновлена логика `ExecuteCommandAsync` и обработчик телеметрии `OnTagValueUpdated`
+- [x] Векторный рендеринг в `Views/DashboardView.axaml`:
+  - [x] Стиль Pill: скругленный трек с круглым бегунком (Thumb) и центрированным цветным акцентом
+  - [x] Стиль Rocker: промышленная двухплечевая клавиша с рельефными плечами, центральным разделителем и индикаторными полосками
+  - [x] Стиль Lever: круглая гайка-основание, внутренний колодец и перекидной шток с углом наклона ±25° с металлическим набалдашником
+  - [x] Поддержка горизонтальной (слева направо) и вертикальной (снизу вверх) ориентаций для всех 3 стилей
+  - [x] Автомасштабирование через `Viewbox` и полноразмерный сенсорный хитбокс
+- [x] Интеграция в Редактор виджетов (`Views/WidgetEditorWindow.axaml` & `ViewModels/WidgetEditorViewModel.cs`):
+  - [x] Динамическое отображение секции «Параметры переключателя (ToggleSwitch)» при выборе режима `ToggleSwitch`
+  - [x] Селекторы ComboBox для выбора стиля (`AvailableSwitchStyles`) и ориентации (`AvailableOrientations`)
+  - [x] Двусторонняя синхронизация при загрузке и сохранении конфигурации `ToWidgetConfig()`
+- [x] Тестирование и верификация:
+  - [x] Разработан комплексный тест №21 в `AvaloniaApplication1.UIValidation/Program.cs` для проверки всех 6 комбинаций, переключения команд, телеметрии и редактора
+  - [x] 21/21 тестов пройдено успешно (ALL AUTOMATED VALIDATIONS PASSED)
+  - [x] Сборка `dotnet build AvaloniaApplication1/AvaloniaApplication1.csproj -c Debug --nologo` завершена с 0 ошибок и 0 предупреждений
+
+# Tasks: Code Review Audit & Robustness Hardening (Сессия 47 — Выполнено)
+
+- [x] Безопасность и подтверждение операций (ISA-101 / Concepts Brief Requirement 3):
+  - [x] Добавлено свойство `RequireConfirmation` в `CommandButtonConfig`
+  - [x] Интеграция модального диалога подтверждения `DialogService.ShowConfirmAsync` перед переключением состояния в `ExecuteCommandAsync`
+  - [x] Поддержка чекбокса подтверждения в `WidgetEditorWindow.axaml` и сохранение в `WidgetEditorViewModel`
+- [x] Устойчивость к граничным условиям разметки в `DashboardView.axaml`:
+  - [x] Изолирован опциональный заголовок `Title` в отдельную строку Grid (`RowDefinitions="Auto,*"`) для предотвращения перекрытия переключателя
+  - [x] Устранены жестко заданные `Width="124"` / `Height="124"`, вызывающие обрезку длинных меток (напр. "ВКЛЮЧЕНО" / "ВЫКЛЮЧЕНО")
+  - [x] Добавлен `TextTrimming="CharacterEllipsis"` и отступы плеч в клавишном стиле `Rocker`
+- [x] Надежность вьюмодели и fallback:
+  - [x] Безопасный фоллбэк на стиль `Pill` при некорректных или пустых значениях `SwitchStyle`
+  - [x] Регистронезависимое распознавание `ButtonMode` и стилей (`StringComparison.OrdinalIgnoreCase`)
+  - [x] Сохранение `Icon`, `ShowIconOnly`, `CornerRadius` при редактировании в `WidgetEditorViewModel`
+- [x] Расширенное тестирование в `UIValidation/Program.cs`:
+  - [x] Проверка блокировки отправки команды при отмене оператором в диалоге подтверждения
+  - [x] Проверка успешной отправки команды при подтверждении
+  - [x] Проверка безопасного отката на стиль Pill при неизвестном стиле и нечувствительности к регистру
+  - [x] 21/21 тестов пройдено успешно, 0 предупреждений, 0 ошибок
+
+# Tasks: TagPicker UX Optimization, Multi-Column Sorting, Express Filtering & Secondary Valve Tags (Сессия 48 — Выполнено)
+
+- [x] Окно выбора тегов TagPicker (`Views/TagPickerWindow.axaml` и `ViewModels/TagPickerViewModel.cs`):
+  - [x] Интерактивная сортировка по клику на заголовки колонок: TagId, Наименование, Драйвер/Подключение, Адрес, Тип данных, Ед. изм.
+  - [x] Отображение маркеров направления сортировки (▲ / ▼) в заголовках активных колонок
+  - [x] Экспресс-фильтрация: комбинированный текстовый поиск `SearchText` + фильтр по подключению/драйверу (`AvailableConnectionsFilter`, `SelectedConnectionFilter`) + фильтр по типу данных (`AvailableDataTypesFilter`, `SelectedDataTypeFilter`)
+  - [x] Поддержка предфильтрации через конструктор `targetDataType` (автоматический выбор фильтра при вызове для дискретных/специфичных сигналов)
+  - [x] Навигация с клавиатуры: подтверждение по клавише Enter, отмена по Esc, переход из поисковой строки в список по стрелке Down, возврат по Up
+  - [x] Исправлена раскладка колонок: гибкая ширина `*` отдана наименованию тега вместо масштаба, предотвращена обрезка длинных имен
+  - [x] Кнопка «✕ Сброс» (`ResetFiltersCommand`) и отображение плейсхолдера при пустом результате поиска (`HasNoTags`)
+  - [x] Поиск по типу данных в поисковой строке
+  - [x] Устранено предупреждение компилятора MVVMTK0034 при переключении колонок сортировки
+- [x] Редактор свойств виджетов (`Views/WidgetEditorWindow.axaml` и `ViewModels/WidgetEditorViewModel.cs`):
+  - [x] Алфавитная сортировка выпадающего списка `AvailableTags` по `TagId` / `Name`
+  - [x] Кнопки вызова браузера тегов «🏷️ Выбрать...» для концевиков клапанов SQH (Feedback), SQL (ClosedFeedback) и тега режима ModeSource
+  - [x] Команды `BrowseFeedbackTagCommand` / `PickFeedbackTagCommand`, `BrowseClosedFeedbackTagCommand` / `PickClosedFeedbackTagCommand`, `BrowseModeTagCommand` / `PickModeTagCommand`
+  - [x] Автоматическое добавление неизвестных подключений в `AvailableConnections` при выборе тега из базы
+  - [x] Автоматическая предфильтрация `targetDataType="Bool"` для дискретных кнопочных виджетов и отсечных клапанов
+- [x] Автоматическое тестирование и верификация:
+  - [x] Разработан комплексный автотест (Тест 22) в `AvaloniaApplication1.UIValidation/Program.cs`
+  - [x] Проверка сортировки по всем колонкам в обоих направлениях (Asc/Desc)
+  - [x] Проверка сквозной фильтрации (поиск + драйвер + тип) и сброса фильтров через `ResetFiltersCommand`
+  - [x] Проверка предварительной фильтрации конструктора (`targetDataType="Bool"`)
+  - [x] Проверка выбора вторичных тегов клапана и сохранения конфигурации
+  - [x] Проверка вызова `BrowseTagsCommand` для дискретных кнопок
+  - [x] Успешное прохождение всех автотестов (22/22 PASS)
+  - [x] Сборка проекта без ошибок и предупреждений (0 ошибок, 0 предупреждений)
+
+# Tasks: TagManager & TagPicker Window Exit & Column Sorting (Сессия 49 — Выполнено)
+
+- [x] Выход / закрытие окна базы тегов (`TagManagerWindow`):
+  - [x] Добавлена кнопка «✕ Закрыть» в верхнем заголовке (Row 0)
+  - [x] Добавлена кнопка «🚪 Выход» на панели инструментов (Row 1)
+  - [x] Добавлена кнопка «Закрыть (Esc)» в статусном футере (Row 4)
+  - [x] Реализовано закрытие по горячей клавише `Escape` в `TagManagerWindow.axaml.cs`
+  - [x] Добавлена команда `CloseCommand` в `TagManagerViewModel` и вызов `CloseAction?.Invoke()`
+- [x] Интерактивная сортировка по колонкам в базе тегов (`TagManagerWindow` / `TagManagerViewModel`):
+  - [x] Интерактивные кнопки заголовков в разметке таблицы с `Classes="header-btn"` и индикаторами `▲`/`▼`
+  - [x] Сортировка по столбцам: TagId, Наименование, Драйвер, Адрес, Тип данных, Ед. изм., Масштаб (Y), Апертура, Текущее (Live), Качество, Время
+  - [x] Автоматическое переключение направления Ascending/Descending при повторном клике
+  - [x] Привязка `SortCommand` и обработчик кликов `OnHeaderClick`
+- [x] Доработка окна выбора тега (`TagPickerWindow` / `TagPickerViewModel`):
+  - [x] Добавлена кнопка «✕ Закрыть» в заголовок окна
+  - [x] Добавлена сортировка по колонке «Масштаб Y» (`ScalingHeader`, `Scaling`)
+  - [x] Исправлены стили `Button.header-btn` с корректными псевдоклассами `:pointerover` и `:pressed` через шаблон `ContentPresenter`
+  - [x] Установлен `IsHitTestVisible="False"` на дочерние `TextBlock` заголовков и добавлен `OnHeaderClick`
+- [x] Автоматическое тестирование:
+  - [x] Обновлён Тест 20 в `UIValidation`: проверка сортировки по `Name`, `TagId`, стрелок индикации и вызова `CloseCommand`
+  - [x] Обновлён Тест 22 в `UIValidation`: проверка сортировки по колонке `Scaling`
+  - [x] Все 22 автотеста успешно пройдены (22/22 PASS)
+  - [x] Headless-рендеры `TagManagerWindow` и `TagPickerWindow` выполнены без замечаний
+
+
+
+
+

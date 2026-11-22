@@ -14,6 +14,23 @@
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource ThemeBackgroundBrush}">
 
+    <Window.Styles>
+        <Style Selector="Button.header-btn">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4,2" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Button.header-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#2D2D30" />
+        </Style>
+        <Style Selector="Button.header-btn:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#3E3E42" />
+        </Style>
+    </Window.Styles>
+
     <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
 
         <!-- Row 0: Top Header & Statistics Badges -->
@@ -76,6 +93,15 @@
                             <TextBlock Text="{Binding OverriddenCount}" Foreground="#E040FB" FontSize="12" FontWeight="Bold" />
                         </StackPanel>
                     </Border>
+
+                    <!-- Close / Exit Button in Top Header -->
+                    <Button Command="{Binding CloseCommand}"
+                            Click="OnCloseClick"
+                            Content="✕ Закрыть"
+                            Background="#C62828" Foreground="White"
+                            CornerRadius="4" Padding="12,5" FontSize="12" FontWeight="Bold"
+                            Margin="8,0,0,0"
+                            ToolTip.Tip="Закрыть окно диспетчера тегов (Esc)" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -149,25 +175,58 @@
                             Background="#00796B" Foreground="White"
                             CornerRadius="4" Padding="9,5" FontSize="12" FontWeight="SemiBold"
                             ToolTip.Tip="Сохранить базу тегов в файл проекта config.json" />
+
+                    <Border Width="1" Background="#4A4A4F" Margin="2,2" />
+
+                    <Button Command="{Binding CloseCommand}"
+                            Click="OnCloseClick"
+                            Content="🚪 Выход"
+                            Background="#3E3E42" Foreground="#CCCCCC"
+                            CornerRadius="4" Padding="9,5" FontSize="12" FontWeight="SemiBold"
+                            ToolTip.Tip="Закрыть диспетчер тегов (Esc)" />
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Row 2: Table Column Headers -->
-        <Border Grid.Row="2" Background="#18181A" BorderBrush="#3F3F46" BorderThickness="0,0,0,1" Padding="8,8">
+        <!-- Row 2: Table Column Headers with Interactive Sorting -->
+        <Border Grid.Row="2" Background="#18181A" BorderBrush="#3F3F46" BorderThickness="0,0,0,1" Padding="8,4">
             <Grid ColumnDefinitions="140,170,90,95,75,55,95,70,110,125,90,140">
-                <TextBlock Grid.Column="0" Text="Идентификатор (TagId)" Foreground="#9CDCFE" FontSize="11" FontWeight="Bold" Margin="4,0" />
-                <TextBlock Grid.Column="1" Text="Наименование" Foreground="#CCCCCC" FontSize="11" FontWeight="Bold" Margin="4,0" />
-                <TextBlock Grid.Column="2" Text="Драйвер" Foreground="#4EC9B0" FontSize="11" FontWeight="Bold" Margin="4,0" />
-                <TextBlock Grid.Column="3" Text="Адрес / Топик" Foreground="#DCDCAA" FontSize="11" FontWeight="Bold" Margin="4,0" />
-                <TextBlock Grid.Column="4" Text="Тип данных" Foreground="#C586C0" FontSize="11" FontWeight="Bold" Margin="4,0" />
-                <TextBlock Grid.Column="5" Text="Ед. изм." Foreground="#CCCCCC" FontSize="11" FontWeight="Bold" Margin="4,0" />
-                <TextBlock Grid.Column="6" Text="Масштаб (Y)" Foreground="#B5CEA8" FontSize="11" FontWeight="Bold" Margin="4,0" ToolTip.Tip="Формула линейного пересчёта Y = A*X + B" />
-                <TextBlock Grid.Column="7" Text="Апертура" Foreground="#858585" FontSize="11" FontWeight="Bold" Margin="4,0" ToolTip.Tip="Deadband: фильтрация шума" />
-                <TextBlock Grid.Column="8" Text="Текущее (Live)" Foreground="#00E5FF" FontSize="11" FontWeight="Bold" Margin="4,0" />
-                <TextBlock Grid.Column="9" Text="Качество" Foreground="#CCCCCC" FontSize="11" FontWeight="Bold" Margin="4,0" />
-                <TextBlock Grid.Column="10" Text="Время" Foreground="#858585" FontSize="11" FontWeight="Bold" Margin="4,0" />
-                <TextBlock Grid.Column="11" Text="Управление (Force)" Foreground="#E040FB" FontSize="11" FontWeight="Bold" Margin="4,0" />
+                <Button Grid.Column="0" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="TagId" Click="OnHeaderClick" ToolTip.Tip="Сортировка по ID тега">
+                    <TextBlock Text="{Binding TagIdHeader}" Foreground="#9CDCFE" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="1" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="Name" Click="OnHeaderClick" ToolTip.Tip="Сортировка по наименованию">
+                    <TextBlock Text="{Binding NameHeader}" Foreground="#CCCCCC" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="2" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="ConnId" Click="OnHeaderClick" ToolTip.Tip="Сортировка по драйверу">
+                    <TextBlock Text="{Binding ConnIdHeader}" Foreground="#4EC9B0" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="3" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="Address" Click="OnHeaderClick" ToolTip.Tip="Сортировка по адресу/топику">
+                    <TextBlock Text="{Binding AddressHeader}" Foreground="#DCDCAA" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="4" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="DataType" Click="OnHeaderClick" ToolTip.Tip="Сортировка по типу данных">
+                    <TextBlock Text="{Binding DataTypeHeader}" Foreground="#C586C0" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="5" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="Unit" Click="OnHeaderClick" ToolTip.Tip="Сортировка по единицам измерения">
+                    <TextBlock Text="{Binding UnitHeader}" Foreground="#CCCCCC" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="6" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="Scaling" Click="OnHeaderClick" ToolTip.Tip="Сортировка по формуле масштабирования Y = A*X + B">
+                    <TextBlock Text="{Binding ScalingHeader}" Foreground="#B5CEA8" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="7" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="Deadband" Click="OnHeaderClick" ToolTip.Tip="Сортировка по апертуре (фильтрация шума)">
+                    <TextBlock Text="{Binding DeadbandHeader}" Foreground="#858585" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="8" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="LiveValue" Click="OnHeaderClick" ToolTip.Tip="Сортировка по текущему значению">
+                    <TextBlock Text="{Binding LiveValueHeader}" Foreground="#00E5FF" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="9" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="Quality" Click="OnHeaderClick" ToolTip.Tip="Сортировка по качеству сигнала">
+                    <TextBlock Text="{Binding QualityHeader}" Foreground="#CCCCCC" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Button Grid.Column="10" Classes="header-btn" Command="{Binding SortCommand}" CommandParameter="Timestamp" Click="OnHeaderClick" ToolTip.Tip="Сортировка по времени обновления">
+                    <TextBlock Text="{Binding TimestampHeader}" Foreground="#858585" FontSize="11" FontWeight="Bold" IsHitTestVisible="False" Margin="2,0" />
+                </Button>
+                <Border Grid.Column="11" Padding="4,2">
+                    <TextBlock Text="Управление (Force)" Foreground="#E040FB" FontSize="11" FontWeight="Bold" Margin="4,0" VerticalAlignment="Center" />
+                </Border>
             </Grid>
         </Border>
 
@@ -279,7 +338,8 @@
                            Margin="24,0" VerticalAlignment="Center" />
 
                 <!-- Close Button -->
-                <Button Grid.Column="2" Content="Закрыть"
+                <Button Grid.Column="2" Content="Закрыть (Esc)"
+                        Command="{Binding CloseCommand}"
                         Background="#3E3E42" Foreground="White"
                         CornerRadius="4" Padding="16,6" FontSize="13"
                         Click="OnCloseClick" />
