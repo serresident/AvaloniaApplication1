@@ -68,8 +68,9 @@ namespace AvaloniaApplication1.Services.History
         public void Initialize(DashboardConfig initialSnapshot, string title = "Исходное состояние", string iconKey = "Home")
         {
             _steps.Clear();
-            var clone = CloneDashboardConfig(initialSnapshot);
-            var initialStep = new HistoryStep(title, iconKey, clone) { IsCurrent = true };
+            var json = JsonSerializer.Serialize(initialSnapshot);
+            var clone = JsonSerializer.Deserialize<DashboardConfig>(json) ?? new DashboardConfig();
+            var initialStep = new HistoryStep(title, iconKey, clone, cachedJson: json) { IsCurrent = true };
             _steps.Add(initialStep);
             CurrentIndex = 0;
             NotifyStateChanged();
@@ -82,10 +83,10 @@ namespace AvaloniaApplication1.Services.History
 
             var newJson = JsonSerializer.Serialize(snapshot);
 
-            // Duplicate guard: don't record if identical to current snapshot
+            // Duplicate guard: don't record if identical to current snapshot (reuses CachedJson)
             if (CurrentStep != null)
             {
-                var currentJson = JsonSerializer.Serialize(CurrentStep.Snapshot);
+                var currentJson = CurrentStep.CachedJson ?? JsonSerializer.Serialize(CurrentStep.Snapshot);
                 if (string.Equals(currentJson, newJson, StringComparison.Ordinal))
                 {
                     return;
@@ -109,7 +110,7 @@ namespace AvaloniaApplication1.Services.History
                 _steps.RemoveAt(0);
             }
 
-            var step = new HistoryStep(title, iconKey, clonedSnapshot);
+            var step = new HistoryStep(title, iconKey, clonedSnapshot, cachedJson: newJson);
             _steps.Add(step);
             CurrentIndex = _steps.Count - 1;
             UpdateStepSelection();

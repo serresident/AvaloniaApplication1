@@ -8,7 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AvaloniaApplication1.ViewModels.Popups
 {
-    public partial class ValveControlPopupViewModel : ViewModelBase
+    public partial class ValveControlPopupViewModel : ViewModelBase, IDisposable
     {
         [ObservableProperty]
         private ValveWidgetViewModel _valveViewModel;

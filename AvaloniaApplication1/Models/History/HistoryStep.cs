@@ -11,6 +11,7 @@ namespace AvaloniaApplication1.Models.History
         public string Title { get; }
         public string IconKey { get; }
         public DashboardConfig Snapshot { get; }
+        internal string? CachedJson { get; }
 
         [ObservableProperty]
         private bool _isCurrent;
@@ -31,11 +32,12 @@ namespace AvaloniaApplication1.Models.History
             _ => "📝"
         };
 
-        public HistoryStep(string title, string iconKey, DashboardConfig snapshot, DateTime? timestamp = null, Guid? id = null)
+        public HistoryStep(string title, string iconKey, DashboardConfig snapshot, DateTime? timestamp = null, Guid? id = null, string? cachedJson = null)
         {
             Title = title ?? "Изменение";
             IconKey = iconKey ?? "Edit";
             Snapshot = snapshot;
+            CachedJson = cachedJson;
             if (timestamp.HasValue) Timestamp = timestamp.Value;
             if (id.HasValue) Id = id.Value;
         }

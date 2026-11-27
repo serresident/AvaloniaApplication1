@@ -1,3 +1,34 @@
+# Tasks: Phase 1 — Core Integrity, Protocol Fixes & Memory Leak Elimination (Сессия 51)
+
+- [x] Синхронизировать шину данных Rx (`Subject.Synchronize` в `DataCoreService`, `TagManagerService`, `ModbusProtocolDriver`, `MqttProtocolDriver`)
+- [x] Устранить обход калибровки `ScaleA/B` и оверрайдов: `TagManagerService` — единый источник правды для `GetCurrentValue()`, убрана двойная подписка в `WidgetViewModelBase`
+- [x] Реализовать `ITagManagerService.Clear()` и сброс состояния при `DataCoreService.StopAsync()`
+- [x] Добавить сканирование `RealTimeTrendConfig.Pens[*].Source` в `ExtractAllTags`
+- [x] Убрать слепую оптимистичную запись в `DataCoreService.WriteCommand` при активном драйвере (с уведомлением об ошибке через `IAlarmNotificationService`)
+- [x] Добавить `TagWatchdogMode` (`Cyclic` vs `OnChange`) для защиты MQTT-тегов от ложного `Stale`
+- [x] Убрать `Retain = true` на запись команд в `MqttProtocolDriver`, добавить `IsConnected` и `EmitCommFailure` при разрыве
+- [x] Добавить `SlaveId` в `ConnectionConfig` и `ModbusProtocolDriver`, изолировать `SlaveException` при записи
+- [x] Отображать реальный статус подключенных драйверов в `MainViewModel.UpdateConnectionStatus()`
+- [x] Устранить утечки памяти: `: IDisposable` у `ValveControlPopupViewModel`, остановка таймера `ReactorControl`, отписка `INotifyCollectionChanged` и кэш пера в `TrendLineControl`, `ShutdownRequested` в `App.axaml.cs`
+- [x] Оптимизировать `HistoryService` через `HistoryStep.CachedJson` (исключение повторной сериализации текущего снапшота)
+- [x] Добавить Тест 28 в `UIValidation` и подтвердить прохождение 28/28 тестов
+
+# Tasks: Industrial SCADA/HMI Deep Audit & Evolution Planning (Сессия 50)
+
+- [x] Провести аудит текущего решения на основе имеющихся серверов, интерфейсов, артефактов и тестов (27/27 UIValidation)
+- [x] Провести сопоставление с индустриальными эквивалентами (Siemens WinCC, Inductive Automation Ignition, InTouch, zenon, DeltaV)
+- [x] Провести анализ архитектурных уязвимостей (EGM Hostile Design Critic):
+  - [x] Идентификация гонок потоков в `Subject<T>` и обхода `TagManager` в VM оборудования
+  - [x] Анализ рисков оптимистичных записей и хардкода `SlaveId`
+  - [x] Поиск утечек памяти (`ReactorControl` timer, `ValveControlPopupViewModel` without `IDisposable`)
+- [x] Разрешить фундаментальные противоречия методами ТРИЗ (EGM Inventive Catalyst):
+  - [x] Высокочастотный сбор (10-50 мс) vs 60 FPS UI рендер (Lock-free mailbox + единый dirty-пульс)
+  - [x] Локальный Historian vs износ диска и задержки I/O (Swinging Door Trending + SQLite WAL)
+  - [x] Свобода CAD-редактирования vs 21 CFR Part 11 / безопасность (Draft vs Signed Runtime + Command Gateway)
+  - [x] Информационная насыщенность vs когнитивная перегрузка (ISA-101 Grayscale-first + Faceplates)
+- [x] Разработать глубокий план анализа и дорожную карту реализации (Фазы 1-3)
+- [x] Зафиксировать проектный артефакт в `docs/designs/industrial_scada_audit_and_evolution_plan.md` и обновить `SITEMAP.md`
+
 # Tasks: HMI Dashboard SCADA Mimic Refinements (Сессия 4)
 
 - [x] Реализовать предотвращение дублирования MDI-окон (закрытие при повторном клике):

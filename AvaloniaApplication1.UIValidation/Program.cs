@@ -73,6 +73,9 @@ public class MockDataCoreService : IDataCoreService, IDisposable
     public TagSnapshot GetTagSnapshot(string connId, string address) => TagManager.GetSnapshotByAddress(connId, address);
     public void ForceOverride(string tagId, object value) => TagManager.ForceOverride(tagId, value);
     public void ClearOverride(string tagId) => TagManager.ClearOverride(tagId);
+    public int ConnectedDriverCount => 0;
+    public int TotalDriverCount => 0;
+    public IReadOnlyDictionary<string, bool> GetDriverConnectionStates() => new Dictionary<string, bool>();
     public void Dispose() { _subject.Dispose(); }
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
@@ -3649,7 +3652,81 @@ public static class Program
                 }
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (28/28) PASSED SUCCESSFULLY!");
+            // Test 29: Phase 1 Core Integrity, Scaling/Override Propagation, WatchdogMode, Concurrent Safety & Leak Fixes
+            Console.WriteLine("[UIValidation] Testing Phase 1 Core Integrity, Scaling/Override Propagation & Leak Fixes (Test 29)...");
+            {
+                // 28.1 Verify DataCoreService.GetCurrentValue returns scaled & overridden values from TagManager
+                using var tagMgr = new TagManagerService(startWatchdogLoop: false);
+                tagMgr.RegisterTag(new TagDefinition
+                {
+                    TagId = "tag_scaled",
+                    Name = "ScaledLevel",
+                    ConnId = "plc1",
+                    Address = "40010",
+                    ScaleA = 0.1,
+                    ScaleB = -5.0,
+                    WatchdogMode = TagWatchdogMode.Cyclic
+                });
+                tagMgr.RegisterTag(new TagDefinition
+                {
+                    TagId = "tag_mqtt_onchange",
+                    Name = "MqttEvent",
+                    ConnId = "mqtt1",
+                    Address = "plant/valve1",
+                    WatchdogMode = TagWatchdogMode.OnChange,
+                    StaleTimeout = TimeSpan.FromMilliseconds(50)
+                });
+
+                var cfgSvc = sp.GetRequiredService<IConfigurationService>();
+                var p1DataCore = new DataCoreService(cfgSvc, new AvaloniaApplication1.Services.Protocols.ProtocolDriverFactory(), tagMgr);
+
+                p1DataCore.PublishTag(new TagData("plc1", "40010", 150.0, TagQuality.Good));
+                var scaledVal = p1DataCore.GetCurrentValue("plc1", "40010");
+                if (scaledVal == null || Math.Abs(Convert.ToDouble(scaledVal) - 10.0) > 0.001)
+                    throw new Exception($"Expected scaled value 10.0 (0.1*150 - 5), got {scaledVal}");
+
+                p1DataCore.ForceOverride("tag_scaled", 77.7);
+                var overriddenVal = p1DataCore.GetCurrentValue("plc1", "40010");
+                if (overriddenVal == null || Math.Abs(Convert.ToDouble(overriddenVal) - 77.7) > 0.001)
+                    throw new Exception($"Expected overridden value 77.7, got {overriddenVal}");
+
+                // 28.2 Verify OnChange WatchdogMode does not falsely turn Stale
+                p1DataCore.PublishTag(new TagData("mqtt1", "plant/valve1", true, TagQuality.Good, DateTime.UtcNow.AddSeconds(-10)));
+                tagMgr.CheckStaleTags();
+                var mqttSnap = tagMgr.GetSnapshot("tag_mqtt_onchange");
+                if (mqttSnap.Quality != TagQuality.Good)
+                    throw new Exception($"OnChange tag should remain Good after CheckStaleTags, got {mqttSnap.Quality}");
+
+                // 28.3 Verify multi-threaded concurrent PublishTag safety
+                int snapshotCount = 0;
+                using var sub = p1DataCore.SnapshotUpdates.Subscribe(_ => Interlocked.Increment(ref snapshotCount));
+                var tasks = Enumerable.Range(0, 4).Select(tIdx => Task.Run(() =>
+                {
+                    for (int i = 0; i < 100; i++)
+                    {
+                        p1DataCore.PublishTag(new TagData("plc1", $"4010{tIdx}", (double)i, TagQuality.Good));
+                    }
+                })).ToArray();
+                Task.WaitAll(tasks);
+                if (snapshotCount < 400)
+                    throw new Exception($"Expected >= 400 synchronized snapshots, got {snapshotCount}");
+
+                // 28.4 Verify TagManager.Clear resets state on StopAsync
+                p1DataCore.StopAsync().GetAwaiter().GetResult();
+                if (tagMgr.AllTags.Count != 0)
+                    throw new Exception($"Expected TagManager.AllTags to be cleared after StopAsync, got {tagMgr.AllTags.Count}");
+
+                // 28.5 Verify ValveControlPopupViewModel implements IDisposable
+                var valveCfg = new ValveConfig { Title = "V1", Source = new DataSourceConfig { ConnId = "plc1", Address = "00001" } };
+                using var p1ValveVm = new ValveWidgetViewModel(valveCfg, p1DataCore, new ProjectContextService());
+                using var p1PopupVm = new ValveControlPopupViewModel(p1ValveVm, () => { });
+                if (p1PopupVm is not IDisposable)
+                    throw new Exception("ValveControlPopupViewModel must implement IDisposable");
+
+                p1DataCore.Dispose();
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (29/29) PASSED SUCCESSFULLY!");
         }
     }
 

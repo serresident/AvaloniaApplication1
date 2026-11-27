@@ -111,12 +111,17 @@ namespace AvaloniaApplication1.Controls.Equipment
         {
             base.OnAttachedToVisualTree(e);
             ActualThemeVariantChanged += OnActualThemeVariantChanged;
+            if (IsAgitatorRunning && !_animationTimer.IsEnabled)
+            {
+                _animationTimer.Start();
+            }
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnDetachedFromVisualTree(e);
             ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+            _animationTimer.Stop();
         }
 
         private void OnActualThemeVariantChanged(object? sender, EventArgs e)

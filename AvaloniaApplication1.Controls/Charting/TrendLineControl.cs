@@ -321,17 +321,46 @@ namespace AvaloniaApplication1.Controls.Charting
         {
             base.OnAttachedToVisualTree(e);
             ActualThemeVariantChanged += OnActualThemeVariantChanged;
+            if (Values is INotifyCollectionChanged valCol)
+            {
+                valCol.CollectionChanged -= OnCollectionChanged;
+                valCol.CollectionChanged += OnCollectionChanged;
+            }
+            if (Pens is INotifyCollectionChanged penCol)
+            {
+                penCol.CollectionChanged -= OnCollectionChanged;
+                penCol.CollectionChanged += OnCollectionChanged;
+            }
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnDetachedFromVisualTree(e);
             ActualThemeVariantChanged -= OnActualThemeVariantChanged;
+            if (Values is INotifyCollectionChanged valCol)
+                valCol.CollectionChanged -= OnCollectionChanged;
+            if (Pens is INotifyCollectionChanged penCol)
+                penCol.CollectionChanged -= OnCollectionChanged;
         }
 
         private void OnActualThemeVariantChanged(object? sender, EventArgs e)
         {
             InvalidateVisual();
+        }
+
+        private IBrush? _cachedLegacyBrush;
+        private Pen? _cachedLegacyPen;
+
+        private Pen GetLegacyPen()
+        {
+            var brush = LineBrush;
+            if (brush == null) return DefaultLinePen;
+            if (!ReferenceEquals(_cachedLegacyBrush, brush) || _cachedLegacyPen == null)
+            {
+                _cachedLegacyBrush = brush;
+                _cachedLegacyPen = new Pen(brush, 2);
+            }
+            return _cachedLegacyPen;
         }
 
         private Pen GetOrCreatePen(string colorHex, double thickness, string strokeStyle)
@@ -706,7 +735,7 @@ namespace AvaloniaApplication1.Controls.Charting
             double invRange = 1.0 / (maxY - minY);
             double stepX = w / (count - 1);
 
-            var pen = LineBrush != null ? new Pen(LineBrush, 2) : DefaultLinePen;
+            var pen = GetLegacyPen();
 
             double prevVal = Math.Clamp(_legacyValList[0], minY, maxY);
             double prevX = 0;

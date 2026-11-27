@@ -15,9 +15,11 @@ namespace AvaloniaApplication1.Services.Protocols
     public class MqttProtocolDriver : IProtocolDriver
     {
         public string ConnectionId { get; }
+        public bool IsConnected => _mqttClient?.IsConnected == true;
         private readonly ConnectionConfig _config;
         private readonly IEnumerable<string> _topicsToSubscribe;
-        private readonly Subject<TagData> _tagUpdates = new();
+        private readonly Subject<TagData> _rawTagUpdates = new();
+        private readonly ISubject<TagData> _tagUpdates;
         private IMqttClient? _mqttClient;
 
         public IObservable<TagData> TagUpdates => _tagUpdates;
@@ -27,6 +29,7 @@ namespace AvaloniaApplication1.Services.Protocols
             _config = config;
             ConnectionId = config.Id;
             _topicsToSubscribe = topicsToSubscribe.Distinct().ToList();
+            _tagUpdates = Subject.Synchronize(_rawTagUpdates);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -60,6 +63,13 @@ namespace AvaloniaApplication1.Services.Protocols
                 return Task.CompletedTask;
             };
 
+            _mqttClient.DisconnectedAsync += e =>
+            {
+                Console.WriteLine($"MQTT disconnected from {_config.Host}:{_config.Port}: {e.Reason}");
+                EmitCommFailure();
+                return Task.CompletedTask;
+            };
+
             // Reconnection loop
             Task.Run(async () =>
             {
@@ -83,6 +93,7 @@ namespace AvaloniaApplication1.Services.Protocols
                     catch (Exception ex)
                     {
                         Console.WriteLine($"MQTT connection failed: {ex.Message}");
+                        EmitCommFailure();
                     }
 
                     await Task.Delay(5000, cancellationToken);
@@ -92,9 +103,21 @@ namespace AvaloniaApplication1.Services.Protocols
             return Task.CompletedTask;
         }
 
+        private void EmitCommFailure()
+        {
+            var now = DateTime.UtcNow;
+            foreach (var topic in _topicsToSubscribe)
+            {
+                _tagUpdates.OnNext(new TagData(ConnectionId, topic, null!, TagQuality.CommFailure, now));
+            }
+        }
+
         public async Task WriteAsync(string address, object value, CancellationToken cancellationToken)
         {
-            if (_mqttClient == null || !_mqttClient.IsConnected) return;
+            if (_mqttClient == null || !_mqttClient.IsConnected)
+            {
+                throw new InvalidOperationException($"MQTT client for '{ConnectionId}' is not connected.");
+            }
 
             string payload = value switch
             {
@@ -106,7 +129,7 @@ namespace AvaloniaApplication1.Services.Protocols
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(address)
                 .WithPayload(payload)
-                .WithRetainFlag(true)
+                .WithRetainFlag(false)
                 .Build();
 
             await _mqttClient.PublishAsync(message, cancellationToken);
@@ -124,7 +147,7 @@ namespace AvaloniaApplication1.Services.Protocols
 
         public void Dispose()
         {
-            _tagUpdates.Dispose();
+            _rawTagUpdates.Dispose();
             _mqttClient?.Dispose();
         }
     }

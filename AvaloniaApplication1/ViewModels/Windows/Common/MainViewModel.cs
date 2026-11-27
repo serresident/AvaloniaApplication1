@@ -171,14 +171,26 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                 return;
             }
 
-            var count = _currentConfig?.Connections?.Count ?? 0;
-            if (count == 0)
+            var totalDrivers = _dataCoreService.TotalDriverCount;
+            var connectedDrivers = _dataCoreService.ConnectedDriverCount;
+            var configuredCount = _currentConfig?.Connections?.Count ?? 0;
+
+            if (configuredCount == 0 && totalDrivers == 0)
             {
                 ConnectionStatusText = "⚪ Нет связей";
             }
+            else if (totalDrivers > 0 && connectedDrivers == totalDrivers)
+            {
+                ConnectionStatusText = $"🟢 Онлайн ({connectedDrivers})";
+            }
+            else if (connectedDrivers > 0)
+            {
+                ConnectionStatusText = $"🟠 Частично ({connectedDrivers}/{totalDrivers})";
+            }
             else
             {
-                ConnectionStatusText = $"🟢 Онлайн ({count})";
+                var denom = totalDrivers > 0 ? totalDrivers : configuredCount;
+                ConnectionStatusText = $"🔴 Офлайн (0/{denom})";
             }
         }
 

@@ -194,26 +194,11 @@ namespace AvaloniaApplication1.ViewModels.Core
                 }
             }
 
-            // High-Performance TagManager Snapshot Stream
+            // High-Performance TagManager Snapshot Stream (single source of truth for scaled, deadband-filtered, and overridden values)
             DataService.SnapshotUpdates
                 .Where(s => MatchesSource(s))
                 .Subscribe(snapshot => Dispatcher.UIThread.Post(() => ApplySnapshot(snapshot)))
                 .DisposeWith(Disposables);
-
-            // Raw TagUpdates Stream for legacy/driver updates
-            if (!string.IsNullOrEmpty(connId) && !string.IsNullOrEmpty(address))
-            {
-                DataService.TagUpdates
-                    .Where(tag => tag.ConnId == connId && tag.Address == address)
-                    .Subscribe(tag => Dispatcher.UIThread.Post(() =>
-                    {
-                        if (Quality == TagQuality.Good && tag.Value != null)
-                        {
-                            OnTagValueUpdated(tag.Value);
-                        }
-                    }))
-                    .DisposeWith(Disposables);
-            }
         }
 
         private bool MatchesSource(TagSnapshot s)

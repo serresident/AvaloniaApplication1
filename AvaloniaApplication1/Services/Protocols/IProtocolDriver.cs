@@ -9,6 +9,7 @@ namespace AvaloniaApplication1.Services.Protocols
     public interface IProtocolDriver : IDisposable
     {
         string ConnectionId { get; }
+        bool IsConnected { get; }
         
         // Starts the polling/subscription loop
         Task StartAsync(CancellationToken cancellationToken);

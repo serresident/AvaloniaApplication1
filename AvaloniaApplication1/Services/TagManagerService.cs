@@ -21,7 +21,8 @@ namespace AvaloniaApplication1.Services
         private readonly ConcurrentDictionary<string, object> _overrides = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, (object? Value, TagQuality Quality, DateTime Timestamp, string? ErrorMessage)> _lastTelemetry = new(StringComparer.OrdinalIgnoreCase);
 
-        private readonly Subject<TagSnapshot> _snapshotSubject = new();
+        private readonly Subject<TagSnapshot> _rawSnapshotSubject = new();
+        private readonly ISubject<TagSnapshot> _snapshotSubject;
         public IObservable<TagSnapshot> SnapshotUpdates => _snapshotSubject;
 
         private CancellationTokenSource? _watchdogCts;
@@ -31,6 +32,7 @@ namespace AvaloniaApplication1.Services
 
         public TagManagerService(bool startWatchdogLoop = true)
         {
+            _snapshotSubject = Subject.Synchronize(_rawSnapshotSubject);
             _startWatchdogLoop = startWatchdogLoop;
             if (_startWatchdogLoop)
             {
@@ -45,6 +47,15 @@ namespace AvaloniaApplication1.Services
             {
                 RegisterTag(tag);
             }
+        }
+
+        public void Clear()
+        {
+            _tags.Clear();
+            _addressToTagId.Clear();
+            _snapshots.Clear();
+            _overrides.Clear();
+            _lastTelemetry.Clear();
         }
 
         public void RegisterTag(TagDefinition tag)
@@ -250,6 +261,7 @@ namespace AvaloniaApplication1.Services
 
             foreach (var tag in _tags.Values)
             {
+                if (tag.WatchdogMode == TagWatchdogMode.OnChange) continue; // Event-driven tags (e.g. MQTT) only go Bad on broker disconnect
                 if (_overrides.ContainsKey(tag.TagId)) continue; // Overrides are not affected by watchdog
 
                 if (_snapshots.TryGetValue(tag.TagId, out var snapshot))
@@ -334,7 +346,7 @@ namespace AvaloniaApplication1.Services
             _watchdogCts?.Cancel();
             _watchdogCts?.Dispose();
             _watchdogCts = null;
-            _snapshotSubject.Dispose();
+            _rawSnapshotSubject.Dispose();
         }
     }
 }

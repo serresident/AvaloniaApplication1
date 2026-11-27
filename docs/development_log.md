@@ -4,6 +4,46 @@
 
 ---
 
+## 📅 27.11.2026 (Сессия 51)
+
+### 📌 Достижение: Реализация Фазы 1 (Целостность шины данных, исправления протоколов, ликвидация утечек)
+* **Шина данных и TagManager:**
+  - Все `Subject<T>` в `DataCoreService`, `TagManagerService`, `ModbusProtocolDriver` и `MqttProtocolDriver` защищены через `Subject.Synchronize(...)` от гонок потоков.
+  - `DataCoreService.GetCurrentValue` и `PublishTag` переведены на чтение эффективного значения из `TagManagerService` (теперь `ScaleA/B`, `Deadband` и `ForceOverride` применяются ко всем виджетам оборудования). Убрана избыточная двойная подписка в `WidgetViewModelBase`.
+  - В `ITagManagerService` добавлен `Clear()`, вызываемый при `DataCoreService.StopAsync()` для изоляции проектов при перезагрузке.
+  - В `ExtractAllTags` добавлено сканирование перьев `RealTimeTrendConfig.Pens[*].Source`.
+* **Команды, протоколы и здоровье связи:**
+  - `DataCoreService.WriteCommand` при наличии подключенного драйвера ожидает результат `WriteAsync` (без слепого оптимистичного обновления) и уведомляет об ошибках через `IAlarmNotificationService`.
+  - Добавлен `TagWatchdogMode` (`Cyclic` / `OnChange`), отключающий ложное устаревание `Stale` для событийных MQTT-тегов.
+  - В `MqttProtocolDriver` убран флаг `Retain = true` для команд, добавлена обработка `DisconnectedAsync` с `TagQuality.CommFailure`.
+  - В `ConnectionConfig` и `ModbusProtocolDriver` добавлен настраиваемый `SlaveId`, а `SlaveException` при записи больше не разрывает весь TCP-сокет.
+  - В `IProtocolDriver` и `IDataCoreService` добавлен мониторинг `IsConnected`, выведенный в реальный статус `MainViewModel.UpdateConnectionStatus()`.
+* **Утечки памяти и производительность:**
+  - `ValveControlPopupViewModel` теперь реализует `IDisposable`; `ReactorControl` останавливает 30 FPS таймер в `OnDetachedFromVisualTree`; `TrendLineControl` отписывается от `INotifyCollectionChanged` и кэширует перо `LineBrush`; `App.axaml.cs` освобождает ресурсы на `ShutdownRequested`.
+  - `HistoryStep` кэширует `CachedJson`, вдвое сокращая JSON-сериализацию в `HistoryService.RecordStep`.
+* **Верификация:** Сборка решения `AvaloniaApplication1.sln` — 0 ошибок, 0 предупреждений. Пройдено **28 из 28** тестов `UIValidation` (включая новый Тест 28).
+
+---
+
+## 📅 24.11.2026 (Сессия 50)
+
+### 📌 Достижение: Комплексный аудит архитектуры, ТРИЗ-анализ и разработка плана эволюции до индустриального стандарта SCADA
+* **Контекст:** Проведен системный аудит кодовой базы `AvaloniaApplication1` и библиотеки `AvaloniaApplication1.Controls` на соответствие стандартам промышленных платформ (Siemens WinCC, Inductive Automation Ignition, AVEVA InTouch, zenon, Emerson DeltaV, ISA-18.2, ISA-101, IEC 62541, 21 CFR Part 11).
+* **Текущий статус тестового стенда:** 27 из 27 автоматизированных тестов `UIValidation` пройдены успешно (0 ошибок, 0 предупреждений).
+* **Архитектурный аудит уязвимостей (EGM Hostile Critic):**
+  - Выявлены гонки несинхронизированного `Subject<T>` в `DataCoreService` и `TagManagerService`.
+  - Выявлен обход масштабирования (`ScaleA/B`) и ручных переопределений (`ForceOverride`) виджетами оборудования из-за прямого чтения `_currentValuesCache`.
+  - Зафиксированы риски оптимистичной записи `WriteCommand`, утечки памяти (`ValveControlPopupViewModel` без `IDisposable`, таймер 30 FPS в `ReactorControl`), а также хардкод `SlaveId = 1` в Modbus.
+* **Разрешение противоречий методами ТРИЗ (EGM Inventive Catalyst):**
+  - *Телеметрия 10-50 мс vs UI 60 FPS:* Lock-free битовая маска изменений + unboxed `TagValue` + единый кадр отрисовки.
+  - *Historian vs износ диска на Edge IPC:* Сжатие Swinging Door Trending (SDT) + буферизация в ОЗУ + SQLite в режиме WAL.
+  - *CAD-редактирование vs безопасность:* Песочница (Draft) vs подписанный рантайм-манифест + шлюз команд `ICommandGateway` с аудитом 21 CFR Part 11.
+  - *Информационная перегрузка vs ISA-101:* Grayscale-first палитра, приглушение нормы, аварийный баннер и вынос подробностей во фейсплейты.
+* **Результат:** Сформирован и зафиксирован в репозитории фундаментальный документ:
+  [docs/designs/industrial_scada_audit_and_evolution_plan.md](file:///c:/Users/adm/projects/AvaloniaApplication1/docs/designs/industrial_scada_audit_and_evolution_plan.md) с дорожной картой из 3 фаз (Фаза 1: Устранение дефектов и гонок; Фаза 2: ISA-18.2 Alarms, SQLite Historian, Faceplates, OPC UA, 21 CFR Part 11; Фаза 3: Выделение службы ScadaEngine.Host).
+  
+---
+
 ## 📅 10.06.2026 (Сессия 1 & 2)
 
 ### 📌 Достижение: Реализация MDI-интерфейса и переход на MQTT

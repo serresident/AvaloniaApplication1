@@ -7,6 +7,7 @@ namespace AvaloniaApplication1.Services
     public interface ITagManagerService : IDisposable
     {
         void Initialize(IEnumerable<TagDefinition> tags);
+        void Clear();
         void RegisterTag(TagDefinition tag);
         void UpdateTag(TagDefinition tag);
         bool RemoveTag(string tagId);

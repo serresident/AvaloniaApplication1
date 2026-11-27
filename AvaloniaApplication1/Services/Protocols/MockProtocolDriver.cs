@@ -10,6 +10,7 @@ namespace AvaloniaApplication1.Services.Protocols
     public class MockProtocolDriver : IProtocolDriver
     {
         public string ConnectionId { get; }
+        public bool IsConnected { get; private set; } = true;
         private readonly Subject<TagData> _tagUpdates = new();
         private readonly Random _random = new();
         private readonly SimulationEngine _simulationEngine = new();

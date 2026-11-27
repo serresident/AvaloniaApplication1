@@ -2,6 +2,12 @@ using System;
 
 namespace AvaloniaApplication1.Models
 {
+    public enum TagWatchdogMode
+    {
+        Cyclic = 0,
+        OnChange = 1
+    }
+
     /// <summary>
     /// Metadata definition for a centralized SCADA tag in the TagManager engine.
     /// </summary>
@@ -16,6 +22,7 @@ namespace AvaloniaApplication1.Models
         public double ScaleB { get; set; } = 0.0;
         public double Deadband { get; set; } = 0.0;
         public TimeSpan StaleTimeout { get; set; } = TimeSpan.FromSeconds(5);
+        public TagWatchdogMode WatchdogMode { get; set; } = TagWatchdogMode.Cyclic;
         public string? Description { get; set; }
         public string? Unit { get; set; }
 
@@ -37,6 +44,7 @@ namespace AvaloniaApplication1.Models
                 ScaleB = ScaleB,
                 Deadband = Deadband,
                 StaleTimeout = StaleTimeout,
+                WatchdogMode = WatchdogMode,
                 Description = Description,
                 Unit = Unit
             };

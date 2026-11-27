@@ -18,17 +18,27 @@ namespace AvaloniaApplication1.Services
         private readonly IConfigurationService _configService;
         private readonly IProtocolDriverFactory _driverFactory;
         private readonly ITagManagerService _tagManager;
+        private readonly IAlarmNotificationService? _alarmService;
         private readonly ConcurrentDictionary<string, IProtocolDriver> _drivers = new();
         private readonly ConcurrentDictionary<string, object> _currentValuesCache = new();
         
         public ITagManagerService TagManager => _tagManager;
 
-        // The unified event aggregator stream for raw tag data
-        private readonly Subject<TagData> _unifiedTagStream = new();
+        // The unified event aggregator stream for raw tag data (synchronized for multi-driver thread safety)
+        private readonly Subject<TagData> _rawUnifiedTagStream = new();
+        private readonly ISubject<TagData> _unifiedTagStream;
         public IObservable<TagData> TagUpdates => _unifiedTagStream;
 
         // High-level snapshot updates from TagManager (with Quality & Overridden flags)
         public IObservable<TagSnapshot> SnapshotUpdates => _tagManager.SnapshotUpdates;
+
+        public int TotalDriverCount => _drivers.Count;
+        public int ConnectedDriverCount => _drivers.Values.Count(d => d.IsConnected);
+
+        public IReadOnlyDictionary<string, bool> GetDriverConnectionStates()
+        {
+            return _drivers.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsConnected);
+        }
 
         private CancellationTokenSource? _cts;
         private CompositeDisposable _disposables = new();
@@ -36,11 +46,14 @@ namespace AvaloniaApplication1.Services
         public DataCoreService(
             IConfigurationService configService, 
             IProtocolDriverFactory driverFactory,
-            ITagManagerService? tagManager = null)
+            ITagManagerService? tagManager = null,
+            IAlarmNotificationService? alarmService = null)
         {
             _configService = configService;
             _driverFactory = driverFactory;
             _tagManager = tagManager ?? new TagManagerService();
+            _alarmService = alarmService;
+            _unifiedTagStream = Subject.Synchronize(_rawUnifiedTagStream);
         }
 
         public async Task StartAsync()
@@ -54,9 +67,23 @@ namespace AvaloniaApplication1.Services
                 var config = await _configService.LoadConfigurationAsync();
                 if (config == null) return;
 
-                // Initialize TagManager with config tags
+                // Initialize TagManager with config tags (mark MQTT tags as OnChange watchdog)
                 if (config.Tags != null && config.Tags.Count > 0)
                 {
+                    var mqttConnIds = new HashSet<string>(
+                        (config.Connections ?? Enumerable.Empty<ConnectionConfig>())
+                        .Where(c => string.Equals(c.Type, "MQTT", StringComparison.OrdinalIgnoreCase))
+                        .Select(c => c.Id),
+                        StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var tag in config.Tags)
+                    {
+                        if (mqttConnIds.Contains(tag.ConnId))
+                        {
+                            tag.WatchdogMode = TagWatchdogMode.OnChange;
+                        }
+                    }
+
                     _tagManager.Initialize(config.Tags);
                 }
 
@@ -107,13 +134,18 @@ namespace AvaloniaApplication1.Services
 
         public void PublishTag(TagData tag)
         {
-            var key = $"{tag.ConnId}_{tag.Address}";
-            if (tag.Value != null)
-            {
-                _currentValuesCache[key] = tag.Value;
-            }
+            var rawOrFallback = tag.Value ?? GetCurrentValue(tag.ConnId, tag.Address) ?? 0;
+            _tagManager.UpdateTagValue(tag.ConnId, tag.Address, rawOrFallback, tag.Quality);
 
-            _tagManager.UpdateTagValue(tag.ConnId, tag.Address, tag.Value ?? GetCurrentValue(tag.ConnId, tag.Address) ?? 0, tag.Quality);
+            var effective = _tagManager.GetSnapshotByAddress(tag.ConnId, tag.Address);
+            var key = $"{tag.ConnId}_{tag.Address}";
+            var valueToCache = effective.Quality != TagQuality.Uninitialized && effective.Value != null
+                ? effective.Value
+                : tag.Value;
+            if (valueToCache != null)
+            {
+                _currentValuesCache[key] = valueToCache;
+            }
         }
 
         public async Task StopAsync()
@@ -133,23 +165,45 @@ namespace AvaloniaApplication1.Services
             }
             _drivers.Clear();
             _currentValuesCache.Clear();
+            _tagManager.Clear();
         }
 
         public void WriteCommand(string connId, string address, object value)
         {
-            // Optimistic update
-            PublishTag(new TagData(connId, address, value));
-
             if (_drivers.TryGetValue(connId, out var driver))
             {
-                // Fire and forget Command Bus
-                Task.Run(() => driver.WriteAsync(address, value, CancellationToken.None))
+                ExecuteDriverWriteAsync(driver, connId, address, value)
                     .FireAndForget(context: $"WriteCommand.{connId}");
+            }
+            else
+            {
+                // Local / Simulation fallback when no physical protocol driver is attached
+                PublishTag(new TagData(connId, address, value));
+            }
+        }
+
+        private async Task ExecuteDriverWriteAsync(IProtocolDriver driver, string connId, string address, object value)
+        {
+            try
+            {
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                await driver.WriteAsync(address, value, cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DataCore] WriteCommand failed for {connId}:{address} -> {ex.Message}");
+                _alarmService?.ShowAlarm("Ошибка записи команды", $"Не удалось записать {value} в {connId}:{address}: {ex.Message}");
             }
         }
 
         public object? GetCurrentValue(string connId, string address)
         {
+            var snapshot = _tagManager.GetSnapshotByAddress(connId, address);
+            if (snapshot.Quality != TagQuality.Uninitialized && snapshot.Value != null)
+            {
+                return snapshot.Value;
+            }
+
             var key = $"{connId}_{address}";
             return _currentValuesCache.TryGetValue(key, out var val) ? val : null;
         }
@@ -190,14 +244,14 @@ namespace AvaloniaApplication1.Services
             _drivers.Clear();
             _currentValuesCache.Clear();
             _tagManager.Dispose();
-            _unifiedTagStream.Dispose();
+            _rawUnifiedTagStream.Dispose();
         }
 
         public async ValueTask DisposeAsync()
         {
             await StopAsync();
             _tagManager.Dispose();
-            _unifiedTagStream.Dispose();
+            _rawUnifiedTagStream.Dispose();
         }
 
         private IEnumerable<DataSourceConfig> ExtractAllTags(HmiConfiguration config)
@@ -255,6 +309,13 @@ namespace AvaloniaApplication1.Services
                     {
                         AddSource(rc.AgitatorSource);
                         AddSource(rc.TempSource);
+                    }
+                    else if (w is RealTimeTrendConfig rtc && rtc.Pens != null)
+                    {
+                        foreach (var pen in rtc.Pens)
+                        {
+                            AddSource(pen.Source);
+                        }
                     }
 
                     if (w is ContainerButtonConfig cb && cb.Children != null) Scan(cb.Children);

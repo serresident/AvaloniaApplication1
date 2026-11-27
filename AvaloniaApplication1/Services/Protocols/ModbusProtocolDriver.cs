@@ -24,10 +24,12 @@ namespace AvaloniaApplication1.Services.Protocols
     public class ModbusProtocolDriver : IProtocolDriver
     {
         public string ConnectionId { get; }
+        public bool IsConnected { get; private set; }
         private readonly ConnectionConfig _config;
         private readonly List<DataSourceConfig> _tagsToPoll;
         private readonly List<ModbusPollBlock> _coalescedBlocks = new();
-        private readonly Subject<TagData> _tagUpdates = new();
+        private readonly Subject<TagData> _rawTagUpdates = new();
+        private readonly ISubject<TagData> _tagUpdates;
 
         private readonly Channel<ModbusWriteRequest> _writeChannel =
             Channel.CreateUnbounded<ModbusWriteRequest>(new UnboundedChannelOptions { SingleReader = true });
@@ -40,6 +42,7 @@ namespace AvaloniaApplication1.Services.Protocols
         {
             _config = config;
             ConnectionId = config.Id;
+            _tagUpdates = Subject.Synchronize(_rawTagUpdates);
 
             // Deduplicate by address
             _tagsToPoll = tagsToPoll
@@ -77,6 +80,7 @@ namespace AvaloniaApplication1.Services.Protocols
 
         public Task StopAsync()
         {
+            IsConnected = false;
             _driverCts?.Cancel();
             _writeChannel.Writer.TryComplete();
             return Task.CompletedTask;
@@ -84,11 +88,12 @@ namespace AvaloniaApplication1.Services.Protocols
 
         public void Dispose()
         {
+            IsConnected = false;
             _driverCts?.Cancel();
             _driverCts?.Dispose();
             _driverCts = null;
             _writeChannel.Writer.TryComplete();
-            _tagUpdates.Dispose();
+            _rawTagUpdates.Dispose();
         }
 
         #region Communication & Polling Loop
@@ -116,6 +121,7 @@ namespace AvaloniaApplication1.Services.Protocols
                     master = factory.CreateMaster(tcpClient);
                     master.Transport.ReadTimeout = 1500;
                     master.Transport.WriteTimeout = 1500;
+                    IsConnected = true;
 
                     Console.WriteLine($"[Modbus] Persistent master connected to {ConnectionId} ({_config.Host}:{_config.Port})");
 
@@ -158,6 +164,7 @@ namespace AvaloniaApplication1.Services.Protocols
                 }
                 catch (Exception ex)
                 {
+                    IsConnected = false;
                     Console.WriteLine($"[Modbus] Connection/Comm failure on {ConnectionId}: {ex.Message}");
                     
                     // Mark all polled tags with CommFailure
@@ -183,6 +190,7 @@ namespace AvaloniaApplication1.Services.Protocols
                 }
                 finally
                 {
+                    IsConnected = false;
                     master?.Dispose();
                     tcpClient?.Dispose();
                 }
@@ -202,7 +210,7 @@ namespace AvaloniaApplication1.Services.Protocols
                 if (ParseModbusAddress(req.Address, out byte fc, out ushort rawAddr))
                 {
                     ushort offset = GetModbusOffset(fc, rawAddr);
-                    byte slaveId = 1;
+                    byte slaveId = _config.SlaveId > 0 ? _config.SlaveId : (byte)1;
 
                     if (fc == 1 || fc == 2)
                     {
@@ -279,6 +287,15 @@ namespace AvaloniaApplication1.Services.Protocols
                 {
                     req.CompletionSource.TrySetException(new FormatException($"Invalid Modbus address: {req.Address}"));
                 }
+            }
+            catch (SlaveException ex)
+            {
+                Console.WriteLine($"[Modbus] Slave exception on write {ConnectionId}:{req.Address} -> {ex.Message}");
+                req.CompletionSource.TrySetException(ex);
+            }
+            catch (FormatException ex)
+            {
+                req.CompletionSource.TrySetException(ex);
             }
             catch (Exception ex)
             {
@@ -388,6 +405,7 @@ namespace AvaloniaApplication1.Services.Protocols
             // Group by Function Code and Slave ID (1)
             var groups = tagMappings.GroupBy(m => m.FunctionCode);
 
+            byte slaveId = _config.SlaveId > 0 ? _config.SlaveId : (byte)1;
             foreach (var group in groups)
             {
                 byte fc = group.Key;
@@ -401,7 +419,7 @@ namespace AvaloniaApplication1.Services.Protocols
                     {
                         currentBlock = new ModbusPollBlock
                         {
-                            SlaveId = 1,
+                            SlaveId = slaveId,
                             FunctionCode = fc,
                             StartOffset = item.Offset,
                             RegCount = item.RegCount
@@ -430,7 +448,7 @@ namespace AvaloniaApplication1.Services.Protocols
                     _coalescedBlocks.Add(currentBlock);
                     currentBlock = new ModbusPollBlock
                     {
-                        SlaveId = 1,
+                        SlaveId = slaveId,
                         FunctionCode = fc,
                         StartOffset = item.Offset,
                         RegCount = item.RegCount

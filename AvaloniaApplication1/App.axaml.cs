@@ -35,6 +35,14 @@ namespace AvaloniaApplication1
                 {
                     DataContext = mainVm
                 };
+                desktop.ShutdownRequested += (_, _) =>
+                {
+                    mainVm.Dispose();
+                    if (Services is IDisposable disposableProvider)
+                    {
+                        disposableProvider.Dispose();
+                    }
+                };
             }
 
 #if DEBUG

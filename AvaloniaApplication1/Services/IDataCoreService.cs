@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AvaloniaApplication1.Models;
 
@@ -30,5 +31,9 @@ namespace AvaloniaApplication1.Services
 
         void ForceOverride(string tagId, object value);
         void ClearOverride(string tagId);
+
+        int ConnectedDriverCount { get; }
+        int TotalDriverCount { get; }
+        IReadOnlyDictionary<string, bool> GetDriverConnectionStates();
     }
 }
