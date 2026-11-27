@@ -9,7 +9,7 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace AvaloniaApplication1.Controls.Charting
+namespace AvaloniaApplication1.Controls.Indication
 {
     public class TrendLineControl : Control
     {

@@ -301,6 +301,15 @@ namespace AvaloniaApplication1.Services
                         AddSource(vc.ClosedFeedbackSource);
                         AddSource(vc.ModeSource);
                     }
+                    else if (w is PumpConfig pc)
+                    {
+                        AddSource(pc.ModeSource);
+                        AddSource(pc.FeedbackSource);
+                        AddSource(pc.SetpointSource);
+                        AddSource(pc.FrequencyFeedbackSource);
+                        AddSource(pc.CurrentFeedbackSource);
+                        AddSource(pc.StatusWordSource);
+                    }
                     else if (w is HeatExchangerConfig he)
                     {
                         AddSource(he.SecondarySource);

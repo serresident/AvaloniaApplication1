@@ -1,3 +1,24 @@
+# Tasks: Production Pump Vertical Slice, 3-Theme System & TagPicker Integration (Сессия 52)
+
+- [x] Добавить сканирование вторичных тегов `PumpConfig` (`ModeSource`, `FeedbackSource`, `SetpointSource`, `FrequencyFeedbackSource`, `CurrentFeedbackSource`, `StatusWordSource`) в `DataCoreService.ExtractAllTags` и тест в `UIValidation`
+- [x] Добавить кнопки выбора тегов `TagPicker` для вторичных полей насоса (`FeedbackSource`, `SetpointSource`, `FrequencyFeedbackSource`, `CurrentFeedbackSource`, `StatusWordSource`) в `WidgetEditorWindow.axaml` и `WidgetEditorViewModel.cs`
+- [x] Провести визуальную проверку (`render_ui.ps1`) для `PumpFaceplateView`, `WidgetEditorPumpVfd` и `MimicViewIndustrialGray` в теме `IndustrialGray`, исправить контраст чекбоксов и ширину `BitIndex` в `WidgetEditorWindow.axaml`
+- [x] Подтвердить сборку `AvaloniaApplication1.sln` (0 ошибок, 0 предупреждений) и прохождение `UIValidation` (32/32)
+
+# Tasks: Controls Extraction, 3-Theme System (ISA-101 IndustrialGray) & Pump Production Slice (Сессия 52)
+
+- [x] Вынести все оставшиеся контролы из `DashboardView.axaml` в `AvaloniaApplication1.Controls` с разделением на `Indication/` и `Actuation/` (+ `Primitives/ScadaControlBase.cs`)
+- [x] Вынести общую обвязку виджетов в `WidgetChrome` (`Views/Canvas/Overlays/WidgetChrome.axaml`)
+- [x] Реализовать систему из 3 тем (`Dark`, `Light`, `IndustrialGray` ISA-101) в `IThemeService`, `ThemeService.cs` и `App.axaml` (с подавлением фоновых анимаций `HmiSuppressSteadyAnimations`)
+- [x] Проработать вертикальный срез Насоса до продакшн-качества:
+  - [x] Расширить `PumpConfig` (`PumpControlMode`: `Discrete`, `DiscreteWithFeedback`, `CombinedVfd`, вторичные источники и `StatusWordMap`)
+  - [x] Реализовать векторный `PumpControl` с поддержкой ISA-101 и ПЧ-индикации
+  - [x] Реализовать `PumpWidgetViewModel` (Manual/Auto, контроль обратной связи, декодирование битовой маски `StatusWord`, блокировки в Auto)
+  - [x] Реализовать `PumpFaceplateView` / `PumpFaceplateViewModel : IDisposable` со встроенной цифровой клавиатурой и таблицей `StatusWord`
+  - [x] Обновить `WidgetEditorWindow` / `WidgetEditorViewModel` (выбор режима насоса, `TagPicker` для всех вторичных тегов, редактор битовой таблицы `StatusWord`)
+  - [x] Добавить сканирование вторичных тегов `PumpConfig` в `DataCoreService.ExtractAllTags`
+- [x] Добавить тесты 30, 31, 32 в `AvaloniaApplication1.UIValidation` и подтвердить прохождение **32/32** тестов с 0 ошибок и 0 предупреждений
+
 # Tasks: Phase 1 — Core Integrity, Protocol Fixes & Memory Leak Elimination (Сессия 51)
 
 - [x] Синхронизировать шину данных Rx (`Subject.Synchronize` в `DataCoreService`, `TagManagerService`, `ModbusProtocolDriver`, `MqttProtocolDriver`)

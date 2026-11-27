@@ -33,9 +33,9 @@ using AvaloniaApplication1.ViewModels.Popups;
 using AvaloniaApplication1.ViewModels.Windows.Common;
 using AvaloniaApplication1.ViewModels.Windows.Connections;
 using AvaloniaApplication1.ViewModels.Windows.Tags;
-using AvaloniaApplication1.Controls.Equipment;
-using AvaloniaApplication1.Controls.Piping;
-using AvaloniaApplication1.Controls.Charting;
+using AvaloniaApplication1.Controls.Primitives;
+using AvaloniaApplication1.Controls.Indication;
+using AvaloniaApplication1.Controls.Actuation;
 using AvaloniaApplication1.Controls.Common;
 using AvaloniaApplication1.Views.Canvas.Helpers;
 using AvaloniaApplication1.Views.Canvas.Overlays;
@@ -127,6 +127,25 @@ public class MockTestDialogService : IDialogService
     public Task<List<TagDefinition>?> ShowTagImportExportAsync(bool isImportMode, IEnumerable<TagDefinition> currentTags, IHmiClipboardService? clipboard = null) => Task.FromResult<List<TagDefinition>?>(null);
 }
 
+public class InMemoryConfigService : IConfigurationService
+{
+    private readonly HmiConfiguration _config;
+    public InMemoryConfigService(HmiConfiguration config) => _config = config;
+    public string CurrentFilePath { get; set; } = string.Empty;
+    public Task<HmiConfiguration> LoadConfigurationAsync(string? filePath = null) => Task.FromResult(_config);
+    public Task SaveConfigurationAsync(HmiConfiguration config, string? filePath = null) => Task.CompletedTask;
+}
+
+public class CapturingDriverFactory : AvaloniaApplication1.Services.Protocols.IProtocolDriverFactory
+{
+    public List<DataSourceConfig> CapturedTags { get; } = new();
+    public AvaloniaApplication1.Services.Protocols.IProtocolDriver? CreateDriver(ConnectionConfig config, IEnumerable<DataSourceConfig> tags)
+    {
+        CapturedTags.AddRange(tags);
+        return null;
+    }
+}
+
 public class BoundsDto
 {
     public double X { get; set; }
@@ -179,7 +198,7 @@ public static class Program
         using var finishedEvent = new ManualResetEventSlim(false);
         Exception? backgroundError = null;
 
-        session.Dispatch(() =>
+        var dispatchTask = session.Dispatch(() =>
         {
             try
             {
@@ -382,6 +401,102 @@ public static class Program
                     Height = 700
                 };
             }
+            else if (string.Equals(targetView, "WidgetEditorPumpVfd", StringComparison.OrdinalIgnoreCase))
+            {
+                sp.GetRequiredService<IThemeService>().SetTheme("IndustrialGray");
+                var pumpCfg = new PumpConfig
+                {
+                    Type = "Pump",
+                    Title = "H-201 (ПЧ)",
+                    ControlMode = PumpControlMode.CombinedVfd,
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "VFD_CMD", DataType = "Bool" },
+                    ModeSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_MODE", DataType = "Bool" },
+                    FeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_FB", DataType = "Bool" },
+                    SetpointSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_SP", DataType = "Float" },
+                    FrequencyFeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_FQ", DataType = "Float" },
+                    CurrentFeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_CUR", DataType = "Float" },
+                    StatusWordSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_SW", DataType = "UInt16" },
+                    FrequencyUnit = "Hz",
+                    MinFrequency = 10.0,
+                    MaxFrequency = 50.0,
+                    StatusWordMap = new List<StatusBitMapping>
+                    {
+                        new() { BitIndex = 0, Text = "Готов к пуску", Severity = StatusSeverity.Normal },
+                        new() { BitIndex = 2, Text = "Авария ПЧ", Severity = StatusSeverity.Fault },
+                        new() { BitIndex = 5, Text = "Перегрев двигателя", Severity = StatusSeverity.Warning }
+                    }
+                };
+                var editorVm = new WidgetEditorViewModel(
+                    pumpCfg,
+                    new List<ConnectionConfig> { new() { Id = "plc1", Type = "ModbusTCP" } },
+                    null,
+                    null,
+                    sp.GetRequiredService<IDialogService>());
+                window = new WidgetEditorWindow
+                {
+                    DataContext = editorVm,
+                    Width = 620,
+                    Height = 820
+                };
+            }
+            else if (string.Equals(targetView, "PumpFaceplateView", StringComparison.OrdinalIgnoreCase))
+            {
+                sp.GetRequiredService<IThemeService>().SetTheme("IndustrialGray");
+                var pumpCfg = new PumpConfig
+                {
+                    Type = "Pump",
+                    Title = "H-201 (ПЧ)",
+                    ControlMode = PumpControlMode.CombinedVfd,
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "VFD_CMD", DataType = "Bool" },
+                    ModeSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_MODE", DataType = "Bool" },
+                    FeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_FB", DataType = "Bool" },
+                    SetpointSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_SP", DataType = "Float" },
+                    FrequencyFeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_FQ", DataType = "Float" },
+                    CurrentFeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_CUR", DataType = "Float" },
+                    StatusWordSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_SW", DataType = "UInt16" },
+                    FrequencyUnit = "Hz",
+                    MinFrequency = 10.0,
+                    MaxFrequency = 50.0,
+                    StatusWordMap = new List<StatusBitMapping>
+                    {
+                        new() { BitIndex = 0, Text = "Готов к пуску", Severity = StatusSeverity.Normal },
+                        new() { BitIndex = 2, Text = "Авария ПЧ", Severity = StatusSeverity.Fault },
+                        new() { BitIndex = 5, Text = "Перегрев двигателя", Severity = StatusSeverity.Warning }
+                    }
+                };
+                var dataService = sp.GetRequiredService<IDataCoreService>();
+                var projContext = sp.GetRequiredService<IProjectContextService>();
+                var pumpVm = new PumpWidgetViewModel(pumpCfg, dataService, projContext);
+                dataService.PublishTag(new TagData("plc1", "VFD_MODE", false));
+                dataService.PublishTag(new TagData("plc1", "VFD_FQ", 42.5));
+                dataService.PublishTag(new TagData("plc1", "VFD_CUR", 12.8));
+                dataService.PublishTag(new TagData("plc1", "VFD_SW", (ushort)37));
+                Dispatcher.UIThread.RunJobs();
+                var fpVm = new PumpFaceplateViewModel(pumpVm, () => { });
+                window = new Window
+                {
+                    Title = "PumpFaceplateView Preview",
+                    Width = 420,
+                    Height = 640,
+                    Content = new PumpFaceplateView { DataContext = fpVm }
+                };
+            }
+            else if (string.Equals(targetView, "MimicViewIndustrialGray", StringComparison.OrdinalIgnoreCase))
+            {
+                sp.GetRequiredService<IThemeService>().SetTheme("IndustrialGray");
+                mainVm.ShowMimicCommand.Execute(null);
+                for (int i = 0; i < 20; i++)
+                {
+                    Dispatcher.UIThread.RunJobs();
+                    Thread.Sleep(20);
+                }
+                window = new MainWindow
+                {
+                    DataContext = mainVm,
+                    Width = 1400,
+                    Height = 768
+                };
+            }
             else if (string.Equals(targetView, "ValveControlPopupView", StringComparison.OrdinalIgnoreCase))
             {
                 var valveCfg = new ValveConfig
@@ -515,6 +630,15 @@ public static class Program
             window.Show();
 
             Dispatcher.UIThread.RunJobs();
+            if (string.Equals(targetView, "WidgetEditorPumpVfd", StringComparison.OrdinalIgnoreCase))
+            {
+                var sv = window.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+                if (sv != null)
+                {
+                    sv.Offset = new Vector(0, 620);
+                }
+            }
+            Dispatcher.UIThread.RunJobs();
             AvaloniaHeadlessPlatform.ForceRenderTimerTick(3);
             Dispatcher.UIThread.RunJobs();
 
@@ -563,10 +687,10 @@ public static class Program
         }
     }, CancellationToken.None);
 
-    if (!finishedEvent.Wait(TimeSpan.FromSeconds(60)))
+    if (!finishedEvent.Wait(TimeSpan.FromSeconds(15)))
     {
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("[UIValidation] TIMEOUT: Headless session did not finish within 60 seconds.");
+        Console.WriteLine($"[UIValidation] TIMEOUT: Headless session did not finish. TaskStatus={dispatchTask.Status}, Exception={dispatchTask.Exception}");
         Console.ResetColor();
         Environment.Exit(2);
     }
@@ -2077,7 +2201,10 @@ public static class Program
                     }
                 }
 
-                // 22.3 Toggle Back to Dark Theme
+                // 22.3 Toggle Light -> IndustrialGray -> Dark Theme
+                themeService.ToggleTheme();
+                if (themeService.CurrentTheme != "IndustrialGray" || !themeService.IsIndustrialGrayTheme || themeService.ThemeToggleGlyph != "🏭")
+                    throw new Exception($"Toggled IndustrialGray theme state invalid: Current={themeService.CurrentTheme}");
                 themeService.ToggleTheme();
                 if (themeService.CurrentTheme != "Dark" || !themeService.IsDarkTheme || themeService.ThemeToggleGlyph != "🌙")
                     throw new Exception($"Toggled Dark theme state invalid: Current={themeService.CurrentTheme}");
@@ -2098,6 +2225,10 @@ public static class Program
                 mainVm.ToggleThemeCommand.Execute(null);
                 if (mainVm.ThemeToggleGlyph != "☀️" || themeService.CurrentTheme != "Light")
                     throw new Exception("MainViewModel ToggleThemeCommand failed to activate Light theme.");
+
+                mainVm.ToggleThemeCommand.Execute(null);
+                if (mainVm.ThemeToggleGlyph != "🏭" || themeService.CurrentTheme != "IndustrialGray")
+                    throw new Exception("MainViewModel ToggleThemeCommand failed to activate IndustrialGray theme.");
 
                 mainVm.ToggleThemeCommand.Execute(null);
                 if (mainVm.ThemeToggleGlyph != "🌙" || themeService.CurrentTheme != "Dark")
@@ -3726,7 +3857,250 @@ public static class Program
                 p1DataCore.Dispose();
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (29/29) PASSED SUCCESSFULLY!");
+            // Test 30: 3-Theme System (Dark, Light, IndustrialGray ISA-101)
+            Console.WriteLine("[UIValidation] Testing 3-Theme System (Dark, Light, IndustrialGray) (Test 30)...");
+            {
+                var themeSvc = new ThemeService();
+                if (!themeSvc.IsDarkTheme || themeSvc.CurrentTheme != "Dark")
+                    throw new Exception($"Expected initial Dark theme, got {themeSvc.CurrentTheme}");
+
+                themeSvc.ToggleTheme();
+                if (themeSvc.CurrentTheme != "Light" || themeSvc.IsDarkTheme || themeSvc.IsIndustrialGrayTheme)
+                    throw new Exception($"Expected Light after 1st toggle, got {themeSvc.CurrentTheme}");
+
+                themeSvc.ToggleTheme();
+                if (themeSvc.CurrentTheme != "IndustrialGray" || !themeSvc.IsIndustrialGrayTheme || themeSvc.IsDarkTheme)
+                    throw new Exception($"Expected IndustrialGray after 2nd toggle, got {themeSvc.CurrentTheme}");
+
+                if (Application.Current?.RequestedThemeVariant != ThemeService.IndustrialGrayVariant)
+                    throw new Exception("Application.RequestedThemeVariant did not switch to IndustrialGrayVariant");
+
+                var testPump = new PumpControl { Width = 48, Height = 48 };
+                if (!testPump.IsSteadyAnimationSuppressed)
+                    throw new Exception("Expected PumpControl.IsSteadyAnimationSuppressed=True in IndustrialGray");
+
+                themeSvc.ToggleTheme();
+                if (themeSvc.CurrentTheme != "Dark")
+                    throw new Exception($"Expected Dark after 3rd toggle, got {themeSvc.CurrentTheme}");
+            }
+
+            // Test 31: Extracted Indication & Actuation Controls
+            Console.WriteLine("[UIValidation] Testing Extracted Indication & Actuation Controls (Test 31)...");
+            {
+                var vd = new ValueDisplayControl { Title = "T1", DisplayValue = "42.0 °C", ShowTitle = true };
+                var pl = new PilotLightControl { IsOn = true, Width = 32, Height = 32 };
+                var tk = new TankControl { Level = 65, MinValue = 0, MaxValue = 100, Width = 60, Height = 120 };
+                var cb = new CommandButtonControl { Title = "BTN", CurrentLabel = "START" };
+                var ctn = new ContainerButtonControl { Title = "SUB" };
+                var sl = new SliderControl { Title = "SP", Value = 55, Minimum = 0, Maximum = 100 };
+                var sv = new SetValueControl { Title = "SV", DisplayValue = "50.0" };
+                var pm = new PumpControl { OperationalState = EquipmentOperationalState.Running, IsRunning = true, IsManualMode = true, IsVfdMode = true, FrequencyText = "42.5 Hz", Width = 64, Height = 64 };
+
+                if (vd.DisplayValue != "42.0 °C" || !pl.IsOn || Math.Abs(tk.Level - 65) > 0.01 || cb.CurrentLabel != "START" || ctn.Title != "SUB" || Math.Abs(sl.Value - 55) > 0.01 || sv.DisplayValue != "50.0" || !pm.IsManualMode)
+                    throw new Exception("Extracted control properties failed sanity check");
+            }
+
+            // Test 32: Production Pump Vertical Slice (Backward Compat, Feedback Transit, VFD Interlocks & StatusWord)
+            Console.WriteLine("[UIValidation] Testing Production Pump Vertical Slice (Test 32)...");
+            {
+                // 32.1 Backward compatibility: legacy PumpConfig JSON without ControlMode
+                var legacyJson = """{"Type":"Pump","Title":"LegacyPump","ActiveColor":"#00FF00","InactiveColor":"#FF0000"}""";
+                var legacyCfg = JsonSerializer.Deserialize<PumpConfig>(legacyJson)
+                    ?? throw new Exception("Failed to deserialize legacy PumpConfig");
+                if (legacyCfg.ControlMode != PumpControlMode.Discrete)
+                    throw new Exception($"Expected legacy PumpConfig to default to Discrete, got {legacyCfg.ControlMode}");
+
+                // 32.2 DiscreteWithFeedback transit detection
+                using var mockCore = new MockDataCoreService();
+                var projCtx = new ProjectContextService();
+                var fbPumpCfg = new PumpConfig
+                {
+                    Title = "P-101",
+                    ControlMode = PumpControlMode.DiscreteWithFeedback,
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "CMD_101", DataType = "Bool" },
+                    FeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "FB_101", DataType = "Bool" }
+                };
+                using var fbPumpVm = new PumpWidgetViewModel(fbPumpCfg, mockCore, projCtx);
+                mockCore.WriteCommand("plc1", "CMD_101", true);
+                mockCore.WriteCommand("plc1", "FB_101", false);
+                Dispatcher.UIThread.RunJobs();
+                if (fbPumpVm.OperationalState != EquipmentOperationalState.Transit || fbPumpVm.DisplayValue != "STARTING")
+                    throw new Exception($"Expected Transit/STARTING when CMD=true FB=false, got {fbPumpVm.OperationalState}/{fbPumpVm.DisplayValue}");
+
+                mockCore.WriteCommand("plc1", "FB_101", true);
+                Dispatcher.UIThread.RunJobs();
+                if (fbPumpVm.OperationalState != EquipmentOperationalState.Running || !fbPumpVm.IsRunning)
+                    throw new Exception($"Expected Running when CMD=true FB=true, got {fbPumpVm.OperationalState}");
+
+                // 32.3 CombinedVfd Mode Interlocks, Setpoint Clamping & StatusWord Bitmask Decoding
+                var vfdCfg = new PumpConfig
+                {
+                    Title = "P-201 VFD",
+                    ControlMode = PumpControlMode.CombinedVfd,
+                    Source = new DataSourceConfig { ConnId = "plc1", Address = "VFD_CMD", DataType = "Bool" },
+                    ModeSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_MODE", DataType = "Bool" },
+                    SetpointSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_SP", DataType = "Float" },
+                    FrequencyFeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_FQ", DataType = "Float" },
+                    CurrentFeedbackSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_CUR", DataType = "Float" },
+                    StatusWordSource = new DataSourceConfig { ConnId = "plc1", Address = "VFD_SW", DataType = "UInt16" },
+                    FrequencyUnit = "Hz",
+                    MinFrequency = 10.0,
+                    MaxFrequency = 50.0,
+                    StatusWordMap = new List<StatusBitMapping>
+                    {
+                        new() { BitIndex = 0, Text = "Готов", Severity = StatusSeverity.Normal },
+                        new() { BitIndex = 2, Text = "Авария ПЧ", Severity = StatusSeverity.Fault },
+                        new() { BitIndex = 5, Text = "Перегрев", Severity = StatusSeverity.Warning }
+                    }
+                };
+                using var vfdVm = new PumpWidgetViewModel(vfdCfg, mockCore, projCtx);
+
+                // Set Auto mode via string "True" -> Manual commands & setpoint writes must be blocked
+                mockCore.PublishTag(new TagData("plc1", "VFD_MODE", "True"));
+                Dispatcher.UIThread.RunJobs();
+                if (vfdVm.IsManualMode) throw new Exception("Expected Auto mode when VFD_MODE=\"True\"");
+                if (vfdVm.SendStartCommand()) throw new Exception("Start command should be blocked in Auto mode");
+                if (vfdVm.WriteSetpoint(35.0)) throw new Exception("Setpoint write should be blocked in Auto mode");
+
+                // Switch to Manual mode (false) -> commands allowed & setpoint clamped
+                mockCore.PublishTag(new TagData("plc1", "VFD_MODE", false));
+                Dispatcher.UIThread.RunJobs();
+                if (!vfdVm.IsManualMode) throw new Exception("Expected Manual mode when VFD_MODE=false");
+                if (!vfdVm.SendStartCommand()) throw new Exception("Start command should succeed in Manual mode");
+                if (!vfdVm.WriteSetpoint(80.0)) throw new Exception("Setpoint write should succeed in Manual mode");
+                var writtenSp = Convert.ToDouble(mockCore.GetCurrentValue("plc1", "VFD_SP"));
+                if (Math.Abs(writtenSp - 50.0) > 0.01) throw new Exception($"Expected clamped setpoint 50.0, got {writtenSp}");
+
+                // Publish VFD telemetry & StatusWord (bits 0 and 2 and 5 -> 1 + 4 + 32 = 37)
+                mockCore.PublishTag(new TagData("plc1", "VFD_FQ", 42.5));
+                mockCore.PublishTag(new TagData("plc1", "VFD_CUR", 12.8));
+                mockCore.PublishTag(new TagData("plc1", "VFD_SW", (ushort)37));
+                Dispatcher.UIThread.RunJobs();
+
+                if (!vfdVm.IsFault || !vfdVm.HasWarning || vfdVm.OperationalState != EquipmentOperationalState.Fault)
+                    throw new Exception($"Expected Fault+Warning from StatusWord=37, got Fault={vfdVm.IsFault} Warn={vfdVm.HasWarning} State={vfdVm.OperationalState}");
+                if (vfdVm.ActiveStatusBits.Count != 3 || vfdVm.ActiveStatusBits[1].Text != "Авария ПЧ")
+                    throw new Exception($"Expected 3 decoded status bits, got {vfdVm.ActiveStatusBits.Count}");
+
+                // 32.4 PumpFaceplateViewModel + View + Keypad operations
+                using var faceplateVm = new PumpFaceplateViewModel(vfdVm, () => { });
+                var faceplateView = new PumpFaceplateView { DataContext = faceplateVm };
+                if (faceplateVm.StatusWordHex != "0x0025")
+                    throw new Exception($"Expected StatusWordHex=0x0025, got {faceplateVm.StatusWordHex}");
+
+                faceplateVm.ToggleKeypadCommand.Execute(null);
+                if (!faceplateVm.IsKeypadVisible) throw new Exception("Expected IsKeypadVisible=true");
+                faceplateVm.KeypadClearCommand.Execute(null);
+                faceplateVm.KeypadDigitCommand.Execute("3");
+                faceplateVm.KeypadDigitCommand.Execute("7");
+                faceplateVm.KeypadDigitCommand.Execute("5");
+                faceplateVm.KeypadBackspaceCommand.Execute(null);
+                if (faceplateVm.SetpointInputText != "37")
+                    throw new Exception($"Expected SetpointInputText=37 after backspace, got {faceplateVm.SetpointInputText}");
+                faceplateVm.KeypadConfirmCommand.Execute(null);
+                if (faceplateVm.IsKeypadVisible) throw new Exception("Expected IsKeypadVisible=false after confirm");
+                var keypadSp = Convert.ToDouble(mockCore.GetCurrentValue("plc1", "VFD_SP"));
+                if (Math.Abs(keypadSp - 37.0) > 0.01) throw new Exception($"Expected VFD_SP=37.0 after keypad confirm, got {keypadSp}");
+
+                // 32.5 DataCoreService.ExtractAllTags scans all PumpConfig secondary sources
+                var extractHmiCfg = new HmiConfiguration
+                {
+                    Connections = new List<ConnectionConfig>
+                    {
+                        new() { Id = "plc_pump", Type = "ModbusTCP", Host = "127.0.0.1", Port = 502 }
+                    },
+                    Mimic = new DashboardConfig
+                    {
+                        Widgets = new List<WidgetConfig>
+                        {
+                            new PumpConfig
+                            {
+                                Title = "ExtractTestPump",
+                                ControlMode = PumpControlMode.CombinedVfd,
+                                Source = new DataSourceConfig { ConnId = "plc_pump", Address = "00001", DataType = "Bool" },
+                                ModeSource = new DataSourceConfig { ConnId = "plc_pump", Address = "00002", DataType = "Bool" },
+                                FeedbackSource = new DataSourceConfig { ConnId = "plc_pump", Address = "10001", DataType = "Bool" },
+                                SetpointSource = new DataSourceConfig { ConnId = "plc_pump", Address = "40001", DataType = "Float" },
+                                FrequencyFeedbackSource = new DataSourceConfig { ConnId = "plc_pump", Address = "30001", DataType = "Float" },
+                                CurrentFeedbackSource = new DataSourceConfig { ConnId = "plc_pump", Address = "30003", DataType = "Float" },
+                                StatusWordSource = new DataSourceConfig { ConnId = "plc_pump", Address = "30005", DataType = "UInt16" }
+                            }
+                        }
+                    }
+                };
+                var capturingFactory = new CapturingDriverFactory();
+                using var extractDataCore = new DataCoreService(new InMemoryConfigService(extractHmiCfg), capturingFactory);
+                extractDataCore.StartAsync().GetAwaiter().GetResult();
+                var extractedAddresses = capturingFactory.CapturedTags.Select(t => t.Address).ToHashSet();
+                string[] expectedPumpAddrs = { "00001", "00002", "10001", "40001", "30001", "30003", "30005" };
+                foreach (var addr in expectedPumpAddrs)
+                {
+                    if (!extractedAddresses.Contains(addr))
+                        throw new Exception($"DataCoreService.ExtractAllTags missed PumpConfig address '{addr}'");
+                }
+
+                // 32.6 WidgetEditorViewModel Pump secondary TagPicker commands
+                var mockPumpDialog = new MockTestDialogService();
+                var pumpEditorTags = new List<TagDefinition>
+                {
+                    new() { TagId = "t_fb", Name = "Pump FB", ConnId = "plc_pump", Address = "10001", DataType = "Bool" },
+                    new() { TagId = "t_sp", Name = "Pump SP", ConnId = "plc_pump", Address = "40001", DataType = "Float32" },
+                    new() { TagId = "t_fq", Name = "Pump FQ", ConnId = "plc_pump", Address = "30001", DataType = "Float32" },
+                    new() { TagId = "t_cur", Name = "Pump CUR", ConnId = "plc_pump", Address = "30003", DataType = "Float32" },
+                    new() { TagId = "t_sw", Name = "Pump SW", ConnId = "plc_pump", Address = "30005", DataType = "UInt16" }
+                };
+                var pumpEditCfg = new PumpConfig
+                {
+                    Type = "Pump",
+                    Title = "P-Test",
+                    ControlMode = PumpControlMode.CombinedVfd,
+                    Source = new DataSourceConfig { ConnId = "plc_pump", Address = "00001", DataType = "Bool" }
+                };
+                var pumpEditorVm = new WidgetEditorViewModel(
+                    pumpEditCfg,
+                    new List<ConnectionConfig> { new() { Id = "plc_pump", Type = "ModbusTCP" } },
+                    null,
+                    pumpEditorTags,
+                    mockPumpDialog);
+
+                mockPumpDialog.TagPickerResult = pumpEditorTags[0];
+                pumpEditorVm.BrowseFeedbackTagCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (pumpEditorVm.FeedbackAddress != "10001" || mockPumpDialog.LastTagPickerTargetDataType != "Bool")
+                    throw new Exception("Pump BrowseFeedbackTagCommand failed");
+
+                mockPumpDialog.TagPickerResult = pumpEditorTags[1];
+                pumpEditorVm.BrowsePumpSetpointTagCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (pumpEditorVm.PumpSetpointAddress != "40001")
+                    throw new Exception("Pump BrowsePumpSetpointTagCommand failed");
+
+                mockPumpDialog.TagPickerResult = pumpEditorTags[2];
+                pumpEditorVm.BrowsePumpFreqFeedbackTagCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (pumpEditorVm.PumpFreqFeedbackAddress != "30001")
+                    throw new Exception("Pump BrowsePumpFreqFeedbackTagCommand failed");
+
+                mockPumpDialog.TagPickerResult = pumpEditorTags[3];
+                pumpEditorVm.BrowsePumpCurrentFeedbackTagCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (pumpEditorVm.PumpCurrentFeedbackAddress != "30003")
+                    throw new Exception("Pump BrowsePumpCurrentFeedbackTagCommand failed");
+
+                mockPumpDialog.TagPickerResult = pumpEditorTags[4];
+                pumpEditorVm.BrowsePumpStatusWordTagCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+                if (pumpEditorVm.PumpStatusWordAddress != "30005")
+                    throw new Exception("Pump BrowsePumpStatusWordTagCommand failed");
+
+                var savedPumpCfg = pumpEditorVm.ToWidgetConfig() as PumpConfig
+                    ?? throw new Exception("ToWidgetConfig did not return PumpConfig");
+                if (savedPumpCfg.FeedbackSource?.Address != "10001" ||
+                    savedPumpCfg.SetpointSource?.Address != "40001" ||
+                    savedPumpCfg.FrequencyFeedbackSource?.Address != "30001" ||
+                    savedPumpCfg.CurrentFeedbackSource?.Address != "30003" ||
+                    savedPumpCfg.StatusWordSource?.Address != "30005")
+                {
+                    throw new Exception("Saved PumpConfig did not preserve all browsed secondary tag sources");
+                }
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (32/32) PASSED SUCCESSFULLY!");
         }
     }
 

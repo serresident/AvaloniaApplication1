@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 
-namespace AvaloniaApplication1.Controls.Equipment
+namespace AvaloniaApplication1.Controls.Actuation
 {
     /// <summary>
     /// Custom SCADA-style valve control.

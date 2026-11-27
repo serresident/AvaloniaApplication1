@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:c="clr-namespace:AvaloniaApplication1.Converters"
+             xmlns:svc="clr-namespace:AvaloniaApplication1.Services"
              x:Class="AvaloniaApplication1.App"
              RequestedThemeVariant="Dark">
 
@@ -30,6 +31,20 @@
                     <SolidColorBrush x:Key="ThemeTabActiveBrush" Color="#007ACC" />
                     <SolidColorBrush x:Key="ThemeTabInactiveBrush" Color="#2D2D30" />
                     <SolidColorBrush x:Key="ThemeAccentBrush" Color="#007ACC" />
+                    <!-- Semantic HMI Tokens -->
+                    <SolidColorBrush x:Key="HmiNormalBackgroundBrush" Color="#252526" />
+                    <SolidColorBrush x:Key="HmiNormalForegroundBrush" Color="#E2E8F0" />
+                    <SolidColorBrush x:Key="HmiNormalBorderBrush" Color="#475569" />
+                    <SolidColorBrush x:Key="HmiRunningFillBrush" Color="#22C55E" />
+                    <SolidColorBrush x:Key="HmiRunningStrokeBrush" Color="#16A34A" />
+                    <SolidColorBrush x:Key="HmiStoppedFillBrush" Color="#3F3F46" />
+                    <SolidColorBrush x:Key="HmiStoppedStrokeBrush" Color="#71717A" />
+                    <SolidColorBrush x:Key="HmiTransitBrush" Color="#38BDF8" />
+                    <SolidColorBrush x:Key="HmiFaultBrush" Color="#EF4444" />
+                    <SolidColorBrush x:Key="HmiWarningBrush" Color="#F59E0B" />
+                    <SolidColorBrush x:Key="HmiOverrideBrush" Color="#38BDF8" />
+                    <SolidColorBrush x:Key="HmiOfflineBrush" Color="#6B7280" />
+                    <x:Boolean x:Key="HmiSuppressSteadyAnimations">False</x:Boolean>
                 </ResourceDictionary>
 
                 <!-- Industrial SCADA Dark Theme -->
@@ -51,6 +66,20 @@
                     <SolidColorBrush x:Key="ThemeTabActiveBrush" Color="#007ACC" />
                     <SolidColorBrush x:Key="ThemeTabInactiveBrush" Color="#2D2D30" />
                     <SolidColorBrush x:Key="ThemeAccentBrush" Color="#007ACC" />
+                    <!-- Semantic HMI Tokens -->
+                    <SolidColorBrush x:Key="HmiNormalBackgroundBrush" Color="#252526" />
+                    <SolidColorBrush x:Key="HmiNormalForegroundBrush" Color="#E2E8F0" />
+                    <SolidColorBrush x:Key="HmiNormalBorderBrush" Color="#475569" />
+                    <SolidColorBrush x:Key="HmiRunningFillBrush" Color="#22C55E" />
+                    <SolidColorBrush x:Key="HmiRunningStrokeBrush" Color="#16A34A" />
+                    <SolidColorBrush x:Key="HmiStoppedFillBrush" Color="#3F3F46" />
+                    <SolidColorBrush x:Key="HmiStoppedStrokeBrush" Color="#71717A" />
+                    <SolidColorBrush x:Key="HmiTransitBrush" Color="#38BDF8" />
+                    <SolidColorBrush x:Key="HmiFaultBrush" Color="#EF4444" />
+                    <SolidColorBrush x:Key="HmiWarningBrush" Color="#F59E0B" />
+                    <SolidColorBrush x:Key="HmiOverrideBrush" Color="#38BDF8" />
+                    <SolidColorBrush x:Key="HmiOfflineBrush" Color="#6B7280" />
+                    <x:Boolean x:Key="HmiSuppressSteadyAnimations">False</x:Boolean>
                 </ResourceDictionary>
 
                 <!-- High-Contrast Clean SCADA Light Theme -->
@@ -72,6 +101,55 @@
                     <SolidColorBrush x:Key="ThemeTabActiveBrush" Color="#0969DA" />
                     <SolidColorBrush x:Key="ThemeTabInactiveBrush" Color="#D0D7DE" />
                     <SolidColorBrush x:Key="ThemeAccentBrush" Color="#0969DA" />
+                    <!-- Semantic HMI Tokens -->
+                    <SolidColorBrush x:Key="HmiNormalBackgroundBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HmiNormalForegroundBrush" Color="#1F2428" />
+                    <SolidColorBrush x:Key="HmiNormalBorderBrush" Color="#94A3B8" />
+                    <SolidColorBrush x:Key="HmiRunningFillBrush" Color="#16A34A" />
+                    <SolidColorBrush x:Key="HmiRunningStrokeBrush" Color="#15803D" />
+                    <SolidColorBrush x:Key="HmiStoppedFillBrush" Color="#CBD5E1" />
+                    <SolidColorBrush x:Key="HmiStoppedStrokeBrush" Color="#64748B" />
+                    <SolidColorBrush x:Key="HmiTransitBrush" Color="#0284C7" />
+                    <SolidColorBrush x:Key="HmiFaultBrush" Color="#DC2626" />
+                    <SolidColorBrush x:Key="HmiWarningBrush" Color="#D97706" />
+                    <SolidColorBrush x:Key="HmiOverrideBrush" Color="#0284C7" />
+                    <SolidColorBrush x:Key="HmiOfflineBrush" Color="#94A3B8" />
+                    <x:Boolean x:Key="HmiSuppressSteadyAnimations">False</x:Boolean>
+                </ResourceDictionary>
+
+                <!-- ISA-101 High-Performance Industrial Gray Theme -->
+                <ResourceDictionary x:Key="{x:Static svc:ThemeService.IndustrialGrayVariant}">
+                    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#D2D5D9" />
+                    <SolidColorBrush x:Key="ThemeCanvasBackgroundBrush" Color="#C8CCD1" />
+                    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#1F2328" />
+                    <SolidColorBrush x:Key="ThemeSurfaceBrush" Color="#DCDFE3" />
+                    <SolidColorBrush x:Key="ThemeCardBackgroundBrush" Color="#D8DCE0" />
+                    <SolidColorBrush x:Key="ThemeHeaderBrush" Color="#BFC4CA" />
+                    <SolidColorBrush x:Key="ThemeToolbarBrush" Color="#C6CBD1" />
+                    <SolidColorBrush x:Key="ThemeSubtleBrush" Color="#CED3D8" />
+                    <SolidColorBrush x:Key="ThemeBorderBrush" Color="#9AA1AA" />
+                    <SolidColorBrush x:Key="ThemeSeparatorBrush" Color="#A7AEB7" />
+                    <SolidColorBrush x:Key="ThemeTextPrimaryBrush" Color="#181B1F" />
+                    <SolidColorBrush x:Key="ThemeTextSecondaryBrush" Color="#374151" />
+                    <SolidColorBrush x:Key="ThemeMutedTextBrush" Color="#5B636E" />
+                    <SolidColorBrush x:Key="ThemeGridLineBrush" Color="#B8BEC6" />
+                    <SolidColorBrush x:Key="ThemeTabActiveBrush" Color="#4B5563" />
+                    <SolidColorBrush x:Key="ThemeTabInactiveBrush" Color="#B8BEC6" />
+                    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#475569" />
+                    <!-- Semantic HMI Tokens (ISA-101: muted grayscale for normal, saturated color only for faults/transit/overrides) -->
+                    <SolidColorBrush x:Key="HmiNormalBackgroundBrush" Color="#D5D9DE" />
+                    <SolidColorBrush x:Key="HmiNormalForegroundBrush" Color="#1F2328" />
+                    <SolidColorBrush x:Key="HmiNormalBorderBrush" Color="#8C949E" />
+                    <SolidColorBrush x:Key="HmiRunningFillBrush" Color="#E8ECEF" />
+                    <SolidColorBrush x:Key="HmiRunningStrokeBrush" Color="#334155" />
+                    <SolidColorBrush x:Key="HmiStoppedFillBrush" Color="#AEB5BD" />
+                    <SolidColorBrush x:Key="HmiStoppedStrokeBrush" Color="#525A65" />
+                    <SolidColorBrush x:Key="HmiTransitBrush" Color="#0284C7" />
+                    <SolidColorBrush x:Key="HmiFaultBrush" Color="#DC2626" />
+                    <SolidColorBrush x:Key="HmiWarningBrush" Color="#D97706" />
+                    <SolidColorBrush x:Key="HmiOverrideBrush" Color="#0284C7" />
+                    <SolidColorBrush x:Key="HmiOfflineBrush" Color="#9CA3AF" />
+                    <x:Boolean x:Key="HmiSuppressSteadyAnimations">True</x:Boolean>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>

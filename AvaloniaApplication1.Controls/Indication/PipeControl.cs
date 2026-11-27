@@ -8,7 +8,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Rendering;
 
-namespace AvaloniaApplication1.Controls.Piping
+namespace AvaloniaApplication1.Controls.Indication
 {
     public class PipeControl : Control, ICustomHitTest
     {

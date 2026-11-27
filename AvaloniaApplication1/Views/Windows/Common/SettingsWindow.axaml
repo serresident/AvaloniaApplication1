@@ -55,8 +55,9 @@
                             <ComboBox SelectedItem="{Binding Theme, Mode=TwoWay}" HorizontalAlignment="Stretch" Height="32">
                                 <x:String>Dark</x:String>
                                 <x:String>Light</x:String>
+                                <x:String>IndustrialGray</x:String>
                             </ComboBox>
-                            <TextBlock Text="Переключение темы: Dark (промышленная темная) или Light (высококонтрастная светлая)."
+                            <TextBlock Text="Переключение темы: Dark (темная), Light (светлая) или IndustrialGray (ISA-101 серый)."
                                        FontSize="11" Foreground="{DynamicResource ThemeMutedTextBrush}" />
                         </StackPanel>
 

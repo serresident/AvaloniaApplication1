@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 
-namespace AvaloniaApplication1.Controls.Equipment
+namespace AvaloniaApplication1.Controls.Indication
 {
     /// <summary>
     /// Промышленный кастомный контрол теплообменника (кожухотрубный или пластинчатый).

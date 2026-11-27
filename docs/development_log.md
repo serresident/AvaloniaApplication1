@@ -4,6 +4,39 @@
 
 ---
 
+## 📅 27.11.2026 (Сессия 52)
+
+### 📌 Достижение: Завершение вертикального среза насоса (Pump VFD), TagPicker и верификация темы IndustrialGray
+* **DataCoreService (`ExtractAllTags`):**
+  - Добавлено сканирование всех вторичных источников `PumpConfig` (`ModeSource`, `FeedbackSource`, `SetpointSource`, `FrequencyFeedbackSource`, `CurrentFeedbackSource`, `StatusWordSource`) для корректной регистрации тегов в драйверах протоколов.
+* **Редактор виджетов (`WidgetEditorWindow.axaml`, `WidgetEditorViewModel.cs`):**
+  - Добавлены команды `BrowsePumpSetpointTagCommand`, `BrowsePumpFreqFeedbackTagCommand`, `BrowsePumpCurrentFeedbackTagCommand`, `BrowsePumpStatusWordTagCommand` и кнопки `🏷️` для всех вторичных полей насоса (включая `FeedbackSource`).
+  - Исправлен контраст чекбоксов в секции «Отображение и типографика» (`ThemeForegroundBrush`/`ThemeMutedTextBrush`) и увеличена ширина колонки `BitIndex` (70 -> 105 px) в таблице `StatusWordMap`.
+* **Верификация и рендеринг (`UIValidation`):**
+  - Добавлены сценарии headless-рендера `PumpFaceplateView`, `WidgetEditorPumpVfd`, `MimicViewIndustrialGray` в теме `IndustrialGray` и проверки 32.5 / 32.6.
+  - Сборка `AvaloniaApplication1.sln`: 0 ошибок, 0 предупреждений. `UIValidation`: **32/32** пройдены успешно.
+
+---
+
+## 📅 28.11.2026 (Сессия 52)
+
+### 📌 Достижение: Вынос всех контролов в `AvaloniaApplication1.Controls`, 3 темы (вкл. ISA-101 IndustrialGray) и продакшн-срез Насоса
+* **Структуризация `AvaloniaApplication1.Controls`:**
+  - Все оставшиеся контролы перенесены из `DashboardView.axaml` в библиотеку контролов и разделены на две группы:
+    - `Indication/`: `TankControl`, `LevelSensorControl`, `HeatExchangerControl`, `ValueDisplayControl`, `PilotLightControl`, `PipeControl`, `TrendLineControl`.
+    - `Actuation/`: `ValveControl`, `PumpControl`, `ReactorControl`, `CommandButtonControl`, `ContainerButtonControl`, `SliderControl`, `SetValueControl`.
+    - `Primitives/ScadaControlBase.cs`: базовая логика инвалидации кистей при смене темы и подавления установившихся анимаций.
+  - В `DashboardView.axaml` вынесена общая обвязка `WidgetChrome`.
+* **Система из 3 тем (`Dark`, `Light`, `IndustrialGray`):**
+  - В `ThemeService` и `App.axaml` добавлена третья индустриальная тема `IndustrialGray` (стандарты ISA-101: приглушённые серые тона для нормы, цвет только на авариях/переходах/`[M]`, флаг `HmiSuppressSteadyAnimations = true`).
+* **Проработка контрола Насос (`Pump`):**
+  - Поддержаны режимы: `Discrete`, `DiscreteWithFeedback`, `CombinedVfd` (пуск/стоп, уставка частоты Hz/%, обратная связь по частоте и току, режим Ручной/Авто, блокировка ручного управления в Авто).
+  - Реализован настраиваемый битовый `StatusWord` (`StatusBitMapping`: номер бита → текст + уровень важности) с редактором в `WidgetEditorWindow` и декодированием в новом фейсплейте `PumpFaceplateView` / `PumpFaceplateViewModel`.
+  - В `DataCoreService.ExtractAllTags` добавлено сканирование всех вторичных источников `PumpConfig`.
+* **Верификация:** Сборка `AvaloniaApplication1.sln` — **0 ошибок, 0 предупреждений**. Все **32 из 32** автоматических тестов `UIValidation` пройдены успешно (включая Тест 30 — 3 темы, Тест 31 — разделение контролов, Тест 32 — ПЧ-насос и `StatusWord`).
+
+---
+
 ## 📅 27.11.2026 (Сессия 51)
 
 ### 📌 Достижение: Реализация Фазы 1 (Целостность шины данных, исправления протоколов, ликвидация утечек)

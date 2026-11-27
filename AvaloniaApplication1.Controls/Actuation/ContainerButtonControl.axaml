@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaApplication1.Controls.Actuation.ContainerButtonControl"
+             x:Name="Root"
+             x:CompileBindings="False">
+    <Button Command="{Binding #Root.Command}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="6"
+            Background="#005A9E" Padding="2,1" MinHeight="14" MinWidth="14"
+            HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+        <Grid RowDefinitions="Auto,*" Margin="4">
+            <TextBlock Grid.Row="0" Text="📁" FontSize="18" HorizontalAlignment="Center" Foreground="White" />
+            <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="{Binding #Root.Title}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White" TextWrapping="Wrap" TextAlignment="Center" />
+            </Viewbox>
+        </Grid>
+    </Button>
+</UserControl>

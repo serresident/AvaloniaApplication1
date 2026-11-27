@@ -1,5 +1,5 @@
-using AvaloniaApplication1.Controls.Equipment;
-using AvaloniaApplication1.Controls.Piping;
+using AvaloniaApplication1.Controls.Actuation;
+using AvaloniaApplication1.Controls.Indication;
 using AvaloniaApplication1.ViewModels.Core;
 using AvaloniaApplication1.ViewModels.Widgets;
 using AvaloniaApplication1.ViewModels.Panels;

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace AvaloniaApplication1.Controls.Charting
+namespace AvaloniaApplication1.Controls.Indication
 {
     public interface ITrendPenRenderData
     {

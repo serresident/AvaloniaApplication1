@@ -119,7 +119,7 @@
                             BorderBrush="{DynamicResource ThemeBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="4" Padding="8,4"
-                            ToolTip.Tip="Сменить тему оформления (Темная / Светлая)" />
+                            ToolTip.Tip="Сменить тему оформления (Темная / Светлая / Промышленный серый ISA-101)" />
 
                     <!-- Calculator Button (ALWAYS VISIBLE) -->
                     <Button Command="{Binding OpenCalculatorCommand}"
@@ -340,6 +340,9 @@
                                             </DataTemplate>
                                             <DataTemplate DataType="{x:Type vmPopups:ValveControlPopupViewModel}">
                                                 <vPopups:ValveControlPopupView />
+                                            </DataTemplate>
+                                            <DataTemplate DataType="{x:Type vmPopups:PumpFaceplateViewModel}">
+                                                <vPopups:PumpFaceplateView />
                                             </DataTemplate>
                                             <DataTemplate DataType="{x:Type vmPopups:NumpadViewModel}">
                                                 <vPopups:NumpadView />

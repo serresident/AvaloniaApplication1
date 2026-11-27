@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 
-namespace AvaloniaApplication1.Controls.Equipment
+namespace AvaloniaApplication1.Controls.Actuation
 {
     /// <summary>
     /// Промышленный кастомный контрол реактора / сосуда с мешалкой.

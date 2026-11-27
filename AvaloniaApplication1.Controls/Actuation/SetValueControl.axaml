@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaApplication1.Controls.Actuation.SetValueControl"
+             x:Name="Root"
+             x:CompileBindings="False">
+    <Button Command="{Binding #Root.Command}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="6"
+            Background="{DynamicResource ThemeCardBackgroundBrush}" Padding="2,1" MinHeight="14" MinWidth="14"
+            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+        <Grid RowDefinitions="Auto,*" Margin="4,2">
+            <Viewbox Grid.Row="0" MaxHeight="14" Stretch="Uniform" HorizontalAlignment="Center" IsVisible="{Binding #Root.ShowTitle}">
+                <TextBlock Text="{Binding #Root.Title}" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" HorizontalAlignment="Center" />
+            </Viewbox>
+            <Border Grid.Row="1" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeAccentBrush}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,2,0,0">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Viewbox Grid.Column="0" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding #Root.DisplayValue}" Foreground="{Binding #Root.ValueBrush}" FontWeight="Bold" VerticalAlignment="Center" />
+                    </Viewbox>
+                    <TextBlock Grid.Column="1" Text="✏️" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="10" VerticalAlignment="Center" Margin="2,0,0,0" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Button>
+</UserControl>

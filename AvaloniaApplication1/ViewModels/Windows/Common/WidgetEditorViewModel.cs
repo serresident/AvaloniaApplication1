@@ -3,13 +3,23 @@ using AvaloniaApplication1.ViewModels.Widgets;
 using AvaloniaApplication1.ViewModels.Windows.Tags;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using AvaloniaApplication1.Controls.Primitives;
 using AvaloniaApplication1.Models.Config;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AvaloniaApplication1.ViewModels.Windows.Common
 {
+    public partial class StatusBitMappingItem : ObservableObject
+    {
+        [ObservableProperty] private int _bitIndex;
+        [ObservableProperty] private string _text = string.Empty;
+        [ObservableProperty] private StatusSeverity _severity = StatusSeverity.Normal;
+        [ObservableProperty] private string _customColorHex = string.Empty;
+    }
+
     public partial class WidgetEditorViewModel : ViewModelBase
     {
         // --- Widget Type ---
@@ -117,7 +127,7 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         public async System.Threading.Tasks.Task BrowseFeedbackTagAsync()
         {
             if (DialogService == null) return;
-            var targetType = SelectedValveType == "CutOff" ? "Bool" : null;
+            var targetType = (SelectedWidgetType == "Pump" || (SelectedWidgetType == "Valve" && SelectedValveType == "CutOff")) ? "Bool" : null;
             var currentTagId = !string.IsNullOrEmpty(FeedbackAddress)
                 ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(FeedbackConnectionId) || t.ConnId == FeedbackConnectionId) && t.Address == FeedbackAddress)?.TagId
                 : null;
@@ -183,6 +193,86 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         [RelayCommand]
         public async System.Threading.Tasks.Task PickModeTagAsync() => await BrowseModeTagAsync();
 
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowsePumpSetpointTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(PumpSetpointAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(PumpSetpointConnectionId) || t.ConnId == PumpSetpointConnectionId) && t.Address == PumpSetpointAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, null);
+            if (picked != null)
+            {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
+                PumpSetpointConnectionId = picked.ConnId;
+                PumpSetpointAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowsePumpFreqFeedbackTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(PumpFreqFeedbackAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(PumpFreqFeedbackConnectionId) || t.ConnId == PumpFreqFeedbackConnectionId) && t.Address == PumpFreqFeedbackAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, null);
+            if (picked != null)
+            {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
+                PumpFreqFeedbackConnectionId = picked.ConnId;
+                PumpFreqFeedbackAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowsePumpCurrentFeedbackTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(PumpCurrentFeedbackAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(PumpCurrentFeedbackConnectionId) || t.ConnId == PumpCurrentFeedbackConnectionId) && t.Address == PumpCurrentFeedbackAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, null);
+            if (picked != null)
+            {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
+                PumpCurrentFeedbackConnectionId = picked.ConnId;
+                PumpCurrentFeedbackAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowsePumpStatusWordTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(PumpStatusWordAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(PumpStatusWordConnectionId) || t.ConnId == PumpStatusWordConnectionId) && t.Address == PumpStatusWordAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, null);
+            if (picked != null)
+            {
+                if (!string.IsNullOrEmpty(picked.ConnId) && !AvailableConnections.Contains(picked.ConnId))
+                {
+                    AvailableConnections.Add(picked.ConnId);
+                    OnPropertyChanged(nameof(AvailableConnections));
+                }
+                PumpStatusWordConnectionId = picked.ConnId;
+                PumpStatusWordAddress = picked.Address;
+            }
+        }
+
         [ObservableProperty]
         private string? _selectedConnectionId;
 
@@ -217,6 +307,64 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
 
         [ObservableProperty]
         private bool _showStatusText = true;
+
+        // --- Pump Production Settings ---
+        [ObservableProperty]
+        private bool _showPumpSettings;
+
+        public PumpControlMode[] AvailablePumpControlModes => new[]
+        {
+            PumpControlMode.Discrete,
+            PumpControlMode.DiscreteWithFeedback,
+            PumpControlMode.CombinedVfd
+        };
+
+        [ObservableProperty]
+        private PumpControlMode _selectedPumpControlMode = PumpControlMode.Discrete;
+
+        public bool IsPumpFeedbackMode => SelectedPumpControlMode == PumpControlMode.DiscreteWithFeedback || SelectedPumpControlMode == PumpControlMode.CombinedVfd;
+        public bool IsPumpVfdMode => SelectedPumpControlMode == PumpControlMode.CombinedVfd;
+
+        partial void OnSelectedPumpControlModeChanged(PumpControlMode value)
+        {
+            OnPropertyChanged(nameof(IsPumpFeedbackMode));
+            OnPropertyChanged(nameof(IsPumpVfdMode));
+        }
+
+        [ObservableProperty] private string? _pumpSetpointConnectionId;
+        [ObservableProperty] private string _pumpSetpointAddress = string.Empty;
+        [ObservableProperty] private string? _pumpFreqFeedbackConnectionId;
+        [ObservableProperty] private string _pumpFreqFeedbackAddress = string.Empty;
+        [ObservableProperty] private string? _pumpCurrentFeedbackConnectionId;
+        [ObservableProperty] private string _pumpCurrentFeedbackAddress = string.Empty;
+        [ObservableProperty] private string? _pumpStatusWordConnectionId;
+        [ObservableProperty] private string _pumpStatusWordAddress = string.Empty;
+        [ObservableProperty] private string _pumpFrequencyUnit = "Hz";
+        public string[] AvailableFrequencyUnits => new[] { "Hz", "%" };
+        [ObservableProperty] private double _pumpMinFrequency = 0.0;
+        [ObservableProperty] private double _pumpMaxFrequency = 50.0;
+
+        public ObservableCollection<StatusBitMappingItem> PumpStatusWordMap { get; } = new();
+        public StatusSeverity[] AvailableStatusSeverities => new[] { StatusSeverity.Normal, StatusSeverity.Info, StatusSeverity.Warning, StatusSeverity.Fault };
+
+        [RelayCommand]
+        private void AddStatusBitMapping()
+        {
+            var nextBit = PumpStatusWordMap.Count > 0 ? Math.Min(15, PumpStatusWordMap.Max(x => x.BitIndex) + 1) : 0;
+            PumpStatusWordMap.Add(new StatusBitMappingItem
+            {
+                BitIndex = nextBit,
+                Text = $"Бит {nextBit}",
+                Severity = StatusSeverity.Normal
+            });
+        }
+
+        [RelayCommand]
+        private void RemoveStatusBitMapping(StatusBitMappingItem? item)
+        {
+            if (item != null)
+                PumpStatusWordMap.Remove(item);
+        }
 
         [ObservableProperty]
         private double _labelOffset = 0;
@@ -640,7 +788,44 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                     LabelOffset = vc.LabelOffset;
                 }
                 if (existingConfig is TankConfig tc) { Format = tc.Format; MinValue = tc.MinValue; MaxValue = tc.MaxValue; ValueColor = tc.ValueColor; ValueFontSize = tc.ValueFontSize; }
-                if (existingConfig is PumpConfig pu) { ActiveColor = pu.ActiveColor; InactiveColor = pu.InactiveColor; ControlWindowWidth = pu.ControlWindowWidth; ControlWindowHeight = pu.ControlWindowHeight; }
+                if (existingConfig is PumpConfig pu)
+                {
+                    ActiveColor = pu.ActiveColor;
+                    InactiveColor = pu.InactiveColor;
+                    ControlWindowWidth = pu.ControlWindowWidth;
+                    ControlWindowHeight = pu.ControlWindowHeight;
+                    SelectedPumpControlMode = pu.ControlMode;
+                    ModeConnectionId = pu.ModeSource?.ConnId;
+                    ModeAddress = pu.ModeSource?.Address ?? string.Empty;
+                    FeedbackConnectionId = pu.FeedbackSource?.ConnId;
+                    FeedbackAddress = pu.FeedbackSource?.Address ?? string.Empty;
+                    PumpSetpointConnectionId = pu.SetpointSource?.ConnId;
+                    PumpSetpointAddress = pu.SetpointSource?.Address ?? string.Empty;
+                    PumpFreqFeedbackConnectionId = pu.FrequencyFeedbackSource?.ConnId;
+                    PumpFreqFeedbackAddress = pu.FrequencyFeedbackSource?.Address ?? string.Empty;
+                    PumpCurrentFeedbackConnectionId = pu.CurrentFeedbackSource?.ConnId;
+                    PumpCurrentFeedbackAddress = pu.CurrentFeedbackSource?.Address ?? string.Empty;
+                    PumpStatusWordConnectionId = pu.StatusWordSource?.ConnId;
+                    PumpStatusWordAddress = pu.StatusWordSource?.Address ?? string.Empty;
+                    PumpFrequencyUnit = string.IsNullOrEmpty(pu.FrequencyUnit) ? "Hz" : pu.FrequencyUnit;
+                    PumpMinFrequency = pu.MinFrequency;
+                    PumpMaxFrequency = pu.MaxFrequency > pu.MinFrequency ? pu.MaxFrequency : 50.0;
+                    SelectedRotation = pu.Rotation;
+                    PumpStatusWordMap.Clear();
+                    if (pu.StatusWordMap != null)
+                    {
+                        foreach (var m in pu.StatusWordMap)
+                        {
+                            PumpStatusWordMap.Add(new StatusBitMappingItem
+                            {
+                                BitIndex = m.BitIndex,
+                                Text = m.Text,
+                                Severity = m.Severity,
+                                CustomColorHex = m.CustomColorHex
+                            });
+                        }
+                    }
+                }
                 if (existingConfig is HeatExchangerConfig he) { Format = he.Format; ActiveColor = he.ActiveColor; InactiveColor = he.InactiveColor; ShowFlanges = he.ShowFlanges; }
                 if (existingConfig is ReactorConfig re) { Format = re.Format; MinValue = re.MinValue; MaxValue = re.MaxValue; ActiveColor = re.ActiveColor; InactiveColor = re.InactiveColor; }
                 if (existingConfig is LevelSensorConfig ls) { Format = ls.Format; MinValue = ls.MinValue; MaxValue = ls.MaxValue; ValueColor = ls.ValueColor; }
@@ -751,6 +936,7 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             ShowPilotLightSettings = SelectedWidgetType == "PilotLight";
             ShowPipeSettings = SelectedWidgetType == "Pipe";
             ShowValveSettings = SelectedWidgetType == "Valve";
+            ShowPumpSettings = SelectedWidgetType == "Pump";
             ShowIndustrialSettings = SelectedWidgetType == "Pipe" || SelectedWidgetType == "Valve" || SelectedWidgetType == "Pump" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor";
             ShowRegulatingSettings = SelectedWidgetType == "Valve";
             ShowContainerSettings = SelectedWidgetType == "ContainerButton";
@@ -836,7 +1022,31 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                     LabelOffset = LabelOffset
                 },
                 "Tank" => new TankConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
-                "Pump" => new PumpConfig { ActiveColor = ActiveColor, InactiveColor = InactiveColor, ControlWindowWidth = ControlWindowWidth, ControlWindowHeight = ControlWindowHeight },
+                "Pump" => new PumpConfig
+                {
+                    ActiveColor = ActiveColor,
+                    InactiveColor = InactiveColor,
+                    ControlWindowWidth = ControlWindowWidth,
+                    ControlWindowHeight = ControlWindowHeight,
+                    ControlMode = SelectedPumpControlMode,
+                    ModeSource = !string.IsNullOrEmpty(ModeAddress) ? new DataSourceConfig { ConnId = ModeConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" } : null,
+                    FeedbackSource = !string.IsNullOrEmpty(FeedbackAddress) ? new DataSourceConfig { ConnId = FeedbackConnectionId ?? SelectedConnectionId ?? string.Empty, Address = FeedbackAddress, DataType = "Bool" } : null,
+                    SetpointSource = !string.IsNullOrEmpty(PumpSetpointAddress) ? new DataSourceConfig { ConnId = PumpSetpointConnectionId ?? SelectedConnectionId ?? string.Empty, Address = PumpSetpointAddress, DataType = "Float" } : null,
+                    FrequencyFeedbackSource = !string.IsNullOrEmpty(PumpFreqFeedbackAddress) ? new DataSourceConfig { ConnId = PumpFreqFeedbackConnectionId ?? SelectedConnectionId ?? string.Empty, Address = PumpFreqFeedbackAddress, DataType = "Float" } : null,
+                    CurrentFeedbackSource = !string.IsNullOrEmpty(PumpCurrentFeedbackAddress) ? new DataSourceConfig { ConnId = PumpCurrentFeedbackConnectionId ?? SelectedConnectionId ?? string.Empty, Address = PumpCurrentFeedbackAddress, DataType = "Float" } : null,
+                    StatusWordSource = !string.IsNullOrEmpty(PumpStatusWordAddress) ? new DataSourceConfig { ConnId = PumpStatusWordConnectionId ?? SelectedConnectionId ?? string.Empty, Address = PumpStatusWordAddress, DataType = "UInt16" } : null,
+                    FrequencyUnit = PumpFrequencyUnit,
+                    MinFrequency = PumpMinFrequency,
+                    MaxFrequency = PumpMaxFrequency,
+                    Rotation = SelectedRotation,
+                    StatusWordMap = PumpStatusWordMap.Select(m => new StatusBitMapping
+                    {
+                        BitIndex = m.BitIndex,
+                        Text = m.Text,
+                        Severity = m.Severity,
+                        CustomColorHex = m.CustomColorHex
+                    }).ToList()
+                },
                 "HeatExchanger" => new HeatExchangerConfig { ExchangerType = "ShellAndTube", Format = Format, ActiveColor = ActiveColor, InactiveColor = InactiveColor, ShowFlanges = ShowFlanges },
                 "Reactor" => new ReactorConfig { MinValue = MinValue, MaxValue = MaxValue, Format = Format, HasJacket = true, ActiveColor = ActiveColor, InactiveColor = InactiveColor },
                 "LevelSensor" => new LevelSensorConfig { SensorType = "Radar", TagNumber = Title, Unit = "%", Format = Format, MinValue = MinValue, MaxValue = MaxValue, AlarmHigh = 90, AlarmLow = 10, ValueColor = ValueColor },

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using AvaloniaApplication1.Controls.Primitives;
 
 namespace AvaloniaApplication1.Models.Config
 {
@@ -275,6 +276,25 @@ namespace AvaloniaApplication1.Models.Config
         public bool LabelInside { get; set; } = false;
     }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum PumpControlMode
+    {
+        Discrete,
+        DiscreteWithFeedback,
+        CombinedVfd
+    }
+
+    public class StatusBitMapping
+    {
+        public int BitIndex { get; set; }
+        public string Text { get; set; } = string.Empty;
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public StatusSeverity Severity { get; set; } = StatusSeverity.Normal;
+
+        public string CustomColorHex { get; set; } = string.Empty;
+    }
+
     public class PumpConfig : WidgetConfig
     {
         public PumpConfig() { Type = "Pump"; }
@@ -283,6 +303,23 @@ namespace AvaloniaApplication1.Models.Config
         public double ControlWindowWidth { get; set; } = 0;
         public double ControlWindowHeight { get; set; } = 0;
         public bool ShowStatusText { get; set; } = true;
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public PumpControlMode ControlMode { get; set; } = PumpControlMode.Discrete;
+
+        public DataSourceConfig? ModeSource { get; set; }
+        public DataSourceConfig? FeedbackSource { get; set; }
+        public DataSourceConfig? SetpointSource { get; set; }
+        public DataSourceConfig? FrequencyFeedbackSource { get; set; }
+        public DataSourceConfig? CurrentFeedbackSource { get; set; }
+        public DataSourceConfig? StatusWordSource { get; set; }
+
+        public string FrequencyUnit { get; set; } = "Hz";
+        public double MinFrequency { get; set; } = 0.0;
+        public double MaxFrequency { get; set; } = 50.0;
+        public int Rotation { get; set; } = 0;
+
+        public List<StatusBitMapping> StatusWordMap { get; set; } = new();
     }
 
     public class HeatExchangerConfig : WidgetConfig

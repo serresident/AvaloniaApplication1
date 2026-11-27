@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaApplication1.Controls.Indication.ValueDisplayControl"
+             x:Name="Root"
+             x:CompileBindings="False">
+    <Grid RowDefinitions="Auto,*">
+        <Viewbox Grid.Row="0" MaxHeight="14" Stretch="Uniform" HorizontalAlignment="Center" IsVisible="{Binding #Root.ShowTitle}">
+            <TextBlock Text="{Binding #Root.Title}" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" HorizontalAlignment="Center" />
+        </Viewbox>
+        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,1">
+            <TextBlock Text="{Binding #Root.DisplayValue}"
+                       Foreground="{Binding #Root.ValueBrush}"
+                       FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Viewbox>
+    </Grid>
+</UserControl>

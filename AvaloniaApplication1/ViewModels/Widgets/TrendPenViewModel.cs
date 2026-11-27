@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia.Media;
-using AvaloniaApplication1.Controls.Charting;
+using AvaloniaApplication1.Controls.Indication;
 using AvaloniaApplication1.Models;
 using AvaloniaApplication1.Models.Common;
 using AvaloniaApplication1.Models.Config;

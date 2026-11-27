@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaApplication1.Controls.Actuation.SliderControl"
+             x:Name="Root"
+             x:CompileBindings="False">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <Viewbox Grid.Row="0" MaxHeight="14" Stretch="Uniform" HorizontalAlignment="Center" IsVisible="{Binding #Root.ShowTitle}">
+            <TextBlock Text="{Binding #Root.Title}" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" HorizontalAlignment="Center" />
+        </Viewbox>
+        <Viewbox Grid.Row="1" MaxHeight="20" Stretch="Uniform" HorizontalAlignment="Center">
+            <TextBlock Text="{Binding #Root.Value, StringFormat=\{0:F0\}}" Foreground="{DynamicResource ThemeTextPrimaryBrush}" FontWeight="Bold" HorizontalAlignment="Center" />
+        </Viewbox>
+        <Slider Grid.Row="2" Minimum="{Binding #Root.Minimum}" Maximum="{Binding #Root.Maximum}" Value="{Binding #Root.Value, Mode=TwoWay}" VerticalAlignment="Center" />
+    </Grid>
+</UserControl>
