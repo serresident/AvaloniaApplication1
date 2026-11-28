@@ -306,6 +306,31 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
         private bool _isSimulationRunning = false;
 
         [RelayCommand]
+        private async Task LoadDemoProjectAsync()
+        {
+            var demoPath = Path.Combine(AppContext.BaseDirectory, "config_scada_demo.json");
+            if (!File.Exists(demoPath))
+            {
+                ShowToast("Файл config_scada_demo.json не найден");
+                return;
+            }
+
+            if (IsSimulationRunning)
+            {
+                await _simulationService.StopSimulationAsync();
+                IsSimulationRunning = false;
+            }
+
+            await LoadConfigAsync(demoPath);
+
+            await _simulationService.StartSimulationAsync();
+            IsSimulationRunning = true;
+            UpdateConnectionStatus();
+            UpdateWindowTitle();
+            ShowToast("Запущен SCADA Демо-стенд с симуляцией");
+        }
+
+        [RelayCommand]
         private async Task ToggleSimulationAsync()
         {
             if (IsSimulationRunning)

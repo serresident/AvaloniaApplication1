@@ -5,6 +5,13 @@
 - [x] Провести визуальную проверку (`render_ui.ps1`) для `PumpFaceplateView`, `WidgetEditorPumpVfd` и `MimicViewIndustrialGray` в теме `IndustrialGray`, исправить контраст чекбоксов и ширину `BitIndex` в `WidgetEditorWindow.axaml`
 - [x] Подтвердить сборку `AvaloniaApplication1.sln` (0 ошибок, 0 предупреждений) и прохождение `UIValidation` (32/32)
 
+# Tasks: Full SCADA Demo Stand & Closed-Loop Simulation (Сессия 55)
+
+- [x] Создать `AvaloniaApplication1/config_scada_demo.json` с полным набором контролов во всех режимах (Дашборд: `RealTimeTrend`, `ValueDisplay`, `PilotLight`, `Slider`, `SetValue`, `CommandButton` в 4 режимах + `ToggleSwitch`, `ContainerButton`; Мнемосхема: `Tank` Cylindrical/Rectangular, `LevelSensor` Radar/Hydrostatic, `Pump` DiscreteWithFeedback & CombinedVfd с 6-битным `StatusWord`, `Valve` CutOff/Regulating, `Reactor` с мешалкой и рубашкой, `HeatExchanger`, `Pipe`)
+- [x] Реализовать замкнутую физическую модель `demo/*` в `MockProtocolDriver` (перекачка, рампа частоты ПЧ, ток, битовый `StatusWord`, нагрев/охлаждение реактора) и обратную связь команд из `_dataCore.TagUpdates` в `SimulationService`
+- [x] Добавить 1-клик кнопку `🧪 Демо` (`LoadDemoProjectCommand`) в `MainWindow.axaml` / `MainViewModel.cs`
+- [x] Добавить Тест 35 в `UIValidation` и подтвердить прохождение **35/35** тестов (0 ошибок, 0 предупреждений)
+
 # Tasks: Production TankControl & LevelSensorControl (Сессия 54)
 
 - [x] Расширить `TankConfig` (`AlarmHigh`, `AlarmLow`, `ShowAlarmMarkers`, `VesselStyle`: `Cylindrical`/`Rectangular`)

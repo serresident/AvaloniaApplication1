@@ -18,6 +18,19 @@
 
 ---
 
+## 📅 28.11.2026 (Сессия 55)
+
+### 📌 Достижение: Полный интерактивный SCADA Демо-стенд (`config_scada_demo.json`) и замкнутая симуляция
+* **Демо-проект (`config_scada_demo.json`):**
+  - Вкладка **Мнемосхема**: полная технологическая линия (`T-101` Cylindrical + `LT-101` Radar → `P-101` DiscreteWithFeedback → `YV-101` CutOff Dual-FB → `R-101` Reactor с мешалкой и рубашкой → `P-102` CombinedVfd с 6-битным `StatusWord` → `HE-101` HeatExchanger → `FV-102` Regulating → `YV-103` → `T-102` Rectangular + `LT-102` Hydrostatic, соединённые `Pipe`).
+  - Вкладка **Дашборд**: 3-перьевой тренд `RealTimeTrend`, `ValueDisplay`, `PilotLight`, `Slider`, `SetValue`, `CommandButton` во всех 4 режимах (`Toggle`, `Momentary`, `Latching`, `ToggleSwitch` Pill/Rocker), `ContainerButton`.
+* **Замкнутая физика (`MockProtocolDriver` + `SimulationService`):**
+  - Добавлена пересылка команд от UI (`_dataCore.TagUpdates`) в `MockProtocolDriver.WriteAsync` и модель процесса (перекачка уровней, рампа частоты ПЧ 12 Гц/с, расчёт тока, динамический `StatusWord` с предупреждением >45 Гц и аварией >48.5 Гц, сброс аварий, нагрев/охлаждение реактора).
+* **Запуск в 1 клик:** В шапку `MainWindow.axaml` добавлена кнопка `🧪 Демо` (`MainViewModel.LoadDemoProjectCommand`).
+* **Верификация:** Сборка `AvaloniaApplication1.sln` — **0 ошибок, 0 предупреждений**. Тесты `UIValidation` — **35 из 35 пройдены успешно** (включая новый Тест 35).
+
+---
+
 ## 📅 28.11.2026 (Сессия 54)
 
 ### 📌 Достижение: Продакшн-проработка `TankControl` и `LevelSensorControl`

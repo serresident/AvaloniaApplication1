@@ -104,6 +104,16 @@
 
                 <!-- Right Section: Current Config Badge, Theme Switch, Calculator, Mode Switch -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <!-- 1-Click SCADA Demo Stand -->
+                    <Button Command="{Binding LoadDemoProjectCommand}"
+                            Content="🧪 Демо"
+                            Background="{DynamicResource ThemeSubtleBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderBrush}"
+                            BorderThickness="1"
+                            Foreground="{DynamicResource ThemeTextSecondaryBrush}"
+                            Padding="8,4" CornerRadius="4" FontSize="12"
+                            ToolTip.Tip="Загрузить полный демо-стенд (все контролы) и запустить симуляцию" />
+
                     <!-- Active Project Name Badge (ALWAYS VISIBLE) -->
                     <Border Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8,3"
                             VerticalAlignment="Center"

@@ -4265,7 +4265,58 @@ public static class Program
                 tDataCore.Dispose();
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (34/34) PASSED SUCCESSFULLY!");
+            // Test 35: Full SCADA Demo Stand (config_scada_demo.json) + Closed-Loop SimulationService
+            Console.WriteLine("[UIValidation] Testing Full SCADA Demo Stand & Closed-Loop Simulation (Test 35)...");
+            {
+                var demoPath = Path.Combine(AppContext.BaseDirectory, "config_scada_demo.json");
+                if (!File.Exists(demoPath))
+                    demoPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "AvaloniaApplication1", "config_scada_demo.json"));
+                if (!File.Exists(demoPath))
+                    throw new Exception($"config_scada_demo.json not found at {demoPath}");
+
+                var demoJson = File.ReadAllText(demoPath);
+                var demoCfg = JsonSerializer.Deserialize<HmiConfiguration>(demoJson)
+                    ?? throw new Exception("Failed to deserialize config_scada_demo.json");
+
+                if (demoCfg.Dashboard.Widgets.Count < 14 || demoCfg.Mimic.Widgets.Count < 13)
+                    throw new Exception($"Expected full demo widget coverage, got Dashboard={demoCfg.Dashboard.Widgets.Count}, Mimic={demoCfg.Mimic.Widgets.Count}");
+
+                // Verify closed-loop MockProtocolDriver demo simulation
+                using var simDriver = new AvaloniaApplication1.Services.Protocols.MockProtocolDriver("sim_plc");
+                var demoCore = new MockDataCoreService();
+                demoCore.TagManager.Initialize(demoCfg.Tags);
+                using var simSub = simDriver.TagUpdates.Subscribe(t => demoCore.PublishTag(t));
+                using var simCts = new CancellationTokenSource();
+                simDriver.StartAsync(simCts.Token).GetAwaiter().GetResult();
+
+                // Verify initial states emitted
+                var swSnap = demoCore.GetTagSnapshot("t_p102_sw");
+                if (swSnap.Quality == TagQuality.Uninitialized || swSnap.Value == null)
+                    throw new Exception("Demo simulation failed to emit initial StatusWord");
+
+                // Write new VFD frequency setpoint > 45 Hz and verify StatusWord Bit 5 (Over-freq Warning) triggers
+                simDriver.WriteAsync("demo/P102/FreqSp", 46.5, CancellationToken.None).GetAwaiter().GetResult();
+                var deadline = DateTime.UtcNow.AddSeconds(3);
+                bool bit5Set = false;
+                while (DateTime.UtcNow < deadline)
+                {
+                    var swVal = Convert.ToUInt32(demoCore.GetTagSnapshot("t_p102_sw").Value ?? 0);
+                    if ((swVal & (1u << 5)) != 0)
+                    {
+                        bit5Set = true;
+                        break;
+                    }
+                    Thread.Sleep(150);
+                }
+                if (!bit5Set)
+                    throw new Exception("Expected StatusWord Bit 5 (High Frequency >45 Hz) to activate during closed-loop demo ramp");
+
+                simCts.Cancel();
+                simDriver.StopAsync().GetAwaiter().GetResult();
+                demoCore.Dispose();
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (35/35) PASSED SUCCESSFULLY!");
         }
     }
 

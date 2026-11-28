@@ -1,0 +1,403 @@
+{
+  "SchemaVersion": 2,
+  "Theme": "Dark",
+  "Project": {
+    "Name": "SCADA Demo Line (All Controls)",
+    "Version": "1.0.0",
+    "IsCompactMode": false,
+    "Theme": "Dark"
+  },
+  "Security": {
+    "RequirePasswordForDesignMode": false,
+    "DesignModePassword": "1234"
+  },
+  "Connections": [
+    {
+      "Id": "sim_plc",
+      "Type": "ModbusTCP",
+      "Host": "127.0.0.1",
+      "Port": 502,
+      "PollIntervalMs": 200,
+      "ByteOrder": "ABCD",
+      "SlaveId": 1
+    }
+  ],
+  "Tags": [
+    { "TagId": "t_t101_lvl", "Name": "T-101 Уровень (L)", "ConnId": "sim_plc", "Address": "demo/T101/Level", "DataType": "Float32", "Unit": "L" },
+    { "TagId": "t_t102_lvl", "Name": "T-102 Уровень (L)", "ConnId": "sim_plc", "Address": "demo/T102/Level", "DataType": "Float32", "Unit": "L" },
+    { "TagId": "t_r101_lvl", "Name": "R-101 Уровень (L)", "ConnId": "sim_plc", "Address": "demo/R101/Level", "DataType": "Float32", "Unit": "L" },
+    { "TagId": "t_r101_temp", "Name": "R-101 Температура", "ConnId": "sim_plc", "Address": "demo/R101/Temp", "DataType": "Float32", "Unit": "°C" },
+    { "TagId": "t_r101_tempsp", "Name": "R-101 Уставка T", "ConnId": "sim_plc", "Address": "demo/R101/TempSp", "DataType": "Float32", "Unit": "°C" },
+    { "TagId": "t_r101_ag_cmd", "Name": "R-101 Мешалка Пуск", "ConnId": "sim_plc", "Address": "demo/R101/AgitatorCmd", "DataType": "Bool" },
+    { "TagId": "t_r101_ag_fb", "Name": "R-101 Мешалка ОС", "ConnId": "sim_plc", "Address": "demo/R101/AgitatorFb", "DataType": "Bool" },
+    { "TagId": "t_r101_mode", "Name": "R-101 Режим (0=Ручн,1=Авто)", "ConnId": "sim_plc", "Address": "demo/R101/Mode", "DataType": "Bool" },
+    { "TagId": "t_r101_heat", "Name": "R-101 Нагрев рубашки", "ConnId": "sim_plc", "Address": "demo/R101/HeaterEnable", "DataType": "Bool" },
+
+    { "TagId": "t_p101_cmd", "Name": "P-101 Подача Пуск", "ConnId": "sim_plc", "Address": "demo/P101/Cmd", "DataType": "Bool" },
+    { "TagId": "t_p101_fb", "Name": "P-101 Подача ОС", "ConnId": "sim_plc", "Address": "demo/P101/Fb", "DataType": "Bool" },
+    { "TagId": "t_p101_mode", "Name": "P-101 Режим", "ConnId": "sim_plc", "Address": "demo/P101/Mode", "DataType": "Bool" },
+
+    { "TagId": "t_p102_cmd", "Name": "P-102 ПЧ Пуск", "ConnId": "sim_plc", "Address": "demo/P102/Cmd", "DataType": "Bool" },
+    { "TagId": "t_p102_fb", "Name": "P-102 ПЧ ОС", "ConnId": "sim_plc", "Address": "demo/P102/Fb", "DataType": "Bool" },
+    { "TagId": "t_p102_mode", "Name": "P-102 ПЧ Режим", "ConnId": "sim_plc", "Address": "demo/P102/Mode", "DataType": "Bool" },
+    { "TagId": "t_p102_freqsp", "Name": "P-102 ПЧ Уставка Гц", "ConnId": "sim_plc", "Address": "demo/P102/FreqSp", "DataType": "Float32", "Unit": "Hz" },
+    { "TagId": "t_p102_freqfb", "Name": "P-102 ПЧ Частота ОС", "ConnId": "sim_plc", "Address": "demo/P102/FreqFb", "DataType": "Float32", "Unit": "Hz" },
+    { "TagId": "t_p102_curr", "Name": "P-102 ПЧ Ток", "ConnId": "sim_plc", "Address": "demo/P102/Current", "DataType": "Float32", "Unit": "A" },
+    { "TagId": "t_p102_sw", "Name": "P-102 ПЧ StatusWord", "ConnId": "sim_plc", "Address": "demo/P102/StatusWord", "DataType": "UInt16" },
+
+    { "TagId": "t_yv101_cmd", "Name": "YV-101 Входной клапан", "ConnId": "sim_plc", "Address": "demo/YV101/Cmd", "DataType": "Bool" },
+    { "TagId": "t_yv101_open", "Name": "YV-101 КВО", "ConnId": "sim_plc", "Address": "demo/YV101/OpenFb", "DataType": "Bool" },
+    { "TagId": "t_yv101_close", "Name": "YV-101 КВЗ", "ConnId": "sim_plc", "Address": "demo/YV101/CloseFb", "DataType": "Bool" },
+    { "TagId": "t_yv101_mode", "Name": "YV-101 Режим", "ConnId": "sim_plc", "Address": "demo/YV101/Mode", "DataType": "Bool" },
+
+    { "TagId": "t_fv102_pos", "Name": "FV-102 Рег. клапан (%)", "ConnId": "sim_plc", "Address": "demo/FV102/Pos", "DataType": "Float32", "Unit": "%" },
+    { "TagId": "t_yv103_cmd", "Name": "YV-103 Сливной клапан", "ConnId": "sim_plc", "Address": "demo/YV103/Cmd", "DataType": "Bool" },
+    { "TagId": "t_he101_sec", "Name": "HE-101 Выход T", "ConnId": "sim_plc", "Address": "demo/HE101/TempOut", "DataType": "Float32", "Unit": "°C" },
+    { "TagId": "t_line_power", "Name": "Питание линии", "ConnId": "sim_plc", "Address": "demo/LinePower", "DataType": "Bool" },
+    { "TagId": "t_reset_fault", "Name": "Сброс аварий", "ConnId": "sim_plc", "Address": "demo/ResetFault", "DataType": "Bool" },
+    { "TagId": "t_fault_active", "Name": "Общая авария", "ConnId": "sim_plc", "Address": "demo/FaultActive", "DataType": "Bool" }
+  ],
+  "Dashboard": {
+    "CellSize": 80,
+    "ZoomScale": 1.0,
+    "Widgets": [
+      {
+        "Type": "RealTimeTrend",
+        "Title": "Тренды процесса (T-101, R-101, P-102)",
+        "Source": { "TagId": "t_r101_temp", "ConnId": "sim_plc", "Address": "demo/R101/Temp" },
+        "Position": { "Row": 0, "Col": 0, "SizeX": 8, "SizeY": 4 },
+        "MaxDataPoints": 180,
+        "TimeWindowSeconds": 180,
+        "ShowGrid": true,
+        "ShowLegend": true,
+        "Pens": [
+          { "Name": "R-101 T (°C)", "ColorHex": "#F97316", "Thickness": 2.0, "AutoScale": false, "MinY": 0, "MaxY": 160, "Source": { "TagId": "t_r101_temp", "ConnId": "sim_plc", "Address": "demo/R101/Temp" } },
+          { "Name": "P-102 Hz", "ColorHex": "#06B6D4", "Thickness": 2.0, "AutoScale": false, "MinY": 0, "MaxY": 60, "Source": { "TagId": "t_p102_freqfb", "ConnId": "sim_plc", "Address": "demo/P102/FreqFb" } },
+          { "Name": "T-101 L/10", "ColorHex": "#22C55E", "Thickness": 1.5, "AutoScale": false, "MinY": 0, "MaxY": 1000, "Source": { "TagId": "t_t101_lvl", "ConnId": "sim_plc", "Address": "demo/T101/Level" } }
+        ]
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Уровень T-101",
+        "Source": { "TagId": "t_t101_lvl", "ConnId": "sim_plc", "Address": "demo/T101/Level" },
+        "Position": { "Row": 0, "Col": 8, "SizeX": 2, "SizeY": 1 },
+        "Format": "{0:F0}",
+        "Unit": "L",
+        "ValueColor": "#38BDF8"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Темп. R-101",
+        "Source": { "TagId": "t_r101_temp", "ConnId": "sim_plc", "Address": "demo/R101/Temp" },
+        "Position": { "Row": 0, "Col": 10, "SizeX": 2, "SizeY": 1 },
+        "Format": "{0:F1}",
+        "Unit": "°C",
+        "ValueColor": "#F97316"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Частота P-102",
+        "Source": { "TagId": "t_p102_freqfb", "ConnId": "sim_plc", "Address": "demo/P102/FreqFb" },
+        "Position": { "Row": 1, "Col": 8, "SizeX": 2, "SizeY": 1 },
+        "Format": "{0:F1}",
+        "Unit": "Hz",
+        "ValueColor": "#22C55E"
+      },
+      {
+        "Type": "ValueDisplay",
+        "Title": "Ток P-102",
+        "Source": { "TagId": "t_p102_curr", "ConnId": "sim_plc", "Address": "demo/P102/Current" },
+        "Position": { "Row": 1, "Col": 10, "SizeX": 2, "SizeY": 1 },
+        "Format": "{0:F1}",
+        "Unit": "A",
+        "ValueColor": "#EAB308"
+      },
+      {
+        "Type": "PilotLight",
+        "Title": "Питание ОК",
+        "Source": { "TagId": "t_line_power", "ConnId": "sim_plc", "Address": "demo/LinePower" },
+        "Position": { "Row": 2, "Col": 8, "SizeX": 2, "SizeY": 1 },
+        "TrueColor": "#22C55E",
+        "FalseColor": "#475569"
+      },
+      {
+        "Type": "PilotLight",
+        "Title": "Авария ПЧ",
+        "Source": { "TagId": "t_fault_active", "ConnId": "sim_plc", "Address": "demo/FaultActive" },
+        "Position": { "Row": 2, "Col": 10, "SizeX": 2, "SizeY": 1 },
+        "TrueColor": "#EF4444",
+        "FalseColor": "#334155"
+      },
+      {
+        "Type": "Slider",
+        "Title": "Уставка ПЧ P-102 (Hz)",
+        "Source": { "TagId": "t_p102_freqsp", "ConnId": "sim_plc", "Address": "demo/P102/FreqSp" },
+        "Position": { "Row": 3, "Col": 8, "SizeX": 4, "SizeY": 1 },
+        "MinValue": 0,
+        "MaxValue": 50
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Линия (Toggle)",
+        "Source": { "TagId": "t_line_power", "ConnId": "sim_plc", "Address": "demo/LinePower" },
+        "Position": { "Row": 4, "Col": 0, "SizeX": 2, "SizeY": 1 },
+        "ButtonMode": "Toggle",
+        "LabelOn": "ВКЛ",
+        "LabelOff": "ВЫКЛ",
+        "ColorOn": "#16A34A",
+        "ColorOff": "#475569"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Сброс (Momentary)",
+        "Source": { "TagId": "t_reset_fault", "ConnId": "sim_plc", "Address": "demo/ResetFault" },
+        "Position": { "Row": 4, "Col": 2, "SizeX": 2, "SizeY": 1 },
+        "ButtonMode": "Momentary",
+        "LabelOn": "СБРОС!",
+        "LabelOff": "СБРОС",
+        "ColorOn": "#D97706",
+        "ColorOff": "#334155"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Подача P-101 (Latching)",
+        "Source": { "TagId": "t_p101_cmd", "ConnId": "sim_plc", "Address": "demo/P101/Cmd" },
+        "Position": { "Row": 4, "Col": 4, "SizeX": 2, "SizeY": 1 },
+        "ButtonMode": "Latching",
+        "LabelOn": "СТОП P-101",
+        "LabelOff": "ПУСК P-101",
+        "ColorOn": "#DC2626",
+        "ColorOff": "#16A34A"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Нагрев R-101 (Pill)",
+        "Source": { "TagId": "t_r101_heat", "ConnId": "sim_plc", "Address": "demo/R101/HeaterEnable" },
+        "Position": { "Row": 4, "Col": 6, "SizeX": 2, "SizeY": 1 },
+        "ButtonMode": "ToggleSwitch",
+        "SwitchStyle": "Pill",
+        "LabelOn": "ВКЛ",
+        "LabelOff": "ВЫКЛ"
+      },
+      {
+        "Type": "CommandButton",
+        "Title": "Мешалка (Rocker)",
+        "Source": { "TagId": "t_r101_ag_cmd", "ConnId": "sim_plc", "Address": "demo/R101/AgitatorCmd" },
+        "Position": { "Row": 4, "Col": 8, "SizeX": 2, "SizeY": 1 },
+        "ButtonMode": "ToggleSwitch",
+        "SwitchStyle": "Rocker",
+        "LabelOn": "ПУСК",
+        "LabelOff": "СТОП"
+      },
+      {
+        "Type": "SetValue",
+        "Title": "Уставка T R-101 (°C)",
+        "Source": { "TagId": "t_r101_tempsp", "ConnId": "sim_plc", "Address": "demo/R101/TempSp" },
+        "Position": { "Row": 4, "Col": 10, "SizeX": 2, "SizeY": 1 }
+      },
+      {
+        "Type": "ContainerButton",
+        "Title": "🔍 Диагностика узла",
+        "Position": { "Row": 5, "Col": 0, "SizeX": 4, "SizeY": 1 },
+        "CellSize": 70,
+        "ZoomScale": 1.0,
+        "Children": [
+          {
+            "Type": "ValueDisplay",
+            "Title": "StatusWord P-102",
+            "Source": { "TagId": "t_p102_sw", "ConnId": "sim_plc", "Address": "demo/P102/StatusWord" },
+            "Position": { "Row": 0, "Col": 0, "SizeX": 2, "SizeY": 1 },
+            "Format": "{0:F0}"
+          },
+          {
+            "Type": "PilotLight",
+            "Title": "КВО YV-101",
+            "Source": { "TagId": "t_yv101_open", "ConnId": "sim_plc", "Address": "demo/YV101/OpenFb" },
+            "Position": { "Row": 0, "Col": 2, "SizeX": 2, "SizeY": 1 }
+          }
+        ]
+      }
+    ]
+  },
+  "Mimic": {
+    "CellSize": 10,
+    "ZoomScale": 1.0,
+    "Widgets": [
+      {
+        "Type": "Tank",
+        "Title": "T-101 Сырье",
+        "Source": { "TagId": "t_t101_lvl", "ConnId": "sim_plc", "Address": "demo/T101/Level" },
+        "Position": { "Row": 10, "Col": 4, "SizeX": 14, "SizeY": 22 },
+        "MinValue": 0,
+        "MaxValue": 1000,
+        "AlarmHigh": 900,
+        "AlarmLow": 100,
+        "ShowAlarmMarkers": true,
+        "VesselStyle": "Cylindrical",
+        "Format": "{0:F0} L"
+      },
+      {
+        "Type": "LevelSensor",
+        "Title": "LT-101",
+        "Source": { "TagId": "t_t101_lvl", "ConnId": "sim_plc", "Address": "demo/T101/Level" },
+        "Position": { "Row": 4, "Col": 19, "SizeX": 8, "SizeY": 14 },
+        "SensorType": "Radar",
+        "TagNumber": "LT101",
+        "Unit": "L",
+        "MinValue": 0,
+        "MaxValue": 1000,
+        "AlarmHigh": 900,
+        "AlarmLow": 100,
+        "Format": "{0:F0}"
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Pipe T101-P101",
+        "Position": { "Row": 26, "Col": 18, "SizeX": 8, "SizeY": 2 },
+        "PipePoints": "0,1;8,1",
+        "PipeThickness": 10,
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Pump",
+        "Title": "P-101 (Дискр.)",
+        "Source": { "TagId": "t_p101_cmd", "ConnId": "sim_plc", "Address": "demo/P101/Cmd" },
+        "FeedbackSource": { "TagId": "t_p101_fb", "ConnId": "sim_plc", "Address": "demo/P101/Fb" },
+        "ModeSource": { "TagId": "t_p101_mode", "ConnId": "sim_plc", "Address": "demo/P101/Mode" },
+        "ControlMode": "DiscreteWithFeedback",
+        "Position": { "Row": 23, "Col": 26, "SizeX": 9, "SizeY": 9 }
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Pipe P101-YV101",
+        "Position": { "Row": 26, "Col": 35, "SizeX": 6, "SizeY": 2 },
+        "PipePoints": "0,1;6,1",
+        "PipeThickness": 10,
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Valve",
+        "Title": "YV-101",
+        "Source": { "TagId": "t_yv101_cmd", "ConnId": "sim_plc", "Address": "demo/YV101/Cmd" },
+        "FeedbackSource": { "TagId": "t_yv101_open", "ConnId": "sim_plc", "Address": "demo/YV101/OpenFb" },
+        "ClosedFeedbackSource": { "TagId": "t_yv101_close", "ConnId": "sim_plc", "Address": "demo/YV101/CloseFb" },
+        "ModeSource": { "TagId": "t_yv101_mode", "ConnId": "sim_plc", "Address": "demo/YV101/Mode" },
+        "ValveType": "CutOff",
+        "ActuatorType": "Solenoid",
+        "Position": { "Row": 23, "Col": 41, "SizeX": 8, "SizeY": 8 }
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Pipe YV101-R101",
+        "Position": { "Row": 18, "Col": 49, "SizeX": 8, "SizeY": 10 },
+        "PipePoints": "0,9;4,9;4,1;8,1",
+        "PipeThickness": 10,
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Reactor",
+        "Title": "R-101 Реактор",
+        "Source": { "TagId": "t_r101_lvl", "ConnId": "sim_plc", "Address": "demo/R101/Level" },
+        "AgitatorSource": { "TagId": "t_r101_ag_cmd", "ConnId": "sim_plc", "Address": "demo/R101/AgitatorCmd" },
+        "AgitatorFeedbackSource": { "TagId": "t_r101_ag_fb", "ConnId": "sim_plc", "Address": "demo/R101/AgitatorFb" },
+        "TempSource": { "TagId": "t_r101_temp", "ConnId": "sim_plc", "Address": "demo/R101/Temp" },
+        "TempSetpointSource": { "TagId": "t_r101_tempsp", "ConnId": "sim_plc", "Address": "demo/R101/TempSp" },
+        "ModeSource": { "TagId": "t_r101_mode", "ConnId": "sim_plc", "Address": "demo/R101/Mode" },
+        "MinValue": 0,
+        "MaxValue": 500,
+        "MinTemp": 10,
+        "MaxTemp": 160,
+        "HighTempAlarm": 120,
+        "HighLevelAlarm": 450,
+        "LowLevelAlarm": 50,
+        "HasJacket": true,
+        "Format": "{0:F0} L",
+        "Position": { "Row": 8, "Col": 57, "SizeX": 18, "SizeY": 24 }
+      },
+      {
+        "Type": "Pipe",
+        "Title": "Pipe R101-P102",
+        "Position": { "Row": 32, "Col": 65, "SizeX": 2, "SizeY": 7 },
+        "PipePoints": "1,0;1,7",
+        "PipeThickness": 10,
+        "ShowFlanges": true
+      },
+      {
+        "Type": "Pump",
+        "Title": "P-102 (ПЧ VFD)",
+        "Source": { "TagId": "t_p102_cmd", "ConnId": "sim_plc", "Address": "demo/P102/Cmd" },
+        "FeedbackSource": { "TagId": "t_p102_fb", "ConnId": "sim_plc", "Address": "demo/P102/Fb" },
+        "ModeSource": { "TagId": "t_p102_mode", "ConnId": "sim_plc", "Address": "demo/P102/Mode" },
+        "SetpointSource": { "TagId": "t_p102_freqsp", "ConnId": "sim_plc", "Address": "demo/P102/FreqSp" },
+        "FrequencyFeedbackSource": { "TagId": "t_p102_freqfb", "ConnId": "sim_plc", "Address": "demo/P102/FreqFb" },
+        "CurrentFeedbackSource": { "TagId": "t_p102_curr", "ConnId": "sim_plc", "Address": "demo/P102/Current" },
+        "StatusWordSource": { "TagId": "t_p102_sw", "ConnId": "sim_plc", "Address": "demo/P102/StatusWord" },
+        "ControlMode": "CombinedVfd",
+        "FrequencyUnit": "Hz",
+        "MinFrequency": 0,
+        "MaxFrequency": 50,
+        "StatusWordMap": [
+          { "BitIndex": 0, "Text": "Готов к пуску (Ready)", "Severity": "Normal" },
+          { "BitIndex": 1, "Text": "Работа ПЧ (Running)", "Severity": "Info" },
+          { "BitIndex": 2, "Text": "Перегрузка по току", "Severity": "Fault" },
+          { "BitIndex": 3, "Text": "Перегрев ПЧ", "Severity": "Warning" },
+          { "BitIndex": 4, "Text": "Местный пульт [M]", "Severity": "Info" },
+          { "BitIndex": 5, "Text": "Высокая частота (>45 Hz)", "Severity": "Warning" }
+        ],
+        "Position": { "Row": 39, "Col": 61, "SizeX": 10, "SizeY": 10 }
+      },
+      {
+        "Type": "HeatExchanger",
+        "Title": "HE-101 Теплообм.",
+        "Source": { "TagId": "t_r101_temp", "ConnId": "sim_plc", "Address": "demo/R101/Temp" },
+        "SecondarySource": { "TagId": "t_he101_sec", "ConnId": "sim_plc", "Address": "demo/HE101/TempOut" },
+        "ExchangerType": "ShellAndTube",
+        "ShowFlanges": true,
+        "Position": { "Row": 38, "Col": 76, "SizeX": 14, "SizeY": 12 }
+      },
+      {
+        "Type": "Valve",
+        "Title": "FV-102 (Рег.)",
+        "Source": { "TagId": "t_fv102_pos", "ConnId": "sim_plc", "Address": "demo/FV102/Pos" },
+        "ValveType": "Regulating",
+        "ActuatorType": "Diaphragm",
+        "Position": { "Row": 22, "Col": 80, "SizeX": 8, "SizeY": 8 }
+      },
+      {
+        "Type": "Valve",
+        "Title": "YV-103 (Слив)",
+        "Source": { "TagId": "t_yv103_cmd", "ConnId": "sim_plc", "Address": "demo/YV103/Cmd" },
+        "ValveType": "CutOff",
+        "ActuatorType": "Manual",
+        "Position": { "Row": 23, "Col": 92, "SizeX": 8, "SizeY": 8 }
+      },
+      {
+        "Type": "Tank",
+        "Title": "T-102 Продукт",
+        "Source": { "TagId": "t_t102_lvl", "ConnId": "sim_plc", "Address": "demo/T102/Level" },
+        "Position": { "Row": 10, "Col": 104, "SizeX": 14, "SizeY": 22 },
+        "MinValue": 0,
+        "MaxValue": 500,
+        "AlarmHigh": 450,
+        "AlarmLow": 50,
+        "ShowAlarmMarkers": true,
+        "VesselStyle": "Rectangular",
+        "Format": "{0:F0} L"
+      },
+      {
+        "Type": "LevelSensor",
+        "Title": "LT-102",
+        "Source": { "TagId": "t_t102_lvl", "ConnId": "sim_plc", "Address": "demo/T102/Level" },
+        "Position": { "Row": 4, "Col": 119, "SizeX": 8, "SizeY": 14 },
+        "SensorType": "Hydrostatic",
+        "TagNumber": "LT102",
+        "Unit": "L",
+        "MinValue": 0,
+        "MaxValue": 500,
+        "AlarmHigh": 450,
+        "AlarmLow": 50,
+        "Format": "{0:F0}"
+      }
+    ]
+  }
+}

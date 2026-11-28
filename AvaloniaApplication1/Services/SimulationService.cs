@@ -15,6 +15,7 @@ namespace AvaloniaApplication1.Services
         private readonly List<MockProtocolDriver> _backgroundSimulators = new();
         private CancellationTokenSource? _simCts;
         private readonly CompositeDisposable _simSubscriptions = new();
+        private volatile bool _isPublishingFromSim;
 
         public SimulationService(IDataCoreService dataCore, IConfigurationService configService)
         {
@@ -36,13 +37,36 @@ namespace AvaloniaApplication1.Services
                     
                     var sub = sim.TagUpdates.Subscribe(tag => 
                     {
-                        _dataCore.PublishTag(tag);
+                        _isPublishingFromSim = true;
+                        try
+                        {
+                            _dataCore.PublishTag(tag);
+                        }
+                        finally
+                        {
+                            _isPublishingFromSim = false;
+                        }
                     });
                     _simSubscriptions.Add(sub);
                     _backgroundSimulators.Add(sim);
 
                     sim.StartAsync(_simCts.Token).FireAndForget(context: "SimulationService.Start");
                 }
+
+                // Forward UI WriteCommand / TagUpdates back into MockProtocolDriver for closed-loop control
+                var cmdSub = _dataCore.TagUpdates.Subscribe(tag =>
+                {
+                    if (_isPublishingFromSim || tag.Value == null) return;
+                    foreach (var sim in _backgroundSimulators)
+                    {
+                        if (string.Equals(sim.ConnectionId, tag.ConnId, StringComparison.OrdinalIgnoreCase))
+                        {
+                            sim.WriteAsync(tag.Address, tag.Value, CancellationToken.None)
+                               .FireAndForget(context: "SimulationService.ForwardWrite");
+                        }
+                    }
+                });
+                _simSubscriptions.Add(cmdSub);
             }
         }
 
