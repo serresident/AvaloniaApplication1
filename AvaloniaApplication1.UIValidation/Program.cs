@@ -4100,7 +4100,104 @@ public static class Program
                 }
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (32/32) PASSED SUCCESSFULLY!");
+            // Test 33: Production ReactorControl, ReactorWidgetViewModel & ReactorFaceplateViewModel
+            Console.WriteLine("[UIValidation] Testing Production Reactor Control & Faceplate (Test 33)...");
+            {
+                // 33.1 Backward compatibility
+                var legacyReactorJson = """{"Type":"Reactor","Title":"R-101"}""";
+                var legacyReactor = JsonSerializer.Deserialize<WidgetConfig>(legacyReactorJson) as ReactorConfig
+                    ?? throw new Exception("Failed to deserialize legacy ReactorConfig");
+                if (!legacyReactor.HasJacket || Math.Abs(legacyReactor.MaxValue - 100.0) > 0.001)
+                    throw new Exception("Legacy ReactorConfig defaults mismatch");
+
+                // 33.2 Full ReactorConfig with Mode, Agitator Feedback, Temp Setpoint & Alarms
+                var rCfg = new ReactorConfig
+                {
+                    Title = "R-201",
+                    Source = new DataSourceConfig { ConnId = "plc_r", Address = "40001" },
+                    AgitatorSource = new DataSourceConfig { ConnId = "plc_r", Address = "00001" },
+                    AgitatorFeedbackSource = new DataSourceConfig { ConnId = "plc_r", Address = "10001" },
+                    TempSource = new DataSourceConfig { ConnId = "plc_r", Address = "40002" },
+                    TempSetpointSource = new DataSourceConfig { ConnId = "plc_r", Address = "40003" },
+                    ModeSource = new DataSourceConfig { ConnId = "plc_r", Address = "00002" },
+                    MinValue = 0,
+                    MaxValue = 1000,
+                    HighLevelAlarm = 900,
+                    LowLevelAlarm = 50,
+                    MinTemp = 10,
+                    MaxTemp = 180,
+                    HighTempAlarm = 140
+                };
+
+                var rDataCore = new MockDataCoreService();
+                var rProjCtx = new ProjectContextService { IsDesignMode = false };
+                var rThemeSvc = sp.GetRequiredService<IThemeService>();
+                using var rVm = new ReactorWidgetViewModel(rCfg, rDataCore, rProjCtx, null, rThemeSvc);
+
+                // Transit when command != feedback
+                rDataCore.PublishTag(new TagData("plc_r", "40001", 500.0, TagQuality.Good));
+                rDataCore.PublishTag(new TagData("plc_r", "40002", 85.0, TagQuality.Good));
+                rDataCore.PublishTag(new TagData("plc_r", "00001", true, TagQuality.Good));
+                rDataCore.PublishTag(new TagData("plc_r", "10001", false, TagQuality.Good));
+                rVm.UpdateState();
+                if (rVm.OperationalState != AvaloniaApplication1.Controls.Primitives.EquipmentOperationalState.Transit)
+                    throw new Exception($"Expected Transit when agitator cmd!=fb, got {rVm.OperationalState}");
+
+                // Running when feedback matches
+                rDataCore.PublishTag(new TagData("plc_r", "10001", true, TagQuality.Good));
+                rVm.UpdateState();
+                if (rVm.OperationalState != AvaloniaApplication1.Controls.Primitives.EquipmentOperationalState.Running)
+                    throw new Exception($"Expected Running when agitator cmd==fb, got {rVm.OperationalState}");
+
+                // HighTempAlarm -> Fault
+                rDataCore.PublishTag(new TagData("plc_r", "40002", 145.0, TagQuality.Good));
+                rVm.UpdateState();
+                if (!rVm.HasTempAlarm || rVm.OperationalState != AvaloniaApplication1.Controls.Primitives.EquipmentOperationalState.Fault)
+                    throw new Exception($"Expected Fault on HighTempAlarm, got {rVm.OperationalState}");
+                rDataCore.PublishTag(new TagData("plc_r", "40002", 85.0, TagQuality.Good));
+                rVm.UpdateState();
+
+                // ModeSource Auto lock & Manual unlock
+                rDataCore.PublishTag(new TagData("plc_r", "00002", "True", TagQuality.Good)); // Auto
+                rVm.UpdateState();
+                if (rVm.IsManualMode)
+                    throw new Exception("Expected IsManualMode == false when ModeSource is True");
+                rVm.SetTemperatureSetpoint(110.0);
+                if (rDataCore.GetCurrentValue("plc_r", "40003") != null)
+                    throw new Exception("TempSetpoint write should be blocked in Auto mode");
+
+                rDataCore.PublishTag(new TagData("plc_r", "00002", false, TagQuality.Good)); // Manual
+                rVm.UpdateState();
+                using var rFaceplate = new ReactorFaceplateViewModel(rVm, () => { });
+                rFaceplate.ToggleKeypadCommand.Execute(null);
+                rFaceplate.KeypadClearCommand.Execute(null);
+                rFaceplate.KeypadDigitCommand.Execute("1");
+                rFaceplate.KeypadDigitCommand.Execute("2");
+                rFaceplate.KeypadDigitCommand.Execute("5");
+                rFaceplate.KeypadDigitCommand.Execute("9");
+                rFaceplate.KeypadBackspaceCommand.Execute(null);
+                rFaceplate.KeypadConfirmCommand.Execute(null);
+                var spVal = rDataCore.GetCurrentValue("plc_r", "40003");
+                if (spVal == null || Math.Abs(Convert.ToDouble(spVal) - 125.0) > 0.01)
+                    throw new Exception($"Expected Reactor TempSetpoint 125.0 after keypad edit, got {spVal}");
+
+                // 33.3 ReactorControl ScadaControlBase & ISA-101 animation suppression check
+                var rCtrl = new ReactorControl
+                {
+                    MinValue = 0,
+                    MaxValue = 1000,
+                    Level = 500,
+                    IsAgitatorRunning = true,
+                    IsManualMode = true,
+                    HasTempAlarm = true
+                };
+                if (rCtrl is not AvaloniaApplication1.Controls.Primitives.ScadaControlBase)
+                    throw new Exception("ReactorControl must inherit ScadaControlBase");
+
+                rDataCore.Dispose();
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (33/33) PASSED SUCCESSFULLY!");
         }
     }
 

@@ -18,6 +18,17 @@
 
 ---
 
+## 📅 28.11.2026 (Сессия 53)
+
+### 📌 Достижение: Продакшн-проработка `ReactorControl`, `ReactorWidgetViewModel` и фейсплейта `ReactorFaceplateView`
+* **Модель и сканирование тегов:** `ReactorConfig` дополнен полями `AgitatorFeedbackSource`, `TempSetpointSource`, `ModeSource`, `MinTemp`, `MaxTemp`, `HighTempAlarm`, `HighLevelAlarm`, `LowLevelAlarm`; все вторичные источники добавлены в `DataCoreService.ExtractAllTags`.
+* **Контрол ([ReactorControl.cs](file:///c:/Users/adm/projects/AvaloniaApplication1/AvaloniaApplication1.Controls/Actuation/ReactorControl.cs)):** переведён на `ScadaControlBase`, поддерживает 3 темы (`Dark`, `Light`, `IndustrialGray` ISA-101 с автоматической остановкой вращения 30 FPS при подавлении анимаций), нормализацию уровня по `MinValue..MaxValue`, цветовую сигнализацию перегрева/уровня и бейджи `[M]` / `[!]`.
+* **ViewModel и фейсплейт:** `ReactorWidgetViewModel` переведён на `SnapshotUpdates` (учитывает калибровку и оверрайды), вычисляет `EquipmentOperationalState`, открывает единый `ReactorFaceplateView` (переключатель Ручной/Авто с блокировкой в Авто, Пуск/Стоп мешалки, слайдер и 4-колоночная цифровая клавиатура уставки температуры).
+* **Редактор и шаблон:** в `WidgetEditorWindow` / `WidgetEditorViewModel` добавлена секция `ShowReactorSettings` с кнопками `TagPicker`; шаблон реактора в `DashboardView.axaml` обёрнут в `WidgetChrome`.
+* **Верификация:** Сборка `AvaloniaApplication1.sln` — **0 ошибок, 0 предупреждений**. Тесты `UIValidation` — **33 из 33 пройдены** (включая новый Тест 33).
+
+---
+
 ## 📅 28.11.2026 (Сессия 52)
 
 ### 📌 Достижение: Вынос всех контролов в `AvaloniaApplication1.Controls`, 3 темы (вкл. ISA-101 IndustrialGray) и продакшн-срез Насоса

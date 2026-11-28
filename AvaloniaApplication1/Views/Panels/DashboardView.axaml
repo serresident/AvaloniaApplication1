@@ -482,39 +482,34 @@
 
                        <!-- Reactor (Реактор с мешалкой) -->
                        <DataTemplate DataType="{x:Type vmWidgets:ReactorWidgetViewModel}">
-                           <Grid ClipToBounds="False">
-                               <Button Command="{Binding ToggleAgitatorCommand}"
+                           <canvasOverlays:WidgetChrome CardPadding="2">
+                               <Button Command="{Binding OpenControlPopupCommand}"
                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                        Background="Transparent" BorderThickness="0" Padding="0">
-                                   <Border Background="{DynamicResource ThemeCardBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1.5" CornerRadius="8" Margin="3">
-                                       <Grid RowDefinitions="Auto,*,Auto">
-                                           <TextBlock Grid.Row="0" Text="{Binding Title}" Foreground="LightGray" FontSize="12" HorizontalAlignment="Center" Margin="0,4,0,2" />
-                                           <scada:ReactorControl Grid.Row="1"
-                                                            Level="{Binding CurrentLevel}"
-                                                            Temperature="{Binding Temperature}"
-                                                            IsAgitatorRunning="{Binding IsAgitatorRunning}"
-                                                            HasJacket="{Binding HasJacket}"
-                                                            ActiveColor="{Binding ActiveColor}"
-                                                            InactiveColor="{Binding InactiveColor}"
-                                                            Margin="6,2" />
-                                           <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,2,0,4">
-                                               <TextBlock Text="{Binding DisplayValue}" FontSize="12" FontWeight="Bold" Foreground="{Binding ActiveColor, Converter={StaticResource HexToBrush}}" />
-                                               <TextBlock Text="{Binding Temperature, StringFormat=\{0:F1\} °C}" FontSize="11" Foreground="#FFA500" />
-                                           </StackPanel>
-                                       </Grid>
-                                   </Border>
-                               </Button>
-
-                               <!-- Design Overlay -->
-                               <Border IsVisible="{Binding IsSelected}" Name="DragHandle" Background="{x:Null}" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="8" Margin="3" ZIndex="100" ClipToBounds="False">
-                                   <Grid ClipToBounds="False">
-                                        <Border Height="18" VerticalAlignment="Top" Background="#DD0E2A47" CornerRadius="4,4,0,0">
-                                            <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" IsHitTestVisible="False" />
-                                        </Border>
-                                       <TextBlock Text="◢" Foreground="#007ACC" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,2" IsHitTestVisible="False" />
+                                   <Grid RowDefinitions="Auto,*,Auto" Margin="2">
+                                       <TextBlock Grid.Row="0" Text="{Binding Title}" Foreground="{DynamicResource ThemeMutedTextBrush}" FontSize="12" HorizontalAlignment="Center" Margin="0,2,0,2" IsVisible="{Binding ShowTitle}" />
+                                       <scada:ReactorControl Grid.Row="1"
+                                                             OperationalState="{Binding OperationalState}"
+                                                             Level="{Binding CurrentLevel}"
+                                                             MinValue="{Binding MinValue}"
+                                                             MaxValue="{Binding MaxValue}"
+                                                             Temperature="{Binding Temperature}"
+                                                             IsAgitatorRunning="{Binding IsAgitatorRunning}"
+                                                             HasJacket="{Binding HasJacket}"
+                                                             IsManualMode="{Binding IsManualMode}"
+                                                             IsFault="{Binding IsFault}"
+                                                             HasTempAlarm="{Binding HasTempAlarm}"
+                                                             HasLevelAlarm="{Binding HasLevelAlarm}"
+                                                             ActiveColor="{Binding ActiveColor}"
+                                                             InactiveColor="{Binding InactiveColor}"
+                                                             Margin="6,2" />
+                                       <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,2,0,4">
+                                           <TextBlock Text="{Binding DisplayValue}" FontSize="12" FontWeight="Bold" Foreground="{Binding CurrentColor, Converter={StaticResource HexToBrush}}" />
+                                           <TextBlock Text="{Binding Temperature, StringFormat=\{0:F1\} °C}" FontSize="11" Foreground="{DynamicResource ThemeMutedTextBrush}" />
+                                       </StackPanel>
                                    </Grid>
-                               </Border>
-                           </Grid>
+                               </Button>
+                           </canvasOverlays:WidgetChrome>
                        </DataTemplate>
 
                        <!-- LevelSensor (Датчик уровня LT) -->

@@ -10,15 +10,17 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         private readonly IDataCoreService _dataService;
         private readonly IProjectContextService _projectContext;
         private readonly IAlarmNotificationService _alarmService;
+        private readonly IThemeService? _themeService;
         public IChildWindowService? ChildWindowService { get; set; }
         public IDialogService? DialogService { get; set; }
 
         public WidgetFactory(IDataCoreService dataService, IProjectContextService projectContext,
-            IAlarmNotificationService alarmService)
+            IAlarmNotificationService alarmService, IThemeService? themeService = null)
         {
             _dataService = dataService;
             _projectContext = projectContext;
             _alarmService = alarmService;
+            _themeService = themeService;
         }
 
         public WidgetViewModelBase CreateWidgetViewModel(WidgetConfig config)
@@ -37,7 +39,7 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 TankConfig c => new TankWidgetViewModel(c, _dataService, _projectContext),
                 PumpConfig c => new PumpWidgetViewModel(c, _dataService, _projectContext),
                 HeatExchangerConfig c => new HeatExchangerWidgetViewModel(c, _dataService, _projectContext),
-                ReactorConfig c => new ReactorWidgetViewModel(c, _dataService, _projectContext),
+                ReactorConfig c => new ReactorWidgetViewModel(c, _dataService, _projectContext, ChildWindowService, _themeService),
                 LevelSensorConfig c => new LevelSensorWidgetViewModel(c, _dataService, _projectContext),
                 _ => throw new ArgumentException($"Unknown widget config type: {config.GetType().Name}")
             };

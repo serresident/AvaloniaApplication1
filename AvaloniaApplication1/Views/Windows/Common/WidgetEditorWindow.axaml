@@ -697,6 +697,83 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Reactor Production Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowReactorSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Настройки реактора и мешалки" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <CheckBox Content="Отображать рубашку обогрева/охлаждения" IsChecked="{Binding ReactorHasJacket}" Foreground="LightGray" />
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Команда мешалки (AgitatorSource)" Foreground="#AAAAAA" FontSize="11" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding ReactorAgitatorAddress}" PlaceholderText="Адрес пуска мешалки..." />
+                                    <Button Grid.Column="1" Command="{Binding BrowseReactorAgitatorTagCommand}" Content="🏷️" Margin="4,0,0,0" ToolTip.Tip="Выбрать тег мешалки" />
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="ОС мешалки (AgitatorFeedback)" Foreground="#AAAAAA" FontSize="11" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding ReactorAgitatorFeedbackAddress}" PlaceholderText="Адрес ОС мешалки..." />
+                                    <Button Grid.Column="1" Command="{Binding BrowseReactorAgitatorFeedbackTagCommand}" Content="🏷️" Margin="4,0,0,0" ToolTip.Tip="Выбрать тег ОС мешалки" />
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Температура (TempSource)" Foreground="#AAAAAA" FontSize="11" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding ReactorTempAddress}" PlaceholderText="Адрес температуры..." />
+                                    <Button Grid.Column="1" Command="{Binding BrowseReactorTempTagCommand}" Content="🏷️" Margin="4,0,0,0" ToolTip.Tip="Выбрать тег температуры" />
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="Уставка температуры (TempSetpoint)" Foreground="#AAAAAA" FontSize="11" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding ReactorTempSetpointAddress}" PlaceholderText="Адрес уставки..." />
+                                    <Button Grid.Column="1" Command="{Binding BrowseReactorTempSetpointTagCommand}" Content="🏷️" Margin="4,0,0,0" ToolTip.Tip="Выбрать тег уставки" />
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Режим Ручной/Авто (ModeSource)" Foreground="#AAAAAA" FontSize="11" />
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0" Text="{Binding ModeAddress}" PlaceholderText="Адрес режима (0=Ручн, 1=Авто)..." />
+                                <Button Grid.Column="1" Command="{Binding BrowseModeTagCommand}" Content="🏷️" Margin="4,0,0,0" ToolTip.Tip="Выбрать тег режима" />
+                            </Grid>
+                        </StackPanel>
+
+                        <Grid ColumnDefinitions="*,8,*,8,*">
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="Мин. T (°C)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ReactorMinTemp}" Minimum="-100" Maximum="1000" Increment="5" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="2">
+                                <TextBlock Text="Макс. T (°C)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ReactorMaxTemp}" Minimum="-100" Maximum="1000" Increment="5" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="4" Spacing="2">
+                                <TextBlock Text="Авария T (°C)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ReactorHighTempAlarm}" Minimum="-100" Maximum="1000" Increment="5" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="Верхний уровень аварии" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ReactorHighLevelAlarm}" Minimum="0" Maximum="10000" Increment="5" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="2">
+                                <TextBlock Text="Нижний уровень аварии" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding ReactorLowLevelAlarm}" Minimum="0" Maximum="10000" Increment="5" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
                 <!-- Industrial Color Settings -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowIndustrialSettings}">

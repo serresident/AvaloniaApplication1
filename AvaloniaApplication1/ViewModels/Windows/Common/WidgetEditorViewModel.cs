@@ -366,6 +366,83 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                 PumpStatusWordMap.Remove(item);
         }
 
+        // --- Reactor Production Settings ---
+        [ObservableProperty] private bool _showReactorSettings;
+        [ObservableProperty] private bool _reactorHasJacket = true;
+        [ObservableProperty] private double _reactorMinTemp = 0.0;
+        [ObservableProperty] private double _reactorMaxTemp = 200.0;
+        [ObservableProperty] private double _reactorHighTempAlarm = 150.0;
+        [ObservableProperty] private double _reactorHighLevelAlarm = 90.0;
+        [ObservableProperty] private double _reactorLowLevelAlarm = 10.0;
+        [ObservableProperty] private string? _reactorAgitatorConnectionId;
+        [ObservableProperty] private string _reactorAgitatorAddress = string.Empty;
+        [ObservableProperty] private string? _reactorAgitatorFeedbackConnectionId;
+        [ObservableProperty] private string _reactorAgitatorFeedbackAddress = string.Empty;
+        [ObservableProperty] private string? _reactorTempConnectionId;
+        [ObservableProperty] private string _reactorTempAddress = string.Empty;
+        [ObservableProperty] private string? _reactorTempSetpointConnectionId;
+        [ObservableProperty] private string _reactorTempSetpointAddress = string.Empty;
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseReactorAgitatorTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(ReactorAgitatorAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(ReactorAgitatorConnectionId) || t.ConnId == ReactorAgitatorConnectionId) && t.Address == ReactorAgitatorAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, "Bool");
+            if (picked != null)
+            {
+                ReactorAgitatorConnectionId = picked.ConnId;
+                ReactorAgitatorAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseReactorAgitatorFeedbackTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(ReactorAgitatorFeedbackAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(ReactorAgitatorFeedbackConnectionId) || t.ConnId == ReactorAgitatorFeedbackConnectionId) && t.Address == ReactorAgitatorFeedbackAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, "Bool");
+            if (picked != null)
+            {
+                ReactorAgitatorFeedbackConnectionId = picked.ConnId;
+                ReactorAgitatorFeedbackAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseReactorTempTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(ReactorTempAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(ReactorTempConnectionId) || t.ConnId == ReactorTempConnectionId) && t.Address == ReactorTempAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, null);
+            if (picked != null)
+            {
+                ReactorTempConnectionId = picked.ConnId;
+                ReactorTempAddress = picked.Address;
+            }
+        }
+
+        [RelayCommand]
+        public async System.Threading.Tasks.Task BrowseReactorTempSetpointTagAsync()
+        {
+            if (DialogService == null) return;
+            var currentTagId = !string.IsNullOrEmpty(ReactorTempSetpointAddress)
+                ? AvailableTags.FirstOrDefault(t => (string.IsNullOrEmpty(ReactorTempSetpointConnectionId) || t.ConnId == ReactorTempSetpointConnectionId) && t.Address == ReactorTempSetpointAddress)?.TagId
+                : null;
+            var picked = await DialogService.ShowTagPickerAsync(AvailableTags, currentTagId, null);
+            if (picked != null)
+            {
+                ReactorTempSetpointConnectionId = picked.ConnId;
+                ReactorTempSetpointAddress = picked.Address;
+            }
+        }
+
         [ObservableProperty]
         private double _labelOffset = 0;
 
@@ -827,7 +904,30 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                     }
                 }
                 if (existingConfig is HeatExchangerConfig he) { Format = he.Format; ActiveColor = he.ActiveColor; InactiveColor = he.InactiveColor; ShowFlanges = he.ShowFlanges; }
-                if (existingConfig is ReactorConfig re) { Format = re.Format; MinValue = re.MinValue; MaxValue = re.MaxValue; ActiveColor = re.ActiveColor; InactiveColor = re.InactiveColor; }
+                if (existingConfig is ReactorConfig re)
+                {
+                    Format = re.Format;
+                    MinValue = re.MinValue;
+                    MaxValue = re.MaxValue;
+                    ActiveColor = re.ActiveColor;
+                    InactiveColor = re.InactiveColor;
+                    ReactorHasJacket = re.HasJacket;
+                    ReactorMinTemp = re.MinTemp;
+                    ReactorMaxTemp = re.MaxTemp;
+                    ReactorHighTempAlarm = re.HighTempAlarm;
+                    ReactorHighLevelAlarm = re.HighLevelAlarm;
+                    ReactorLowLevelAlarm = re.LowLevelAlarm;
+                    ReactorAgitatorConnectionId = re.AgitatorSource?.ConnId;
+                    ReactorAgitatorAddress = re.AgitatorSource?.Address ?? string.Empty;
+                    ReactorAgitatorFeedbackConnectionId = re.AgitatorFeedbackSource?.ConnId;
+                    ReactorAgitatorFeedbackAddress = re.AgitatorFeedbackSource?.Address ?? string.Empty;
+                    ReactorTempConnectionId = re.TempSource?.ConnId;
+                    ReactorTempAddress = re.TempSource?.Address ?? string.Empty;
+                    ReactorTempSetpointConnectionId = re.TempSetpointSource?.ConnId;
+                    ReactorTempSetpointAddress = re.TempSetpointSource?.Address ?? string.Empty;
+                    ModeConnectionId = re.ModeSource?.ConnId;
+                    ModeAddress = re.ModeSource?.Address ?? string.Empty;
+                }
                 if (existingConfig is LevelSensorConfig ls) { Format = ls.Format; MinValue = ls.MinValue; MaxValue = ls.MaxValue; ValueColor = ls.ValueColor; }
                 if (existingConfig is ContainerButtonConfig ctn)
                 {
@@ -937,6 +1037,7 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             ShowPipeSettings = SelectedWidgetType == "Pipe";
             ShowValveSettings = SelectedWidgetType == "Valve";
             ShowPumpSettings = SelectedWidgetType == "Pump";
+            ShowReactorSettings = SelectedWidgetType == "Reactor";
             ShowIndustrialSettings = SelectedWidgetType == "Pipe" || SelectedWidgetType == "Valve" || SelectedWidgetType == "Pump" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor";
             ShowRegulatingSettings = SelectedWidgetType == "Valve";
             ShowContainerSettings = SelectedWidgetType == "ContainerButton";
@@ -1048,7 +1149,25 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                     }).ToList()
                 },
                 "HeatExchanger" => new HeatExchangerConfig { ExchangerType = "ShellAndTube", Format = Format, ActiveColor = ActiveColor, InactiveColor = InactiveColor, ShowFlanges = ShowFlanges },
-                "Reactor" => new ReactorConfig { MinValue = MinValue, MaxValue = MaxValue, Format = Format, HasJacket = true, ActiveColor = ActiveColor, InactiveColor = InactiveColor },
+                "Reactor" => new ReactorConfig
+                {
+                    MinValue = MinValue,
+                    MaxValue = MaxValue,
+                    Format = Format,
+                    HasJacket = ReactorHasJacket,
+                    ActiveColor = ActiveColor,
+                    InactiveColor = InactiveColor,
+                    MinTemp = ReactorMinTemp,
+                    MaxTemp = ReactorMaxTemp,
+                    HighTempAlarm = ReactorHighTempAlarm,
+                    HighLevelAlarm = ReactorHighLevelAlarm,
+                    LowLevelAlarm = ReactorLowLevelAlarm,
+                    AgitatorSource = !string.IsNullOrEmpty(ReactorAgitatorAddress) ? new DataSourceConfig { ConnId = ReactorAgitatorConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ReactorAgitatorAddress, DataType = "Bool" } : null,
+                    AgitatorFeedbackSource = !string.IsNullOrEmpty(ReactorAgitatorFeedbackAddress) ? new DataSourceConfig { ConnId = ReactorAgitatorFeedbackConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ReactorAgitatorFeedbackAddress, DataType = "Bool" } : null,
+                    TempSource = !string.IsNullOrEmpty(ReactorTempAddress) ? new DataSourceConfig { ConnId = ReactorTempConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ReactorTempAddress, DataType = "Float" } : null,
+                    TempSetpointSource = !string.IsNullOrEmpty(ReactorTempSetpointAddress) ? new DataSourceConfig { ConnId = ReactorTempSetpointConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ReactorTempSetpointAddress, DataType = "Float" } : null,
+                    ModeSource = !string.IsNullOrEmpty(ModeAddress) ? new DataSourceConfig { ConnId = ModeConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" } : null
+                },
                 "LevelSensor" => new LevelSensorConfig { SensorType = "Radar", TagNumber = Title, Unit = "%", Format = Format, MinValue = MinValue, MaxValue = MaxValue, AlarmHigh = 90, AlarmLow = 10, ValueColor = ValueColor },
                 "ContainerButton" => new ContainerButtonConfig 
                 { 

@@ -317,7 +317,10 @@ namespace AvaloniaApplication1.Services
                     else if (w is ReactorConfig rc)
                     {
                         AddSource(rc.AgitatorSource);
+                        AddSource(rc.AgitatorFeedbackSource);
                         AddSource(rc.TempSource);
+                        AddSource(rc.TempSetpointSource);
+                        AddSource(rc.ModeSource);
                     }
                     else if (w is RealTimeTrendConfig rtc && rtc.Pens != null)
                     {

@@ -1,0 +1,148 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:AvaloniaApplication1.ViewModels.Popups"
+             xmlns:scada="https://github.com/avaloniaapplication1/controls"
+             xmlns:c="clr-namespace:AvaloniaApplication1.Converters"
+             x:Class="AvaloniaApplication1.Views.Popups.ReactorFaceplateView"
+             x:DataType="vm:ReactorFaceplateViewModel"
+             x:CompileBindings="True"
+             MinWidth="350" MaxWidth="420">
+
+    <UserControl.Resources>
+        <c:HexToBrushConverter x:Key="HexToBrush" />
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Button.mode-btn">
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.mode-btn.active">
+            <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="14">
+        <StackPanel Spacing="12">
+            <!-- Header -->
+            <Grid ColumnDefinitions="76,*,Auto">
+                <scada:ReactorControl Grid.Column="0" Width="68" Height="76"
+                                      OperationalState="{Binding ReactorViewModel.OperationalState}"
+                                      Level="{Binding ReactorViewModel.CurrentLevel}"
+                                      MinValue="{Binding ReactorViewModel.MinValue}"
+                                      MaxValue="{Binding ReactorViewModel.MaxValue}"
+                                      Temperature="{Binding ReactorViewModel.Temperature}"
+                                      IsAgitatorRunning="{Binding ReactorViewModel.IsAgitatorRunning}"
+                                      HasJacket="{Binding ReactorViewModel.HasJacket}"
+                                      IsManualMode="{Binding ReactorViewModel.IsManualMode}"
+                                      IsFault="{Binding ReactorViewModel.IsFault}"
+                                      HasTempAlarm="{Binding ReactorViewModel.HasTempAlarm}"
+                                      HasLevelAlarm="{Binding ReactorViewModel.HasLevelAlarm}"
+                                      ActiveColor="{Binding ReactorViewModel.ActiveColor}"
+                                      InactiveColor="{Binding ReactorViewModel.InactiveColor}" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0" Spacing="3">
+                    <TextBlock Text="{Binding ReactorViewModel.Title}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource ThemeTextPrimaryBrush}" />
+                    <TextBlock Text="{Binding ReactorViewModel.StatusText}" FontSize="13" FontWeight="SemiBold"
+                               Foreground="{Binding ReactorViewModel.CurrentColor, Converter={StaticResource HexToBrush}}" />
+                    <TextBlock Text="{Binding ReactorViewModel.DisplayValue, StringFormat='Уровень: {0}'}" FontSize="11" Foreground="{DynamicResource ThemeMutedTextBrush}" />
+                </StackPanel>
+                <Button Grid.Column="2" Command="{Binding CloseCommand}" Content="✕" Width="28" Height="28" VerticalAlignment="Top"
+                        Background="Transparent" Foreground="{DynamicResource ThemeMutedTextBrush}" />
+            </Grid>
+
+            <!-- Manual / Auto Mode Switch -->
+            <Border Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="8"
+                    IsVisible="{Binding HasModeSource}">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <TextBlock Grid.Column="0" Text="Режим управления:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ThemeForegroundBrush}" />
+                    <Button Grid.Column="1" Command="{Binding SetManualModeCommand}" Content="РУЧНОЙ [M]" Margin="4,0" Padding="10,5"
+                            Classes="mode-btn" Classes.active="{Binding IsManualMode}"
+                            FontWeight="SemiBold" FontSize="11" CornerRadius="4" />
+                    <Button Grid.Column="2" Command="{Binding SetAutoModeCommand}" Content="АВТО [A]" Padding="10,5"
+                            Classes="mode-btn" Classes.active="{Binding !IsManualMode}"
+                            FontWeight="SemiBold" FontSize="11" CornerRadius="4" />
+                </Grid>
+            </Border>
+
+            <!-- Telemetry Cards: Level & Temperature -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Border Grid.Column="0" Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="8">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="Уровень в реакторе" FontSize="11" Foreground="{DynamicResource ThemeMutedTextBrush}" />
+                        <TextBlock Text="{Binding ReactorViewModel.DisplayValue}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource ThemeTextPrimaryBrush}" />
+                        <TextBlock Text="АВАРИЯ УРОВНЯ" FontSize="10" FontWeight="Bold" Foreground="#DC2626" IsVisible="{Binding ReactorViewModel.HasLevelAlarm}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="8">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="Температура" FontSize="11" Foreground="{DynamicResource ThemeMutedTextBrush}" />
+                        <TextBlock Text="{Binding ReactorViewModel.Temperature, StringFormat='{}{0:F1} °C'}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource ThemeTextPrimaryBrush}" />
+                        <TextBlock Text="ПЕРЕГРЕВ" FontSize="10" FontWeight="Bold" Foreground="#DC2626" IsVisible="{Binding ReactorViewModel.HasTempAlarm}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Agitator Start / Stop -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Button Grid.Column="0" Command="{Binding StartAgitatorCommand}" IsEnabled="{Binding CanOperateManual}"
+                        Content="▶ ПУСК МЕШАЛКИ" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,10"
+                        Background="#16A34A" Foreground="White" FontWeight="Bold" FontSize="11" CornerRadius="6" />
+                <Button Grid.Column="1" Command="{Binding StopAgitatorCommand}" IsEnabled="{Binding CanOperateManual}"
+                        Content="⏹ СТОП МЕШАЛКИ" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,10"
+                        Background="#DC2626" Foreground="White" FontWeight="Bold" FontSize="11" CornerRadius="6" />
+            </Grid>
+
+            <!-- Jacket Temperature Setpoint -->
+            <Border Background="{DynamicResource ThemeSubtleBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="10"
+                    IsVisible="{Binding HasTempSetpointSource}">
+                <StackPanel Spacing="6">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                        <TextBlock Grid.Column="0" Text="Уставка температуры (°C)" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ThemeForegroundBrush}" />
+                        <Button Grid.Column="1" Command="{Binding ToggleKeypadCommand}" IsEnabled="{Binding CanOperateManual}"
+                                Content="{Binding TempSetpointInput, StringFormat='{}{0:F1} °C ⌨'}"
+                                Padding="8,4" Margin="0,0,6,0" FontWeight="Bold" />
+                        <Button Grid.Column="2" Command="{Binding ApplyTempSetpointCommand}" IsEnabled="{Binding CanOperateManual}"
+                                Content="Задать" Padding="10,4" Background="{DynamicResource ThemeAccentBrush}" Foreground="White" />
+                    </Grid>
+                    <Slider Minimum="{Binding ReactorViewModel.MinTemp}"
+                            Maximum="{Binding ReactorViewModel.MaxTemp}"
+                            Value="{Binding TempSetpointInput}"
+                            IsEnabled="{Binding CanOperateManual}" />
+
+                    <!-- Embedded 4-Column Keypad -->
+                    <Border Background="{DynamicResource ThemeCardBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="8"
+                            IsVisible="{Binding IsKeypadVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBox Text="{Binding SetpointInputText}" IsReadOnly="True" HorizontalContentAlignment="Right" FontSize="15" FontWeight="Bold" />
+                            <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="4" RowSpacing="4">
+                                <Button Grid.Row="0" Grid.Column="0" Command="{Binding KeypadDigitCommand}" CommandParameter="7" Content="7" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="0" Grid.Column="1" Command="{Binding KeypadDigitCommand}" CommandParameter="8" Content="8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="0" Grid.Column="2" Command="{Binding KeypadDigitCommand}" CommandParameter="9" Content="9" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="0" Grid.Column="3" Command="{Binding KeypadBackspaceCommand}" Content="⌫" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+
+                                <Button Grid.Row="1" Grid.Column="0" Command="{Binding KeypadDigitCommand}" CommandParameter="4" Content="4" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="1" Grid.Column="1" Command="{Binding KeypadDigitCommand}" CommandParameter="5" Content="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="1" Grid.Column="2" Command="{Binding KeypadDigitCommand}" CommandParameter="6" Content="6" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="1" Grid.Column="3" Command="{Binding KeypadClearCommand}" Content="C" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+
+                                <Button Grid.Row="2" Grid.Column="0" Command="{Binding KeypadDigitCommand}" CommandParameter="1" Content="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="2" Grid.Column="1" Command="{Binding KeypadDigitCommand}" CommandParameter="2" Content="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="2" Grid.Column="2" Command="{Binding KeypadDigitCommand}" CommandParameter="3" Content="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="2" Grid.Column="3" Grid.RowSpan="2" Command="{Binding KeypadConfirmCommand}" Content="OK"
+                                        Background="{DynamicResource ThemeAccentBrush}" Foreground="White" FontWeight="Bold"
+                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+
+                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Command="{Binding KeypadDigitCommand}" CommandParameter="0" Content="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Grid.Row="3" Grid.Column="2" Command="{Binding KeypadDigitCommand}" CommandParameter="." Content="." HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>

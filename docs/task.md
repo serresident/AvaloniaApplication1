@@ -5,6 +5,15 @@
 - [x] Провести визуальную проверку (`render_ui.ps1`) для `PumpFaceplateView`, `WidgetEditorPumpVfd` и `MimicViewIndustrialGray` в теме `IndustrialGray`, исправить контраст чекбоксов и ширину `BitIndex` в `WidgetEditorWindow.axaml`
 - [x] Подтвердить сборку `AvaloniaApplication1.sln` (0 ошибок, 0 предупреждений) и прохождение `UIValidation` (32/32)
 
+# Tasks: Production ReactorControl, ReactorWidgetViewModel & ReactorFaceplate (Сессия 53)
+
+- [x] Расширить `ReactorConfig` (`AgitatorFeedbackSource`, `TempSetpointSource`, `ModeSource`, `MinTemp`, `MaxTemp`, `HighTempAlarm`, `HighLevelAlarm`, `LowLevelAlarm`)
+- [x] Перевести `ReactorControl` на `ScadaControlBase` (3 темы, подавление 30 FPS анимации в `IndustrialGray`, нормализация уровня `MinValue..MaxValue`, бейджи `[M]` и `[!]`, кэш перьев)
+- [x] Обновить `ReactorWidgetViewModel` (подписка через `SnapshotUpdates`, `EquipmentOperationalState`, контроль рассогласования мешалки `Transit`/`Fault`, блокировки в `Auto`, вызов `ReactorFaceplateViewModel`)
+- [x] Создать `ReactorFaceplateView` и `ReactorFaceplateViewModel : IDisposable` (режим Ручной/Авто, управление мешалкой, телеметрия уровня/температуры, уставка температуры со встроенной 4-колоночной клавиатурой)
+- [x] Обновить `DashboardView.axaml` (обвязка `WidgetChrome`), `DataCoreService.ExtractAllTags` и `WidgetEditorWindow` / `WidgetEditorViewModel` (панель настроек реактора с `TagPicker`)
+- [x] Добавить Тест 33 в `UIValidation` и подтвердить прохождение **33/33** тестов (0 ошибок, 0 предупреждений)
+
 # Tasks: Controls Extraction, 3-Theme System (ISA-101 IndustrialGray) & Pump Production Slice (Сессия 52)
 
 - [x] Вынести все оставшиеся контролы из `DashboardView.axaml` в `AvaloniaApplication1.Controls` с разделением на `Indication/` и `Actuation/` (+ `Primitives/ScadaControlBase.cs`)

@@ -337,9 +337,17 @@ namespace AvaloniaApplication1.Models.Config
     {
         public ReactorConfig() { Type = "Reactor"; }
         public DataSourceConfig? AgitatorSource { get; set; }
+        public DataSourceConfig? AgitatorFeedbackSource { get; set; }
         public DataSourceConfig? TempSource { get; set; }
+        public DataSourceConfig? TempSetpointSource { get; set; }
+        public DataSourceConfig? ModeSource { get; set; }
         public double MinValue { get; set; } = 0;
         public double MaxValue { get; set; } = 100;
+        public double MinTemp { get; set; } = 0;
+        public double MaxTemp { get; set; } = 200;
+        public double HighTempAlarm { get; set; } = 150;
+        public double HighLevelAlarm { get; set; } = 90;
+        public double LowLevelAlarm { get; set; } = 10;
         public string Format { get; set; } = "{0:F1} %";
         public bool HasJacket { get; set; } = true;
         public string ActiveColor { get; set; } = "#00FF00";
