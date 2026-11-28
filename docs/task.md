@@ -5,6 +5,14 @@
 - [x] Провести визуальную проверку (`render_ui.ps1`) для `PumpFaceplateView`, `WidgetEditorPumpVfd` и `MimicViewIndustrialGray` в теме `IndustrialGray`, исправить контраст чекбоксов и ширину `BitIndex` в `WidgetEditorWindow.axaml`
 - [x] Подтвердить сборку `AvaloniaApplication1.sln` (0 ошибок, 0 предупреждений) и прохождение `UIValidation` (32/32)
 
+# Tasks: Production TankControl & LevelSensorControl (Сессия 54)
+
+- [x] Расширить `TankConfig` (`AlarmHigh`, `AlarmLow`, `ShowAlarmMarkers`, `VesselStyle`: `Cylindrical`/`Rectangular`)
+- [x] Доработать `TankControl` (маркеры Hi/Lo, подсветка аварий и Offline, кэширование кисти `FillColor`, цилиндрический/прямоугольный стиль, бейдж `[!]`) и `TankWidgetViewModel` (ISA-101 `DisplayColor`, `IsHighAlarm`/`IsLowAlarm`/`IsOffline`)
+- [x] Перевести `LevelSensorControl` на `ScadaControlBase` (3 темы с ISA-101, кэширование `FormattedText`, тип `Hydrostatic`, `IsOffline`, бейдж `[!]`) и обновить `LevelSensorWidgetViewModel`
+- [x] Обновить `DashboardView.axaml` (обвязка `WidgetChrome` для `LevelSensorWidgetViewModel`), `WidgetFactory.cs`, `WidgetEditorWindow` / `WidgetEditorViewModel` (`ShowTankSettings`, `ShowLevelSensorSettings`)
+- [x] Добавить Тест 34 в `UIValidation` и подтвердить прохождение **34/34** тестов (0 ошибок, 0 предупреждений)
+
 # Tasks: Production ReactorControl, ReactorWidgetViewModel & ReactorFaceplate (Сессия 53)
 
 - [x] Расширить `ReactorConfig` (`AgitatorFeedbackSource`, `TempSetpointSource`, `ModeSource`, `MinTemp`, `MaxTemp`, `HighTempAlarm`, `HighLevelAlarm`, `LowLevelAlarm`)

@@ -1,10 +1,12 @@
-using AvaloniaApplication1.ViewModels.Core;
 using System;
+using System.ComponentModel;
 using System.Globalization;
+using Avalonia.Threading;
+using AvaloniaApplication1.Models;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
+using AvaloniaApplication1.ViewModels.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Avalonia.Threading;
 
 namespace AvaloniaApplication1.ViewModels.Widgets
 {
@@ -18,56 +20,109 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         [ObservableProperty]
         private string _displayValue = "---";
 
+        [ObservableProperty]
+        private bool _isHighAlarm;
+
+        [ObservableProperty]
+        private bool _isLowAlarm;
+
+        [ObservableProperty]
+        private bool _isOffline;
+
+        [ObservableProperty]
+        private string _displayColor = "#E5C158";
+
+        private readonly IThemeService? _themeService;
+
         public double MinValue => TypedConfig.MinValue;
         public double MaxValue => TypedConfig.MaxValue == 0 ? 100 : TypedConfig.MaxValue;
+        public double AlarmHigh => TypedConfig.AlarmHigh;
+        public double AlarmLow => TypedConfig.AlarmLow;
+        public bool ShowAlarmMarkers => TypedConfig.ShowAlarmMarkers;
+        public string VesselStyle => string.IsNullOrEmpty(TypedConfig.VesselStyle) ? "Cylindrical" : TypedConfig.VesselStyle;
         public string Format => string.IsNullOrEmpty(TypedConfig.Format) ? "{0:F1} %" : TypedConfig.Format;
         public string ValueColor => string.IsNullOrEmpty(TypedConfig.ValueColor) ? "#E5C158" : TypedConfig.ValueColor;
         public double ValueFontSize => TypedConfig.ValueFontSize <= 0 ? 14 : TypedConfig.ValueFontSize;
 
-        public TankWidgetViewModel(TankConfig config, IDataCoreService dataService, IProjectContextService projectContext) 
+        public TankWidgetViewModel(
+            TankConfig config,
+            IDataCoreService dataService,
+            IProjectContextService projectContext,
+            IThemeService? themeService = null)
             : base(config, dataService, projectContext)
         {
+            _themeService = themeService;
+            if (_themeService != null)
+            {
+                _themeService.PropertyChanged += OnThemePropertyChanged;
+            }
             UpdateState();
         }
 
-        protected override void OnTagValueUpdated(object newValue)
+        private void OnThemePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            UpdateState();
+            if (e.PropertyName == nameof(IThemeService.CurrentTheme) || e.PropertyName == nameof(IThemeService.IsIndustrialGrayTheme))
+            {
+                Dispatcher.UIThread.Post(UpdateState);
+            }
         }
 
-        private void UpdateState()
+        protected override void OnTagValueUpdated(object newValue) => UpdateState();
+        protected override void OnTagSnapshotUpdated(TagSnapshot snapshot) => UpdateState();
+
+        public void UpdateState()
         {
-            if (Source == null) return;
+            IsOffline = Quality == TagQuality.Bad || Quality == TagQuality.CommFailure || Quality == TagQuality.Timeout;
+
+            if (Source == null)
+            {
+                IsHighAlarm = false;
+                IsLowAlarm = false;
+                DisplayValue = "---";
+                UpdateDisplayColor();
+                return;
+            }
 
             var val = DataService.GetCurrentValue(Source.ConnId, Source.Address);
-            if (val != null && TryConvertDouble(val, out double dVal))
+            if (val != null)
             {
-                // Clamp
+                double dVal = TagValueConverter.ToDouble(val);
                 CurrentLevel = Math.Clamp(dVal, MinValue, MaxValue);
+                IsHighAlarm = !IsOffline && CurrentLevel >= AlarmHigh;
+                IsLowAlarm = !IsOffline && CurrentLevel <= AlarmLow;
+
                 try
                 {
-                    DisplayValue = string.Format(Format, CurrentLevel);
+                    DisplayValue = string.Format(CultureInfo.InvariantCulture, Format, CurrentLevel);
                 }
                 catch
                 {
-                    DisplayValue = $"{CurrentLevel:F1}";
+                    DisplayValue = $"{CurrentLevel.ToString("F1", CultureInfo.InvariantCulture)}";
                 }
             }
             else
             {
+                IsHighAlarm = false;
+                IsLowAlarm = false;
                 DisplayValue = "---";
             }
+
+            UpdateDisplayColor();
         }
 
-        private static bool TryConvertDouble(object valObj, out double result)
+        private void UpdateDisplayColor()
         {
-            if (valObj is float f) { result = f; return true; }
-            if (valObj is double d) { result = d; return true; }
-            if (valObj is int i) { result = i; return true; }
-            if (valObj is short s) { result = s; return true; }
-            if (valObj is ushort us) { result = us; return true; }
-            if (valObj is uint ui) { result = ui; return true; }
-            return double.TryParse(valObj.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out result);
+            bool isGray = _themeService?.IsIndustrialGrayTheme == true ||
+                          string.Equals(Avalonia.Application.Current?.ActualThemeVariant?.Key?.ToString(), "IndustrialGray", StringComparison.OrdinalIgnoreCase);
+
+            if (IsOffline)
+                DisplayColor = "#6B7280";
+            else if (IsHighAlarm)
+                DisplayColor = "#DC2626";
+            else if (IsLowAlarm)
+                DisplayColor = "#D97706";
+            else
+                DisplayColor = isGray ? "#334155" : ValueColor;
         }
 
         public override void UpdateFromConfig(WidgetConfig newConfig)
@@ -77,11 +132,20 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             {
                 TypedConfig.MinValue = tankConfig.MinValue;
                 TypedConfig.MaxValue = tankConfig.MaxValue;
+                TypedConfig.AlarmHigh = tankConfig.AlarmHigh;
+                TypedConfig.AlarmLow = tankConfig.AlarmLow;
+                TypedConfig.ShowAlarmMarkers = tankConfig.ShowAlarmMarkers;
+                TypedConfig.VesselStyle = tankConfig.VesselStyle;
                 TypedConfig.Format = tankConfig.Format;
                 TypedConfig.ValueColor = tankConfig.ValueColor;
                 TypedConfig.ValueFontSize = tankConfig.ValueFontSize;
+
                 OnPropertyChanged(nameof(MinValue));
                 OnPropertyChanged(nameof(MaxValue));
+                OnPropertyChanged(nameof(AlarmHigh));
+                OnPropertyChanged(nameof(AlarmLow));
+                OnPropertyChanged(nameof(ShowAlarmMarkers));
+                OnPropertyChanged(nameof(VesselStyle));
                 OnPropertyChanged(nameof(Format));
                 OnPropertyChanged(nameof(ValueColor));
                 OnPropertyChanged(nameof(ValueFontSize));
@@ -91,6 +155,10 @@ namespace AvaloniaApplication1.ViewModels.Widgets
 
         public override void Dispose()
         {
+            if (_themeService != null)
+            {
+                _themeService.PropertyChanged -= OnThemePropertyChanged;
+            }
             base.Dispose();
         }
     }

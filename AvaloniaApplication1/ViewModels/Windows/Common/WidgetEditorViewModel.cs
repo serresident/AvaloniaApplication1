@@ -366,6 +366,22 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                 PumpStatusWordMap.Remove(item);
         }
 
+        // --- Tank & LevelSensor Production Settings ---
+        [ObservableProperty] private bool _showTankSettings;
+        [ObservableProperty] private string _tankVesselStyle = "Cylindrical";
+        public string[] AvailableTankVesselStyles => new[] { "Cylindrical", "Rectangular" };
+        [ObservableProperty] private bool _tankShowAlarmMarkers = true;
+        [ObservableProperty] private double _tankAlarmHigh = 90.0;
+        [ObservableProperty] private double _tankAlarmLow = 10.0;
+
+        [ObservableProperty] private bool _showLevelSensorSettings;
+        [ObservableProperty] private string _levelSensorType = "Radar";
+        public string[] AvailableLevelSensorTypes => new[] { "Radar", "Ultrasonic", "Float", "Hydrostatic" };
+        [ObservableProperty] private string _levelTagNumber = "LT-101";
+        [ObservableProperty] private string _levelUnit = "%";
+        [ObservableProperty] private double _levelAlarmHigh = 90.0;
+        [ObservableProperty] private double _levelAlarmLow = 10.0;
+
         // --- Reactor Production Settings ---
         [ObservableProperty] private bool _showReactorSettings;
         [ObservableProperty] private bool _reactorHasJacket = true;
@@ -864,7 +880,18 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                     ShowStatusText = vc.ShowStatusText;
                     LabelOffset = vc.LabelOffset;
                 }
-                if (existingConfig is TankConfig tc) { Format = tc.Format; MinValue = tc.MinValue; MaxValue = tc.MaxValue; ValueColor = tc.ValueColor; ValueFontSize = tc.ValueFontSize; }
+                if (existingConfig is TankConfig tc)
+                {
+                    Format = tc.Format;
+                    MinValue = tc.MinValue;
+                    MaxValue = tc.MaxValue;
+                    ValueColor = tc.ValueColor;
+                    ValueFontSize = tc.ValueFontSize;
+                    TankAlarmHigh = tc.AlarmHigh;
+                    TankAlarmLow = tc.AlarmLow;
+                    TankShowAlarmMarkers = tc.ShowAlarmMarkers;
+                    TankVesselStyle = string.IsNullOrEmpty(tc.VesselStyle) ? "Cylindrical" : tc.VesselStyle;
+                }
                 if (existingConfig is PumpConfig pu)
                 {
                     ActiveColor = pu.ActiveColor;
@@ -928,7 +955,18 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                     ModeConnectionId = re.ModeSource?.ConnId;
                     ModeAddress = re.ModeSource?.Address ?? string.Empty;
                 }
-                if (existingConfig is LevelSensorConfig ls) { Format = ls.Format; MinValue = ls.MinValue; MaxValue = ls.MaxValue; ValueColor = ls.ValueColor; }
+                if (existingConfig is LevelSensorConfig ls)
+                {
+                    Format = ls.Format;
+                    MinValue = ls.MinValue;
+                    MaxValue = ls.MaxValue;
+                    ValueColor = ls.ValueColor;
+                    LevelSensorType = string.IsNullOrEmpty(ls.SensorType) ? "Radar" : ls.SensorType;
+                    LevelTagNumber = ls.TagNumber;
+                    LevelUnit = ls.Unit;
+                    LevelAlarmHigh = ls.AlarmHigh;
+                    LevelAlarmLow = ls.AlarmLow;
+                }
                 if (existingConfig is ContainerButtonConfig ctn)
                 {
                     ContainerCellSize = ctn.CellSize > 0 ? ctn.CellSize : 40;
@@ -1038,6 +1076,8 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
             ShowValveSettings = SelectedWidgetType == "Valve";
             ShowPumpSettings = SelectedWidgetType == "Pump";
             ShowReactorSettings = SelectedWidgetType == "Reactor";
+            ShowTankSettings = SelectedWidgetType == "Tank";
+            ShowLevelSensorSettings = SelectedWidgetType == "LevelSensor";
             ShowIndustrialSettings = SelectedWidgetType == "Pipe" || SelectedWidgetType == "Valve" || SelectedWidgetType == "Pump" || SelectedWidgetType == "HeatExchanger" || SelectedWidgetType == "Reactor";
             ShowRegulatingSettings = SelectedWidgetType == "Valve";
             ShowContainerSettings = SelectedWidgetType == "ContainerButton";
@@ -1122,7 +1162,18 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                     ShowStatusText = ShowStatusText,
                     LabelOffset = LabelOffset
                 },
-                "Tank" => new TankConfig { Format = Format, MinValue = MinValue, MaxValue = MaxValue, ValueColor = ValueColor, ValueFontSize = ValueFontSize },
+                "Tank" => new TankConfig
+                {
+                    Format = Format,
+                    MinValue = MinValue,
+                    MaxValue = MaxValue,
+                    AlarmHigh = TankAlarmHigh,
+                    AlarmLow = TankAlarmLow,
+                    ShowAlarmMarkers = TankShowAlarmMarkers,
+                    VesselStyle = TankVesselStyle,
+                    ValueColor = ValueColor,
+                    ValueFontSize = ValueFontSize
+                },
                 "Pump" => new PumpConfig
                 {
                     ActiveColor = ActiveColor,
@@ -1168,7 +1219,18 @@ namespace AvaloniaApplication1.ViewModels.Windows.Common
                     TempSetpointSource = !string.IsNullOrEmpty(ReactorTempSetpointAddress) ? new DataSourceConfig { ConnId = ReactorTempSetpointConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ReactorTempSetpointAddress, DataType = "Float" } : null,
                     ModeSource = !string.IsNullOrEmpty(ModeAddress) ? new DataSourceConfig { ConnId = ModeConnectionId ?? SelectedConnectionId ?? string.Empty, Address = ModeAddress, DataType = "Bool" } : null
                 },
-                "LevelSensor" => new LevelSensorConfig { SensorType = "Radar", TagNumber = Title, Unit = "%", Format = Format, MinValue = MinValue, MaxValue = MaxValue, AlarmHigh = 90, AlarmLow = 10, ValueColor = ValueColor },
+                "LevelSensor" => new LevelSensorConfig
+                {
+                    SensorType = LevelSensorType,
+                    TagNumber = LevelTagNumber,
+                    Unit = LevelUnit,
+                    Format = Format,
+                    MinValue = MinValue,
+                    MaxValue = MaxValue,
+                    AlarmHigh = LevelAlarmHigh,
+                    AlarmLow = LevelAlarmLow,
+                    ValueColor = ValueColor
+                },
                 "ContainerButton" => new ContainerButtonConfig 
                 { 
                     Children = (_existingConfig as ContainerButtonConfig)?.Children ?? new(),

@@ -36,11 +36,11 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 RealTimeTrendConfig c => new RealTimeTrendViewModel(c, _dataService, _projectContext),
                 PipeConfig c => new PipeWidgetViewModel(c, _dataService, _projectContext),
                 ValveConfig c => new ValveWidgetViewModel(c, _dataService, _projectContext),
-                TankConfig c => new TankWidgetViewModel(c, _dataService, _projectContext),
+                TankConfig c => new TankWidgetViewModel(c, _dataService, _projectContext, _themeService),
                 PumpConfig c => new PumpWidgetViewModel(c, _dataService, _projectContext),
                 HeatExchangerConfig c => new HeatExchangerWidgetViewModel(c, _dataService, _projectContext),
                 ReactorConfig c => new ReactorWidgetViewModel(c, _dataService, _projectContext, ChildWindowService, _themeService),
-                LevelSensorConfig c => new LevelSensorWidgetViewModel(c, _dataService, _projectContext),
+                LevelSensorConfig c => new LevelSensorWidgetViewModel(c, _dataService, _projectContext, _themeService),
                 _ => throw new ArgumentException($"Unknown widget config type: {config.GetType().Name}")
             };
 

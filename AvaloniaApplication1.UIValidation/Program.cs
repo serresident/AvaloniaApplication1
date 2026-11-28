@@ -4197,7 +4197,75 @@ public static class Program
                 rDataCore.Dispose();
             }
 
-            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (33/33) PASSED SUCCESSFULLY!");
+            // Test 34: Production TankControl & LevelSensorControl (ISA-101, Hi/Lo Alarms, Styles)
+            Console.WriteLine("[UIValidation] Testing Production Tank & LevelSensor Controls (Test 34)...");
+            {
+                // 34.1 TankConfig backward compatibility
+                var legacyTankJson = """{"Type":"Tank","Title":"T-101"}""";
+                var legacyTank = JsonSerializer.Deserialize<WidgetConfig>(legacyTankJson) as TankConfig
+                    ?? throw new Exception("Failed to deserialize legacy TankConfig");
+                if (!legacyTank.ShowAlarmMarkers || legacyTank.VesselStyle != "Cylindrical")
+                    throw new Exception("Legacy TankConfig defaults mismatch");
+
+                // 34.2 TankWidgetViewModel Hi/Lo alarms & ISA-101 color
+                var tCfg = new TankConfig
+                {
+                    Title = "T-201",
+                    Source = new DataSourceConfig { ConnId = "plc_t", Address = "40001" },
+                    MinValue = 0,
+                    MaxValue = 500,
+                    AlarmHigh = 450,
+                    AlarmLow = 50,
+                    VesselStyle = "Cylindrical"
+                };
+                var tDataCore = new MockDataCoreService();
+                var tThemeSvc = sp.GetRequiredService<IThemeService>();
+                using var tVm = new TankWidgetViewModel(tCfg, tDataCore, new ProjectContextService(), tThemeSvc);
+
+                tDataCore.PublishTag(new TagData("plc_t", "40001", 460.0, TagQuality.Good));
+                tVm.UpdateState();
+                if (!tVm.IsHighAlarm || tVm.IsLowAlarm || tVm.DisplayColor != "#DC2626")
+                    throw new Exception($"Expected Tank IsHighAlarm with #DC2626, got hi={tVm.IsHighAlarm}, color={tVm.DisplayColor}");
+
+                tDataCore.PublishTag(new TagData("plc_t", "40001", 30.0, TagQuality.Good));
+                tVm.UpdateState();
+                if (!tVm.IsLowAlarm || tVm.IsHighAlarm || tVm.DisplayColor != "#D97706")
+                    throw new Exception($"Expected Tank IsLowAlarm with #D97706, got lo={tVm.IsLowAlarm}, color={tVm.DisplayColor}");
+
+                // 34.3 LevelSensorControl ScadaControlBase & Hydrostatic/Hi-Lo alarms
+                var lsCfg = new LevelSensorConfig
+                {
+                    Title = "LT-301",
+                    Source = new DataSourceConfig { ConnId = "plc_t", Address = "40002" },
+                    SensorType = "Hydrostatic",
+                    TagNumber = "LT301",
+                    Unit = "m",
+                    MinValue = 0,
+                    MaxValue = 10,
+                    AlarmHigh = 8.5,
+                    AlarmLow = 1.5
+                };
+                using var lsVm = new LevelSensorWidgetViewModel(lsCfg, tDataCore, new ProjectContextService(), tThemeSvc);
+                tDataCore.PublishTag(new TagData("plc_t", "40002", 9.0, TagQuality.Good));
+                lsVm.UpdateState();
+                if (!lsVm.IsHighAlarm || !lsVm.IsAlarm || lsVm.DisplayColor != "#DC2626")
+                    throw new Exception($"Expected LevelSensor IsHighAlarm, got alarm={lsVm.IsAlarm}, color={lsVm.DisplayColor}");
+
+                var lsCtrl = new LevelSensorControl
+                {
+                    SensorType = "Hydrostatic",
+                    TagNumber = "LT301",
+                    Value = 9.0,
+                    AlarmHigh = 8.5,
+                    AlarmLow = 1.5
+                };
+                if (lsCtrl is not AvaloniaApplication1.Controls.Primitives.ScadaControlBase)
+                    throw new Exception("LevelSensorControl must inherit ScadaControlBase");
+
+                tDataCore.Dispose();
+            }
+
+            Console.WriteLine("[UIValidation] ALL AUTOMATED VALIDATIONS (34/34) PASSED SUCCESSFULLY!");
         }
     }
 

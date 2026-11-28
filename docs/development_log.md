@@ -18,6 +18,19 @@
 
 ---
 
+## 📅 28.11.2026 (Сессия 54)
+
+### 📌 Достижение: Продакшн-проработка `TankControl` и `LevelSensorControl`
+* **`TankControl` и `TankWidgetViewModel`:**
+  - `TankConfig` дополнен `AlarmHigh`, `AlarmLow`, `ShowAlarmMarkers`, `VesselStyle` (`Cylindrical` / `Rectangular`).
+  - В `TankControl` добавлены маркеры уставок Hi/Lo, цветовая индикация аварий/Offline, кэширование кастомной кисти `FillColor` (без аллокаций на кадре) и бейдж `[!]`; `TankWidgetViewModel` переведён на `TagValueConverter` и вычисляет `IsHighAlarm`/`IsLowAlarm`/`IsOffline`/`DisplayColor` с учётом `IndustrialGray`.
+* **`LevelSensorControl` и `LevelSensorWidgetViewModel`:**
+  - `LevelSensorControl` переведён на `ScadaControlBase`, поддерживает 3 темы (`Dark`, `Light`, `IndustrialGray`), кэширует `FormattedText` (нулевые аллокации), добавлена отрисовка гидростатического датчика (`Hydrostatic`), статус `IsOffline` и бейдж `[!]`.
+* **UI и Редактор:** шаблон `LevelSensorWidgetViewModel` в `DashboardView.axaml` обёрнут в `WidgetChrome`; в `WidgetEditorWindow` / `WidgetEditorViewModel` добавлены секции `ShowTankSettings` и `ShowLevelSensorSettings`.
+* **Верификация:** Сборка `AvaloniaApplication1.sln` — **0 ошибок, 0 предупреждений**. Все **34 из 34** тестов `UIValidation` пройдены успешно (включая новый Тест 34).
+
+---
+
 ## 📅 28.11.2026 (Сессия 53)
 
 ### 📌 Достижение: Продакшн-проработка `ReactorControl`, `ReactorWidgetViewModel` и фейсплейта `ReactorFaceplateView`

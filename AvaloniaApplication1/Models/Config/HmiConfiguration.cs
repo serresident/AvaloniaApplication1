@@ -271,6 +271,10 @@ namespace AvaloniaApplication1.Models.Config
         public string Format { get; set; } = "{0}";
         public double MinValue { get; set; } = 0;
         public double MaxValue { get; set; } = 100;
+        public double AlarmHigh { get; set; } = 90;
+        public double AlarmLow { get; set; } = 10;
+        public bool ShowAlarmMarkers { get; set; } = true;
+        public string VesselStyle { get; set; } = "Cylindrical"; // Cylindrical | Rectangular
         public string ValueColor { get; set; } = string.Empty;
         public double ValueFontSize { get; set; } = 0;
         public bool LabelInside { get; set; } = false;

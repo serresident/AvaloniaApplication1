@@ -1,8 +1,11 @@
-using AvaloniaApplication1.ViewModels.Core;
 using System;
+using System.ComponentModel;
 using System.Globalization;
+using Avalonia.Threading;
+using AvaloniaApplication1.Models;
 using AvaloniaApplication1.Models.Config;
 using AvaloniaApplication1.Services;
+using AvaloniaApplication1.ViewModels.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AvaloniaApplication1.ViewModels.Widgets
@@ -20,6 +23,20 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         [ObservableProperty]
         private bool _isAlarm;
 
+        [ObservableProperty]
+        private bool _isHighAlarm;
+
+        [ObservableProperty]
+        private bool _isLowAlarm;
+
+        [ObservableProperty]
+        private bool _isOffline;
+
+        [ObservableProperty]
+        private string _displayColor = "#FFFFFF";
+
+        private readonly IThemeService? _themeService;
+
         public string TagNumber => TypedConfig.TagNumber ?? "LT-101";
         public string SensorType => TypedConfig.SensorType ?? "Radar";
         public string Unit => TypedConfig.Unit ?? "%";
@@ -30,25 +47,53 @@ namespace AvaloniaApplication1.ViewModels.Widgets
         public string Format => string.IsNullOrEmpty(TypedConfig.Format) ? "{0:F1}" : TypedConfig.Format;
         public string ValueColor => string.IsNullOrEmpty(TypedConfig.ValueColor) ? "#FFFFFF" : TypedConfig.ValueColor;
 
-        public LevelSensorWidgetViewModel(LevelSensorConfig config, IDataCoreService dataService, IProjectContextService projectContext)
+        public LevelSensorWidgetViewModel(
+            LevelSensorConfig config,
+            IDataCoreService dataService,
+            IProjectContextService projectContext,
+            IThemeService? themeService = null)
             : base(config, dataService, projectContext)
         {
+            _themeService = themeService;
+            if (_themeService != null)
+            {
+                _themeService.PropertyChanged += OnThemePropertyChanged;
+            }
             UpdateState();
         }
 
-        protected override void OnTagValueUpdated(object newValue)
+        private void OnThemePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            UpdateState();
+            if (e.PropertyName == nameof(IThemeService.CurrentTheme) || e.PropertyName == nameof(IThemeService.IsIndustrialGrayTheme))
+            {
+                Dispatcher.UIThread.Post(UpdateState);
+            }
         }
 
-        private void UpdateState()
+        protected override void OnTagValueUpdated(object newValue) => UpdateState();
+        protected override void OnTagSnapshotUpdated(TagSnapshot snapshot) => UpdateState();
+
+        public void UpdateState()
         {
-            if (Source == null) return;
+            IsOffline = Quality == TagQuality.Bad || Quality == TagQuality.CommFailure || Quality == TagQuality.Timeout;
+
+            if (Source == null)
+            {
+                IsHighAlarm = false;
+                IsLowAlarm = false;
+                IsAlarm = false;
+                DisplayValue = "---";
+                UpdateDisplayColor();
+                return;
+            }
+
             var val = DataService.GetCurrentValue(Source.ConnId, Source.Address);
             if (val != null)
             {
                 CurrentValue = TagValueConverter.ToDouble(val);
-                IsAlarm = CurrentValue >= AlarmHigh || CurrentValue <= AlarmLow;
+                IsHighAlarm = !IsOffline && CurrentValue >= AlarmHigh;
+                IsLowAlarm = !IsOffline && CurrentValue <= AlarmLow;
+                IsAlarm = IsHighAlarm || IsLowAlarm;
                 try
                 {
                     DisplayValue = $"{string.Format(CultureInfo.InvariantCulture, Format, CurrentValue)} {Unit}";
@@ -60,8 +105,28 @@ namespace AvaloniaApplication1.ViewModels.Widgets
             }
             else
             {
+                IsHighAlarm = false;
+                IsLowAlarm = false;
+                IsAlarm = false;
                 DisplayValue = "---";
             }
+
+            UpdateDisplayColor();
+        }
+
+        private void UpdateDisplayColor()
+        {
+            bool isGray = _themeService?.IsIndustrialGrayTheme == true ||
+                          string.Equals(Avalonia.Application.Current?.ActualThemeVariant?.Key?.ToString(), "IndustrialGray", StringComparison.OrdinalIgnoreCase);
+
+            if (IsOffline)
+                DisplayColor = "#6B7280";
+            else if (IsHighAlarm)
+                DisplayColor = "#DC2626";
+            else if (IsLowAlarm)
+                DisplayColor = "#D97706";
+            else
+                DisplayColor = isGray ? "#334155" : ValueColor;
         }
 
         public override void UpdateFromConfig(WidgetConfig newConfig)
@@ -89,6 +154,15 @@ namespace AvaloniaApplication1.ViewModels.Widgets
                 OnPropertyChanged(nameof(ValueColor));
                 UpdateState();
             }
+        }
+
+        public override void Dispose()
+        {
+            if (_themeService != null)
+            {
+                _themeService.PropertyChanged -= OnThemePropertyChanged;
+            }
+            base.Dispose();
         }
     }
 }

@@ -774,6 +774,63 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Tank Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowTankSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Настройки ёмкости (Tank)" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Форма корпуса" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableTankVesselStyles}" SelectedItem="{Binding TankVesselStyle}" HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <CheckBox Grid.Column="2" Content="Маркеры уставок Hi/Lo" IsChecked="{Binding TankShowAlarmMarkers}" VerticalAlignment="Bottom" Margin="0,0,0,4" Foreground="LightGray" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="Верхняя уставка (AlarmHigh)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding TankAlarmHigh}" Minimum="-10000" Maximum="100000" Increment="5" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="2">
+                                <TextBlock Text="Нижняя уставка (AlarmLow)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding TankAlarmLow}" Minimum="-10000" Maximum="100000" Increment="5" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- LevelSensor Settings -->
+                <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
+                        IsVisible="{Binding ShowLevelSensorSettings}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Настройки датчика уровня (LT)" Foreground="#00AAFF" FontSize="14" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,8,*,8,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Тип датчика" Foreground="#AAAAAA" FontSize="11" />
+                                <ComboBox ItemsSource="{Binding AvailableLevelSensorTypes}" SelectedItem="{Binding LevelSensorType}" HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="Позиция (TagNumber)" Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding LevelTagNumber}" PlaceholderText="LT-101" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="4" Spacing="4">
+                                <TextBlock Text="Ед. изм." Foreground="#AAAAAA" FontSize="11" />
+                                <TextBox Text="{Binding LevelUnit}" PlaceholderText="%" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="Верхний порог (AlarmHigh)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding LevelAlarmHigh}" Minimum="-10000" Maximum="100000" Increment="5" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="2">
+                                <TextBlock Text="Нижний порог (AlarmLow)" Foreground="#AAAAAA" FontSize="11" />
+                                <NumericUpDown Value="{Binding LevelAlarmLow}" Minimum="-10000" Maximum="100000" Increment="5" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
                 <!-- Industrial Color Settings -->
                 <Border Background="#2D2D30" CornerRadius="6" Padding="12" Margin="0,4"
                         IsVisible="{Binding ShowIndustrialSettings}">
